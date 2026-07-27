@@ -555,6 +555,19 @@ body {
   .panel-left .panel-card { flex-shrink:0; min-width:160px; }
   .panel-left .panel-card:last-child { display:none; }
   .board-3d { width:min(94vw, 58vh); }
+  /* === 移动端渲染优化：关闭 3D，压平合成层 === */
+  .board-wrap { perspective:none; }
+  .board-3d { transform-style:flat; transform:none !important; }
+  .board-3d::before { transform:none; box-shadow:0 8px 20px rgba(var(--sc),.25); }
+  .board { transform-style:flat; }
+  .tile { transform-style:flat; }
+  .tile .face { transform:none; }
+  .tile .ring { transform:none; }
+  .tile .corner { transform:none; }
+  .tile.special-bomb .badge, .tile.special-rainbow .badge { transform:none; }
+  .tile.special-bomb::after, .tile.special-rainbow::after { transform:none; }
+  .fx-layer { transform:none; }
+  .float-layer { transform:none; }
   /* 移动端合成降本：移除实时毛玻璃，用纯色背景 */
   .panel-card, .hud-stat { backdrop-filter:none; -webkit-backdrop-filter:none; background:var(--surface); }
   .level-pill { backdrop-filter:none; -webkit-backdrop-filter:none; background:var(--surface-2); }
@@ -563,6 +576,20 @@ body {
   .board { box-shadow: inset 0 2px 8px rgba(var(--sc),.12), 0 8px 20px rgba(var(--sc),.18); }
   .board-3d::before { box-shadow:0 12px 24px rgba(var(--sc),.25); }
   .board { contain:layout paint style; }
+  /* 移除静止时持续 filter 动画（手机 GPU 杀手） */
+  .tile.selected { filter:none; }
+  .tile.selected .face { animation:none; transform:scale(1.04); }
+  .tile.pre-clear .face { animation:none; transform:scale(1.1); }
+  .tile.special-bomb .badge { animation:none; }
+  .tile.special-rainbow .badge { animation:none; }
+  .tile.special-bomb::after, .tile.special-rainbow::after { animation:none; opacity:.4; }
+  .tile .face { box-shadow: var(--tile-shadow); }
+  .tile .corner { box-shadow:none; }
+  /* 移动端消除/生成动画用 2D 简化版（无 translateZ/filter） */
+  .tile.removing { animation: remove2d .32s ease-in forwards; }
+  .tile.spawning { animation: spawn2d .32s var(--ease-bounce); }
+  @keyframes remove2d { 0%{transform:translate(var(--tx),var(--ty)) scale(1); opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(0) rotate(90deg); opacity:0} }
+  @keyframes spawn2d { 0%{transform:translate(var(--tx),var(--ty)) scale(.3); opacity:0} 60%{transform:translate(var(--tx),var(--ty)) scale(1.1); opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(1); opacity:1} }
 }
 @media (max-width: 480px) {
   .topbar { padding:8px 12px 4px; gap:8px; }

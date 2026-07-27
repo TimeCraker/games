@@ -11,6 +11,10 @@ const SWAP_DUR = 260, REMOVE_DUR = 420, FALL_DUR = 320, GAP = 8, PAD = 10, SWIPE
 const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./assets/faces/face2.jpg','./assets/faces/face3.jpg'];
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, BOMB:1, RAINBOW:2 };
+// 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
+const IS_MOBILE = matchMedia('(max-width:960px)').matches;
+const Z_TILE = IS_MOBILE ? 0 : 8;
+const Z_DRAG = IS_MOBILE ? 0 : 18;
 
 // ---------- SVG 图标系统 ----------
 const SVG = {
@@ -201,14 +205,14 @@ function makeTile(r,c,type,special=SPECIAL.NONE){
   if(special!==SPECIAL.NONE){ const badge=document.createElement('span'); badge.className='badge'; badge.innerHTML=ic(special===SPECIAL.BOMB?'bomb':'rainbow'); el.appendChild(badge); }
   const {x,y}=posOf(r,c);
   el.style.setProperty('--tx',x+'px'); el.style.setProperty('--ty',y+'px');
-  el.style.transform=`translate3d(${x}px,${y}px,8px)`;
+  el.style.transform=`translate3d(${x}px,${y}px,${Z_TILE}px)`;
   el.style.width=el.style.height=tileSize+'px';
   bindInput(el); boardEl.appendChild(el); return el;
 }
 function placeTile(t,r,c,animate=true){
   const {x,y}=posOf(r,c); t.el.dataset.r=r; t.el.dataset.c=c;
   t.el.style.setProperty('--tx',x+'px'); t.el.style.setProperty('--ty',y+'px');
-  t.el.style.transform=`translate3d(${x}px,${y}px,8px)`;
+  t.el.style.transform=`translate3d(${x}px,${y}px,${Z_TILE}px)`;
   if(!animate) t.el.style.transition='none';
   return sleep(animate?SWAP_DUR:0).then(()=>{ if(!animate) t.el.style.transition=''; });
 }
@@ -375,7 +379,7 @@ async function dropAndFill(){
   for(let c=0;c<COLS;c++){ let write=ROWS-1;
     for(let r=ROWS-1;r>=0;r--){ if(board[r][c]){ if(r!==write){ board[write][c]=board[r][c]; board[r][c]=null; placeTile(board[write][c],write,c,true);} write--; } }
     for(let r=write;r>=0;r--){ const type=rnd(TYPES); const el=makeTile(r,c,type,SPECIAL.NONE);
-      const startY=-(write-r+1)*cellUnit; el.style.transition='none'; el.style.transform=`translate3d(${c*cellUnit}px,${startY}px,8px)`;
+      const startY=-(write-r+1)*cellUnit; el.style.transition='none'; el.style.transform=`translate3d(${c*cellUnit}px,${startY}px,${Z_TILE}px)`;
       board[r][c]={type,special:SPECIAL.NONE,el}; newTiles.push({tile:board[r][c],r,c}); }
   }
   await sleep(20);
@@ -385,7 +389,7 @@ async function dropAndFill(){
 
 // ---------- 粒子 ----------
 const ctx=fxCanvas.getContext('2d'); let particles=[]; let particleRAF=null;
-const isMobile = matchMedia('(max-width:960px)').matches;
+const isMobile = IS_MOBILE;
 let dpr = Math.min(window.devicePixelRatio||1, Q.dpr);   // fx canvas 效果 DPR
 let bgDpr = Math.min(window.devicePixelRatio||1, isMobile?1.25:1.5); // 背景 canvas DPR
 const MAX_PARTICLES = isMobile?96:160;
@@ -508,7 +512,7 @@ function flushDrag(){
   dragRAF=null;
   if(!drag) return;
   const {x,y}=posOf(drag.r,drag.c);
-  drag.el.style.transform=`translate3d(${x+drag.dx}px,${y+drag.dy}px,18px) scale(1.05)`;
+  drag.el.style.transform=`translate3d(${x+drag.dx}px,${y+drag.dy}px,${Z_DRAG}px) scale(1.05)`;
 }
 function onUp(e){
   if(!drag) return;
@@ -799,7 +803,7 @@ let resizeTimer=null;
 window.addEventListener('resize',()=>{ clearTimeout(resizeTimer); resizeTimer=setTimeout(()=>{ if(!$('gameShell').hidden){ measure(); resizeFx(); relayoutAll(); } resizeBgCanvas(); },100); });
 // 棋盘尺寸变化时重设特效 canvas（仅在游戏中）
 if('ResizeObserver' in window){ new ResizeObserver(()=>{ if(!$('gameShell').hidden) resizeFx(); }).observe(boardEl); }
-function relayoutAll(){ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r]?.[c]; if(!t) continue; const{x,y}=posOf(r,c); t.el.style.width=t.el.style.height=tileSize+'px'; t.el.style.setProperty('--tx',x+'px'); t.el.style.setProperty('--ty',y+'px'); t.el.style.transform=`translate3d(${x}px,${y}px,8px)`; } }
+function relayoutAll(){ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r]?.[c]; if(!t) continue; const{x,y}=posOf(r,c); t.el.style.width=t.el.style.height=tileSize+'px'; t.el.style.setProperty('--tx',x+'px'); t.el.style.setProperty('--ty',y+'px'); t.el.style.transform=`translate3d(${x}px,${y}px,${Z_TILE}px)`; } }
 document.addEventListener('touchmove',e=>{ if(e.touches.length>1) e.preventDefault(); },{passive:false});
 document.addEventListener('gesturestart',e=>e.preventDefault());
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&(state==='playing'||state==='paused')){ state==='playing'?pauseGame():resumeGame(); } });
