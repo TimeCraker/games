@@ -1,5 +1,5 @@
 // 桓睿消消乐 Service Worker - 离线缓存
-const CACHE = 'xxl-v2.8';
+const CACHE = 'xxl-v2.9';
 const ASSETS = [
   './',
   './index.html',

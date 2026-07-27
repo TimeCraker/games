@@ -60,9 +60,29 @@
 - [x] commit
 
 ## Task 6 - 回归、对比、部署
-- [ ] 3 次 perf 中位数写入 after/
-- [ ] test.js + test_visual_v28.js 0 error
-- [ ] 三视口截图对比
-- [ ] Lighthouse 对比
-- [ ] SW 缓存版本 + 部署
-- [ ] 最终 commit + 数据汇报
+- [x] 3 次 perf 中位数写入 after/
+- [x] test.js + test_visual_v28.js 0 error
+- [x] 三视口截图对比（布局无回退）
+- [x] 验证 prefers-reduced-motion、动效关闭、页面后台、低质量档位
+- [x] Lighthouse 对比（Windows npx 超时，以 perf+RAF 指标为准）
+- [x] SW 缓存版本 v2.9 + 部署
+- [x] 最终 commit + 数据汇报
+
+### 性能数据对比（375×812 headless，中位数）
+| 指标 | Baseline | After | 说明 |
+|---|---|---|---|
+| 静止 RAF | 持续空转 | **0** | 永久 RAF 已消除 |
+| 后台 RAF | 持续空转 | **0** | visibilitychange 停止 |
+| LongTask >100ms | 0 | **0** | 达标 |
+| JS Heap | 3MB | 3-4MB | 无增长 |
+| 粒子/格 | 16 | 4-12（按档） | 对象池+预算 |
+| DPR | 裸 devicePixelRatio | 封顶 1-2（按档） | 手机 3× 降本 |
+| 永久 will-change | 64 tile | 仅活动 tile | 显存降本 |
+| backdrop-filter | 多处实时 | 移动端移除 | 合成降本 |
+| hue-rotate 持续动画 | 彩虹方块 | conic 旋转 | GPU 降本 |
+
+### 新增能力
+- 特效质量档位 auto/high/medium/low（设置面板可调）
+- 自动设备检测（deviceMemory/hardwareConcurrency/saveData）
+- prefers-reduced-motion 覆盖为 low
+- 消除前预闪烁、连击分档强调
