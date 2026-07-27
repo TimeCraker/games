@@ -1,0 +1,109 @@
+// 自动化测试：用系统 Chrome 打开游戏，检查无 JS 错误、DOM 结构、模拟交换
+const { chromium } = require('playwright');
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+const PUB = path.join(__dirname, '..', 'public');
+const PORT = 8231;
+const MIME = { '.html':'text/html', '.css':'text/css', '.js':'application/javascript', '.jpg':'image/jpeg', '.png':'image/png', '.webmanifest':'application/manifest+json' };
+
+function startServer() {
+  return new Promise(resolve => {
+    const srv = http.createServer((req, res) => {
+      let p = decodeURIComponent(req.url.split('?')[0]);
+      if (p === '/') p = '/index.html';
+      const fp = path.join(PUB, p);
+      fs.readFile(fp, (err, data) => {
+        if (err) { res.writeHead(404); res.end('404'); return; }
+        res.writeHead(200, { 'Content-Type': MIME[path.extname(fp)] || 'application/octet-stream' });
+        res.end(data);
+      });
+    });
+    srv.listen(PORT, () => resolve(srv));
+  });
+}
+
+(async () => {
+  const srv = await startServer();
+  console.log('server on', PORT);
+  const shotsDir = path.join(__dirname, 'screenshots');
+  fs.mkdirSync(shotsDir, { recursive: true });
+
+  const errors = [];
+  const browser = await chromium.launch({ channel: 'chrome', headless: true });
+  const page = await browser.newPage({ viewport: { width: 420, height: 860 }, deviceScaleFactor: 2 });
+  page.on('console', m => { if (m.type() === 'error') errors.push('CONSOLE: ' + m.text()); });
+  page.on('pageerror', e => errors.push('PAGEERROR: ' + e.message));
+
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(500);
+
+  // 截图：开场遮罩
+  await page.screenshot({ path: path.join(shotsDir, '01-start.png') });
+
+  // 检查 tile 数量（开场遮罩在，但 tile 已生成）
+  const tileCount = await page.locator('.tile').count();
+  console.log('tile count:', tileCount);
+
+  // 点开始
+  await page.click('#startBtn');
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: path.join(shotsDir, '02-board.png') });
+
+  // 检查棋盘数据：通过 DOM 读取 tile 的 r/c/type
+  const boardInfo = await page.evaluate(() => {
+    const tiles = [...document.querySelectorAll('.tile')];
+    return tiles.map(t => ({ r: +t.dataset.r, c: +t.dataset.c, type: +t.dataset.type, cls: t.className }));
+  });
+  console.log('first 3 tiles:', JSON.stringify(boardInfo.slice(0, 3)));
+
+  // 模拟交换：找两个相邻方块，用 pointer 事件
+  // 取 (0,0) 和 (0,1)
+  async function swap(r1, c1, r2, c2) {
+    const t1 = page.locator(`.tile[data-r="${r1}"][data-c="${c1}"]`);
+    const t2 = page.locator(`.tile[data-r="${r2}"][data-c="${c2}"]`);
+    const b1 = await t1.boundingBox();
+    const b2 = await t2.boundingBox();
+    if (!b1 || !b2) return null;
+    // 在 t1 中心按下，滑到 t2 中心抬起
+    await page.mouse.move(b1.x + b1.width/2, b1.y + b1.height/2);
+    await page.mouse.down();
+    await page.mouse.move(b2.x + b2.width/2, b2.y + b2.height/2, { steps: 6 });
+    await page.mouse.up();
+    await page.waitForTimeout(1200);
+    return true;
+  }
+
+  const scoreBefore = await page.textContent('#score');
+  // 尝试若干次随机相邻交换，直到分数变化
+  let moved = false;
+  for (let i = 0; i < 12 && !moved; i++) {
+    const r = Math.floor(Math.random() * 8), c = Math.floor(Math.random() * 7);
+    await swap(r, c, r, c + 1);
+    const s = await page.textContent('#score');
+    if (s !== scoreBefore) { moved = true; console.log(`swap (${r},${c})<->(${r},${c+1}) score ${scoreBefore} -> ${s}`); }
+  }
+  await page.screenshot({ path: path.join(shotsDir, '03-after-swap.png') });
+  const scoreAfter = await page.textContent('#score');
+  console.log('score before/after:', scoreBefore, scoreAfter, moved ? '(有消除)' : '(未触发消除)');
+
+  // 切换主题
+  await page.click('#themeBtn');
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: path.join(shotsDir, '04-dark.png') });
+  const theme = await page.evaluate(() => document.documentElement.dataset.theme);
+  console.log('theme after toggle:', theme);
+
+  // 移动端视口再截一张
+  await page.setViewportSize({ width: 380, height: 740 });
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: path.join(shotsDir, '05-mobile.png') });
+
+  console.log('ERRORS:', errors.length);
+  errors.forEach(e => console.log('  ', e));
+
+  await browser.close();
+  srv.close();
+  process.exit(errors.length ? 1 : 0);
+})().catch(e => { console.error('TEST CRASH:', e); process.exit(2); });

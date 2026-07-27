@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f5f7fa">
+<meta name="description" content="桓睿消消乐 - 立体三消游戏">
+<title>桓睿消消乐</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./assets/faces/face0.jpg">
+<link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div class="app">
+  <!-- 顶部栏 -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">✦</span>
+      <span class="brand-title">桓睿消消乐</span>
+    </div>
+    <div class="actions">
+      <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题">
+        <span class="ico ico-theme">🌙</span>
+      </button>
+      <button class="icon-btn" id="soundBtn" title="开关声音" aria-label="开关声音">
+        <span class="ico ico-sound">🔊</span>
+      </button>
+      <button class="icon-btn" id="restartBtn" title="重新开始" aria-label="重新开始">
+        <span class="ico ico-restart">↻</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 主舞台 -->
+  <main class="stage">
+    <!-- HUD -->
+    <div class="hud">
+      <div class="hud-card score-card">
+        <div class="hud-label">分数</div>
+        <div class="hud-value" id="score">0</div>
+      </div>
+      <div class="hud-card target-card">
+        <div class="hud-label">目标进度</div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressBar"></div>
+          <div class="progress-text" id="progressText">0 / 1500</div>
+        </div>
+      </div>
+      <div class="hud-card combo-card" id="comboCard">
+        <div class="hud-label">连击</div>
+        <div class="hud-value combo-value" id="combo">×1</div>
+      </div>
+    </div>
+
+    <!-- 棋盘 -->
+    <div class="board-wrap" id="boardWrap">
+      <div class="board-3d">
+        <div class="board" id="board"></div>
+        <canvas class="fx-layer" id="fxCanvas"></canvas>
+        <div class="float-layer" id="floatLayer"></div>
+      </div>
+    </div>
+
+    <div class="hint" id="hint">滑动或点选相邻方块进行交换 · 三个及以上同款连成一线即可消除</div>
+  </main>
+
+  <!-- 开场遮罩 -->
+  <div class="overlay" id="startOverlay">
+    <div class="overlay-card">
+      <h1 class="overlay-title">桓睿消消乐</h1>
+      <p class="overlay-sub">把帅脸三连消除，达成目标分数即可通关</p>
+      <div class="overlay-tips">
+        <div class="tip-row"><span class="tip-badge">基本</span>交换相邻方块，3+ 同款连成线消除</div>
+        <div class="tip-row"><span class="tip-badge">炸弹</span>连成 4 个 → 生成炸弹，爆炸清除周围</div>
+        <div class="tip-row"><span class="tip-badge">彩虹</span>连成 5 个 → 生成彩虹球，清除全场同款</div>
+        <div class="tip-row"><span class="tip-badge">连击</span>连续消除分数倍增，追求 COMBO！</div>
+      </div>
+      <button class="primary-btn" id="startBtn">开始游戏</button>
+    </div>
+  </div>
+
+  <!-- 通关弹窗 -->
+  <div class="modal" id="winModal">
+    <div class="modal-card">
+      <div class="modal-emoji">🎉</div>
+      <h2 class="modal-title">恭喜通关</h2>
+      <p class="modal-sub">你的最终分数</p>
+      <div class="modal-score" id="finalScore">0</div>
+      <div class="modal-stats" id="modalStats"></div>
+      <button class="primary-btn" id="playAgainBtn">再来一局</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+</div>
+<script src="./game.js"></script>
+</body>
+</html>
