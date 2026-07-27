@@ -540,6 +540,11 @@ body {
 .range::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:linear-gradient(135deg,var(--c),var(--p)); cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.2); }
 .range::-moz-range-thumb { width:18px; height:18px; border:none; border-radius:50%; background:linear-gradient(135deg,var(--c),var(--p)); cursor:pointer; }
 .select { font-family:inherit; font-size:13px; font-weight:600; color:var(--text); background:var(--cell-bg); border:1px solid var(--line); border-radius:10px; padding:6px 10px; cursor:pointer; outline:none; }
+.music-picker { display:flex; align-items:center; gap:8px; }
+.music-btn { width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:var(--cell-bg); color:var(--text); font-size:18px; line-height:1; cursor:pointer; display:grid; place-items:center; transition:background .2s,transform .15s; }
+.music-btn:hover { background:var(--surface-2); }
+.music-btn:active { transform:scale(.9); }
+.music-label { font-size:13px; font-weight:600; color:var(--text-soft); min-width:84px; text-align:center; }
 
 /* 减少动效（设置关闭时） */
 .reduce-motion * { animation-duration:.01ms !important; transition-duration:.08s !important; }

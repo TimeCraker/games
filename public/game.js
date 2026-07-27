@@ -94,6 +94,14 @@ let selected=null;
 let bgIdx=0, soundOn=true;
 let state='menu';
 let audioCtx=null, masterGain=null, bgOsc=null, bgGain=null;
+// 背景音乐（MP3 列表播放）
+const MUSIC_LIST = [
+  { file:'bgm1.mp3', name:'Puzzle Loop' },
+  { file:'bgm2.mp3', name:'Puzzle Bright' },
+  { file:'bgm3.mp3', name:'8-Bit Game' },
+  { file:'bgm4.mp3', name:'Retro Arcade' },
+];
+let bgAudio=null, musicIdx=0;
 
 const SAVE = {
   get unlocked(){ return +localStorage.getItem('xxl-unlocked')||1; },
@@ -617,22 +625,21 @@ const sfx=(()=>{
   };
 })();
 function startBgMusic(){
-  if(!settings.music||bgOsc) return; sfx.init(); const a=audioCtx;
-  masterGain.gain.value = settings.volume/100;
-  // 和弦 pad: C-E-G (C大和弦) 多振荡器
-  bgGain=a.createGain(); bgGain.gain.value=0; const filt=a.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=700;
-  bgGain.connect(filt); filt.connect(masterGain);
-  bgOsc=[];
-  [130.8,164.8,196].forEach((freq,i)=>{ // C3 E3 G3
-    const o=a.createOscillator(); o.type=i===0?'sine':'triangle'; o.frequency.value=freq;
-    const g=a.createGain(); g.gain.value=i===0?0.5:0.28;
-    o.connect(g); g.connect(bgGain); o.start(); bgOsc.push(o);
-    // 轻微颤音
-    const lfo=a.createOscillator(); const lfoG=a.createGain(); lfo.frequency.value=0.12+i*0.03; lfoG.gain.value=2.5; lfo.connect(lfoG); lfoG.connect(o.frequency); lfo.start(); bgOsc.push(lfo);
-  });
-  bgGain.gain.linearRampToValueAtTime(0.05,a.currentTime+2);
+  if(!settings.music) return;
+  if(!bgAudio){ bgAudio=new Audio(); bgAudio.loop=true; bgAudio.preload='auto'; }
+  bgAudio.src=`./assets/music/${MUSIC_LIST[musicIdx].file}`;
+  bgAudio.volume = (settings.volume/100)*0.55; // BGM 比音效略低
+  bgAudio.play().catch(()=>{});
+  updateMusicLabel();
 }
-function stopBgMusic(){ if(bgOsc){ try{ bgGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.5); bgOsc.forEach(o=>{try{o.stop(audioCtx.currentTime+0.6);}catch(e){}});}catch(e){} bgOsc=null; bgGain=null; } }
+function stopBgMusic(){ if(bgAudio){ bgAudio.pause(); } }
+function switchMusic(idx){
+  musicIdx = (idx+MUSIC_LIST.length)%MUSIC_LIST.length;
+  localStorage.setItem('xxl-music-idx',musicIdx);
+  if(bgAudio&&settings.music){ bgAudio.src=`./assets/music/${MUSIC_LIST[musicIdx].file}`; bgAudio.play().catch(()=>{}); }
+  updateMusicLabel();
+}
+function updateMusicLabel(){ const el=$('musicLabel'); if(el) el.textContent=MUSIC_LIST[musicIdx].name; }
 
 // ---------- 背景粒子 ----------
 const bgCtx=bgParticles.getContext('2d'); let bgStars=[]; let bgStarRAF=null;
@@ -785,10 +792,12 @@ function openSettings(){ showModal('modalSettings'); syncSettingsUI(); sfx.btn()
 function syncSettingsUI(){
   $('setSfx').checked=settings.sfx; $('setMusic').checked=settings.music; $('setVol').value=settings.volume;
   $('setMotion').checked=settings.motion; $('setHaptic').checked=settings.haptic; $('setQuality').value=settings.quality;
+  updateMusicLabel();
 }
 function applySettings(){
   if(masterGain) masterGain.gain.value=settings.volume/100;
-  if(!settings.music) stopBgMusic(); else if(state==='playing'&&!bgOsc) startBgMusic();
+  if(!settings.music) stopBgMusic(); else if(state==='playing'&&(!bgAudio||bgAudio.paused)) startBgMusic();
+  if(bgAudio) bgAudio.volume=(settings.volume/100)*0.55;
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
   Q = QUALITY_PRESETS[resolveQuality()];
   if(!$('gameShell').hidden){ resizeFx(); }
@@ -801,10 +810,12 @@ $('pauseSettingsBtn').onclick=()=>{ hideAllModal(); openSettings(); };
 $('settingsClose').onclick=()=>{ hideAllModal(); sfx.btn(); if(state==='playing') scheduleHint(); };
 $('setSfx').onchange=e=>{ settings.sfx=e.target.checked; settings.save(); soundOn=settings.sfx; applySettings(); sfx.btn(); };
 $('setMusic').onchange=e=>{ settings.music=e.target.checked; settings.save(); applySettings(); sfx.btn(); };
-$('setVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); if(masterGain) masterGain.gain.value=settings.volume/100; };
+$('setVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); if(masterGain) masterGain.gain.value=settings.volume/100; if(bgAudio) bgAudio.volume=(settings.volume/100)*0.55; };
 $('setMotion').onchange=e=>{ settings.motion=e.target.checked; settings.save(); applySettings(); };
 $('setHaptic').onchange=e=>{ settings.haptic=e.target.checked; settings.save(); if(settings.haptic) haptic(30); };
 $('setQuality').onchange=e=>{ settings.quality=e.target.value; settings.save(); applySettings(); sfx.btn(); };
+$('musicPrev').onclick=()=>{ switchMusic(musicIdx-1); sfx.btn(); };
+$('musicNext').onclick=()=>{ switchMusic(musicIdx+1); sfx.btn(); };
 
 let resizeTimer=null;
 window.addEventListener('resize',()=>{ clearTimeout(resizeTimer); resizeTimer=setTimeout(()=>{ if(!$('gameShell').hidden){ measure(); resizeFx(); relayoutAll(); } resizeBgCanvas(); },100); });
@@ -824,6 +835,7 @@ function start(){
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
   syncBgStars();
   initBgStars(); syncBgStars();
+  musicIdx = Math.min(+localStorage.getItem('xxl-music-idx')||0, MUSIC_LIST.length-1);
   // 预解码方块图，避免首次交换/洗牌解码抖动
   FACE_IMG.forEach(src=>{ const img=new Image(); img.src=src; img.decode&&img.decode().catch(()=>{}); });
   gotoMenu();
