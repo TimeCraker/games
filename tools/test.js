@@ -6,7 +6,7 @@ const path = require('path');
 
 const PUB = path.join(__dirname, '..', 'public');
 const PORT = 8231;
-const MIME = { '.html':'text/html', '.css':'text/css', '.js':'application/javascript', '.jpg':'image/jpeg', '.png':'image/png', '.webmanifest':'application/manifest+json' };
+const MIME = { '.html':'text/html', '.css':'text/css', '.js':'application/javascript', '.jpg':'image/jpeg', '.png':'image/png', '.webp':'image/webp', '.webmanifest':'application/manifest+json' };
 
 function startServer() {
   return new Promise(resolve => {
@@ -45,6 +45,13 @@ function startServer() {
   // 检查主菜单存在
   const menuVisible = await page.locator('#screenMenu').isVisible();
   console.log('menu visible:', menuVisible);
+
+  // 全局主题按钮只在菜单/关卡页显示，先在主菜单验证切换
+  const themeBefore = await page.evaluate(() => document.documentElement.dataset.theme);
+  await page.click('#themeBtn');
+  await page.waitForTimeout(300);
+  const themeAfter = await page.evaluate(() => document.documentElement.dataset.theme);
+  console.log('theme toggle in menu:', themeBefore, '->', themeAfter);
 
   // 点 "继续闯关/开始游戏" 进入第1关（会经过入场动画）
   await page.click('#menuContinue');
@@ -90,13 +97,6 @@ function startServer() {
   await page.screenshot({ path: path.join(shotsDir, '03-after-swap.png') });
   const scoreAfter = await page.textContent('#score');
   console.log('score before/after:', scoreBefore, scoreAfter, moved ? '(有消除)' : '(未触发消除)');
-
-  // 切换主题
-  await page.click('#themeBtn');
-  await page.waitForTimeout(400);
-  await page.screenshot({ path: path.join(shotsDir, '04-dark.png') });
-  const theme = await page.evaluate(() => document.documentElement.dataset.theme);
-  console.log('theme after toggle:', theme);
 
   // 移动端视口再截一张
   await page.setViewportSize({ width: 380, height: 740 });

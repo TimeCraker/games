@@ -58,13 +58,18 @@ def main():
         result.save(output, "JPEG", quality=92, optimize=True, progressive=True)
         print(f"face{index}: {path.name} {box} -> {output}")
 
-    # Cinematic menu cover. Preserve the original composition and optimize for web.
-    hero = Image.open(sunset).convert("RGB")
-    hero = ImageEnhance.Contrast(hero).enhance(1.04)
-    hero = ImageEnhance.Color(hero).enhance(1.06)
-    hero.thumbnail((1920, 1080), Image.Resampling.LANCZOS)
-    hero.save(BG_DIR / "hero-sunset.webp", "WEBP", quality=84, method=6)
-    print(f"hero: {sunset.name} -> {BG_DIR / 'hero-sunset.webp'}")
+    # Theme covers: use only the two illustrations, never personal photos.
+    desktop_hero = Image.open(anime).convert("RGB")
+    desktop_hero = ImageEnhance.Contrast(desktop_hero).enhance(1.04)
+    desktop_hero = ImageEnhance.Color(desktop_hero).enhance(1.08)
+    desktop_hero.save(BG_DIR / "hero-anime-desktop.webp", "WEBP", quality=85, method=6)
+
+    mobile_hero = Image.open(minecraft).convert("RGB")
+    mobile_hero = ImageEnhance.Contrast(mobile_hero).enhance(1.04)
+    mobile_hero = ImageEnhance.Color(mobile_hero).enhance(1.06)
+    mobile_hero.save(BG_DIR / "hero-anime-mobile.webp", "WEBP", quality=86, method=6)
+    print(f"desktop hero: {anime.name} -> {BG_DIR / 'hero-anime-desktop.webp'}")
+    print(f"mobile hero: {minecraft.name} -> {BG_DIR / 'hero-anime-mobile.webp'}")
 
 
 if __name__ == "__main__":

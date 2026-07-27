@@ -112,7 +112,7 @@ body {
 @keyframes neonPulse { 0%{opacity:.6} 100%{opacity:1} }
 
 .bg-photo {
-  background-image: url('./assets/backgrounds/hero-sunset.webp');
+  background-image: url('./assets/backgrounds/hero-anime-desktop.webp');
   background-size: cover; background-position: center;
   filter: blur(18px) brightness(.55) saturate(1.1);
   transform: scale(1.15);
@@ -140,9 +140,10 @@ body {
 
 /* 全局顶栏（主菜单+游戏都可用，z-index高于screen） */
 .global-bar {
-  position: fixed; top: env(safe-area-inset-top); right: 14px; z-index: 160;
-  display: flex; gap: 7px;
+  position:fixed; top:env(safe-area-inset-top); right:14px; z-index:160;
+  display:flex; gap:7px; transition:opacity .2s var(--ease-out),transform .2s var(--ease-out),visibility .2s;
 }
+.game-active .global-bar { opacity:0; visibility:hidden; pointer-events:none; transform:translateY(-8px); }
 
 .topbar {
   display:flex; align-items:center; justify-content:space-between;
@@ -329,22 +330,22 @@ body {
 .screen-menu { padding:0; overflow:hidden; color:#fff; background:#131923; }
 .screen-menu::before {
   content:""; position:absolute; inset:-2%;
-  background:url('./assets/backgrounds/hero-sunset.webp') 43% center / cover no-repeat;
+  background:url('./assets/backgrounds/hero-anime-desktop.webp') center / cover no-repeat;
   transform:scale(1.03); transition:transform 8s ease-out;
 }
 .screen-menu.show::before { transform:scale(1); }
 .screen-menu::after {
   content:""; position:absolute; inset:0;
   background:
-    linear-gradient(90deg,rgba(8,12,19,.80) 0%,rgba(8,12,19,.28) 54%,rgba(8,12,19,.08) 100%),
-    linear-gradient(0deg,rgba(8,12,19,.88) 0%,transparent 56%),
-    linear-gradient(180deg,rgba(8,12,19,.42) 0%,transparent 28%);
+    linear-gradient(270deg,rgba(7,10,20,.82) 0%,rgba(7,10,20,.30) 53%,rgba(7,10,20,.06) 100%),
+    linear-gradient(0deg,rgba(7,10,20,.84) 0%,transparent 54%),
+    linear-gradient(180deg,rgba(7,10,20,.38) 0%,transparent 28%);
 }
 .menu-cover {
   position:relative; z-index:2; width:100%; height:100%; max-width:1440px; margin:0 auto;
-  display:flex; align-items:flex-end; padding:clamp(28px,7vh,74px) clamp(24px,7vw,110px);
+  display:flex; align-items:flex-end; justify-content:flex-end; padding:clamp(28px,7vh,74px) clamp(24px,7vw,110px);
 }
-.menu-content { width:min(610px,58vw); opacity:0; animation:menuEnter .7s var(--ease-out) .12s forwards; }
+.menu-content { width:min(610px,52vw); opacity:0; animation:menuEnter .7s var(--ease-out) .12s forwards; }
 @keyframes menuEnter { from{opacity:0; transform:translateY(22px)} to{opacity:1; transform:translateY(0)} }
 .menu-eyebrow { display:flex; align-items:center; gap:10px; margin-bottom:14px; font-size:11px; font-weight:800; letter-spacing:3.2px; color:rgba(255,255,255,.72); }
 .menu-eyebrow span { width:34px; height:2px; background:#ffbd59; border-radius:2px; }
@@ -377,18 +378,6 @@ body {
 .menu-utilities button { min-height:44px; padding:0 4px; border:0; background:none; color:rgba(255,255,255,.66); font-size:12px; font-weight:650; cursor:pointer; }
 .menu-utilities button:hover { color:#fff; }
 .menu-utilities > span { width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,.4); }
-.menu-tokens { position:absolute; z-index:3; top:18%; right:8%; width:270px; height:220px; pointer-events:none; }
-.menu-token {
-  position:absolute; width:82px; height:82px; padding:5px; border-radius:24px;
-  background:rgba(255,255,255,.88); box-shadow:0 20px 42px rgba(0,0,0,.3),inset 0 1px 0 #fff;
-  animation:tokenFloat 5.5s ease-in-out infinite; transform:rotate(var(--rot));
-}
-.menu-token img { width:100%; height:100%; display:block; object-fit:cover; border-radius:19px; }
-.menu-token.token-0 { --rot:-8deg; left:8px; top:58px; animation-delay:-1.2s; }
-.menu-token.token-1 { --rot:6deg; left:94px; top:4px; animation-delay:-3.6s; }
-.menu-token.token-2 { --rot:-3deg; left:103px; top:101px; animation-delay:-2.1s; }
-.menu-token.token-3 { --rot:9deg; left:188px; top:55px; animation-delay:-4.3s; }
-@keyframes tokenFloat { 0%,100%{translate:0 0;rotate:var(--rot)} 50%{translate:0 -8px;rotate:var(--rot)} }
 .menu-active .global-bar .icon-btn { color:#fff; background:rgba(10,16,26,.34); border-color:rgba(255,255,255,.24); box-shadow:0 8px 24px rgba(0,0,0,.12); }
 .menu-active .global-bar .icon-btn:hover { background:rgba(10,16,26,.52); }
 
@@ -567,18 +556,36 @@ body {
   .level-pill { font-size:12px; padding:5px 12px; }
   .hud-value { font-size:17px; }
   .score-stat .hud-value { font-size:20px; }
-  .screen-menu::before { background-position:37% center; }
+  .game-active .topbar { min-height:54px; padding:6px 10px 4px; }
+  .game-active .brand { display:none; }
+  .game-active .level-pill { margin:0; padding:7px 14px; background:var(--panel-bg); }
+  .game-active .actions { margin-left:auto; }
+  .game-active .game-body { grid-template-rows:auto auto; align-content:start; gap:7px; padding:2px 10px 10px; overflow-y:auto; }
+  .game-active .panel-left { display:block; overflow:visible; }
+  .game-active .panel-left .panel-card:first-child,
+  .game-active .panel-left .panel-card:last-child { display:none; }
+  .game-active .panel-left .panel-card:nth-child(2) { width:100%; min-width:0; padding:8px 12px; border-radius:14px; display:flex; align-items:center; gap:10px; }
+  .game-active .panel-left .panel-title { margin:0; white-space:nowrap; font-size:10px; }
+  .game-active .panel-left .goals { flex:1; min-width:0; flex-direction:row; gap:8px; overflow-x:auto; }
+  .game-active .panel-left .goal-item { min-width:0; flex:1; gap:6px; font-size:11px; }
+  .game-active .panel-left .goal-icon { width:24px; height:24px; border-radius:7px; }
+  .game-active .board-area { justify-content:flex-start; gap:7px; }
+  .game-active .hud-strip { gap:7px; }
+  .game-active .hud-stat { padding:5px 8px; border-radius:12px; }
+  .game-active .board-wrap { flex:0 0 auto; }
+  .game-active .board-3d { width:min(calc(100vw - 20px),58vh); }
+  .game-active .hint { margin-top:1px; font-size:11px; }
+  .screen-menu::before { background-image:url('./assets/backgrounds/hero-anime-mobile.webp'); background-position:center; }
   .screen-menu::after { background:linear-gradient(0deg,rgba(7,11,18,.96) 0%,rgba(7,11,18,.66) 43%,rgba(7,11,18,.18) 72%),linear-gradient(180deg,rgba(7,11,18,.36),transparent 30%); }
-  .menu-cover { align-items:flex-end; padding:72px 20px max(28px,calc(env(safe-area-inset-bottom) + 18px)); }
-  .menu-content { width:100%; }
+  .menu-cover { align-items:stretch; justify-content:stretch; padding:74px 20px max(28px,calc(env(safe-area-inset-bottom) + 18px)); }
+  .menu-content { width:100%; height:100%; display:flex; flex-direction:column; }
   .menu-eyebrow { margin-bottom:10px; font-size:10px; letter-spacing:2.5px; }
   .menu-title { font-size:clamp(42px,13vw,58px); letter-spacing:-2px; }
   .menu-sub { max-width:310px; margin:11px 0 20px; font-size:13px; line-height:1.55; }
-  .menu-actions { gap:8px; }
+  .menu-actions { gap:8px; margin-top:auto; }
   .menu-cta { min-width:0; flex:1; min-height:54px; padding:0 17px; }
   .menu-levels-btn { min-width:112px; min-height:54px; padding:0 14px; }
   .menu-utilities { margin-top:9px; }
-  .menu-tokens { top:15%; right:3%; width:244px; height:190px; transform:scale(.8); transform-origin:top right; }
   .panel-left .panel-card { min-width:140px; padding:10px 12px; }
   .goals { gap:6px; }
   .goal-item { font-size:12px; }
@@ -589,7 +596,6 @@ body {
   .menu-content { width:min(580px,64vw); }
   .menu-title { font-size:clamp(42px,9vw,64px); }
   .menu-sub { margin:8px 0 14px; }
-  .menu-tokens { top:23%; right:5%; transform:scale(.72); transform-origin:top right; }
   .game-body { grid-template-columns: 1fr; }
   .panel-left, .panel-right { display:none; }
   .board-3d { width:min(54vh, 70vw, 460px); }

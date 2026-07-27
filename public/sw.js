@@ -1,5 +1,5 @@
 // 桓睿消消乐 Service Worker - 离线缓存
-const CACHE = 'xxl-v2.7';
+const CACHE = 'xxl-v2.8';
 const ASSETS = [
   './',
   './index.html',
@@ -10,7 +10,8 @@ const ASSETS = [
   './assets/faces/face1.jpg',
   './assets/faces/face2.jpg',
   './assets/faces/face3.jpg',
-  './assets/backgrounds/hero-sunset.webp',
+  './assets/backgrounds/hero-anime-desktop.webp',
+  './assets/backgrounds/hero-anime-mobile.webp',
 ];
 
 self.addEventListener('install', e => {

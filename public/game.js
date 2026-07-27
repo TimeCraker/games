@@ -602,6 +602,7 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
   if(id) $(id).classList.add('show');
   document.documentElement.classList.toggle('menu-active',id==='screenMenu');
+  document.documentElement.classList.toggle('game-active',id===null && state==='playing');
 }
 function showModal(id){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show')); if(id) $(id).classList.add('show'); }
 function hideAllModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show')); }
