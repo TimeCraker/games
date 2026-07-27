@@ -9,7 +9,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
-<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./styles.css?v=2.21">
 </head>
 <body>
 
@@ -258,15 +258,24 @@
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
-    const hadSW = !!navigator.serviceWorker.controller;
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-    // 新版 SW 接管后自动刷新（首次安装不刷新，避免循环）
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if(hadSW) window.location.reload();
-    });
+    // 清理所有旧的 Service Worker，注册新版
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      const old = regs.filter(r => r.active && r.active.scriptURL.indexOf('sw-v20.js') === -1);
+      return Promise.all(old.map(r => r.unregister()));
+    }).then(() => {
+      return navigator.serviceWorker.register('./sw-v20.js');
+    }).then(reg => {
+      // 立即检查更新，新版接管后刷新一次
+      const hadSW = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if(hadSW) window.location.reload();
+      });
+      // 强制拉取新 SW
+      reg.update().catch(()=>{});
+    }).catch(()=>{});
   });
 }
 </script>
-<script src="./game.js"></script>
+<script src="./game.js?v=2.21"></script>
 </body>
 </html>

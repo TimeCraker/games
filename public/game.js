@@ -12,7 +12,7 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, BOMB:1, RAINBOW:2 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.20';
+const CACHE_VER = '2.21';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
