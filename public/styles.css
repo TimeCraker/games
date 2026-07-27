@@ -472,6 +472,7 @@ body {
    ============================================================ */
 .ic { display:inline-flex; align-items:center; justify-content:center; width:1.1em; height:1.1em; vertical-align:-0.18em; flex-shrink:0; }
 .ic svg { width:100%; height:100%; display:block; }
+svg { max-width:100%; }
 .ic.sm { width:15px; height:15px; }
 .ic.lg { width:30px; height:30px; }
 .ic.inline { width:12px; height:12px; vertical-align:-1px; margin-left:2px; color:var(--c); }
