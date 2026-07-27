@@ -39,24 +39,27 @@ function startServer() {
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(500);
 
-  // 截图：开场遮罩
-  await page.screenshot({ path: path.join(shotsDir, '01-start.png') });
+  // 截图：主菜单
+  await page.screenshot({ path: path.join(shotsDir, '01-menu.png') });
 
-  // 检查 tile 数量（开场遮罩在，但 tile 已生成）
-  const tileCount = await page.locator('.tile').count();
-  console.log('tile count:', tileCount);
+  // 检查主菜单存在
+  const menuVisible = await page.locator('#screenMenu').isVisible();
+  console.log('menu visible:', menuVisible);
 
-  // 点开始
-  await page.click('#startBtn');
-  await page.waitForTimeout(800);
+  // 点 "继续闯关/开始游戏" 进入第1关（会经过入场动画）
+  await page.click('#menuContinue');
+  // 入场动画 ~1.6s + 棋盘生成
+  await page.waitForTimeout(2400);
   await page.screenshot({ path: path.join(shotsDir, '02-board.png') });
 
-  // 检查棋盘数据：通过 DOM 读取 tile 的 r/c/type
+  // 检查棋盘数据
+  const tileCount = await page.locator('.tile').count();
+  console.log('tile count:', tileCount);
   const boardInfo = await page.evaluate(() => {
     const tiles = [...document.querySelectorAll('.tile')];
-    return tiles.map(t => ({ r: +t.dataset.r, c: +t.dataset.c, type: +t.dataset.type, cls: t.className }));
+    return tiles.slice(0,3).map(t => ({ r:+t.dataset.r, c:+t.dataset.c, type:+t.dataset.type }));
   });
-  console.log('first 3 tiles:', JSON.stringify(boardInfo.slice(0, 3)));
+  console.log('first 3 tiles:', JSON.stringify(boardInfo));
 
   // 模拟交换：找两个相邻方块，用 pointer 事件
   // 取 (0,0) 和 (0,1)

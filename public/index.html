@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN" data-theme="light" data-bg="cloud">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#f5f7fa">
-<meta name="description" content="桓睿消消乐 - 立体三消游戏">
+<meta name="theme-color" content="#eef2f7">
+<meta name="description" content="桓睿消消乐 - 立体三消闯关游戏">
 <title>桓睿消消乐</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
@@ -12,89 +12,192 @@
 <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<div class="app">
+
+<!-- ===== 背景层（3套 + 粒子） ===== -->
+<div class="bg-layer bg-cloud"></div>
+<div class="bg-layer bg-neon"></div>
+<div class="bg-layer bg-photo"></div>
+<canvas class="bg-particles" id="bgParticles"></canvas>
+
+<!-- ===== 游戏外壳 ===== -->
+<div class="game-shell" id="gameShell" hidden>
+
   <!-- 顶部栏 -->
   <header class="topbar">
-    <div class="brand">
+    <div class="brand" id="brandBtn">
       <span class="brand-icon">✦</span>
       <span class="brand-title">桓睿消消乐</span>
     </div>
+    <div class="level-pill" id="levelPill">Level 1</div>
     <div class="actions">
-      <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题">
-        <span class="ico ico-theme">🌙</span>
-      </button>
-      <button class="icon-btn" id="soundBtn" title="开关声音" aria-label="开关声音">
-        <span class="ico ico-sound">🔊</span>
-      </button>
-      <button class="icon-btn" id="restartBtn" title="重新开始" aria-label="重新开始">
-        <span class="ico ico-restart">↻</span>
-      </button>
+      <button class="icon-btn" id="bgBtn" title="切换背景" aria-label="切换背景"><span class="ico">🌅</span></button>
+      <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"><span class="ico">🌙</span></button>
+      <button class="icon-btn" id="soundBtn" title="声音" aria-label="声音"><span class="ico">🔊</span></button>
+      <button class="icon-btn" id="pauseBtn" title="暂停" aria-label="暂停"><span class="ico">⏸</span></button>
     </div>
   </header>
 
-  <!-- 主舞台 -->
-  <main class="stage">
-    <!-- HUD -->
-    <div class="hud">
-      <div class="hud-card score-card">
-        <div class="hud-label">分数</div>
-        <div class="hud-value" id="score">0</div>
+  <!-- 游戏主体（三栏） -->
+  <main class="game-body">
+
+    <!-- 左侧：目标面板 -->
+    <aside class="panel panel-left">
+      <div class="panel-card">
+        <div class="panel-label">第 <span id="levelNum">1</span> 关</div>
+        <div class="panel-name" id="levelName">初见桓睿</div>
       </div>
-      <div class="hud-card target-card">
-        <div class="hud-label">目标进度</div>
-        <div class="progress-track">
-          <div class="progress-fill" id="progressBar"></div>
-          <div class="progress-text" id="progressText">0 / 1500</div>
+      <div class="panel-card">
+        <div class="panel-title">🎯 本关目标</div>
+        <div class="goals" id="goals"></div>
+      </div>
+      <div class="panel-card">
+        <div class="panel-title">✨ 特殊方块</div>
+        <div class="legend">
+          <div class="legend-row"><span class="legend-badge bomb">💣</span><span>4连生成 · 爆炸清除周围</span></div>
+          <div class="legend-row"><span class="legend-badge rainbow">🌈</span><span>5连生成 · 清除全场同款</span></div>
         </div>
       </div>
-      <div class="hud-card combo-card" id="comboCard">
-        <div class="hud-label">连击</div>
-        <div class="hud-value combo-value" id="combo">×1</div>
-      </div>
-    </div>
+    </aside>
 
-    <!-- 棋盘 -->
-    <div class="board-wrap" id="boardWrap">
-      <div class="board-3d">
-        <div class="board" id="board"></div>
-        <canvas class="fx-layer" id="fxCanvas"></canvas>
-        <div class="float-layer" id="floatLayer"></div>
+    <!-- 中间：棋盘 -->
+    <section class="board-area">
+      <div class="hud-strip">
+        <div class="hud-stat">
+          <div class="hud-label">步数</div>
+          <div class="hud-value" id="movesLeft">24</div>
+        </div>
+        <div class="hud-stat score-stat">
+          <div class="hud-label">分数</div>
+          <div class="hud-value" id="score">0</div>
+        </div>
+        <div class="hud-stat">
+          <div class="hud-label">连击</div>
+          <div class="hud-value" id="combo">×1</div>
+        </div>
       </div>
-    </div>
+      <div class="board-wrap" id="boardWrap">
+        <div class="board-3d">
+          <div class="board" id="board"></div>
+          <canvas class="fx-layer" id="fxCanvas"></canvas>
+          <div class="float-layer" id="floatLayer"></div>
+        </div>
+      </div>
+      <div class="hint" id="hint">滑动或点选相邻方块交换 · 三连消除</div>
+    </section>
 
-    <div class="hint" id="hint">滑动或点选相邻方块进行交换 · 三个及以上同款连成一线即可消除</div>
+    <!-- 右侧：得分板 -->
+    <aside class="panel panel-right">
+      <div class="panel-card score-card">
+        <div class="panel-title">🏆 得分板</div>
+        <div class="big-score" id="bigScore">0</div>
+        <div class="progress-wrap">
+          <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
+          <div class="progress-text" id="progressText">0 / 800</div>
+        </div>
+      </div>
+      <div class="panel-card">
+        <div class="panel-title">📊 战绩</div>
+        <div class="stat-rows">
+          <div class="stat-row"><span>最高分</span><b id="bestScore">0</b></div>
+          <div class="stat-row"><span>消除方块</span><b id="statClears">0</b></div>
+          <div class="stat-row"><span>最高连击</span><b id="statCombo">×0</b></div>
+          <div class="stat-row"><span>已用步数</span><b id="statMoves">0</b></div>
+        </div>
+      </div>
+    </aside>
+
   </main>
-
-  <!-- 开场遮罩 -->
-  <div class="overlay" id="startOverlay">
-    <div class="overlay-card">
-      <h1 class="overlay-title">桓睿消消乐</h1>
-      <p class="overlay-sub">把帅脸三连消除，达成目标分数即可通关</p>
-      <div class="overlay-tips">
-        <div class="tip-row"><span class="tip-badge">基本</span>交换相邻方块，3+ 同款连成线消除</div>
-        <div class="tip-row"><span class="tip-badge">炸弹</span>连成 4 个 → 生成炸弹，爆炸清除周围</div>
-        <div class="tip-row"><span class="tip-badge">彩虹</span>连成 5 个 → 生成彩虹球，清除全场同款</div>
-        <div class="tip-row"><span class="tip-badge">连击</span>连续消除分数倍增，追求 COMBO！</div>
-      </div>
-      <button class="primary-btn" id="startBtn">开始游戏</button>
-    </div>
-  </div>
-
-  <!-- 通关弹窗 -->
-  <div class="modal" id="winModal">
-    <div class="modal-card">
-      <div class="modal-emoji">🎉</div>
-      <h2 class="modal-title">恭喜通关</h2>
-      <p class="modal-sub">你的最终分数</p>
-      <div class="modal-score" id="finalScore">0</div>
-      <div class="modal-stats" id="modalStats"></div>
-      <button class="primary-btn" id="playAgainBtn">再来一局</button>
-    </div>
-  </div>
-
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
 </div>
+
+<!-- ===== 全屏界面 ===== -->
+
+<!-- 主菜单 -->
+<div class="screen screen-menu show" id="screenMenu">
+  <div class="menu-inner">
+    <div class="menu-logo">
+      <div class="logo-spark">✦</div>
+      <h1 class="menu-title">桓睿消消乐</h1>
+      <p class="menu-sub">把帅脸三连消除，闯关成为大师</p>
+    </div>
+    <div class="menu-actions">
+      <button class="menu-btn primary" id="menuContinue">继续闯关</button>
+      <button class="menu-btn" id="menuLevels">关卡选择</button>
+      <button class="menu-btn ghost" id="menuBg">背景：云海白昼</button>
+      <button class="menu-btn ghost" id="menuSound">音效：开启</button>
+    </div>
+    <div class="menu-foot">滑动交换 · 三连消除 · 连击得分</div>
+  </div>
+</div>
+
+<!-- 关卡选择 -->
+<div class="screen screen-levels" id="screenLevels">
+  <div class="levels-inner">
+    <div class="levels-head">
+      <button class="icon-btn back-btn" id="levelsBack" aria-label="返回">‹</button>
+      <h2>选择关卡</h2>
+    </div>
+    <div class="levels-grid" id="levelsGrid"></div>
+  </div>
+</div>
+
+<!-- 关卡开始入场 -->
+<div class="screen screen-intro" id="screenIntro">
+  <div class="intro-inner">
+    <div class="intro-label">LEVEL</div>
+    <div class="intro-num" id="introNum">1</div>
+    <div class="intro-name" id="introName">初见桓睿</div>
+    <div class="intro-goals" id="introGoals"></div>
+  </div>
+</div>
+
+<!-- ===== 弹窗 ===== -->
+
+<!-- 暂停 -->
+<div class="modal" id="modalPause">
+  <div class="modal-card">
+    <div class="modal-emoji">⏸</div>
+    <h2 class="modal-title">游戏暂停</h2>
+    <div class="modal-actions">
+      <button class="menu-btn primary" id="resumeBtn">继续游戏</button>
+      <button class="menu-btn" id="restartBtn2">重新开始</button>
+      <button class="menu-btn ghost" id="pauseMenuBtn">回主菜单</button>
+    </div>
+  </div>
+</div>
+
+<!-- 胜利 -->
+<div class="modal" id="modalWin">
+  <div class="modal-card">
+    <div class="modal-emoji">🎉</div>
+    <h2 class="modal-title">关卡完成</h2>
+    <div class="stars" id="winStars"></div>
+    <div class="modal-score" id="winScore">0</div>
+    <div class="modal-stats" id="winStats"></div>
+    <div class="modal-actions">
+      <button class="menu-btn primary" id="nextLevelBtn">下一关</button>
+      <button class="menu-btn" id="winRetryBtn">再玩一次</button>
+      <button class="menu-btn ghost" id="winMenuBtn">回主菜单</button>
+    </div>
+  </div>
+</div>
+
+<!-- 失败 -->
+<div class="modal" id="modalLose">
+  <div class="modal-card">
+    <div class="modal-emoji">💔</div>
+    <h2 class="modal-title">步数用完</h2>
+    <div class="modal-sub" id="loseSub">差一点就成功了</div>
+    <div class="modal-score" id="loseScore">0</div>
+    <div class="modal-actions">
+      <button class="menu-btn primary" id="loseRetryBtn">再来一次</button>
+      <button class="menu-btn ghost" id="loseMenuBtn">回主菜单</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
 <script src="./game.js"></script>
 </body>
 </html>
