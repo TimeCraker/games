@@ -9,7 +9,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
-<link rel="stylesheet" href="./styles.css?v=2.21">
+<link rel="stylesheet" href="./styles.css?v=2.22">
 </head>
 <body>
 
@@ -37,6 +37,7 @@
     </div>
     <div class="level-pill" id="levelPill">Level 1</div>
     <div class="actions">
+      <button class="icon-btn" id="gameSoundBtn" title="静音" aria-label="静音"></button>
       <button class="icon-btn" id="pauseBtn" title="暂停" aria-label="暂停"></button>
     </div>
   </header>
@@ -163,6 +164,10 @@
   <div class="modal-card">
     <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.5" height="14" rx="1.2"/><rect x="13.5" y="5" width="3.5" height="14" rx="1.2"/></svg></div>
     <h2 class="modal-title">游戏暂停</h2>
+    <div class="pause-volume">
+      <button class="icon-btn sm" id="pauseMuteBtn" title="静音" aria-label="静音"></button>
+      <input type="range" id="pauseVol" min="0" max="100" class="range" aria-label="音量">
+    </div>
     <div class="modal-actions">
       <button class="menu-btn primary" id="resumeBtn">继续游戏</button>
       <button class="menu-btn" id="restartBtn2">重新开始</button>
@@ -276,6 +281,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<script src="./game.js?v=2.21"></script>
+<script src="./game.js?v=2.22"></script>
 </body>
 </html>

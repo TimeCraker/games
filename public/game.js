@@ -12,7 +12,7 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, BOMB:1, RAINBOW:2 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.21';
+const CACHE_VER = '2.22';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -745,7 +745,7 @@ async function startLevel(idx){
   if(soundOn) startBgMusic();
 }
 
-function pauseGame(){ if(state!=='playing') return; state='paused'; clearHint(); showModal('modalPause'); stopBgMusic(); sfx.btn(); }
+function pauseGame(){ if(state!=='playing') return; state='paused'; clearHint(); showModal('modalPause'); stopBgMusic(); sfx.btn(); $('pauseVol').value=settings.volume; const pm=$('pauseMuteBtn'); if(pm){ pm.innerHTML=ic(soundOn?'sound':'mute'); pm.classList.toggle('off',!soundOn); } }
 function resumeGame(){ if(state!=='paused') return; state='playing'; hideAllModal(); if(soundOn) startBgMusic(); sfx.btn(); scheduleHint(); }
 
 function winLevel(){
@@ -779,6 +779,9 @@ $('brandBtn').onclick=()=>{ sfx.btn(); gotoMenu(); };
 $('bgBtn').onclick=()=>cycleBg();
 $('themeBtn').onclick=()=>{ setTheme(document.documentElement.dataset.theme==='light'?'dark':'light'); sfx.btn(); };
 $('soundBtn').onclick=()=>toggleSound();
+$('gameSoundBtn').onclick=()=>toggleSound();
+$('pauseMuteBtn').onclick=()=>toggleSound();
+$('pauseVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); if(masterGain) masterGain.gain.value=settings.volume/100; if(bgAudio) bgAudio.volume=(settings.volume/100)*0.55; };
 $('pauseBtn').onclick=()=>pauseGame();
 $('menuContinue').onclick=()=>{ sfx.init(); sfx.btn(); startBgMusic(); startLevel(Math.min(SAVE.unlocked-1,LEVELS.length-1)); };
 $('menuLevels').onclick=()=>{ sfx.btn(); gotoLevels(); };
@@ -795,9 +798,9 @@ $('loseRetryBtn').onclick=()=>{ hideAllModal(); startLevel(levelIdx); };
 $('loseMenuBtn').onclick=()=>{ hideAllModal(); gotoMenu(); };
 
 function toggleSound(){
-  settings.sfx=!settings.sfx; soundOn=settings.sfx; settings.save();
-  $('soundBtn').innerHTML=ic(soundOn?'sound':'mute');
-  $('soundBtn').classList.toggle('off',!soundOn);
+  settings.sfx=!settings.sfx; settings.music=settings.sfx; soundOn=settings.sfx; settings.save();
+  // 同步所有静音按钮图标
+  for(const id of ['soundBtn','gameSoundBtn','pauseMuteBtn']){ const el=$(id); if(el){ el.innerHTML=ic(soundOn?'sound':'mute'); el.classList.toggle('off',!soundOn); } }
   const ms=$('menuSound'); if(ms) ms.textContent=`音效 · ${soundOn?'开':'关'}`;
   if(!soundOn) stopBgMusic(); else if(state==='playing'&&settings.music) startBgMusic();
   syncSettingsUI();
@@ -820,7 +823,7 @@ function applySettings(){
   if(!$('gameShell').hidden){ resizeFx(); }
   syncBgStars();
   soundOn=settings.sfx;
-  $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn);
+  $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn); const gsb=$('gameSoundBtn'); if(gsb){ gsb.innerHTML=ic(soundOn?'sound':'mute'); gsb.classList.toggle('off',!soundOn); }
 }
 $('settingsBtn').onclick=()=>openSettings();
 $('pauseSettingsBtn').onclick=()=>{ hideAllModal(); openSettings(); };
@@ -847,7 +850,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&(state==='playing'
 // ---------- 启动 ----------
 function start(){
   setTheme(themePref); setBg(bgPref);
-  $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn);
+  $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn); const gsb=$('gameSoundBtn'); if(gsb){ gsb.innerHTML=ic(soundOn?'sound':'mute'); gsb.classList.toggle('off',!soundOn); }
   $('pauseBtn').innerHTML=ic('pause'); $('levelsBack').innerHTML=ic('back');
   $('menuSound').textContent=`音效 · ${soundOn?'开':'关'}`;
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
