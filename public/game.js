@@ -505,11 +505,12 @@ function onMove(e){
   if(drag.dir==='h'){ dy=0; dx=Math.max(-cellUnit*0.55,Math.min(cellUnit*0.55,dx)); }
   else { dx=0; dy=Math.max(-cellUnit*0.55,Math.min(cellUnit*0.55,dy)); }
   drag.dx=dx; drag.dy=dy; drag.moved=true;
-  // RAF 合帧：只存坐标，下一帧统一写 transform
-  if(dragRAF===null) dragRAF=requestAnimationFrame(flushDrag);
+  // 即时写 transform（跟手优先，transform 是合成属性不触发 layout）
+  const {x,y}=posOf(drag.r,drag.c);
+  drag.el.style.transform=`translate3d(${x+dx}px,${y+dy}px,${Z_DRAG}px) scale(1.05)`;
 }
 function flushDrag(){
-  dragRAF=null;
+  // 仅 onUp 时同步确保最终位置
   if(!drag) return;
   const {x,y}=posOf(drag.r,drag.c);
   drag.el.style.transform=`translate3d(${x+drag.dx}px,${y+drag.dy}px,${Z_DRAG}px) scale(1.05)`;
