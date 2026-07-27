@@ -103,6 +103,49 @@ const themePref = localStorage.getItem('xxl-theme')||'light';
 const bgPref = localStorage.getItem('xxl-bg')||'cloud';
 const soundPref = localStorage.getItem('xxl-sound'); soundOn = soundPref===null?true:soundPref==='1';
 
+// 设置
+const settings = {
+  sfx: localStorage.getItem('xxl-sfx')!=='0',
+  music: localStorage.getItem('xxl-music')!=='0',
+  volume: +localStorage.getItem('xxl-vol')||45,
+  motion: localStorage.getItem('xxl-motion')!=='0',
+  haptic: localStorage.getItem('xxl-haptic')!=='0',
+  save(){ localStorage.setItem('xxl-sfx',this.sfx?'1':'0'); localStorage.setItem('xxl-music',this.music?'1':'0'); localStorage.setItem('xxl-vol',this.volume); localStorage.setItem('xxl-motion',this.motion?'1':'0'); localStorage.setItem('xxl-haptic',this.haptic?'1':'0'); }
+};
+soundOn = settings.sfx;
+
+// 成就系统
+const ACHIEVEMENTS = [
+  { id:'first_clear', name:'初出茅庐', desc:'完成首次消除', icon:'spark' },
+  { id:'combo3', name:'连击新星', desc:'达成 3 连击', icon:'fire' },
+  { id:'combo5', name:'连击大师', desc:'达成 5 连击', icon:'fire' },
+  { id:'combo8', name:'连击之王', desc:'达成 8 连击', icon:'fire' },
+  { id:'make_bomb', name:'爆破专家', desc:'首次生成炸弹', icon:'bomb' },
+  { id:'make_rainbow', name:'彩虹召唤', desc:'首次生成彩虹', icon:'rainbow' },
+  { id:'clear5', name:'群体消除', desc:'单次消除 5 个方块', icon:'star' },
+  { id:'clear8', name:'清场达人', desc:'单次消除 8 个方块', icon:'star' },
+  { id:'beat1', name:'闯关启程', desc:'通关第 1 关', icon:'trophy' },
+  { id:'beat6', name:'彩虹猎手', desc:'通关第 6 关', icon:'trophy' },
+  { id:'beat12', name:'桓睿大师', desc:'通关全部关卡', icon:'trophy' },
+  { id:'total500', name:'消消达人', desc:'累计消除 500 个方块', icon:'chart' },
+];
+const achState = JSON.parse(localStorage.getItem('xxl-ach')||'{}');
+let totalClears = +localStorage.getItem('xxl-total')||0;
+function unlockAchievement(id){
+  if(achState[id]) return;
+  const a = ACHIEVEMENTS.find(x=>x.id===id); if(!a) return;
+  achState[id]=Date.now(); localStorage.setItem('xxl-ach',JSON.stringify(achState));
+  showAchievement(a);
+}
+function showAchievement(a){
+  const el=$('achievement');
+  el.innerHTML = `<div class="ach-icon">${SVG[a.icon]||''}</div><div class="ach-text"><div class="ach-label">成就解锁</div><div class="ach-name">${a.name}</div></div>`;
+  el.classList.add('show');
+  sfx.achieve();
+  clearTimeout(showAchievement._t); showAchievement._t=setTimeout(()=>el.classList.remove('show'),3200);
+}
+function haptic(ms){ if(settings.haptic && navigator.vibrate) try{ navigator.vibrate(ms); }catch(e){} }
+
 // ---------- 工具 ----------
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const rnd=n=>Math.floor(Math.random()*n);
@@ -251,11 +294,20 @@ async function cascade(){
     for(const k of collectSpecialTriggers(matched)) toRemove.add(k);
     toRemove=expandSpecials(toRemove);
     const gain=scoreFor(toRemove.size,combo);
-    score+=gain; stats.clears+=toRemove.size; updateHUD();
+    score+=gain; stats.clears+=toRemove.size; totalClears+=toRemove.size; localStorage.setItem('xxl-total',totalClears);
+    updateHUD();
     const center=centerOf(toRemove);
     floatText(center,`+${gain}`,combo>=2?'combo':'');
     if(combo>=2){ floatText({...center,dy:-34},`COMBO ×${combo}`,'combo big'); comboFlash(); }
-    sfx.clear(combo);
+    sfx.clear(combo); haptic(combo>=3?40:20);
+    // 成就检测
+    unlockAchievement('first_clear');
+    if(combo>=3) unlockAchievement('combo3');
+    if(combo>=5) unlockAchievement('combo5');
+    if(combo>=8) unlockAchievement('combo8');
+    if(toRemove.size>=5) unlockAchievement('clear5');
+    if(toRemove.size>=8) unlockAchievement('clear8');
+    if(totalClears>=500) unlockAchievement('total500');
     if([...toRemove].some(k=>{const{r,c}=parseKey(k);const t=board[r]&&board[r][c];return t&&t.special===SPECIAL.BOMB;})) sfx.bomb();
     await removeCells(Array.from(toRemove).map(parseKey),{specials});
     await placeSpecials(specials);
@@ -267,8 +319,8 @@ function scoreFor(n,c){ return Math.round(n*30*(1+(c-1)*0.5)); }
 function planSpecials(runs){
   const out=[];
   for(const run of runs){
-    if(run.len>=5){ const mid=run.cells[Math.floor(run.cells.length/2)]; out.push({r:mid.r,c:mid.c,type:run.type,special:SPECIAL.RAINBOW}); stats.rainbows++; goalProgress.rainbow=(goalProgress.rainbow||0)+1; }
-    else if(run.len>=4){ const mid=run.cells[Math.floor(run.cells.length/2)]; out.push({r:mid.r,c:mid.c,type:run.type,special:SPECIAL.BOMB}); stats.bombs++; goalProgress.bomb=(goalProgress.bomb||0)+1; }
+    if(run.len>=5){ const mid=run.cells[Math.floor(run.cells.length/2)]; out.push({r:mid.r,c:mid.c,type:run.type,special:SPECIAL.RAINBOW}); stats.rainbows++; goalProgress.rainbow=(goalProgress.rainbow||0)+1; unlockAchievement('make_rainbow'); }
+    else if(run.len>=4){ const mid=run.cells[Math.floor(run.cells.length/2)]; out.push({r:mid.r,c:mid.c,type:run.type,special:SPECIAL.BOMB}); stats.bombs++; goalProgress.bomb=(goalProgress.bomb||0)+1; unlockAchievement('make_bomb'); }
   }
   if(combo>=2) goalProgress.combo=Math.max(goalProgress.combo||0,combo);
   return out;
@@ -339,9 +391,22 @@ const parseKey=k=>{const[r,c]=k.split(',').map(Number);return{r,c};};
 
 // ---------- HUD ----------
 let lastScore=0;
+let scoreAnimRAF=null;
+function animateScoreTo(target){
+  const from=lastScore; if(from===target){ scoreEl.textContent=target; bigScoreEl.textContent=target; return; }
+  cancelAnimationFrame(scoreAnimRAF);
+  const start=performance.now(); const dur=400;
+  function step(now){
+    const t=Math.min(1,(now-start)/dur);
+    const eased=1-Math.pow(1-t,3);
+    const v=Math.round(from+(target-from)*eased);
+    scoreEl.textContent=v; bigScoreEl.textContent=v;
+    if(t<1) scoreAnimRAF=requestAnimationFrame(step); else lastScore=target;
+  }
+  scoreAnimRAF=requestAnimationFrame(step);
+}
 function updateHUD(){
-  if(score!==lastScore){ scoreEl.classList.remove('bump'); void scoreEl.offsetWidth; scoreEl.classList.add('bump'); bigScoreEl.classList.remove('bump'); void bigScoreEl.offsetWidth; bigScoreEl.classList.add('bump'); lastScore=score; }
-  scoreEl.textContent=score; bigScoreEl.textContent=score;
+  if(score!==lastScore){ scoreEl.classList.remove('bump'); void scoreEl.offsetWidth; scoreEl.classList.add('bump'); bigScoreEl.classList.remove('bump'); void bigScoreEl.offsetWidth; bigScoreEl.classList.add('bump'); animateScoreTo(score); }
   movesLeftEl.textContent = isInfiniteMoves() ? '∞' : Math.max(0,moves);
   comboEl.textContent='×'+Math.max(1,combo);
   if(currentLevel){ const pct=Math.min(100,score/currentLevel.target*100); progressBar.style.width=pct+'%'; progressText.textContent=`${score} / ${currentLevel.target}`; }
@@ -484,19 +549,27 @@ const sfx=(()=>{
     special:(sp)=>{ if(sp===SPECIAL.RAINBOW){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,0.15,'triangle',0.2),i*50)); } else { tone(80,0.2,'sawtooth',0.3,2); noise(0.15,0.3); } },
     win:()=>{ [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,0.3,'triangle',0.3),i*120)); },
     lose:()=>{ [400,330,260].forEach((f,i)=>setTimeout(()=>tone(f,0.35,'sawtooth',0.25),i*150)); },
+    achieve:()=>{ [659,784,988,1319].forEach((f,i)=>setTimeout(()=>tone(f,0.25,'triangle',0.25),i*90)); },
     btn:()=>tone(660,0.06,'sine',0.12),
   };
 })();
 function startBgMusic(){
-  if(!soundOn||bgOsc) return; sfx.init(); const a=audioCtx;
-  bgOsc=a.createOscillator(); bgGain=a.createGain(); const filt=a.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=600;
-  bgOsc.type='sine'; bgOsc.frequency.value=130; bgGain.gain.value=0;
-  bgOsc.connect(filt); filt.connect(bgGain); bgGain.connect(masterGain); bgOsc.start();
-  bgGain.gain.linearRampToValueAtTime(0.04,a.currentTime+2);
-  const lfo=a.createOscillator(); const lfoG=a.createGain(); lfo.frequency.value=0.15; lfoG.gain.value=4; lfo.connect(lfoG); lfoG.connect(bgOsc.frequency); lfo.start();
-  bgOsc._lfo=lfo;
+  if(!settings.music||bgOsc) return; sfx.init(); const a=audioCtx;
+  masterGain.gain.value = settings.volume/100;
+  // 和弦 pad: C-E-G (C大和弦) 多振荡器
+  bgGain=a.createGain(); bgGain.gain.value=0; const filt=a.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=700;
+  bgGain.connect(filt); filt.connect(masterGain);
+  bgOsc=[];
+  [130.8,164.8,196].forEach((freq,i)=>{ // C3 E3 G3
+    const o=a.createOscillator(); o.type=i===0?'sine':'triangle'; o.frequency.value=freq;
+    const g=a.createGain(); g.gain.value=i===0?0.5:0.28;
+    o.connect(g); g.connect(bgGain); o.start(); bgOsc.push(o);
+    // 轻微颤音
+    const lfo=a.createOscillator(); const lfoG=a.createGain(); lfo.frequency.value=0.12+i*0.03; lfoG.gain.value=2.5; lfo.connect(lfoG); lfoG.connect(o.frequency); lfo.start(); bgOsc.push(lfo);
+  });
+  bgGain.gain.linearRampToValueAtTime(0.05,a.currentTime+2);
 }
-function stopBgMusic(){ if(bgOsc){ try{ bgGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.5); bgOsc._lfo&&bgOsc._lfo.stop(); bgOsc.stop(audioCtx.currentTime+0.6);}catch(e){} bgOsc=null; bgGain=null; } }
+function stopBgMusic(){ if(bgOsc){ try{ bgGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.5); bgOsc.forEach(o=>{try{o.stop(audioCtx.currentTime+0.6);}catch(e){}});}catch(e){} bgOsc=null; bgGain=null; } }
 
 // ---------- 背景粒子 ----------
 const bgCtx=bgParticles.getContext('2d'); let bgStars=[];
@@ -579,6 +652,10 @@ function winLevel(){
   let stars=1; if(movesRatio>=0.3) stars=2; if(movesRatio>=0.5) stars=3;
   SAVE.saveStars(currentLevel.id,stars); SAVE.saveBest(currentLevel.id,score);
   if(levelIdx+1<LEVELS.length) SAVE.unlocked=Math.max(SAVE.unlocked,levelIdx+2);
+  // 通关成就
+  unlockAchievement('beat1');
+  if(currentLevel.id>=6) unlockAchievement('beat6');
+  if(levelIdx+1>=LEVELS.length) unlockAchievement('beat12');
   $('winScore').textContent=score;
   $('winStars').innerHTML=[0,1,2].map(i=>i<stars?ic('star','lg full'):ic('starO','lg empty')).join('');
   $('winStats').innerHTML=`消除方块 <b>${stats.clears}</b> · 最高连击 <b>×${stats.maxCombo}</b><br>生成炸弹 <b>${stats.bombs}</b> · 生成彩虹 <b>${stats.rainbows}</b>`;
@@ -616,13 +693,36 @@ $('loseRetryBtn').onclick=()=>{ hideAllModal(); startLevel(levelIdx); };
 $('loseMenuBtn').onclick=()=>{ hideAllModal(); gotoMenu(); };
 
 function toggleSound(){
-  soundOn=!soundOn; localStorage.setItem('xxl-sound',soundOn?'1':'0');
+  settings.sfx=!settings.sfx; soundOn=settings.sfx; settings.save();
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute');
   $('soundBtn').classList.toggle('off',!soundOn);
   const ms=$('menuSound'); if(ms) ms.innerHTML=`${ic(soundOn?'sound':'mute','sm')}<span>音效：${soundOn?'开启':'关闭'}</span>`;
-  if(!soundOn) stopBgMusic(); else if(state==='playing') startBgMusic();
+  if(!soundOn) stopBgMusic(); else if(state==='playing'&&settings.music) startBgMusic();
+  syncSettingsUI();
   sfx.btn();
 }
+
+// 设置面板
+function openSettings(){ showModal('modalSettings'); syncSettingsUI(); sfx.btn(); }
+function syncSettingsUI(){
+  $('setSfx').checked=settings.sfx; $('setMusic').checked=settings.music; $('setVol').value=settings.volume;
+  $('setMotion').checked=settings.motion; $('setHaptic').checked=settings.haptic;
+}
+function applySettings(){
+  if(masterGain) masterGain.gain.value=settings.volume/100;
+  if(!settings.music) stopBgMusic(); else if(state==='playing'&&!bgOsc) startBgMusic();
+  document.documentElement.classList.toggle('reduce-motion',!settings.motion);
+  soundOn=settings.sfx;
+  $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn);
+}
+$('settingsBtn').onclick=()=>openSettings();
+$('pauseSettingsBtn').onclick=()=>{ hideAllModal(); openSettings(); };
+$('settingsClose').onclick=()=>{ hideAllModal(); sfx.btn(); if(state==='playing') scheduleHint(); };
+$('setSfx').onchange=e=>{ settings.sfx=e.target.checked; settings.save(); soundOn=settings.sfx; applySettings(); sfx.btn(); };
+$('setMusic').onchange=e=>{ settings.music=e.target.checked; settings.save(); applySettings(); sfx.btn(); };
+$('setVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); if(masterGain) masterGain.gain.value=settings.volume/100; };
+$('setMotion').onchange=e=>{ settings.motion=e.target.checked; settings.save(); applySettings(); };
+$('setHaptic').onchange=e=>{ settings.haptic=e.target.checked; settings.save(); if(settings.haptic) haptic(30); };
 
 window.addEventListener('resize',()=>{ if(!$('gameShell').hidden){ measure(); resizeFx(); relayoutAll(); } resizeBgCanvas(); });
 function relayoutAll(){ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r]?.[c]; if(!t) continue; const{x,y}=posOf(r,c); t.el.style.width=t.el.style.height=tileSize+'px'; t.el.style.setProperty('--tx',x+'px'); t.el.style.setProperty('--ty',y+'px'); t.el.style.transform=`translate3d(${x}px,${y}px,8px)`; } }
@@ -636,6 +736,7 @@ function start(){
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn);
   $('pauseBtn').innerHTML=ic('pause'); $('levelsBack').innerHTML=ic('back');
   $('menuSound').innerHTML=`${ic(soundOn?'sound':'mute','sm')}<span>音效：${soundOn?'开启':'关闭'}</span>`;
+  document.documentElement.classList.toggle('reduce-motion',!settings.motion);
   initBgStars(); requestAnimationFrame(tickBgStars); requestAnimationFrame(tickParticles);
   gotoMenu();
 }

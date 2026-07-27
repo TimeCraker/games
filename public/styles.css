@@ -472,6 +472,34 @@ body {
 /* 入场目标图标 */
 .intro-goals .ic { width:15px; height:15px; vertical-align:-2px; color:var(--c); }
 
+/* 成就通知 */
+.achievement { position:fixed; top:14px; left:50%; transform:translate(-50%,-120px); z-index:350;
+  background:linear-gradient(135deg,var(--c),var(--p)); color:#fff; border-radius:16px;
+  padding:12px 20px; display:flex; align-items:center; gap:12px; box-shadow:0 12px 30px rgba(78,205,196,.4);
+  opacity:0; transition:transform .5s var(--ease-bounce), opacity .4s; pointer-events:none; max-width:90vw; }
+.achievement.show { transform:translate(-50%,0); opacity:1; }
+.ach-icon { width:34px; height:34px; background:rgba(255,255,255,.22); border-radius:10px; display:grid; place-items:center; flex-shrink:0; }
+.ach-icon svg { width:20px; height:20px; }
+.ach-label { font-size:10px; opacity:.85; font-weight:600; letter-spacing:1px; }
+.ach-name { font-size:15px; font-weight:800; }
+
+/* 设置面板 */
+.settings-list { display:flex; flex-direction:column; gap:14px; margin:18px 0; text-align:left; }
+.setting-row { display:flex; align-items:center; justify-content:space-between; font-size:14px; color:var(--text-soft); }
+.switch { position:relative; width:46px; height:26px; flex-shrink:0; }
+.switch input { opacity:0; width:0; height:0; }
+.slider { position:absolute; inset:0; background:var(--cell-bg); border-radius:13px; transition:.25s; cursor:pointer; }
+.slider::before { content:""; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.25s; box-shadow:0 2px 4px rgba(0,0,0,.2); }
+.switch input:checked + .slider { background:linear-gradient(135deg,var(--c),var(--p)); }
+.switch input:checked + .slider::before { transform:translateX(20px); }
+.range { -webkit-appearance:none; appearance:none; width:120px; height:6px; border-radius:3px; background:var(--cell-bg); outline:none; }
+.range::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:linear-gradient(135deg,var(--c),var(--p)); cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.2); }
+.range::-moz-range-thumb { width:18px; height:18px; border:none; border-radius:50%; background:linear-gradient(135deg,var(--c),var(--p)); cursor:pointer; }
+
+/* 减少动效（设置关闭时） */
+.reduce-motion * { animation-duration:.01ms !important; transition-duration:.08s !important; }
+.reduce-motion .bg-cloud::after, .reduce-motion .bg-neon::after { animation:none !important; }
+
 /* ============================================================
    响应式
    ============================================================ */
