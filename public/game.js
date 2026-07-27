@@ -110,9 +110,30 @@ const settings = {
   volume: +localStorage.getItem('xxl-vol')||45,
   motion: localStorage.getItem('xxl-motion')!=='0',
   haptic: localStorage.getItem('xxl-haptic')!=='0',
-  save(){ localStorage.setItem('xxl-sfx',this.sfx?'1':'0'); localStorage.setItem('xxl-music',this.music?'1':'0'); localStorage.setItem('xxl-vol',this.volume); localStorage.setItem('xxl-motion',this.motion?'1':'0'); localStorage.setItem('xxl-haptic',this.haptic?'1':'0'); }
+  quality: localStorage.getItem('xxl-quality')||'auto',
+  save(){ localStorage.setItem('xxl-sfx',this.sfx?'1':'0'); localStorage.setItem('xxl-music',this.music?'1':'0'); localStorage.setItem('xxl-vol',this.volume); localStorage.setItem('xxl-motion',this.motion?'1':'0'); localStorage.setItem('xxl-haptic',this.haptic?'1':'0'); localStorage.setItem('xxl-quality',this.quality); }
 };
 soundOn = settings.sfx;
+
+// 特效质量档位
+const QUALITY_PRESETS = {
+  high:   { dpr:2,    particles:12, shockwaves:2, shake:true,  glow:true  },
+  medium: { dpr:1.5,  particles:8,  shockwaves:1, shake:true,  glow:true  },
+  low:    { dpr:1,    particles:4,  shockwaves:0, shake:false, glow:false },
+};
+function detectQuality(){
+  const dm=navigator.deviceMemory||4, hc=navigator.hardwareConcurrency||4, dpr=window.devicePixelRatio||1;
+  const saveData=navigator.connection&&navigator.connection.saveData;
+  if(saveData||dm<=2||hc<=2) return 'low';
+  if(dm>=6&&hc>=6&&dpr<=2) return 'high';
+  return 'medium';
+}
+function resolveQuality(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return 'low';
+  if(!settings.motion) return 'low';
+  return settings.quality==='auto'?detectQuality():settings.quality;
+}
+let Q = QUALITY_PRESETS[resolveQuality()];
 
 // 成就系统
 const ACHIEVEMENTS = [
@@ -298,7 +319,7 @@ async function cascade(){
     updateHUD();
     const center=centerOf(toRemove);
     floatText(center,`+${gain}`,combo>=2?'combo':'');
-    if(combo>=2){ floatText({...center,dy:-34},`COMBO ×${combo}`,'combo big'); comboFlash(); }
+    if(combo>=2){ floatText({...center,dy:-34},`COMBO ×${combo}`,'combo big'); if(combo>=3) comboFlash(combo); }
     sfx.clear(combo); haptic(combo>=3?40:20);
     // 成就检测
     unlockAchievement('first_clear');
@@ -309,6 +330,8 @@ async function cascade(){
     if(toRemove.size>=8) unlockAchievement('clear8');
     if(totalClears>=500) unlockAchievement('total500');
     if([...toRemove].some(k=>{const{r,c}=parseKey(k);const t=board[r]&&board[r][c];return t&&t.special===SPECIAL.BOMB;})) sfx.bomb();
+    // 预闪烁：匹配方块在移除前轻微缩放高亮（仅 transform/opacity）
+    if(Q.glow){ for(const k of toRemove){ const{r,c}=parseKey(k); const t=board[r]&&board[r][c]; if(t) t.el.classList.add('pre-clear'); } await sleep(110); }
     await removeCells(Array.from(toRemove).map(parseKey),{specials});
     await placeSpecials(specials);
     await dropAndFill();
@@ -343,7 +366,7 @@ async function placeSpecials(specials){
 }
 async function removeCells(cells,opts={}){
   for(const {r,c} of cells){ const t=board[r]&&board[r][c]; if(!t) continue; spawnParticles(r,c,t.type,opts.rainbow); t.el.classList.add('removing'); }
-  if(cells.length>=5){ appEl.classList.add('shake'); setTimeout(()=>appEl.classList.remove('shake'),350); }
+  if(cells.length>=5&&Q.shake){ appEl.classList.add('shake'); setTimeout(()=>appEl.classList.remove('shake'),350); }
   await sleep(REMOVE_DUR);
   for(const {r,c} of cells){ const t=board[r]&&board[r][c]; if(!t) continue; t.el.remove(); board[r][c]=null; }
 }
@@ -363,19 +386,19 @@ async function dropAndFill(){
 // ---------- 粒子 ----------
 const ctx=fxCanvas.getContext('2d'); let particles=[]; let particleRAF=null;
 const isMobile = matchMedia('(max-width:960px)').matches;
-let dpr = Math.min(window.devicePixelRatio||1, isMobile?1.5:2);   // fx canvas 效果 DPR
+let dpr = Math.min(window.devicePixelRatio||1, Q.dpr);   // fx canvas 效果 DPR
 let bgDpr = Math.min(window.devicePixelRatio||1, isMobile?1.25:1.5); // 背景 canvas DPR
 const MAX_PARTICLES = isMobile?96:160;
 // 粒子对象池
 const particlePool = [];
 function newParticle(){ return particlePool.pop() || {}; }
 function freeParticle(p){ if(particlePool.length<MAX_PARTICLES){ for(const k in p) p[k]=undefined; particlePool.push(p); } }
-function resizeFx(){ dpr=Math.min(window.devicePixelRatio||1, isMobile?1.5:2); const rect=boardEl.getBoundingClientRect(); if(rect.width<=0) return; fxCanvas.width=rect.width*dpr; fxCanvas.height=rect.height*dpr; fxCanvas.style.width=rect.width+'px'; fxCanvas.style.height=rect.height+'px'; }
+function resizeFx(){ dpr=Math.min(window.devicePixelRatio||1, Q.dpr); const rect=boardEl.getBoundingClientRect(); if(rect.width<=0) return; fxCanvas.width=rect.width*dpr; fxCanvas.height=rect.height*dpr; fxCanvas.style.width=rect.width+'px'; fxCanvas.style.height=rect.height+'px'; }
 function spawnParticles(r,c,type,rainbow){
   if(!settings.motion) return;
   const {x,y}=posOf(r,c); const cx=(x+tileSize/2+PAD)*dpr, cy=(y+tileSize/2+PAD)*dpr;
   const colors=rainbow?['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa']:[ACCENT[type],'#ffffff'];
-  const n = isMobile?7:10;
+  const n = Q.particles;
   for(let i=0;i<n;i++){ const a=(Math.PI*2*i)/n+Math.random()*.4; const sp=(1.8+Math.random()*2.6)*dpr;
     if(particles.length>=MAX_PARTICLES) break;
     const p=newParticle(); Object.assign(p,{x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,life:1,decay:.018+Math.random()*.02,size:(3+Math.random()*4)*dpr,color:colors[i%colors.length],rot:Math.random()*Math.PI,vr:(Math.random()-.5)*.3});
@@ -384,10 +407,10 @@ function spawnParticles(r,c,type,rainbow){
   ensureParticleLoop();
 }
 function shockwave(r,c,sp){
-  if(!settings.motion) return;
+  if(!settings.motion||Q.shockwaves<=0) return;
   const {x,y}=posOf(r,c); const cx=(x+tileSize/2+PAD)*dpr, cy=(y+tileSize/2+PAD)*dpr;
   const col = sp===SPECIAL.RAINBOW?'#a78bfa':'#ff6b6b';
-  for(let k=0;k<3;k++){ if(particles.length>=MAX_PARTICLES) break; const p=newParticle(); Object.assign(p,{ring:true,x:cx,y:cy,r:6*dpr,life:1,decay:.04,color:col}); particles.push(p); }
+  for(let k=0;k<Q.shockwaves;k++){ if(particles.length>=MAX_PARTICLES) break; const p=newParticle(); Object.assign(p,{ring:true,x:cx,y:cy,r:6*dpr,life:1,decay:.04,color:col}); particles.push(p); }
   ensureParticleLoop();
 }
 function tickParticles(){
@@ -404,7 +427,7 @@ function tickParticles(){
 }
 function ensureParticleLoop(){ if(particleRAF===null && particles.length>0) particleRAF=requestAnimationFrame(tickParticles); }
 function stopParticleLoop(){ if(particleRAF!==null){ cancelAnimationFrame(particleRAF); particleRAF=null; } ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); particles.length=0; }
-function comboFlash(){ const f=document.querySelector('.combo-flash')||(()=>{const d=document.createElement('div');d.className='combo-flash';document.body.appendChild(d);return d;})(); if(f.animate){ f.animate([{opacity:0},{opacity:1,offset:.3},{opacity:0}],{duration:400,easing:'ease-out'}); } else { f.classList.remove('on'); f.classList.add('on'); } }
+function comboFlash(level){ const f=document.querySelector('.combo-flash')||(()=>{const d=document.createElement('div');d.className='combo-flash';document.body.appendChild(d);return d;})(); const col = level>=8?'rgba(167,139,250,.35)':level>=5?'rgba(255,107,107,.3)':'rgba(255,217,61,.25)'; f.style.background=`radial-gradient(ellipse at center,${col},transparent 70%)`; if(f.animate){ f.animate([{opacity:0},{opacity:1,offset:.3},{opacity:0}],{duration:400,easing:'ease-out'}); } else { f.classList.remove('on'); f.classList.add('on'); } }
 function floatText(pos,text,cls=''){ const el=document.createElement('div'); el.className='float-text '+cls; el.textContent=text; el.style.left=(pos.x+PAD)+'px'; el.style.top=(pos.y+PAD+(pos.dy||0))+'px'; floatLayer.appendChild(el); setTimeout(()=>el.remove(),950); }
 function centerOf(set){ let sx=0,sy=0,n=0; for(const k of set){const{r,c}=parseKey(k);const{x,y}=posOf(r,c);sx+=x+tileSize/2;sy+=y+tileSize/2;n++;} return {x:sx/n,y:sy/n}; }
 const parseKey=k=>{const[r,c]=k.split(',').map(Number);return{r,c};};
@@ -708,7 +731,7 @@ function winLevel(){
 }
 function loseLevel(){
   state='lose'; stopBgMusic(); sfx.lose();
-  appEl.classList.add('shake'); setTimeout(()=>appEl.classList.remove('shake'),350);
+  if(Q.shake){ appEl.classList.add('shake'); setTimeout(()=>appEl.classList.remove('shake'),350); }
   const gap=currentLevel.target-score;
   $('loseScore').textContent=score;
   $('loseSub').textContent=`差 ${gap} 分达成目标，再来一次！`;
@@ -750,12 +773,15 @@ function toggleSound(){
 function openSettings(){ showModal('modalSettings'); syncSettingsUI(); sfx.btn(); }
 function syncSettingsUI(){
   $('setSfx').checked=settings.sfx; $('setMusic').checked=settings.music; $('setVol').value=settings.volume;
-  $('setMotion').checked=settings.motion; $('setHaptic').checked=settings.haptic;
+  $('setMotion').checked=settings.motion; $('setHaptic').checked=settings.haptic; $('setQuality').value=settings.quality;
 }
 function applySettings(){
   if(masterGain) masterGain.gain.value=settings.volume/100;
   if(!settings.music) stopBgMusic(); else if(state==='playing'&&!bgOsc) startBgMusic();
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
+  Q = QUALITY_PRESETS[resolveQuality()];
+  if(!$('gameShell').hidden){ resizeFx(); }
+  syncBgStars();
   soundOn=settings.sfx;
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn);
 }
@@ -767,6 +793,7 @@ $('setMusic').onchange=e=>{ settings.music=e.target.checked; settings.save(); ap
 $('setVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); if(masterGain) masterGain.gain.value=settings.volume/100; };
 $('setMotion').onchange=e=>{ settings.motion=e.target.checked; settings.save(); applySettings(); };
 $('setHaptic').onchange=e=>{ settings.haptic=e.target.checked; settings.save(); if(settings.haptic) haptic(30); };
+$('setQuality').onchange=e=>{ settings.quality=e.target.value; settings.save(); applySettings(); sfx.btn(); };
 
 let resizeTimer=null;
 window.addEventListener('resize',()=>{ clearTimeout(resizeTimer); resizeTimer=setTimeout(()=>{ if(!$('gameShell').hidden){ measure(); resizeFx(); relayoutAll(); } resizeBgCanvas(); },100); });

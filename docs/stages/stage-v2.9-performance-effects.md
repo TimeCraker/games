@@ -51,13 +51,13 @@
 - [x] commit
 
 ## Task 5 - 质量档位与轻量特效
-- [ ] effectsQuality auto/high/medium/low
-- [ ] 消除前预闪烁
-- [ ] 炸弹/彩虹特效精简
-- [ ] 连击分档强调
-- [ ] 设置面板加质量选择
-- [ ] prefers-reduced-motion 覆盖
-- [ ] commit
+- [x] effectsQuality auto/high/medium/low
+- [x] 消除前预闪烁
+- [x] 炸弹/彩虹特效精简（冲击波层数按档）
+- [x] 连击分档强调（3/5/8 不同颜色）
+- [x] 设置面板加质量选择
+- [x] prefers-reduced-motion 覆盖
+- [x] commit
 
 ## Task 6 - 回归、对比、部署
 - [ ] 3 次 perf 中位数写入 after/

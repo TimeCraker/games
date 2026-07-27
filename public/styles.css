@@ -258,6 +258,9 @@ body {
   transform-style:preserve-3d;
   transition: transform var(--move-dur,.28s) var(--ease-out), opacity .25s var(--ease-out), filter .2s ease;
 }
+.tile.pre-clear { z-index:14; }
+.tile.pre-clear .face { animation: preClear .11s ease-out forwards; }
+@keyframes preClear { to{transform:translateZ(14px) scale(1.12); filter:brightness(1.25);} }
 .tile.dragging, .tile.removing, .tile.spawning { will-change:transform,opacity; }
 .tile .face {
   position:absolute; inset:0; border-radius:inherit; overflow:hidden; background:var(--surface-2);
@@ -536,6 +539,7 @@ body {
 .range { -webkit-appearance:none; appearance:none; width:120px; height:6px; border-radius:3px; background:var(--cell-bg); outline:none; }
 .range::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:linear-gradient(135deg,var(--c),var(--p)); cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.2); }
 .range::-moz-range-thumb { width:18px; height:18px; border:none; border-radius:50%; background:linear-gradient(135deg,var(--c),var(--p)); cursor:pointer; }
+.select { font-family:inherit; font-size:13px; font-weight:600; color:var(--text); background:var(--cell-bg); border:1px solid var(--line); border-radius:10px; padding:6px 10px; cursor:pointer; outline:none; }
 
 /* 减少动效（设置关闭时） */
 .reduce-motion * { animation-duration:.01ms !important; transition-duration:.08s !important; }
