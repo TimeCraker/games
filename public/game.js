@@ -696,7 +696,7 @@ function toggleSound(){
   settings.sfx=!settings.sfx; soundOn=settings.sfx; settings.save();
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute');
   $('soundBtn').classList.toggle('off',!soundOn);
-  const ms=$('menuSound'); if(ms) ms.innerHTML=`${ic(soundOn?'sound':'mute','sm')}<span>音效：${soundOn?'开启':'关闭'}</span>`;
+  const ms=$('menuSound'); if(ms) ms.textContent='音效·'+(soundOn?'开':'关');
   if(!soundOn) stopBgMusic(); else if(state==='playing'&&settings.music) startBgMusic();
   syncSettingsUI();
   sfx.btn();
@@ -735,7 +735,7 @@ function start(){
   setTheme(themePref); setBg(bgPref);
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn);
   $('pauseBtn').innerHTML=ic('pause'); $('levelsBack').innerHTML=ic('back');
-  $('menuSound').innerHTML=`${ic(soundOn?'sound':'mute','sm')}<span>音效：${soundOn?'开启':'关闭'}</span>`;
+  $('menuSound').textContent='音效·'+(soundOn?'开':'关');
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
   initBgStars(); requestAnimationFrame(tickBgStars); requestAnimationFrame(tickParticles);
   gotoMenu();
