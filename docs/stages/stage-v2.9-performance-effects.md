@@ -15,11 +15,13 @@
 - Lighthouse: Windows npx 超时，Task 6 重试
 
 ## Task 1 - 按需调度 Canvas 动画
-- [ ] 粒子 Canvas 按需 RAF
-- [ ] 背景星粒子仅 neon 运行
-- [ ] 统一 syncAnimationLoops + visibilitychange
-- [ ] 验收：静止 cloud/photo 无 Canvas draw；后台停 RAF
-- [ ] commit
+- [x] 粒子 Canvas 按需 RAF
+- [x] 背景星粒子仅 neon 运行
+- [x] 统一 syncAnimationLoops + visibilitychange
+- [x] 验收：静止 cloud/photo 无 Canvas draw；后台停 RAF
+- [x] commit
+
+### 验收: cloud 静止 RAF=0, 后台 RAF=0 (test_raf.js)
 
 ## Task 2 - Canvas 分辨率与粒子预算
 - [ ] 效果 DPR 封顶（移动 1.5 / 桌面 2）

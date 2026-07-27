@@ -214,7 +214,7 @@ function createsMatch(r,c,type){
 }
 function clearBoard(){
   boardEl.querySelectorAll('.tile').forEach(e=>e.remove()); board=[];
-  floatLayer.innerHTML=''; particles=[];
+  floatLayer.innerHTML=''; stopParticleLoop();
 }
 
 // ---------- 匹配检测 ----------
@@ -361,7 +361,7 @@ async function dropAndFill(){
 }
 
 // ---------- 粒子 ----------
-const ctx=fxCanvas.getContext('2d'); let particles=[]; let dpr=window.devicePixelRatio||1;
+const ctx=fxCanvas.getContext('2d'); let particles=[]; let particleRAF=null; let dpr=window.devicePixelRatio||1;
 function resizeFx(){ dpr=window.devicePixelRatio||1; const rect=boardEl.getBoundingClientRect(); fxCanvas.width=rect.width*dpr; fxCanvas.height=rect.height*dpr; fxCanvas.style.width=rect.width+'px'; fxCanvas.style.height=rect.height+'px'; }
 function spawnParticles(r,c,type,rainbow){
   const {x,y}=posOf(r,c); const cx=(x+tileSize/2+PAD)*dpr, cy=(y+tileSize/2+PAD)*dpr;
@@ -370,20 +370,28 @@ function spawnParticles(r,c,type,rainbow){
   for(let i=0;i<n;i++){ const a=(Math.PI*2*i)/n+Math.random()*.4; const sp=(1.8+Math.random()*2.6)*dpr;
     particles.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,life:1,decay:.018+Math.random()*.02,size:(3+Math.random()*4)*dpr,color:colors[i%colors.length],rot:Math.random()*Math.PI,vr:(Math.random()-.5)*.3}); }
   particles.push({ring:true,x:cx,y:cy,r:4*dpr,life:1,decay:.05,color:ACCENT[type]});
+  ensureParticleLoop();
 }
 function shockwave(r,c,sp){
   const {x,y}=posOf(r,c); const cx=(x+tileSize/2+PAD)*dpr, cy=(y+tileSize/2+PAD)*dpr;
   const col = sp===SPECIAL.RAINBOW?'#a78bfa':'#ff6b6b';
   for(let k=0;k<3;k++) particles.push({ring:true,x:cx,y:cy,r:6*dpr,life:1,decay:.04,color:col});
+  ensureParticleLoop();
 }
 function tickParticles(){
   ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
-  particles=particles.filter(p=>{ p.life-=p.decay; if(p.life<=0) return false;
+  let write=0;
+  for(let i=0;i<particles.length;i++){ const p=particles[i]; p.life-=p.decay; if(p.life<=0) continue;
     if(p.ring){ p.r+=3*dpr; ctx.save(); ctx.globalAlpha=p.life*.6; ctx.strokeStyle=p.color; ctx.lineWidth=3*dpr; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.stroke(); ctx.restore(); }
     else { p.x+=p.vx; p.y+=p.vy; p.vy+=.15*dpr; p.rot+=p.vr; ctx.save(); ctx.globalAlpha=p.life; ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.color; ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size); ctx.restore(); }
-    return true; });
-  requestAnimationFrame(tickParticles);
+    particles[write++]=p;
+  }
+  particles.length=write;
+  if(write>0){ particleRAF=requestAnimationFrame(tickParticles); }
+  else { particleRAF=null; }
 }
+function ensureParticleLoop(){ if(particleRAF===null && particles.length>0) particleRAF=requestAnimationFrame(tickParticles); }
+function stopParticleLoop(){ if(particleRAF!==null){ cancelAnimationFrame(particleRAF); particleRAF=null; } ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); particles.length=0; }
 function comboFlash(){ const f=document.querySelector('.combo-flash')||(()=>{const d=document.createElement('div');d.className='combo-flash';document.body.appendChild(d);return d;})(); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
 function floatText(pos,text,cls=''){ const el=document.createElement('div'); el.className='float-text '+cls; el.textContent=text; el.style.left=(pos.x+PAD)+'px'; el.style.top=(pos.y+PAD+(pos.dy||0))+'px'; floatLayer.appendChild(el); setTimeout(()=>el.remove(),950); }
 function centerOf(set){ let sx=0,sy=0,n=0; for(const k of set){const{r,c}=parseKey(k);const{x,y}=posOf(r,c);sx+=x+tileSize/2;sy+=y+tileSize/2;n++;} return {x:sx/n,y:sy/n}; }
@@ -572,13 +580,18 @@ function startBgMusic(){
 function stopBgMusic(){ if(bgOsc){ try{ bgGain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.5); bgOsc.forEach(o=>{try{o.stop(audioCtx.currentTime+0.6);}catch(e){}});}catch(e){} bgOsc=null; bgGain=null; } }
 
 // ---------- 背景粒子 ----------
-const bgCtx=bgParticles.getContext('2d'); let bgStars=[];
+const bgCtx=bgParticles.getContext('2d'); let bgStars=[]; let bgStarRAF=null;
 function initBgStars(){ bgStars=[]; for(let i=0;i<60;i++) bgStars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.6+0.4,tw:Math.random()*Math.PI*2}); resizeBgCanvas(); }
 function resizeBgCanvas(){ bgParticles.width=innerWidth*dpr; bgParticles.height=innerHeight*dpr; bgParticles.style.width=innerWidth+'px'; bgParticles.style.height=innerHeight+'px'; }
 function tickBgStars(){
   bgCtx.clearRect(0,0,bgParticles.width,bgParticles.height);
   if(document.documentElement.dataset.bg==='neon'){ for(const s of bgStars){ s.tw+=0.03; const a=0.3+Math.sin(s.tw)*0.3; bgCtx.globalAlpha=Math.max(0,a); bgCtx.fillStyle='#a78bfa'; bgCtx.beginPath(); bgCtx.arc(s.x*bgParticles.width,s.y*bgParticles.height,s.r*dpr,0,Math.PI*2); bgCtx.fill(); } }
-  requestAnimationFrame(tickBgStars);
+  bgStarRAF=requestAnimationFrame(tickBgStars);
+}
+function syncBgStars(){
+  const shouldRun = document.documentElement.dataset.bg==='neon' && settings.motion && !document.hidden && state!=='menu';
+  if(shouldRun){ if(bgStarRAF===null){ bgStarRAF=requestAnimationFrame(tickBgStars); } }
+  else { if(bgStarRAF!==null){ cancelAnimationFrame(bgStarRAF); bgStarRAF=null; } bgCtx.clearRect(0,0,bgParticles.width,bgParticles.height); }
 }
 
 // ---------- 主题/背景 ----------
@@ -594,6 +607,7 @@ function setBg(key){
   $('bgBtn').innerHTML = ic(cur.icon);
   const mb=$('menuBg'); if(mb) mb.textContent = `背景 · ${cur.name}`;
   localStorage.setItem('xxl-bg',key);
+  syncBgStars();
 }
 function cycleBg(){ const next=BG_LIST[(bgIdx+1)%BG_LIST.length]; setBg(next.key); sfx.btn(); showToast('背景：'+next.name); }
 
@@ -611,6 +625,7 @@ function gotoMenu(){
   state='menu'; showScreen('screenMenu'); hideAllModal();
   $('gameShell').hidden=true; stopBgMusic();
   clearBoard(); combo=0; busy=false; clearSelection(); selected=null;
+  syncBgStars();
   const unlocked=Math.min(SAVE.unlocked,LEVELS.length);
   $('menuContinue').querySelector('span').textContent = unlocked>1 ? `继续第 ${unlocked} 关` : '开始游戏';
   $('menuProgress').textContent = `${String(unlocked).padStart(2,'0')} / ${LEVELS.length}`;
@@ -642,6 +657,7 @@ async function startLevel(idx){
   $('introGoals').innerHTML=currentLevel.goals.map(g=>{const m=GOAL_META[g.t];return `<div>${ic(m.icon,'sm')} ${m.label} <b>${g.v}</b></div>`;}).join('') + (currentLevel.moves===0?'':'<div>'+ic('target','sm')+' '+currentLevel.moves+' 步内完成</div>');
   sfx.init(); await sleep(1600);
   state='playing'; showScreen(null); $('gameShell').hidden=false;
+  syncBgStars();
   levelPill.textContent=`Level ${currentLevel.id}`; levelNum.textContent=currentLevel.id; levelName.textContent=currentLevel.name;
   hintEl.textContent = `${currentLevel.name} · ${currentLevel.moves===0?'无限步数':currentLevel.moves+'步内'}完成目标`;
   await new Promise(r=>requestAnimationFrame(r)); await new Promise(r=>requestAnimationFrame(r));
@@ -744,9 +760,11 @@ function start(){
   $('pauseBtn').innerHTML=ic('pause'); $('levelsBack').innerHTML=ic('back');
   $('menuSound').textContent=`音效 · ${soundOn?'开':'关'}`;
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
-  initBgStars(); requestAnimationFrame(tickBgStars); requestAnimationFrame(tickParticles);
-  gotoMenu();
+  syncBgStars();
+  initBgStars(); syncBgStars(); gotoMenu();
 }
 start();
+
+document.addEventListener('visibilitychange',()=>{ syncBgStars(); if(document.hidden){ stopParticleLoop(); } });
 
 })();
