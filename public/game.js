@@ -7,7 +7,7 @@
 
 // ---------- 配置 ----------
 const ROWS = 8, COLS = 8, TYPES = 4;
-const SWAP_DUR = 260, REMOVE_DUR = 420, FALL_DUR = 320, GAP = 8, PAD = 10, SWIPE_THRESH = 0.35;
+const SWAP_DUR = 260, REMOVE_DUR = 420, FALL_DUR = 320, GAP = 8, PAD = 10, SWIPE_THRESH = 0.22;
 const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./assets/faces/face2.jpg','./assets/faces/face3.jpg'];
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, BOMB:1, RAINBOW:2 };
@@ -486,7 +486,7 @@ function onDown(e){
   e.preventDefault();
   clearHint();
   const el=e.currentTarget; const r=+el.dataset.r,c=+el.dataset.c;
-  drag={r,c,x:e.clientX,y:e.clientY,el,dx:0,dy:0,dir:null,moved:false};
+  drag={r,c,x:e.clientX,y:e.clientY,el,dx:0,dy:0,dir:null,moved:false,lastT:performance.now(),lastX:e.clientX,lastY:e.clientY,vx:0,vy:0};
   el.classList.add('dragging');
   el.style.transition='none';
   try{ el.setPointerCapture(e.pointerId); }catch(_){}
@@ -505,6 +505,10 @@ function onMove(e){
   if(drag.dir==='h'){ dy=0; dx=Math.max(-cellUnit*0.55,Math.min(cellUnit*0.55,dx)); }
   else { dx=0; dy=Math.max(-cellUnit*0.55,Math.min(cellUnit*0.55,dy)); }
   drag.dx=dx; drag.dy=dy; drag.moved=true;
+  // 记录瞬时速度（用于轻扫触发）
+  const now=performance.now(); const dt=now-drag.lastT;
+  if(dt>0){ drag.vx=(e.clientX-drag.lastX)/dt; drag.vy=(e.clientY-drag.lastY)/dt; }
+  drag.lastT=now; drag.lastX=e.clientX; drag.lastY=e.clientY;
   // 即时写 transform（跟手优先，transform 是合成属性不触发 layout）
   const {x,y}=posOf(drag.r,drag.c);
   drag.el.style.transform=`translate3d(${x+dx}px,${y+dy}px,${Z_DRAG}px) scale(1.05)`;
@@ -521,8 +525,10 @@ function onUp(e){
   const d=drag; drag.el.classList.remove('dragging');
   drag.el.style.transition='';
   window.removeEventListener('pointermove',onMove);
-  // 判断是否达到交换阈值
-  const reach = Math.hypot(d.dx,d.dy) > tileSize*SWIPE_THRESH;
+  // 判断是否达到交换阈值：距离够 或 轻扫速度够快
+  const dist = Math.hypot(d.dx,d.dy);
+  const speed = d.dir==='h' ? Math.abs(d.vx) : Math.abs(d.vy);
+  const reach = dist > tileSize*SWIPE_THRESH || (dist > tileSize*0.1 && speed > 0.6);
   if(reach){
     let nr=d.r,nc=d.c;
     if(d.dir==='h') nc+=d.dx>0?1:-1; else nr+=d.dy>0?1:-1;
