@@ -10,6 +10,9 @@
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
 <link rel="stylesheet" href="./styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -18,6 +21,14 @@
 <div class="bg-layer bg-neon"></div>
 <div class="bg-layer bg-photo"></div>
 <canvas class="bg-particles" id="bgParticles"></canvas>
+
+<!-- ===== 全局顶栏（主菜单+游戏都可用） ===== -->
+<div class="global-bar">
+  <button class="icon-btn" id="bgBtn" title="切换背景" aria-label="切换背景"></button>
+  <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"></button>
+  <button class="icon-btn" id="soundBtn" title="声音" aria-label="声音"></button>
+  <button class="icon-btn" id="settingsBtn" title="设置" aria-label="设置"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 005 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 005 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 5a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span></button>
+</div>
 
 <!-- ===== 游戏外壳 ===== -->
 <div class="game-shell" id="gameShell" hidden>
@@ -29,11 +40,7 @@
     </div>
     <div class="level-pill" id="levelPill">Level 1</div>
     <div class="actions">
-      <button class="icon-btn" id="bgBtn" title="切换背景" aria-label="切换背景"></button>
-      <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"></button>
-      <button class="icon-btn" id="soundBtn" title="声音" aria-label="声音"></button>
       <button class="icon-btn" id="pauseBtn" title="暂停" aria-label="暂停"></button>
-      <button class="icon-btn" id="settingsBtn" title="设置" aria-label="设置"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 005 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 005 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 5a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span></button>
     </div>
   </header>
 
@@ -110,16 +117,23 @@
 <!-- 主菜单 -->
 <div class="screen screen-menu show" id="screenMenu">
   <div class="menu-inner">
+    <div class="menu-deco menu-deco-1"></div>
+    <div class="menu-deco menu-deco-2"></div>
     <div class="menu-logo">
       <div class="logo-spark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5l2.6 7.9L22.5 12l-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z"/></svg></div>
-      <h1 class="menu-title">桓睿消消乐</h1>
+      <div class="menu-title-wrap">
+        <div class="menu-kicker">MATCH-3 GAME</div>
+        <h1 class="menu-title">桓睿消消乐</h1>
+      </div>
       <p class="menu-sub">把帅脸三连消除，闯关成为大师</p>
     </div>
     <div class="menu-actions">
       <button class="menu-btn primary" id="menuContinue">开始游戏</button>
       <button class="menu-btn" id="menuLevels">关卡选择</button>
-      <button class="menu-btn ghost" id="menuBg">背景：云海白昼</button>
-      <button class="menu-btn ghost" id="menuSound">音效：开启</button>
+      <div class="menu-row">
+        <button class="menu-btn ghost" id="menuBg">背景：云海白昼</button>
+        <button class="menu-btn ghost" id="menuSound">音效：开启</button>
+      </div>
     </div>
     <div class="menu-foot">滑动交换 · 三连消除 · 连击得分</div>
   </div>

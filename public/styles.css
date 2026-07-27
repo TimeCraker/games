@@ -50,6 +50,7 @@
 }
 
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+[hidden] { display:none !important; }
 html, body { height:100%; }
 body {
   font-family: "Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
@@ -135,6 +136,12 @@ body {
   display: flex; flex-direction: column;
   max-width: 1280px; margin: 0 auto;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* 全局顶栏（主菜单+游戏都可用，z-index高于screen） */
+.global-bar {
+  position: fixed; top: env(safe-area-inset-top); right: 14px; z-index: 160;
+  display: flex; gap: 7px;
 }
 
 .topbar {
@@ -319,29 +326,55 @@ body {
 
 /* 主菜单 */
 .screen-menu .menu-inner {
-  text-align:center; max-width:380px; width:100%;
-  transform:translateY(20px); opacity:0; transition:all .5s var(--ease-bounce);
+  text-align:center; max-width:400px; width:100%; position:relative; padding:0 8px;
+  transform:translateY(20px); opacity:0; transition:all .6s var(--ease-bounce);
 }
 .screen-menu.show .menu-inner { transform:translateY(0); opacity:1; }
-.menu-logo { margin-bottom:30px; }
-.logo-spark { font-size:42px; background:linear-gradient(135deg,var(--r),var(--p)); -webkit-background-clip:text; background-clip:text; color:transparent; filter:drop-shadow(0 4px 12px rgba(167,139,250,.4)); animation: sparkRotate 8s linear infinite; }
-@keyframes sparkRotate { to{transform:rotate(360deg)} }
-.menu-title { font-size:38px; font-weight:900; letter-spacing:2px; background:linear-gradient(135deg,var(--r),var(--y),var(--c),var(--p)); -webkit-background-clip:text; background-clip:text; color:transparent; margin:6px 0; background-size:200% auto; animation: gradMove 4s linear infinite; }
-@keyframes gradMove { to{background-position:200% center} }
-.menu-sub { color:var(--text-soft); font-size:14px; }
-.menu-actions { display:flex; flex-direction:column; gap:12px; margin-bottom:24px; }
-.menu-btn {
-  padding:14px 28px; font-size:15px; font-weight:700; border:none; border-radius:14px; cursor:pointer;
-  background:var(--surface); color:var(--text); border:1px solid var(--line);
-  transition:transform .15s var(--ease-out), box-shadow .2s, filter .2s;
-  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+.menu-deco { position:absolute; border-radius:50%; filter:blur(44px); opacity:.45; z-index:-1; }
+.menu-deco-1 { width:190px; height:190px; background:var(--c); top:-30px; left:-50px; animation: decoFloat 8s ease-in-out infinite; }
+.menu-deco-2 { width:170px; height:170px; background:var(--p); bottom:60px; right:-40px; animation: decoFloat 9s ease-in-out infinite reverse; }
+@keyframes decoFloat { 0%,100%{transform:translate(0,0)} 50%{transform:translate(22px,-18px)} }
+.menu-logo { margin-bottom:34px; }
+.logo-spark { width:48px; height:48px; margin:0 auto 14px; color:var(--p); filter:drop-shadow(0 6px 16px rgba(167,139,250,.45)); animation: sparkGlow 3s ease-in-out infinite; }
+.logo-spark svg { width:100%; height:100%; }
+@keyframes sparkGlow { 0%,100%{transform:rotate(0) scale(1)} 50%{transform:rotate(180deg) scale(1.1)} }
+.menu-kicker { font-size:11px; font-weight:700; letter-spacing:6px; color:var(--text-mute); margin-bottom:8px; opacity:0; animation: fadeInUp .6s var(--ease-out) .2s forwards; }
+.menu-title {
+  font-family:"ZCOOL QingKe HuangYou","Noto Serif SC","PingFang SC","Microsoft YaHei",serif;
+  font-size:clamp(40px,11vw,58px); font-weight:900; letter-spacing:4px; line-height:1.05; margin:0;
+  background:linear-gradient(120deg,var(--r) 0%,var(--y) 35%,var(--c) 65%,var(--p) 100%);
+  background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation: gradMove 5s linear infinite, fadeInUp .7s var(--ease-bounce) .3s both;
+  filter:drop-shadow(0 4px 18px rgba(167,139,250,.25));
 }
-.menu-btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(var(--sc),.16); }
+.menu-title::after { content:""; display:block; width:60px; height:3px; margin:14px auto 0; background:linear-gradient(90deg,transparent,var(--c),transparent); border-radius:2px; }
+@keyframes gradMove { to{background-position:200% center} }
+.menu-sub { color:var(--text-soft); font-size:14px; margin-top:14px; opacity:0; animation: fadeInUp .6s var(--ease-out) .5s forwards; }
+.menu-actions { display:flex; flex-direction:column; gap:12px; margin-bottom:26px; opacity:0; animation: fadeInUp .6s var(--ease-out) .65s forwards; }
+.menu-row { display:flex; gap:10px; }
+.menu-row .menu-btn { flex:1; }
+.menu-btn {
+  padding:15px 28px; font-size:15px; font-weight:700; border:none; border-radius:16px; cursor:pointer;
+  background:var(--surface); color:var(--text); border:1px solid var(--line);
+  transition:transform .18s var(--ease-out), box-shadow .25s, filter .2s;
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.menu-btn:hover { transform:translateY(-2px); box-shadow:0 10px 24px rgba(var(--sc),.16); }
 .menu-btn:active { transform:scale(.96); }
-.menu-btn.primary { color:#fff; background:linear-gradient(135deg,var(--c),var(--p)); border:none; box-shadow:0 8px 20px rgba(78,205,196,.4); }
-.menu-btn.primary:hover { box-shadow:0 12px 26px rgba(78,205,196,.55); filter:brightness(1.05); }
-.menu-btn.ghost { background:transparent; font-size:13px; padding:11px 20px; }
-.menu-foot { color:var(--text-mute); font-size:12px; }
+.menu-btn.primary {
+  color:#fff; background:linear-gradient(135deg,var(--c),var(--p)); border:none;
+  box-shadow:0 10px 26px rgba(78,205,196,.4), inset 0 1px 0 rgba(255,255,255,.25);
+  font-size:16px; padding:17px 28px; position:relative; overflow:hidden;
+}
+.menu-btn.primary::before { content:""; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent); animation: shine 3.5s ease-in-out infinite; }
+@keyframes shine { 0%,60%{left:-100%} 100%{left:100%} }
+.menu-btn.primary:hover { box-shadow:0 14px 32px rgba(78,205,196,.55); filter:brightness(1.06); }
+.menu-btn.ghost { background:var(--panel-bg); font-size:13px; padding:12px 18px; }
+.menu-btn.ghost .ic.sm { width:14px; height:14px; }
+.menu-btn small { font-weight:500; opacity:.7; font-size:12px; }
+.menu-foot { color:var(--text-mute); font-size:12px; letter-spacing:1px; opacity:0; animation: fadeInUp .6s var(--ease-out) .85s forwards; }
+@keyframes fadeInUp { from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:translateY(0)} }
 
 /* 关卡选择 */
 .screen-levels .levels-inner { max-width:560px; width:100%; }
@@ -454,11 +487,7 @@ body {
 .lc-lock .ic { width:15px; height:15px; }
 .lc-stars .ic { width:16px; height:16px; }
 
-/* 菜单按钮带图标 */
-.menu-btn.ghost { display:flex; align-items:center; justify-content:center; gap:8px; }
-.menu-btn.ghost .ic.sm { width:14px; height:14px; }
-.menu-btn small { font-weight:500; opacity:.75; font-size:12px; }
-#menuContinue small { font-weight:600; }
+/* 菜单按钮带图标 (补充) */
 
 /* 星级 */
 .stars { display:flex; justify-content:center; gap:6px; margin:8px 0 4px; }
@@ -513,13 +542,16 @@ body {
 }
 @media (max-width: 480px) {
   .topbar { padding:8px 12px 4px; gap:8px; }
+  .global-bar { gap:5px; right:10px; }
+  .global-bar .icon-btn { width:32px; height:32px; }
+  .global-bar .icon-btn .ic { width:15px; height:15px; }
   .brand-title { font-size:16px; }
   .level-pill { font-size:12px; padding:5px 12px; }
   .icon-btn { width:34px; height:34px; font-size:14px; }
   .hud-value { font-size:17px; }
   .score-stat .hud-value { font-size:20px; }
-  .menu-title { font-size:30px; }
-  .intro-num { font-size:70px; }
+  .menu-kicker { letter-spacing:4px; }
+  .menu-row { flex-direction:column; }
   .panel-left .panel-card { min-width:140px; padding:10px 12px; }
   .goals { gap:6px; }
   .goal-item { font-size:12px; }
