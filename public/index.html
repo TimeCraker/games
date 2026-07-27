@@ -247,7 +247,16 @@
 <div class="achievement" id="achievement"></div>
 
 <script>
-if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{})); }
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    const hadSW = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+    // 新版 SW 接管后自动刷新（首次安装不刷新，避免循环）
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if(hadSW) window.location.reload();
+    });
+  });
+}
 </script>
 <script src="./game.js"></script>
 </body>
