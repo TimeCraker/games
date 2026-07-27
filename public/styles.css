@@ -112,7 +112,7 @@ body {
 @keyframes neonPulse { 0%{opacity:.6} 100%{opacity:1} }
 
 .bg-photo {
-  background-image: url('./assets/backgrounds/hero-anime-desktop.webp');
+  background-image: var(--bg-photo-url, url('./assets/backgrounds/bg-anime-1.webp'));
   background-size: cover; background-position: center;
   filter: blur(18px) brightness(.55) saturate(1.1);
   transform: scale(1.15);
@@ -338,7 +338,7 @@ body {
 .screen-menu { padding:0; overflow:hidden; color:#fff; background:#131923; }
 .screen-menu::before {
   content:""; position:absolute; inset:-2%;
-  background:url('./assets/backgrounds/hero-anime-desktop.webp') center / cover no-repeat;
+  background:var(--bg-photo-url, url('./assets/backgrounds/bg-anime-1.webp')) center / cover no-repeat;
   transform:scale(1.03); transition:transform 8s ease-out;
 }
 .screen-menu.show::before { transform:scale(1); }
@@ -624,7 +624,7 @@ body {
   .game-active .board-wrap { flex:0 0 auto; }
   .game-active .board-3d { width:min(calc(100vw - 20px),58vh); }
   .game-active .hint { margin-top:1px; font-size:11px; }
-  .screen-menu::before { background-image:url('./assets/backgrounds/hero-anime-mobile.webp'); background-position:center; }
+  .screen-menu::before { background:var(--bg-photo-url, url('./assets/backgrounds/bg-anime-1.webp')) center / cover no-repeat; }
   .screen-menu::after { background:linear-gradient(0deg,rgba(7,11,18,.96) 0%,rgba(7,11,18,.66) 43%,rgba(7,11,18,.18) 72%),linear-gradient(180deg,rgba(7,11,18,.36),transparent 30%); }
   .menu-cover { align-items:stretch; justify-content:stretch; padding:74px 20px max(28px,calc(env(safe-area-inset-bottom) + 18px)); }
   .menu-content { width:100%; height:100%; display:flex; flex-direction:column; }

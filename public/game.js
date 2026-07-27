@@ -12,7 +12,7 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, BOMB:1, RAINBOW:2 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.16';
+const CACHE_VER = '2.17';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -48,9 +48,10 @@ const SVG = {
 function ic(name, cls=''){ return `<span class="ic ${cls}">${SVG[name]||''}</span>`; }
 
 const BG_LIST = [
-  { key:'cloud', name:'云海白昼', icon:'cloud' },
-  { key:'neon',  name:'赛博夜场', icon:'neon' },
-  { key:'photo', name:'桓睿舞台', icon:'photo' },
+  { key:'cloud',  name:'云海白昼',  icon:'cloud' },
+  { key:'neon',   name:'赛博夜场',  icon:'neon'  },
+  { key:'photo1', name:'二次元·壹', icon:'photo' },
+  { key:'photo2', name:'二次元·贰', icon:'photo' },
 ];
 
 // 关卡配置 (moves: 0 = 无限步数)
@@ -665,7 +666,11 @@ function setTheme(t){
   localStorage.setItem('xxl-theme',t);
 }
 function setBg(key){
-  document.documentElement.dataset.bg=key;
+  document.documentElement.dataset.bg=key.startsWith('photo')?'photo':key;
+  if(key.startsWith('photo')){
+    const idx = key==='photo1'?1:2;
+    document.documentElement.style.setProperty('--bg-photo-url', `url('./assets/backgrounds/bg-anime-${idx}.webp?v=${CACHE_VER}')`);
+  }
   bgIdx=BG_LIST.findIndex(b=>b.key===key);
   const cur=BG_LIST[bgIdx];
   $('bgBtn').innerHTML = ic(cur.icon);

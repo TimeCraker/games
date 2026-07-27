@@ -59,17 +59,17 @@ def main():
         print(f"face{index}: {path.name} {box} -> {output}")
 
     # Theme covers: use only the two illustrations, never personal photos.
-    desktop_hero = Image.open(anime).convert("RGB")
-    desktop_hero = ImageEnhance.Contrast(desktop_hero).enhance(1.04)
-    desktop_hero = ImageEnhance.Color(desktop_hero).enhance(1.08)
-    desktop_hero.save(BG_DIR / "hero-anime-desktop.webp", "WEBP", quality=85, method=6)
-
-    mobile_hero = Image.open(minecraft).convert("RGB")
-    mobile_hero = ImageEnhance.Contrast(mobile_hero).enhance(1.04)
-    mobile_hero = ImageEnhance.Color(mobile_hero).enhance(1.06)
-    mobile_hero.save(BG_DIR / "hero-anime-mobile.webp", "WEBP", quality=86, method=6)
-    print(f"desktop hero: {anime.name} -> {BG_DIR / 'hero-anime-desktop.webp'}")
-    print(f"mobile hero: {minecraft.name} -> {BG_DIR / 'hero-anime-mobile.webp'}")
+    # 每张二次元图做成全屏背景（保留原比例，CSS cover 自适应），供背景轮换
+    anime_sources = [anime, minecraft]
+    for i, src in enumerate(anime_sources, start=1):
+        img = Image.open(src).convert("RGB")
+        img = ImageEnhance.Contrast(img).enhance(1.04)
+        img = ImageEnhance.Color(img).enhance(1.08)
+        # 限制最大边，控制体积；不裁正方形，保留横/竖比例供 cover 适配
+        img.thumbnail((1920, 1920), Image.Resampling.LANCZOS)
+        out = BG_DIR / f"bg-anime-{i}.webp"
+        img.save(out, "WEBP", quality=82, method=6)
+        print(f"bg-anime-{i}: {src.name} {img.size} -> {out}")
 
 
 if __name__ == "__main__":
