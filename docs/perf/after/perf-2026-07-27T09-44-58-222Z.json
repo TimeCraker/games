@@ -1,0 +1,32 @@
+{
+  "totalFrames": 4738,
+  "durationMs": 28312,
+  "static": {
+    "n": 300,
+    "avgMs": 6.41,
+    "p95Ms": 9.1,
+    "fps": 156.1
+  },
+  "swap": {
+    "n": 4138,
+    "avgMs": 5.93,
+    "p95Ms": 9.1,
+    "p99Ms": 9.2,
+    "fps": 168.7
+  },
+  "settle": {
+    "n": 300,
+    "avgMs": 6.21,
+    "p95Ms": 9.2,
+    "fps": 161
+  },
+  "longTasks": [],
+  "longTaskCount": 0,
+  "longTaskMax": 0,
+  "longTaskOver100": 0,
+  "heap": {
+    "usedMB": 3,
+    "totalMB": 4
+  },
+  "errors": []
+}

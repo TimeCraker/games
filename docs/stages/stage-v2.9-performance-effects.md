@@ -24,11 +24,13 @@
 ### 验收: cloud 静止 RAF=0, 后台 RAF=0 (test_raf.js)
 
 ## Task 2 - Canvas 分辨率与粒子预算
-- [ ] 效果 DPR 封顶（移动 1.5 / 桌面 2）
-- [ ] ResizeObserver
-- [ ] 粒子预算 + 原地压缩 + 对象池
-- [ ] 关闭动效时不生成粒子
-- [ ] commit
+- [x] 效果 DPR 封顶（移动 1.5 / 桌面 2）
+- [x] ResizeObserver
+- [x] 粒子预算 + 原地压缩 + 对象池
+- [x] 关闭动效时不生成粒子
+- [x] commit
+
+### 验收: 静止 RAF=0, 粒子移动端封顶96, DPR封顶1.5
 
 ## Task 3 - 移动端 CSS 合成降本
 - [ ] 移除/降级 backdrop-filter

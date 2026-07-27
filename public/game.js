@@ -361,27 +361,39 @@ async function dropAndFill(){
 }
 
 // ---------- 粒子 ----------
-const ctx=fxCanvas.getContext('2d'); let particles=[]; let particleRAF=null; let dpr=window.devicePixelRatio||1;
-function resizeFx(){ dpr=window.devicePixelRatio||1; const rect=boardEl.getBoundingClientRect(); fxCanvas.width=rect.width*dpr; fxCanvas.height=rect.height*dpr; fxCanvas.style.width=rect.width+'px'; fxCanvas.style.height=rect.height+'px'; }
+const ctx=fxCanvas.getContext('2d'); let particles=[]; let particleRAF=null;
+const isMobile = matchMedia('(max-width:960px)').matches;
+let dpr = Math.min(window.devicePixelRatio||1, isMobile?1.5:2);   // fx canvas 效果 DPR
+let bgDpr = Math.min(window.devicePixelRatio||1, isMobile?1.25:1.5); // 背景 canvas DPR
+const MAX_PARTICLES = isMobile?96:160;
+// 粒子对象池
+const particlePool = [];
+function newParticle(){ return particlePool.pop() || {}; }
+function freeParticle(p){ if(particlePool.length<MAX_PARTICLES){ for(const k in p) p[k]=undefined; particlePool.push(p); } }
+function resizeFx(){ dpr=Math.min(window.devicePixelRatio||1, isMobile?1.5:2); const rect=boardEl.getBoundingClientRect(); if(rect.width<=0) return; fxCanvas.width=rect.width*dpr; fxCanvas.height=rect.height*dpr; fxCanvas.style.width=rect.width+'px'; fxCanvas.style.height=rect.height+'px'; }
 function spawnParticles(r,c,type,rainbow){
+  if(!settings.motion) return;
   const {x,y}=posOf(r,c); const cx=(x+tileSize/2+PAD)*dpr, cy=(y+tileSize/2+PAD)*dpr;
   const colors=rainbow?['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa']:[ACCENT[type],'#ffffff'];
-  const n=16;
+  const n = isMobile?7:10;
   for(let i=0;i<n;i++){ const a=(Math.PI*2*i)/n+Math.random()*.4; const sp=(1.8+Math.random()*2.6)*dpr;
-    particles.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,life:1,decay:.018+Math.random()*.02,size:(3+Math.random()*4)*dpr,color:colors[i%colors.length],rot:Math.random()*Math.PI,vr:(Math.random()-.5)*.3}); }
-  particles.push({ring:true,x:cx,y:cy,r:4*dpr,life:1,decay:.05,color:ACCENT[type]});
+    if(particles.length>=MAX_PARTICLES) break;
+    const p=newParticle(); Object.assign(p,{x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,life:1,decay:.018+Math.random()*.02,size:(3+Math.random()*4)*dpr,color:colors[i%colors.length],rot:Math.random()*Math.PI,vr:(Math.random()-.5)*.3});
+    particles.push(p); }
+  if(particles.length<MAX_PARTICLES){ const p=newParticle(); Object.assign(p,{ring:true,x:cx,y:cy,r:4*dpr,life:1,decay:.05,color:ACCENT[type]}); particles.push(p); }
   ensureParticleLoop();
 }
 function shockwave(r,c,sp){
+  if(!settings.motion) return;
   const {x,y}=posOf(r,c); const cx=(x+tileSize/2+PAD)*dpr, cy=(y+tileSize/2+PAD)*dpr;
   const col = sp===SPECIAL.RAINBOW?'#a78bfa':'#ff6b6b';
-  for(let k=0;k<3;k++) particles.push({ring:true,x:cx,y:cy,r:6*dpr,life:1,decay:.04,color:col});
+  for(let k=0;k<3;k++){ if(particles.length>=MAX_PARTICLES) break; const p=newParticle(); Object.assign(p,{ring:true,x:cx,y:cy,r:6*dpr,life:1,decay:.04,color:col}); particles.push(p); }
   ensureParticleLoop();
 }
 function tickParticles(){
   ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
   let write=0;
-  for(let i=0;i<particles.length;i++){ const p=particles[i]; p.life-=p.decay; if(p.life<=0) continue;
+  for(let i=0;i<particles.length;i++){ const p=particles[i]; p.life-=p.decay; if(p.life<=0){ freeParticle(p); continue; }
     if(p.ring){ p.r+=3*dpr; ctx.save(); ctx.globalAlpha=p.life*.6; ctx.strokeStyle=p.color; ctx.lineWidth=3*dpr; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.stroke(); ctx.restore(); }
     else { p.x+=p.vx; p.y+=p.vy; p.vy+=.15*dpr; p.rot+=p.vr; ctx.save(); ctx.globalAlpha=p.life; ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.color; ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size); ctx.restore(); }
     particles[write++]=p;
@@ -582,10 +594,10 @@ function stopBgMusic(){ if(bgOsc){ try{ bgGain.gain.linearRampToValueAtTime(0,au
 // ---------- 背景粒子 ----------
 const bgCtx=bgParticles.getContext('2d'); let bgStars=[]; let bgStarRAF=null;
 function initBgStars(){ bgStars=[]; for(let i=0;i<60;i++) bgStars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.6+0.4,tw:Math.random()*Math.PI*2}); resizeBgCanvas(); }
-function resizeBgCanvas(){ bgParticles.width=innerWidth*dpr; bgParticles.height=innerHeight*dpr; bgParticles.style.width=innerWidth+'px'; bgParticles.style.height=innerHeight+'px'; }
+function resizeBgCanvas(){ bgDpr=Math.min(window.devicePixelRatio||1, isMobile?1.25:1.5); bgParticles.width=innerWidth*bgDpr; bgParticles.height=innerHeight*bgDpr; bgParticles.style.width=innerWidth+'px'; bgParticles.style.height=innerHeight+'px'; }
 function tickBgStars(){
   bgCtx.clearRect(0,0,bgParticles.width,bgParticles.height);
-  if(document.documentElement.dataset.bg==='neon'){ for(const s of bgStars){ s.tw+=0.03; const a=0.3+Math.sin(s.tw)*0.3; bgCtx.globalAlpha=Math.max(0,a); bgCtx.fillStyle='#a78bfa'; bgCtx.beginPath(); bgCtx.arc(s.x*bgParticles.width,s.y*bgParticles.height,s.r*dpr,0,Math.PI*2); bgCtx.fill(); } }
+  if(document.documentElement.dataset.bg==='neon'){ for(const s of bgStars){ s.tw+=0.03; const a=0.3+Math.sin(s.tw)*0.3; bgCtx.globalAlpha=Math.max(0,a); bgCtx.fillStyle='#a78bfa'; bgCtx.beginPath(); bgCtx.arc(s.x*bgParticles.width,s.y*bgParticles.height,s.r*bgDpr,0,Math.PI*2); bgCtx.fill(); } }
   bgStarRAF=requestAnimationFrame(tickBgStars);
 }
 function syncBgStars(){
@@ -747,7 +759,10 @@ $('setVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); if(ma
 $('setMotion').onchange=e=>{ settings.motion=e.target.checked; settings.save(); applySettings(); };
 $('setHaptic').onchange=e=>{ settings.haptic=e.target.checked; settings.save(); if(settings.haptic) haptic(30); };
 
-window.addEventListener('resize',()=>{ if(!$('gameShell').hidden){ measure(); resizeFx(); relayoutAll(); } resizeBgCanvas(); });
+let resizeTimer=null;
+window.addEventListener('resize',()=>{ clearTimeout(resizeTimer); resizeTimer=setTimeout(()=>{ if(!$('gameShell').hidden){ measure(); resizeFx(); relayoutAll(); } resizeBgCanvas(); },100); });
+// 棋盘尺寸变化时重设特效 canvas（仅在游戏中）
+if('ResizeObserver' in window){ new ResizeObserver(()=>{ if(!$('gameShell').hidden) resizeFx(); }).observe(boardEl); }
 function relayoutAll(){ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r]?.[c]; if(!t) continue; const{x,y}=posOf(r,c); t.el.style.width=t.el.style.height=tileSize+'px'; t.el.style.setProperty('--tx',x+'px'); t.el.style.setProperty('--ty',y+'px'); t.el.style.transform=`translate3d(${x}px,${y}px,8px)`; } }
 document.addEventListener('touchmove',e=>{ if(e.touches.length>1) e.preventDefault(); },{passive:false});
 document.addEventListener('gesturestart',e=>e.preventDefault());
