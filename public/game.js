@@ -592,13 +592,17 @@ function setBg(key){
   bgIdx=BG_LIST.findIndex(b=>b.key===key);
   const cur=BG_LIST[bgIdx];
   $('bgBtn').innerHTML = ic(cur.icon);
-  const mb=$('menuBg'); if(mb) mb.innerHTML = `${ic(cur.icon,'sm')}<span>背景：${cur.name}</span>`;
+  const mb=$('menuBg'); if(mb) mb.textContent = `背景 · ${cur.name}`;
   localStorage.setItem('xxl-bg',key);
 }
 function cycleBg(){ const next=BG_LIST[(bgIdx+1)%BG_LIST.length]; setBg(next.key); sfx.btn(); showToast('背景：'+next.name); }
 
 // ---------- 界面状态机 ----------
-function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show')); if(id) $(id).classList.add('show'); }
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
+  if(id) $(id).classList.add('show');
+  document.documentElement.classList.toggle('menu-active',id==='screenMenu');
+}
 function showModal(id){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show')); if(id) $(id).classList.add('show'); }
 function hideAllModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show')); }
 
@@ -606,7 +610,9 @@ function gotoMenu(){
   state='menu'; showScreen('screenMenu'); hideAllModal();
   $('gameShell').hidden=true; stopBgMusic();
   clearBoard(); combo=0; busy=false; clearSelection(); selected=null;
-  $('menuContinue').innerHTML = SAVE.unlocked>1 ? `继续闯关 <small>第${SAVE.unlocked}关</small>` : '开始游戏';
+  const unlocked=Math.min(SAVE.unlocked,LEVELS.length);
+  $('menuContinue').querySelector('span').textContent = unlocked>1 ? `继续第 ${unlocked} 关` : '开始游戏';
+  $('menuProgress').textContent = `${String(unlocked).padStart(2,'0')} / ${LEVELS.length}`;
 }
 function gotoLevels(){
   state='levels'; showScreen('screenLevels'); hideAllModal(); $('gameShell').hidden=true; renderLevelsGrid();
@@ -696,7 +702,7 @@ function toggleSound(){
   settings.sfx=!settings.sfx; soundOn=settings.sfx; settings.save();
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute');
   $('soundBtn').classList.toggle('off',!soundOn);
-  const ms=$('menuSound'); if(ms) ms.textContent='音效·'+(soundOn?'开':'关');
+  const ms=$('menuSound'); if(ms) ms.textContent=`音效 · ${soundOn?'开':'关'}`;
   if(!soundOn) stopBgMusic(); else if(state==='playing'&&settings.music) startBgMusic();
   syncSettingsUI();
   sfx.btn();
@@ -735,7 +741,7 @@ function start(){
   setTheme(themePref); setBg(bgPref);
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn);
   $('pauseBtn').innerHTML=ic('pause'); $('levelsBack').innerHTML=ic('back');
-  $('menuSound').textContent='音效·'+(soundOn?'开':'关');
+  $('menuSound').textContent=`音效 · ${soundOn?'开':'关'}`;
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
   initBgStars(); requestAnimationFrame(tickBgStars); requestAnimationFrame(tickParticles);
   gotoMenu();

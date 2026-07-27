@@ -114,18 +114,29 @@
 <!-- 主菜单 -->
 <div class="screen screen-menu show" id="screenMenu">
   <div class="menu-cover">
-    <div class="menu-top">
-      <div class="menu-kicker"><span class="kicker-num">01</span><span class="kicker-line"></span><span>MATCH · 3</span></div>
-      <h1 class="menu-title">桓睿<br>消消乐</h1>
-      <div class="menu-rule"></div>
-      <p class="menu-sub">三连消除 · 闯关挑战 · 连击得分</p>
+    <div class="menu-tokens" aria-hidden="true">
+      <div class="menu-token token-0"><img src="./assets/faces/face0.jpg" alt=""></div>
+      <div class="menu-token token-1"><img src="./assets/faces/face1.jpg" alt=""></div>
+      <div class="menu-token token-2"><img src="./assets/faces/face2.jpg" alt=""></div>
+      <div class="menu-token token-3"><img src="./assets/faces/face3.jpg" alt=""></div>
     </div>
-    <div class="menu-bottom">
-      <button class="menu-cta" id="menuContinue">开始游戏</button>
-      <div class="menu-links">
-        <button class="menu-link" id="menuLevels">选择关卡</button>
-        <button class="menu-link" id="menuBg">背景</button>
-        <button class="menu-link" id="menuSound">音效</button>
+    <div class="menu-content">
+      <div class="menu-eyebrow"><span></span>HUANRUI MATCH-3</div>
+      <h1 class="menu-title">桓睿消消乐</h1>
+      <p class="menu-sub">交换、连击、清场，挑战全部 12 关。</p>
+      <div class="menu-actions">
+        <button class="menu-cta" id="menuContinue">
+          <span>开始游戏</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <button class="menu-levels-btn" id="menuLevels">
+          <span>关卡选择</span><small id="menuProgress">01 / 12</small>
+        </button>
+      </div>
+      <div class="menu-utilities">
+        <button id="menuBg">游戏背景</button>
+        <span></span>
+        <button id="menuSound">音效</button>
       </div>
     </div>
   </div>
