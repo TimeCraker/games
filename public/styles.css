@@ -255,9 +255,10 @@ body {
    ============================================================ */
 .tile {
   position:absolute; border-radius:28%; cursor:grab; z-index:1;
-  transform-style:preserve-3d; will-change:transform;
+  transform-style:preserve-3d;
   transition: transform var(--move-dur,.28s) var(--ease-out), opacity .25s var(--ease-out), filter .2s ease;
 }
+.tile.dragging, .tile.removing, .tile.spawning { will-change:transform,opacity; }
 .tile .face {
   position:absolute; inset:0; border-radius:inherit; overflow:hidden; background:var(--surface-2);
   box-shadow: var(--tile-shadow), inset 0 2px 0 rgba(255,255,255,.35), inset 0 -3px 5px rgba(0,0,0,.18);
@@ -292,13 +293,17 @@ body {
   filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));
 }
 .tile.special-bomb .badge { background:rgba(255,90,90,.92); border-radius:50%; animation:bombBeat 1s ease-in-out infinite; padding:8%; }
-.tile.special-bomb { filter:drop-shadow(0 0 12px rgba(255,90,90,.7)); }
+.tile.special-bomb { /* 静态光晕，不动画 filter */ }
+.tile.special-bomb::after { content:""; position:absolute; inset:-4px; border-radius:14px; background:radial-gradient(circle,rgba(255,90,90,.5),transparent 70%); opacity:.7; z-index:-1; animation:bombGlow 1s ease-in-out infinite; }
 .tile.special-rainbow .badge { animation: spin 4s linear infinite; padding:6%; }
-.tile.special-rainbow { filter:drop-shadow(0 0 14px rgba(167,139,250,.8)); animation: hue 3s linear infinite; }
+.tile.special-rainbow { /* 不再持续 hue-rotate */ }
+.tile.special-rainbow::after { content:""; position:absolute; inset:-4px; border-radius:14px; background:conic-gradient(from 0deg,#ff6b6b,#ffd93d,#4ecdc4,#a78bfa,#ff6b6b); opacity:.55; z-index:-1; animation: spin 4s linear infinite; }
 .tile.special-bomb .badge svg, .tile.special-rainbow .badge svg { width:100%; height:100%; display:block; }
 @keyframes bombBeat { 0%,100%{transform:translateZ(12px) scale(1)} 50%{transform:translateZ(16px) scale(1.15)} }
+@keyframes bombGlow { 0%,100%{opacity:.4; transform:scale(.9)} 50%{opacity:.7; transform:scale(1.05)} }
 @keyframes spin { to{transform:translateZ(12px) rotate(360deg)} }
-@keyframes hue { to{filter:hue-rotate(360deg) drop-shadow(0 0 14px rgba(167,139,250,.8))} }
+.tile.special-rainbow::after { animation: ringSpin 4s linear infinite; }
+@keyframes ringSpin { to{transform:rotate(360deg)} }
 
 /* ============================================================
    特效层
@@ -311,7 +316,7 @@ body {
 @keyframes floatUp { 0%{transform:translate(-50%,-30%) scale(.4); opacity:0} 25%{transform:translate(-50%,-60%) scale(1.15); opacity:1} 100%{transform:translate(-50%,-140%) scale(1); opacity:0} }
 .shake { animation: shake .35s var(--ease-in-out); }
 @keyframes shake { 0%,100%{transform:translate(0,0)} 20%{transform:translate(-4px,2px)} 40%{transform:translate(4px,-2px)} 60%{transform:translate(-3px,-2px)} 80%{transform:translate(3px,2px)} }
-.combo-flash { position:fixed; inset:0; pointer-events:none; z-index:55; box-shadow: inset 0 0 120px rgba(255,217,61,.5); opacity:0; }
+.combo-flash { position:fixed; inset:0; pointer-events:none; z-index:55; background:radial-gradient(ellipse at center,rgba(255,217,61,.25),transparent 70%); opacity:0; }
 .combo-flash.on { animation: comboFlash .4s ease-out; }
 @keyframes comboFlash { 0%{opacity:0} 30%{opacity:1} 100%{opacity:0} }
 
@@ -453,10 +458,10 @@ body {
 .big-score.bump { transform-origin:left center; }
 
 /* 提示高亮 */
-.tile.hint { animation: hintShake 0.6s var(--ease-in-out) 3; z-index:20; }
-.tile.hint .ring { opacity:1 !important; border-width:3px !important; box-shadow:0 0 16px var(--glow); }
+.tile.hint { z-index:20; }
+.tile.hint .ring { opacity:1 !important; border-width:3px !important; box-shadow:0 0 16px var(--glow); animation: hintGlow .6s ease-in-out 3; }
 .tile.hint .face { animation: hintPulse .6s ease-in-out 3; }
-@keyframes hintShake { 0%,100%{filter:none} 50%{filter:drop-shadow(0 0 12px var(--glow)) brightness(1.2)} }
+@keyframes hintGlow { 0%,100%{transform:scale(1); opacity:1} 50%{transform:scale(1.08); opacity:.7} }
 @keyframes hintPulse { 0%,100%{transform:translateZ(8px)} 50%{transform:translateZ(16px) scale(1.06)} }
 
 /* ============================================================
@@ -546,6 +551,14 @@ body {
   .panel-left .panel-card { flex-shrink:0; min-width:160px; }
   .panel-left .panel-card:last-child { display:none; }
   .board-3d { width:min(94vw, 58vh); }
+  /* 移动端合成降本：移除实时毛玻璃，用纯色背景 */
+  .panel-card, .hud-stat { backdrop-filter:none; -webkit-backdrop-filter:none; background:var(--surface); }
+  .level-pill { backdrop-filter:none; -webkit-backdrop-filter:none; background:var(--surface-2); }
+  .icon-btn { backdrop-filter:none; -webkit-backdrop-filter:none; background:var(--surface); }
+  /* 简化棋盘阴影 */
+  .board { box-shadow: inset 0 2px 8px rgba(var(--sc),.12), 0 8px 20px rgba(var(--sc),.18); }
+  .board-3d::before { box-shadow:0 12px 24px rgba(var(--sc),.25); }
+  .board { contain:layout paint style; }
 }
 @media (max-width: 480px) {
   .topbar { padding:8px 12px 4px; gap:8px; }

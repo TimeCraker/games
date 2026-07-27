@@ -33,12 +33,12 @@
 ### 验收: 静止 RAF=0, 粒子移动端封顶96, DPR封顶1.5
 
 ## Task 3 - 移动端 CSS 合成降本
-- [ ] 移除/降级 backdrop-filter
-- [ ] 简化阴影
-- [ ] 彩虹/炸弹/提示改 transform/opacity
-- [ ] combo flash 改 opacity 层
-- [ ] contain + 临时 will-change
-- [ ] commit
+- [x] 移除/降级 backdrop-filter
+- [x] 简化阴影
+- [x] 彩虹/炸弹/提示改 transform/opacity
+- [x] combo flash 改 opacity 层
+- [x] contain + 临时 will-change（去掉 64 tile 永久 will-change）
+- [x] commit
 
 ## Task 4 - 输入、DOM 批处理
 - [ ] pointermove RAF 合帧
