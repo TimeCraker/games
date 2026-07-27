@@ -11,6 +11,8 @@ const SWAP_DUR = 260, REMOVE_DUR = 420, FALL_DUR = 320, GAP = 8, PAD = 10, SWIPE
 const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./assets/faces/face2.jpg','./assets/faces/face3.jpg'];
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, BOMB:1, RAINBOW:2 };
+// 资源版本号（部署时同步更新，强制刷新缓存）
+const CACHE_VER = '2.14';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -627,7 +629,7 @@ const sfx=(()=>{
 function startBgMusic(){
   if(!settings.music) return;
   if(!bgAudio){ bgAudio=new Audio(); bgAudio.loop=true; bgAudio.preload='auto'; }
-  bgAudio.src=`./assets/music/${MUSIC_LIST[musicIdx].file}`;
+  bgAudio.src=`./assets/music/${MUSIC_LIST[musicIdx].file}?v=${CACHE_VER}`;
   bgAudio.volume = (settings.volume/100)*0.55; // BGM 比音效略低
   bgAudio.play().catch(()=>{});
   updateMusicLabel();
@@ -636,7 +638,7 @@ function stopBgMusic(){ if(bgAudio){ bgAudio.pause(); } }
 function switchMusic(idx){
   musicIdx = (idx+MUSIC_LIST.length)%MUSIC_LIST.length;
   localStorage.setItem('xxl-music-idx',musicIdx);
-  if(bgAudio&&settings.music){ bgAudio.src=`./assets/music/${MUSIC_LIST[musicIdx].file}`; bgAudio.play().catch(()=>{}); }
+  if(bgAudio&&settings.music){ bgAudio.src=`./assets/music/${MUSIC_LIST[musicIdx].file}?v=${CACHE_VER}`; bgAudio.play().catch(()=>{}); }
   updateMusicLabel();
 }
 function updateMusicLabel(){ const el=$('musicLabel'); if(el) el.textContent=MUSIC_LIST[musicIdx].name; }
