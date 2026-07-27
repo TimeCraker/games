@@ -213,12 +213,12 @@ location /xiaoxiaole/ {
 }
 ```
 
-文件位于 `/var/www/xiaoxiaole/`，复用 `game.asterforge.top` 的 SSL 证书。
+文件位于服务器 `/var/www/xiaoxiaole/`，复用 `game.asterforge.top` 的 SSL 证书。
 
 ```bash
-# 部署命令
-KEY=~/asterforge-deploy/ssh-keys/aliyun-ecs-login.pem
-scp -F /dev/null -o StrictHostKeyChecking=no -i $KEY -r public/* root@8.162.7.172:/var/www/xiaoxiaole/
+# 部署命令（替换为你的服务器和密钥路径）
+KEY=~/.ssh/your-server-key.pem
+scp -F /dev/null -o StrictHostKeyChecking=no -i $KEY -r public/* root@YOUR-SERVER-IP:/var/www/xiaoxiaole/
 ```
 
 > 部署后**务必升 SW 缓存版本号**（`sw.js` 的 `CACHE` + `game.js` 的 `CACHE_VER`），
