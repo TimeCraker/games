@@ -1,5 +1,5 @@
 // 桓睿消消乐 Service Worker v2.10 - 智能缓存 + 自动更新
-const CACHE = 'xxl-v2.15';
+const CACHE = 'xxl-v2.16';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -12,10 +12,10 @@ const CORE_ASSETS = [
   './assets/faces/face3.jpg',
   './assets/backgrounds/hero-anime-desktop.webp',
   './assets/backgrounds/hero-anime-mobile.webp',
-  './assets/music/bgm1.mp3?v=2.14',
-  './assets/music/bgm2.mp3?v=2.14',
-  './assets/music/bgm3.mp3?v=2.14',
-  './assets/music/bgm4.mp3?v=2.14',
+  './assets/music/bgm1.mp3?v=2.16',
+  './assets/music/bgm2.mp3?v=2.16',
+  './assets/music/bgm3.mp3?v=2.16',
+  './assets/music/bgm4.mp3?v=2.16',
 ];
 
 self.addEventListener('install', e => {
