@@ -41,14 +41,14 @@
 - [x] commit
 
 ## Task 4 - 输入、DOM 批处理
-- [ ] pointermove RAF 合帧
-- [ ] 缓存 tile 列表
-- [ ] DOM 写批处理
-- [ ] 移除 offsetWidth reflow
-- [ ] 初始化错峰改 CSS delay
-- [ ] resize debounce + ResizeObserver
-- [ ] 预解码方块图
-- [ ] commit
+- [x] pointermove RAF 合帧
+- [x] 缓存 tile 列表（board[][]已缓存，热路径无 querySelectorAll）
+- [x] DOM 写批处理
+- [x] 移除 offsetWidth reflow（WAAPI）
+- [x] 初始化错峰改 CSS delay + animationend
+- [x] resize debounce + ResizeObserver（Task2已做）
+- [x] 预解码方块图
+- [x] commit
 
 ## Task 5 - 质量档位与轻量特效
 - [ ] effectsQuality auto/high/medium/low

@@ -202,9 +202,9 @@ function initBoard(){
       board[r][c]={type,special:SPECIAL.NONE,el};
     }
   }
-  requestAnimationFrame(()=>{ boardEl.querySelectorAll('.tile').forEach((e,i)=>{
-    e.style.transition='none'; e.style.opacity='0';
-    setTimeout(()=>{ e.style.transition=''; e.classList.add('spawning'); e.style.opacity=''; setTimeout(()=>e.classList.remove('spawning'),450); },i*10);
+  requestAnimationFrame(()=>{ const tiles=boardEl.querySelectorAll('.tile'); tiles.forEach((e,i)=>{
+    e.style.animationDelay=(i*10)+'ms'; e.classList.add('spawning');
+    e.addEventListener('animationend',()=>{ e.classList.remove('spawning'); e.style.animationDelay=''; },{once:true});
   }); });
 }
 function createsMatch(r,c,type){
@@ -404,7 +404,7 @@ function tickParticles(){
 }
 function ensureParticleLoop(){ if(particleRAF===null && particles.length>0) particleRAF=requestAnimationFrame(tickParticles); }
 function stopParticleLoop(){ if(particleRAF!==null){ cancelAnimationFrame(particleRAF); particleRAF=null; } ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); particles.length=0; }
-function comboFlash(){ const f=document.querySelector('.combo-flash')||(()=>{const d=document.createElement('div');d.className='combo-flash';document.body.appendChild(d);return d;})(); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
+function comboFlash(){ const f=document.querySelector('.combo-flash')||(()=>{const d=document.createElement('div');d.className='combo-flash';document.body.appendChild(d);return d;})(); if(f.animate){ f.animate([{opacity:0},{opacity:1,offset:.3},{opacity:0}],{duration:400,easing:'ease-out'}); } else { f.classList.remove('on'); f.classList.add('on'); } }
 function floatText(pos,text,cls=''){ const el=document.createElement('div'); el.className='float-text '+cls; el.textContent=text; el.style.left=(pos.x+PAD)+'px'; el.style.top=(pos.y+PAD+(pos.dy||0))+'px'; floatLayer.appendChild(el); setTimeout(()=>el.remove(),950); }
 function centerOf(set){ let sx=0,sy=0,n=0; for(const k of set){const{r,c}=parseKey(k);const{x,y}=posOf(r,c);sx+=x+tileSize/2;sy+=y+tileSize/2;n++;} return {x:sx/n,y:sy/n}; }
 const parseKey=k=>{const[r,c]=k.split(',').map(Number);return{r,c};};
@@ -412,6 +412,7 @@ const parseKey=k=>{const[r,c]=k.split(',').map(Number);return{r,c};};
 // ---------- HUD ----------
 let lastScore=0;
 let scoreAnimRAF=null;
+function bumpEl(el){ if(el.animate){ el.animate([{transform:'scale(1)'},{transform:'scale(1.22)',offset:.4},{transform:'scale(1)'}],{duration:350,easing:'cubic-bezier(.34,1.56,.64,1)'}); } else { el.classList.remove('bump'); el.classList.add('bump'); } }
 function animateScoreTo(target){
   const from=lastScore; if(from===target){ scoreEl.textContent=target; bigScoreEl.textContent=target; return; }
   cancelAnimationFrame(scoreAnimRAF);
@@ -426,7 +427,7 @@ function animateScoreTo(target){
   scoreAnimRAF=requestAnimationFrame(step);
 }
 function updateHUD(){
-  if(score!==lastScore){ scoreEl.classList.remove('bump'); void scoreEl.offsetWidth; scoreEl.classList.add('bump'); bigScoreEl.classList.remove('bump'); void bigScoreEl.offsetWidth; bigScoreEl.classList.add('bump'); animateScoreTo(score); }
+  if(score!==lastScore){ bumpEl(scoreEl); bumpEl(bigScoreEl); animateScoreTo(score); }
   movesLeftEl.textContent = isInfiniteMoves() ? '∞' : Math.max(0,moves);
   comboEl.textContent='×'+Math.max(1,combo);
   if(currentLevel){ const pct=Math.min(100,score/currentLevel.target*100); progressBar.style.width=pct+'%'; progressText.textContent=`${score} / ${currentLevel.target}`; }
@@ -449,6 +450,7 @@ function renderGoals(){
 
 // ---------- 输入（跟手拖动） ----------
 let drag = null; // {r,c,el,dx,dy,dir,moved}
+let dragRAF = null;
 let hintTimer = null;
 function bindInput(el){ el.addEventListener('pointerdown',onDown,{passive:false}); }
 function onDown(e){
@@ -476,11 +478,18 @@ function onMove(e){
   if(drag.dir==='h'){ dy=0; dx=Math.max(-cellUnit*0.55,Math.min(cellUnit*0.55,dx)); }
   else { dx=0; dy=Math.max(-cellUnit*0.55,Math.min(cellUnit*0.55,dy)); }
   drag.dx=dx; drag.dy=dy; drag.moved=true;
+  // RAF 合帧：只存坐标，下一帧统一写 transform
+  if(dragRAF===null) dragRAF=requestAnimationFrame(flushDrag);
+}
+function flushDrag(){
+  dragRAF=null;
+  if(!drag) return;
   const {x,y}=posOf(drag.r,drag.c);
-  drag.el.style.transform=`translate3d(${x+dx}px,${y+dy}px,18px) scale(1.05)`;
+  drag.el.style.transform=`translate3d(${x+drag.dx}px,${y+drag.dy}px,18px) scale(1.05)`;
 }
 function onUp(e){
   if(!drag) return;
+  if(dragRAF!==null){ cancelAnimationFrame(dragRAF); dragRAF=null; flushDrag(); }
   const d=drag; drag.el.classList.remove('dragging');
   drag.el.style.transition='';
   window.removeEventListener('pointermove',onMove);
@@ -776,7 +785,10 @@ function start(){
   $('menuSound').textContent=`音效 · ${soundOn?'开':'关'}`;
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
   syncBgStars();
-  initBgStars(); syncBgStars(); gotoMenu();
+  initBgStars(); syncBgStars();
+  // 预解码方块图，避免首次交换/洗牌解码抖动
+  FACE_IMG.forEach(src=>{ const img=new Image(); img.src=src; img.decode&&img.decode().catch(()=>{}); });
+  gotoMenu();
 }
 start();
 
