@@ -28,6 +28,8 @@ srv.listen(8254,async()=>{
     await p.click('#menuLevels');await p.waitForTimeout(600);
     await p.screenshot({path:'docs/images/screenshot-levels.png'});
     await b.close();srv.close();
+    // 自动压缩 png -> jpg
+    try{ require('child_process').execSync('python - <<"PY"\nfrom PIL import Image\nfrom pathlib import Path\nfor f in sorted(Path("docs/images").glob("screenshot-*.png")):\n    im=Image.open(f).convert("RGB")\n    w,h=im.size\n    if w>1280: im=im.resize((1280,int(1280*h/w)),Image.Resampling.LANCZOS)\n    im.save(str(f).replace(".png",".jpg"),"JPEG",quality=82,optimize=True)\n    f.unlink()\nPY',{stdio:'inherit'}); }catch(e){}
     console.log('截图完成');
     require('child_process').execSync('ls -lh docs/images/');
     process.exit(0);
