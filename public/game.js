@@ -86,7 +86,7 @@ let score=0, moves=0, usedMoves=0, combo=0, busy=false;
 let currentLevel=null, levelIdx=0;
 let stats={ clears:0, maxCombo:0, bombs:0, rainbows:0 };
 let goalProgress={};
-let pointerStart=null, selected=null;
+let selected=null;
 let bgIdx=0, soundOn=true;
 let state='menu';
 let audioCtx=null, masterGain=null, bgOsc=null, bgGain=null;
@@ -225,7 +225,8 @@ function afterMove(){
   busy=false; updateHUD();
   if(checkGoalsMet()){ setTimeout(()=>winLevel(),500); return; }
   if(!isInfiniteMoves() && moves<=0){ setTimeout(()=>loseLevel(),600); return; }
-  if(!hasPossibleMove()){ showToast('没有可消除的组合，重新洗牌！'); setTimeout(shuffleBoard,600); }
+  if(!hasPossibleMove()){ showToast('没有可消除的组合，重新洗牌！'); setTimeout(shuffleBoard,600); return; }
+  scheduleHint();
 }
 
 // ---------- 目标 ----------
@@ -337,7 +338,9 @@ function centerOf(set){ let sx=0,sy=0,n=0; for(const k of set){const{r,c}=parseK
 const parseKey=k=>{const[r,c]=k.split(',').map(Number);return{r,c};};
 
 // ---------- HUD ----------
+let lastScore=0;
 function updateHUD(){
+  if(score!==lastScore){ scoreEl.classList.remove('bump'); void scoreEl.offsetWidth; scoreEl.classList.add('bump'); bigScoreEl.classList.remove('bump'); void bigScoreEl.offsetWidth; bigScoreEl.classList.add('bump'); lastScore=score; }
   scoreEl.textContent=score; bigScoreEl.textContent=score;
   movesLeftEl.textContent = isInfiniteMoves() ? '∞' : Math.max(0,moves);
   comboEl.textContent='×'+Math.max(1,combo);
@@ -359,34 +362,60 @@ function renderGoals(){
   }
 }
 
-// ---------- 输入 ----------
+// ---------- 输入（跟手拖动） ----------
+let drag = null; // {r,c,el,dx,dy,dir,moved}
+let hintTimer = null;
 function bindInput(el){ el.addEventListener('pointerdown',onDown,{passive:false}); }
 function onDown(e){
   if(busy||state!=='playing') return;
   if(e.pointerType==='mouse'&&e.button!==0) return;
   e.preventDefault();
+  clearHint();
   const el=e.currentTarget; const r=+el.dataset.r,c=+el.dataset.c;
-  pointerStart={r,c,x:e.clientX,y:e.clientY,el};
-  el.setPointerCapture&&el.setPointerCapture(e.pointerId);
+  drag={r,c,x:e.clientX,y:e.clientY,el,dx:0,dy:0,dir:null,moved:false};
+  el.classList.add('dragging');
+  el.style.transition='none';
+  try{ el.setPointerCapture(e.pointerId); }catch(_){}
   window.addEventListener('pointermove',onMove,{passive:false});
   window.addEventListener('pointerup',onUp,{once:true});
+  window.addEventListener('pointercancel',onUp,{once:true});
 }
 function onMove(e){
-  if(!pointerStart) return;
-  const dx=e.clientX-pointerStart.x, dy=e.clientY-pointerStart.y;
-  if(Math.hypot(dx,dy)>tileSize*SWIPE_THRESH){
-    let nr=pointerStart.r,nc=pointerStart.c;
-    if(Math.abs(dx)>Math.abs(dy)) nc+=dx>0?1:-1; else nr+=dy>0?1:-1;
-    const sr=pointerStart.r,sc=pointerStart.c; cleanupPointer(); trySwap(sr,sc,nr,nc);
+  if(!drag) return;
+  let dx=e.clientX-drag.x, dy=e.clientY-drag.y;
+  // 锁定主导方向
+  if(!drag.dir){
+    if(Math.hypot(dx,dy)>6) drag.dir = Math.abs(dx)>Math.abs(dy)?'h':'v';
+    else return;
   }
+  if(drag.dir==='h'){ dy=0; dx=Math.max(-cellUnit*0.55,Math.min(cellUnit*0.55,dx)); }
+  else { dx=0; dy=Math.max(-cellUnit*0.55,Math.min(cellUnit*0.55,dy)); }
+  drag.dx=dx; drag.dy=dy; drag.moved=true;
+  const {x,y}=posOf(drag.r,drag.c);
+  drag.el.style.transform=`translate3d(${x+dx}px,${y+dy}px,18px) scale(1.05)`;
 }
 function onUp(e){
-  if(!pointerStart) return;
-  const dx=e.clientX-pointerStart.x, dy=e.clientY-pointerStart.y;
-  if(Math.hypot(dx,dy)<tileSize*SWIPE_THRESH) handleTap(pointerStart.r,pointerStart.c);
-  cleanupPointer();
+  if(!drag) return;
+  const d=drag; drag.el.classList.remove('dragging');
+  drag.el.style.transition='';
+  window.removeEventListener('pointermove',onMove);
+  // 判断是否达到交换阈值
+  const reach = Math.hypot(d.dx,d.dy) > tileSize*SWIPE_THRESH;
+  if(reach){
+    let nr=d.r,nc=d.c;
+    if(d.dir==='h') nc+=d.dx>0?1:-1; else nr+=d.dy>0?1:-1;
+    // 回弹起始方块（trySwap 会重新定位）
+    placeTile(board[d.r][d.c], d.r, d.c, false);
+    drag=null;
+    trySwap(d.r,d.c,nr,nc);
+  } else {
+    // 回弹
+    placeTile(board[d.r][d.c], d.r, d.c, true);
+    if(!d.moved){ handleTap(d.r,d.c); } // 当点击
+    drag=null;
+  }
+  scheduleHint();
 }
-function cleanupPointer(){ pointerStart=null; window.removeEventListener('pointermove',onMove); }
 function handleTap(r,c){
   if(!selected){ selected={r,c}; board[r][c]?.el.classList.add('selected'); sfx.select(); return; }
   board[selected.r][selected.c]?.el.classList.remove('selected');
@@ -395,6 +424,28 @@ function handleTap(r,c){
   else { selected={r,c}; board[r][c]?.el.classList.add('selected'); sfx.select(); }
 }
 function clearSelection(){ if(selected){ board[selected.r]?.[selected.c]?.el.classList.remove('selected'); selected=null; } }
+
+// ---------- 提示系统 ----------
+function scheduleHint(){ clearHint(); if(state!=='playing') return; hintTimer=setTimeout(showHint,5000); }
+function clearHint(){ if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; } document.querySelectorAll('.tile.hint').forEach(e=>e.classList.remove('hint')); }
+function showHint(){
+  if(busy||state!=='playing') return;
+  const move=findHintMove(); if(!move) return;
+  const a=board[move.r1][move.c1]?.el, b=board[move.r2][move.c2]?.el;
+  if(a) a.classList.add('hint');
+  if(b) b.classList.add('hint');
+  setTimeout(clearHint,2500);
+}
+function findHintMove(){
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    if(board[r][c]&&board[r][c].special!==SPECIAL.NONE) return {r1:r,c1:c,r2:r,c2:Math.min(COLS-1,c+1)};
+  }
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    if(c<COLS-1){ swapData(r,c,r,c+1); const m=findAllMatches().matched.size; swapData(r,c,r,c+1); if(m) return {r1:r,c1:c,r2:r,c2:c+1}; }
+    if(r<ROWS-1){ swapData(r,c,r+1,c); const m=findAllMatches().matched.size; swapData(r,c,r+1,c); if(m) return {r1:r,c1:c,r2:r+1,c2:c}; }
+  }
+  return null;
+}
 
 // ---------- 死局/洗牌 ----------
 function hasPossibleMove(){
@@ -519,8 +570,8 @@ async function startLevel(idx){
   if(soundOn) startBgMusic();
 }
 
-function pauseGame(){ if(state!=='playing') return; state='paused'; showModal('modalPause'); stopBgMusic(); sfx.btn(); }
-function resumeGame(){ if(state!=='paused') return; state='playing'; hideAllModal(); if(soundOn) startBgMusic(); sfx.btn(); }
+function pauseGame(){ if(state!=='playing') return; state='paused'; clearHint(); showModal('modalPause'); stopBgMusic(); sfx.btn(); }
+function resumeGame(){ if(state!=='paused') return; state='playing'; hideAllModal(); if(soundOn) startBgMusic(); sfx.btn(); scheduleHint(); }
 
 function winLevel(){
   state='win'; stopBgMusic(); sfx.win(); confetti();

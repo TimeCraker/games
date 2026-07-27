@@ -407,6 +407,18 @@ body {
 .toast { position:fixed; left:50%; bottom:8vh; transform:translate(-50%,20px); background:var(--surface); color:var(--text); border:1px solid var(--line); padding:10px 18px; border-radius:12px; font-size:13px; font-weight:600; box-shadow:0 10px 30px rgba(var(--sc),.25); opacity:0; visibility:hidden; transition:opacity .3s, transform .3s var(--ease-bounce), visibility .3s; z-index:300; }
 .toast.show { opacity:1; visibility:visible; transform:translate(-50%,0); }
 
+/* 分数跳动 */
+.hud-value.bump, .big-score.bump { animation: bump .35s var(--ease-bounce); }
+@keyframes bump { 0%{transform:scale(1)} 40%{transform:scale(1.22)} 100%{transform:scale(1)} }
+.big-score.bump { transform-origin:left center; }
+
+/* 提示高亮 */
+.tile.hint { animation: hintShake 0.6s var(--ease-in-out) 3; z-index:20; }
+.tile.hint .ring { opacity:1 !important; border-width:3px !important; box-shadow:0 0 16px var(--glow); }
+.tile.hint .face { animation: hintPulse .6s ease-in-out 3; }
+@keyframes hintShake { 0%,100%{filter:none} 50%{filter:drop-shadow(0 0 12px var(--glow)) brightness(1.2)} }
+@keyframes hintPulse { 0%,100%{transform:translateZ(8px)} 50%{transform:translateZ(16px) scale(1.06)} }
+
 /* ============================================================
    SVG 图标系统
    ============================================================ */
