@@ -1,5 +1,5 @@
 // 桓睿消消乐 Service Worker v2.10 - 智能缓存 + 自动更新
-const CACHE = 'xxl-v2.17';
+const CACHE = 'xxl-v2.19';
 const CORE_ASSETS = [
   './',
   './index.html',

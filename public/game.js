@@ -12,7 +12,7 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, BOMB:1, RAINBOW:2 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.17';
+const CACHE_VER = '2.19';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -629,9 +629,10 @@ const sfx=(()=>{
 })();
 function startBgMusic(){
   if(!settings.music) return;
+  sfx.init(); // 确保 audioCtx 激活（解锁自动播放）
   if(!bgAudio){ bgAudio=new Audio(); bgAudio.loop=true; bgAudio.preload='auto'; }
   bgAudio.src=`./assets/music/${MUSIC_LIST[musicIdx].file}?v=${CACHE_VER}`;
-  bgAudio.volume = (settings.volume/100)*0.55; // BGM 比音效略低
+  bgAudio.volume = (settings.volume/100)*0.55;
   bgAudio.play().catch(()=>{});
   updateMusicLabel();
 }
@@ -678,7 +679,14 @@ function setBg(key){
   localStorage.setItem('xxl-bg',key);
   syncBgStars();
 }
-function cycleBg(){ const next=BG_LIST[(bgIdx+1)%BG_LIST.length]; setBg(next.key); sfx.btn(); showToast('背景：'+next.name); }
+function cycleBg(){
+  // 只在 2 张二次元图之间轮换
+  const photos = BG_LIST.filter(b=>b.key.startsWith('photo'));
+  const curKey = BG_LIST[bgIdx]?.key;
+  const curPos = photos.findIndex(b=>b.key===curKey);
+  const next = photos[(curPos+1)%photos.length];
+  setBg(next.key); sfx.btn(); showToast('背景：'+next.name);
+}
 
 // ---------- 界面状态机 ----------
 function showScreen(id){
@@ -814,6 +822,7 @@ function applySettings(){
 }
 $('settingsBtn').onclick=()=>openSettings();
 $('pauseSettingsBtn').onclick=()=>{ hideAllModal(); openSettings(); };
+$('pauseBgBtn').onclick=()=>{ cycleBg(); };
 $('settingsClose').onclick=()=>{ hideAllModal(); sfx.btn(); if(state==='playing'){ scheduleHint(); } else if(state==='paused'){ showModal('modalPause'); } };
 $('setSfx').onchange=e=>{ settings.sfx=e.target.checked; settings.save(); soundOn=settings.sfx; applySettings(); sfx.btn(); };
 $('setMusic').onchange=e=>{ settings.music=e.target.checked; settings.save(); applySettings(); sfx.btn(); };
