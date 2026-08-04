@@ -12,7 +12,7 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, BOMB:1, RAINBOW:2 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.23';
+const CACHE_VER = '2.24';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -681,6 +681,15 @@ function setBg(key){
   localStorage.setItem('xxl-bg',key);
   syncBgStars();
 }
+// 刷新资源: 清 SW 缓存 + 注销 SW + 强制 reload (普通用户无法 F12 清缓存的兜底)
+function refreshAssets(){
+  showToast('刷新资源中…');
+  Promise.all(caches.keys().then(keys => keys.map(k => caches.delete(k))))
+    .then(() => navigator.serviceWorker.getRegistrations())
+    .then(rs => Promise.all(rs.map(r => r.unregister())))
+    .then(() => setTimeout(() => location.reload(), 400))
+    .catch(() => location.reload());
+}
 function cycleBg(){
   // 只在 2 张二次元图之间轮换
   const photos = BG_LIST.filter(b=>b.key.startsWith('photo'));
@@ -786,6 +795,7 @@ $('pauseBtn').onclick=()=>pauseGame();
 $('menuContinue').onclick=()=>{ sfx.init(); sfx.btn(); startBgMusic(); startLevel(Math.min(SAVE.unlocked-1,LEVELS.length-1)); };
 $('menuLevels').onclick=()=>{ sfx.btn(); gotoLevels(); };
 $('menuBg').onclick=()=>cycleBg();
+$('menuRefresh').onclick=()=>refreshAssets();
 $('menuSound').onclick=()=>toggleSound();
 $('levelsBack').onclick=()=>{ sfx.btn(); gotoMenu(); };
 $('resumeBtn').onclick=()=>resumeGame();

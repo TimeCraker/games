@@ -1,5 +1,5 @@
 // 桓睿消消乐 Service Worker v2.10 - 智能缓存 + 自动更新
-const CACHE = 'xxl-v2.23';
+const CACHE = 'xxl-v2.24';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -18,8 +18,13 @@ const CORE_ASSETS = [
   './assets/music/bgm4.mp3?v=2.16',
 ];
 
+// install: 逐个缓存 (Promise.allSettled), 单个资源 fetch 失败不阻塞整体
+// 修复: 之前 addAll 任一失败会整体 reject -> 新 SW 不 activate -> 卡在无缓存空档
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE_ASSETS)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(CACHE).then(c => Promise.allSettled(CORE_ASSETS.map(url => c.add(url))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', e => {
