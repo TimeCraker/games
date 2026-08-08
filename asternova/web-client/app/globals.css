@@ -213,6 +213,22 @@ body {
   }
 }
 
+/* ===== Arena HUD 动效（从 app/arena/page.tsx 内联 <style> 抽离） ===== */
+@keyframes wave-move {
+  0% { mask-position-x: 0%; -webkit-mask-position-x: 0%; }
+  100% { mask-position-x: 200%; -webkit-mask-position-x: 200%; }
+}
+.wave-move-anim {
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  animation: wave-move 3s linear infinite !important;
+}
+@keyframes pulse-scan {
+  0% { transform: translateY(-12%); opacity: 0.55; }
+  50% { transform: translateY(26%); opacity: 0.90; }
+  100% { transform: translateY(-12%); opacity: 0.55; }
+}
+
 .mobile-game-landscape-fill > * {
   box-sizing: border-box;
   height: 100% !important;

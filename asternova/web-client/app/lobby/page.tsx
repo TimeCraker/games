@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 
+import { GlassPanel } from "@/src/components/ui/GlassPanel"
 import { LobbyAvatarPickerModal, LobbyPresetAvatar, useLobbyAvatar } from "@/src/components/lobby/LobbyAvatars"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { wsUrl } from "@/src/config/public-env"
@@ -158,27 +159,6 @@ const ARCADE: ArcadeTile[] = [
     accent: "from-amber-400/25 to-orange-400/10",
   },
 ]
-
-function GlassPanel({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode
-  className?: string
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.5, ease: easeOut }}
-      className={`rounded-[1.35rem] border border-white/[0.08] bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl ${className}`}
-      style={{ WebkitBackdropFilter: "blur(40px) saturate(180%)" }}
-    >
-      {children}
-    </motion.div>
-  )
-}
 
 function SectionRule() {
   return (

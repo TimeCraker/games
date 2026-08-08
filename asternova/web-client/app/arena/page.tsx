@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Orbitron } from "next/font/google"
 
+import { PlayerHud, UltimateButton } from "@/src/components/arena/ArenaHud"
 import { CinematicBlackHole } from "@/src/components/CinematicBlackHole"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { apiV1BaseUrl } from "@/src/config/public-env"
@@ -267,20 +268,6 @@ export default function ArenaPage() {
           <div className="text-sm text-white/55">横屏后即可继续战斗</div>
         </div>
       )}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-            @keyframes wave-move {
-              0% { mask-position-x: 0%; -webkit-mask-position-x: 0%; }
-              100% { mask-position-x: 200%; -webkit-mask-position-x: 200%; }
-            }
-            .wave-move-anim {
-              mask-size: 100% 100%; -webkit-mask-size: 100% 100%;
-              animation: wave-move 3s linear infinite !important;
-            }
-          `,
-        }}
-      />
       <CinematicBlackHole interactive={false} intensity={0.95} opacity={0.3} className="pointer-events-none absolute inset-0" />
 
       <div
@@ -354,163 +341,9 @@ export default function ArenaPage() {
 
       {isSceneReady && (
         <>
-          {/* 大招 Q 按键 (赛博液体波纹 - 绝对防御级内联样式) */}
-          <div
-            className="absolute left-4 top-24 z-50 flex items-center justify-center pointer-events-none transition-all duration-300"
-            style={{
-              width: "72px",
-              height: "72px",
-              filter: p1Status.energy >= 15 ? "drop-shadow(0 0 25px rgba(236,72,153,0.95))" : "drop-shadow(0 0 8px rgba(0,0,0,0.7))",
-              scale: p1Status.energy >= 15 ? "1.15" : "1.0",
-            }}
-          >
-            <div style={{ position: "absolute", inset: 0, borderRadius: "999px", border: "3px solid rgba(255,255,255,0.3)", backgroundColor: "rgba(0,0,0,0.85)", boxShadow: "inset 0 0 15px rgba(236,72,153,0.3)", backdropFilter: "blur(8px)" }} />
-
-            <div style={{ position: "absolute", inset: "4px", overflow: "hidden", borderRadius: "999px" }}>
-              <div
-                className="wave-move-anim"
-                style={{
-                  position: "absolute",
-                  left: "-50%",
-                  width: "200%",
-                  bottom: "-25%",
-                  height: "100%",
-                  backgroundImage: "linear-gradient(to top right, #f472b6, #60a5fa)",
-                  transform: `translateY(-${(p1Status.energy / 15) * 100}%)`,
-                  transition: "transform 0.3s ease-out, opacity 0.3s",
-                  opacity: p1Status.energy >= 15 ? "1" : "0.7",
-                  maskImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 1200 120\' preserveAspectRatio=\'none\'%3E%3Cpath d=\'M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V120H282.65C297.82,95.68,307.39,73.19,321.39,56.44Z\' style=\'fill:%23000;\'%3E%3C/path%3E%3C/svg%3E")',
-                  WebkitMaskImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 1200 120\' preserveAspectRatio=\'none\'%3E%3Cpath d=\'M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V120H282.65C297.82,95.68,307.39,73.19,321.39,56.44Z\' style=\'fill:%23000;\'%3E%3C/path%3E%3C/svg%3E")',
-                  maskRepeat: "repeat-x",
-                  WebkitMaskRepeat: "repeat-x",
-                }}
-              />
-            </div>
-
-            <span
-              className={[orbitron.className, "absolute z-10 text-5xl font-black italic"].join(" ")}
-              style={{
-                color: "#fff",
-                transform: "translateY(1px)",
-                filter: p1Status.energy >= 15 ? "drop-shadow(0 0 15px rgba(255,255,255,0.9))" : "drop-shadow(0 0 2px rgba(255,255,255,0.4))",
-              }}
-            >
-              Q
-            </span>
-          </div>
-
-          {/* P1 本地玩家 (左上角，往下挪一点) */}
-          <div className="pointer-events-none absolute left-28 top-28 z-40 flex w-[40vw] max-w-[450px] flex-col gap-2">
-            <div className="flex items-end justify-between px-2" style={{ textShadow: "0 0 8px rgba(0,0,0,0.8)" }}>
-              <span className={[orbitron.className, "text-2xl font-black tracking-widest text-white"].join(" ")}>{username || "PLAYER 1"}</span>
-              <span className={[orbitron.className, "text-sm font-bold tracking-widest text-yellow-400 drop-shadow-md"].join(" ")}>
-                {p1Status.energy >= 15 ? "ULTIMATE READY [Q]" : "ENERGY"}
-              </span>
-            </div>
-            {/* P1 主血条 */}
-            <div
-              style={{
-                height: "28px",
-                width: "100%",
-                transform: "skewX(-12deg)",
-                overflow: "hidden",
-                borderRadius: "4px",
-                border: "2px solid rgba(255,255,255,0.3)",
-                backgroundColor: "rgba(0,0,0,0.8)",
-                boxShadow: "0 0 15px rgba(0,0,0,0.8)",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  width: `${p1Status.hp}%`,
-                  backgroundImage: "linear-gradient(to right, #db2777, #f43f5e)",
-                  transition: "width 0.3s ease-out",
-                }}
-              />
-            </div>
-            {/* P1 能量条 */}
-            <div
-              style={{
-                height: "12px",
-                width: "100%",
-                transform: "skewX(-12deg)",
-                overflow: "hidden",
-                borderRadius: "4px",
-                border: "1px solid rgba(255,255,255,0.2)",
-                backgroundColor: "rgba(0,0,0,0.8)",
-                boxShadow: "0 0 10px rgba(0,0,0,0.8)",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  width: `${(p1Status.energy / 15) * 100}%`,
-                  backgroundImage: "linear-gradient(to right, #facc15, #22d3ee)",
-                  transition: "width 0.3s ease-out",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* P2 敌方玩家 (右上角) */}
-          <div className="pointer-events-none absolute right-6 top-20 z-50 flex w-[40vw] max-w-[450px] flex-col items-end gap-2">
-            <div className="flex w-full flex-row-reverse items-end justify-between px-2" style={{ textShadow: "0 0 8px rgba(0,0,0,0.8)" }}>
-              <span className={[orbitron.className, "text-2xl font-black tracking-widest text-red-400"].join(" ")}>ENEMY</span>
-            </div>
-            {/* P2 主血条 */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                height: "28px",
-                width: "100%",
-                transform: "skewX(12deg)",
-                overflow: "hidden",
-                borderRadius: "4px",
-                border: "2px solid rgba(255,255,255,0.3)",
-                backgroundColor: "rgba(0,0,0,0.8)",
-                boxShadow: "0 0 15px rgba(0,0,0,0.8)",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  width: `${p2Status.hp}%`,
-                  backgroundImage: "linear-gradient(to left, #dc2626, #f97316)",
-                  transition: "width 0.3s ease-out",
-                }}
-              />
-            </div>
-            {/* P2 能量条 */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                height: "12px",
-                width: "100%",
-                transform: "skewX(12deg)",
-                overflow: "hidden",
-                borderRadius: "4px",
-                border: "1px solid rgba(255,255,255,0.2)",
-                backgroundColor: "rgba(0,0,0,0.8)",
-                boxShadow: "0 0 10px rgba(0,0,0,0.8)",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  width: `${(p2Status.energy / 15) * 100}%`,
-                  backgroundImage: "linear-gradient(to left, #facc15, #22d3ee)",
-                  transition: "width 0.3s ease-out",
-                }}
-              />
-            </div>
-          </div>
+          <UltimateButton energy={p1Status.energy} />
+          <PlayerHud name={username || "PLAYER 1"} side="left" hp={p1Status.hp} energy={p1Status.energy} />
+          <PlayerHud name="ENEMY" side="right" hp={p2Status.hp} energy={p2Status.energy} nameClassName="text-red-400" />
         </>
       )}
 
@@ -553,17 +386,6 @@ export default function ArenaPage() {
                   filter: "blur(14px)",
                   transform: "translateY(0)",
                   animation: "pulse-scan 1.8s ease-in-out infinite",
-                }}
-              />
-              <style
-                dangerouslySetInnerHTML={{
-                  __html: `
-                    @keyframes pulse-scan {
-                      0% { transform: translateY(-12%); opacity: 0.55; }
-                      50% { transform: translateY(26%); opacity: 0.90; }
-                      100% { transform: translateY(-12%); opacity: 0.55; }
-                    }
-                  `,
                 }}
               />
             </div>
