@@ -357,8 +357,7 @@ export default function LobbyPage() {
                 <Gamepad2 className="h-[1.35rem] w-[1.35rem] text-white/82" strokeWidth={1.6} />
               </motion.div>
               <div className="min-w-0 pt-0.5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-white/34">Offline</p>
-                <h2 className="mt-1.5 text-[1.65rem] font-semibold leading-[1.15] tracking-[-0.03em] text-white sm:text-[1.85rem]">
+                <h2 className="text-[1.65rem] font-semibold leading-[1.15] tracking-[-0.03em] text-white sm:text-[1.85rem]">
                   休闲小游戏
                 </h2>
                 <p className="mt-2 max-w-[26rem] text-[14px] leading-[1.55] text-white/44">
@@ -385,11 +384,10 @@ export default function LobbyPage() {
                   setNavigating(game.href)
                   router.push(game.href)
                 }}
-                className="group relative flex flex-col overflow-hidden rounded-[1.28rem] border border-white/[0.07] bg-white/[0.035] p-[1.05rem] pb-[1.15rem] text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_2px_24px_rgba(0,0,0,0.25)] transition-[border-color,box-shadow] duration-300 hover:border-white/[0.14] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_12px_40px_rgba(0,0,0,0.35)]"
-                style={{ WebkitBackdropFilter: "blur(26px)" }}
+                className="observation-window group relative flex flex-col overflow-hidden rounded-[1.28rem] border border-white/[0.07] p-[1.05rem] pb-[1.15rem] text-left shadow-[0_2px_24px_rgba(0,0,0,0.25)] transition-[border-color,box-shadow] duration-300 hover:border-violet-400/25 hover:shadow-[0_12px_40px_rgba(0,0,0,0.35)] focus-visible:outline-none focus-visible:border-violet-400/40"
               >
                 <div
-                  className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br opacity-[0.55] blur-3xl transition-opacity duration-500 group-hover:opacity-[0.75] ${game.accent}`}
+                  className={`pointer-events-none absolute -right-8 -top-8 h-20 w-20 rounded-full bg-gradient-to-br ${game.accent} opacity-30 blur-2xl transition-opacity duration-500 group-hover:opacity-50`}
                 />
                 <div className="relative flex items-start justify-between gap-3">
                   <motion.div
@@ -448,8 +446,7 @@ export default function LobbyPage() {
               <Swords className="h-[1.35rem] w-[1.35rem] text-white/76" strokeWidth={1.6} />
             </motion.div>
             <div className="min-w-0 pt-0.5">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-white/34">Online</p>
-              <h2 className="mt-1.5 text-[1.65rem] font-semibold leading-[1.15] tracking-[-0.03em] text-white sm:text-[1.85rem]">
+              <h2 className="text-[1.65rem] font-semibold leading-[1.15] tracking-[-0.03em] text-white sm:text-[1.85rem]">
                 联机战场
               </h2>
               <p className="mt-2 max-w-[26rem] text-[14px] leading-[1.55] text-white/44">
@@ -532,13 +529,16 @@ export default function LobbyPage() {
                 animate={{ borderColor: "rgba(255,255,255,0.1)" }}
               >
                 <div className="flex aspect-[16/10] max-h-[280px] flex-col items-center justify-center gap-2 px-6 py-10 sm:max-h-[300px]">
-                  <motion.div
-                    animate={{ y: [0, -4, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-3.5"
-                  >
-                    <RoleIcon className="h-8 w-8 text-white/28" strokeWidth={1.2} />
-                  </motion.div>
+                  <div className="relative flex items-center justify-center">
+                    <div className="reticle-ring absolute h-24 w-24 rounded-full opacity-60" />
+                    <motion.div
+                      animate={{ y: [0, -4, 0] }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                      className="relative rounded-2xl border border-white/[0.08] bg-white/[0.04] p-3.5"
+                    >
+                      <RoleIcon className="h-8 w-8 text-white/28" strokeWidth={1.2} />
+                    </motion.div>
+                  </div>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/28">Preview</p>
                   <p className="max-w-[16rem] text-center text-[13px] leading-relaxed text-white/38">
                     角色展示位 · 待接入模型 / 立绘
@@ -632,12 +632,12 @@ export default function LobbyPage() {
               ? undefined
               : {
                   scale: 1.03,
-                  boxShadow: "0 16px 48px rgba(255,255,255,0.14), 0 0 0 1px rgba(255,255,255,0.2) inset",
+                  boxShadow: "0 12px 32px rgba(168,85,247,0.16), 0 0 0 1px rgba(168,85,247,0.28) inset",
                 }
           }
           whileTap={matching ? undefined : { scale: 0.96 }}
           transition={{ type: "spring", stiffness: 460, damping: 26 }}
-          className="pointer-events-auto group relative flex min-h-[54px] w-full max-w-[min(100%-2rem,28rem)] items-center justify-center gap-2.5 overflow-hidden rounded-full bg-white px-8 text-[15px] font-semibold tracking-[-0.02em] text-black shadow-[0_10px_40px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.14)_inset] transition-shadow disabled:cursor-not-allowed disabled:opacity-[0.52]"
+          className="pointer-events-auto group relative flex min-h-[54px] w-full max-w-[min(100%-2rem,28rem)] items-center justify-center gap-2.5 overflow-hidden rounded-full border border-violet-400/40 bg-white px-8 text-[15px] font-semibold tracking-[-0.02em] text-black shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition-shadow disabled:cursor-not-allowed disabled:opacity-[0.52]"
         >
           {!matching ? (
             <span

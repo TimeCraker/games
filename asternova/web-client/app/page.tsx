@@ -3,29 +3,31 @@
 import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
+import { ChevronRight, Footprints, Gem, Layers, Orbit, Target } from "lucide-react"
+import { cinematicEase } from "@/src/lib/motion"
+import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 
 const CinematicBlackHole = dynamic(
   () => import("@/src/components/CinematicBlackHole").then((m) => m.CinematicBlackHole),
   { ssr: false, loading: () => <div className="absolute inset-0 bg-black" /> },
 )
-import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 
-const cinematicEase = [0.22, 1, 0.36, 1] as const
+const GAMES = [
+  { href: "/shoot-them-all", category: "Physics", title: "Shoot Them All", blurb: "物理弹射 · 连锁清场", Icon: Target },
+  { href: "/lets-running", category: "Runner", title: "Let's Running", blurb: "Star Dash · 跑酷滑铲", Icon: Footprints },
+  { href: "/merge", category: "Merge", title: "AsterNova Merge", blurb: "合成星球 · 十级进化", Icon: Layers },
+  { href: "/nebula-survivor", category: "Survivor", title: "Nebula Survivor", blurb: "俯视角肉鸽 · 构筑", Icon: Orbit },
+  { href: "/xiaoxiaole", category: "Match-3", title: "桓睿消消乐", blurb: "立体三消 · 12关闯关", Icon: Gem },
+] as const
 
 export default function Home() {
   const router = useRouter()
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-transparent text-white">
+    <div className="relative min-h-[100dvh] overflow-hidden bg-[#05030f] text-white">
+      {/* 背景:黑洞引力源(品牌资产保留) */}
       <motion.div
-        className="pointer-events-none absolute inset-0 z-0 bg-black"
-        initial={{ opacity: 1 }}
-        animate={{ opacity: 0 }}
-        transition={{ duration: 0.36, ease: cinematicEase }}
-      />
-
-      <motion.div
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute inset-0 z-0"
         initial={{ opacity: 0, scale: 0.94 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.15, delay: 0.12, ease: cinematicEase }}
@@ -33,89 +35,120 @@ export default function Home() {
         <CinematicBlackHole
           interactive
           intensity={1}
-          opacity={0.9}
+          opacity={0.85}
           className="pointer-events-none absolute inset-0"
         />
       </motion.div>
 
-      <motion.div
-        className="pointer-events-none absolute left-1/2 top-1/2 z-[1] h-[62vmin] w-[62vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
-        initial={{ opacity: 0, scale: 0.96, rotate: -10 }}
-        animate={{ opacity: 1, scale: 1, rotate: 0 }}
-        transition={{ duration: 1.18, delay: 0.2, ease: cinematicEase }}
+      {/* 星图坐标网格(committed 视觉决策,贯穿全站) */}
+      <div className="star-chart-grid pointer-events-none absolute inset-0 z-[1]" />
+
+      {/* 引力扫描:主时刻动效(一个精心设计,非散布) */}
+      <div className="pointer-events-none absolute inset-0 z-[2] overflow-hidden">
+        <div className="gravity-scan-line absolute left-0 h-[42vh] w-full bg-[linear-gradient(to_bottom,transparent,rgba(56,189,248,0.09),transparent)]" />
+      </div>
+
+      {/* 顶部观测台导航 */}
+      <motion.header
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: cinematicEase }}
+        className="relative z-20 mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6"
       >
-        <motion.div
-          className="absolute inset-0 rounded-full border border-violet-300/25"
-          style={{
-            background:
-              "conic-gradient(from 220deg, rgba(255,182,193,0.0), rgba(255,182,193,0.45), rgba(168,85,247,0.38), rgba(96,165,250,0.0))",
-            maskImage: "radial-gradient(circle, transparent 66%, black 73%, transparent 79%)",
-            WebkitMaskImage: "radial-gradient(circle, transparent 66%, black 73%, transparent 79%)",
-            filter: "blur(1.2px)",
-          }}
-          initial={{ opacity: 0.1, rotate: -45 }}
-          animate={{ opacity: [0.4, 0.64, 0.46], rotate: [0, 6, 0] }}
-          transition={{ duration: 1.22, delay: 0.28, ease: cinematicEase }}
-        />
-      </motion.div>
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/[0.06]">
+            <Orbit className="h-4 w-4 text-white/80" strokeWidth={1.7} />
+          </div>
+          <span className="font-mono-data text-[11px] uppercase tracking-[0.2em] text-white/45">
+            AsterNova · Obs
+          </span>
+        </div>
+        <span className="font-mono-data text-[11px] tracking-[0.12em] text-white/35">
+          23h 17m · +41°
+        </span>
+      </motion.header>
 
-      <motion.div
-        className="pointer-events-none absolute inset-0 z-[1]"
-        animate={{ opacity: [0.12, 0.2, 0.12] }}
-        transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          background:
-            "radial-gradient(circle at 50% 48%, rgba(168,85,247,0.16), rgba(56,189,248,0.08) 34%, rgba(0,0,0,0) 62%)",
-        }}
-      />
-
-      <motion.div
-        className="relative z-10 flex w-full max-w-4xl flex-col items-center px-6 text-center"
-        initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+      {/* Hero:Orbitron 非渐变标题(craft 禁忌修复) */}
+      <motion.section
+        initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        transition={{ duration: 0.85, delay: 0.9, ease: cinematicEase }}
+        transition={{ duration: 0.8, delay: 0.3, ease: cinematicEase }}
+        className="relative z-10 mx-auto max-w-6xl px-4 pt-4 text-center sm:px-6 sm:pt-8"
       >
-        <div className="mt-[46vh] sm:mt-[48vh]" />
+        <h1 className="aster-title text-3xl sm:text-5xl">ASTERNOVA STUDIO</h1>
+        <p className="aster-slogan mt-3 text-sm sm:text-base">Reach Beyond the Stars</p>
+        <p className="font-mono-data mx-auto mt-5 max-w-md text-[11px] leading-relaxed tracking-[0.06em] text-white/40">
+          即刻进入的宇宙游戏矩阵 · 五款休闲小游戏 + 联机战场
+        </p>
+      </motion.section>
 
-        <motion.h1
-          className="aster-title text-3xl font-semibold tracking-[0.22em] sm:text-4xl"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 1.02, ease: cinematicEase }}
-        >
-          ASTERNOVA STUDIO
-        </motion.h1>
-        <motion.p
-          className="aster-slogan mt-3 text-sm sm:text-base"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 1.12, ease: cinematicEase }}
-        >
-          Reach Beyond the Stars
-        </motion.p>
+      {/* 游戏矩阵:首屏即论点(可即刻进入,证明而非声称) */}
+      <motion.section
+        initial="hidden"
+        animate="show"
+        variants={{
+          hidden: {},
+          show: { transition: { staggerChildren: 0.07, delayChildren: 0.6 } },
+        }}
+        className="relative z-10 mx-auto max-w-6xl px-4 py-9 sm:px-6 sm:py-12"
+      >
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
+          {GAMES.map((g) => (
+            <motion.button
+              key={g.href}
+              type="button"
+              variants={{
+                hidden: { opacity: 0, y: 18 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: cinematicEase } },
+              }}
+              whileHover={{ y: -4 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => router.push(g.href)}
+              className="observation-window group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] p-4 text-left transition-colors duration-300 hover:border-violet-400/30 focus-visible:border-violet-400/50 focus-visible:outline-none"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05]">
+                  <g.Icon className="h-[1.1rem] w-[1.1rem] text-white/85" strokeWidth={1.7} />
+                </div>
+                <span className="font-mono-data text-[9px] uppercase tracking-[0.14em] text-white/35">
+                  {g.category}
+                </span>
+              </div>
+              <p className="mt-4 text-[14px] font-semibold leading-snug tracking-[-0.01em] text-white">
+                {g.title}
+              </p>
+              <p className="mt-1 text-[12px] leading-snug text-white/45">{g.blurb}</p>
+              <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-violet-300/70 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                即玩 <ChevronRight className="h-3 w-3" strokeWidth={2.5} />
+              </span>
+            </motion.button>
+          ))}
+        </div>
+      </motion.section>
 
-        <motion.div
-          className="mt-8"
-          initial={{ opacity: 0, y: 10, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.72, delay: 1.22, ease: cinematicEase }}
+      {/* 底部 CTA:登录进大厅(非发光边,刻度玻璃) */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 1, ease: cinematicEase }}
+        className="relative z-10 mx-auto max-w-6xl px-4 pb-12 text-center sm:px-6"
+      >
+        <motion.button
+          type="button"
+          onClick={() => router.push("/login")}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 420, damping: 26 }}
+          className="group relative inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-500/10 px-8 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors duration-300 hover:border-violet-400/50 hover:bg-violet-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/40"
         >
-          <motion.button
-            type="button"
-            onClick={() => router.push("/login")}
-            className="group relative inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-300 via-violet-400 to-indigo-400 px-10 py-3 text-sm font-semibold text-black shadow-[0_0_44px_rgba(168,85,247,0.25)] transition duration-300 hover:scale-[1.03] hover:shadow-[0_0_70px_rgba(56,189,248,0.30)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200"
-            whileTap={{ scale: 0.985 }}
-            transition={{ type: "spring", stiffness: 420, damping: 26 }}
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              <span className="text-[0.95rem]">开始自由探索（登录Login）</span>
-              <span className="mt-[1px] text-xs opacity-80">↗</span>
-            </span>
-            <span className="pointer-events-none absolute inset-[1px] rounded-full bg-black/10 transition group-hover:bg-black/15" />
-            <span className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(120deg,rgba(255,255,255,0.0),rgba(255,255,255,0.32),rgba(255,255,255,0.0))] opacity-0 blur-[1px] transition duration-500 group-hover:opacity-100 group-hover:translate-x-1" />
-          </motion.button>
-        </motion.div>
+          <span>进入大厅 · 登录</span>
+          <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
+        </motion.button>
+        <p className="font-mono-data mt-3 text-[10px] tracking-[0.1em] text-white/30">
+          登录后解锁联机战场与匹配
+        </p>
       </motion.div>
+
       <LoopingBgmControl src="/audio/home/Deep_space_ambient_d_#4-1774866771004.wav" storageKey="bgm-volume:home" />
     </div>
   )

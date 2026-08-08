@@ -289,6 +289,8 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/70 to-black" />
       </div>
 
+      <div className="star-chart-grid pointer-events-none absolute inset-0 z-[1] opacity-60" />
+
       <motion.div
         className="relative z-10 w-full max-w-[420px] px-5 sm:px-6"
         style={{ fontFamily: loginUiFont }}
@@ -306,14 +308,7 @@ export default function LoginPage() {
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-80"
             aria-hidden
           />
-          <div
-            className="pointer-events-none absolute -right-24 -top-24 h-48 w-48 rounded-full bg-violet-500/[0.12] blur-3xl"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute -bottom-28 -left-20 h-52 w-52 rounded-full bg-cyan-400/[0.08] blur-3xl"
-            aria-hidden
-          />
+          <div className="star-chart-grid-fine pointer-events-none absolute inset-0 opacity-50" aria-hidden />
 
           <div className="relative px-6 pb-7 pt-7 sm:px-8 sm:pb-8 sm:pt-8">
             <header className="space-y-4">
@@ -323,12 +318,12 @@ export default function LoginPage() {
                   className="group/brand inline-flex items-center rounded-md outline-none ring-offset-2 ring-offset-[#070708] focus-visible:ring-2 focus-visible:ring-white/35"
                   aria-label="返回首页"
                 >
-                  <span className="bg-gradient-to-r from-pink-200 via-fuchsia-200 to-sky-300 bg-clip-text text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-transparent transition-opacity group-hover/brand:opacity-85 sm:text-[11px]">
+                  <span className="font-mono-data text-[0.65rem] font-medium uppercase tracking-[0.2em] text-white/55 transition-opacity group-hover/brand:opacity-85 sm:text-[11px]">
                     AsterNova Studio
                   </span>
                 </Link>
-                <span className="rounded-full border border-white/[0.1] bg-white/[0.05] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-white/55">
-                  Secure access
+                <span className="font-mono-data rounded-full border border-white/[0.1] bg-white/[0.05] px-2.5 py-1 text-[10px] tracking-[0.12em] text-white/45">
+                  OBS · 23h 17m
                 </span>
               </div>
               <motion.div
@@ -341,7 +336,7 @@ export default function LoginPage() {
                   <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white/[0.07] ring-1 ring-white/[0.1]">
                     <Sparkles className="h-[1.05rem] w-[1.05rem] text-white/88" strokeWidth={1.5} />
                   </div>
-                  <h1 className="text-[1.35rem] font-semibold tracking-[-0.03em] text-white/95 sm:text-[1.45rem]">
+                  <h1 className="aster-title text-[1.35rem] sm:text-[1.45rem]">
                     AsterNova Access
                   </h1>
                 </div>
@@ -481,7 +476,7 @@ export default function LoginPage() {
                     <Button
                       type="submit"
                       disabled={passwordSubmitting}
-                      className="mt-1 h-12 w-full rounded-xl bg-gradient-to-r from-cyan-300/95 via-sky-300/95 to-cyan-200/90 text-[15px] font-semibold tracking-[-0.02em] text-black shadow-[0_0_32px_rgba(34,211,238,0.22),inset_0_1px_0_rgba(255,255,255,0.45)] transition hover:brightness-105 disabled:opacity-55"
+                      className="mt-1 h-12 w-full rounded-xl bg-cyan-400/90 text-[15px] font-semibold tracking-[-0.02em] text-black shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition hover:bg-cyan-300 disabled:opacity-55"
                     >
                       {passwordSubmitting ? "登录中…" : "登录"}
                     </Button>
@@ -570,7 +565,7 @@ export default function LoginPage() {
                     <Button
                       type="submit"
                       disabled={emailSubmitting}
-                      className="mt-1 h-12 w-full rounded-xl bg-gradient-to-r from-violet-400/95 via-fuchsia-400/90 to-violet-300/95 text-[15px] font-semibold tracking-[-0.02em] text-black shadow-[0_0_36px_rgba(167,139,250,0.28),inset_0_1px_0_rgba(255,255,255,0.4)] transition hover:brightness-105 disabled:opacity-55"
+                      className="mt-1 h-12 w-full rounded-xl bg-violet-400/90 text-[15px] font-semibold tracking-[-0.02em] text-black shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition hover:bg-violet-300 disabled:opacity-55"
                     >
                       {emailSubmitting
                         ? "提交中…"
@@ -692,7 +687,7 @@ export default function LoginPage() {
                   <Button
                     type="submit"
                     disabled={resetSubmitting}
-                    className="h-11 flex-1 rounded-xl bg-gradient-to-r from-cyan-300/95 via-sky-300/95 to-cyan-200/90 text-[14px] font-semibold text-black shadow-[0_0_28px_rgba(34,211,238,0.2)]"
+                    className="h-11 flex-1 rounded-xl bg-cyan-400/90 text-[14px] font-semibold text-black shadow-[0_6px_18px_rgba(0,0,0,0.4)] transition hover:bg-cyan-300"
                   >
                     {resetSubmitting ? "提交中…" : "确认修改"}
                   </Button>

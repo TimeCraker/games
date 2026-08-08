@@ -67,6 +67,7 @@
   --color-brand-indigo: var(--brand-indigo);
   --color-brand-pink: var(--brand-pink);
   --font-display: var(--font-orbitron);
+  --font-mono-data: var(--font-jetbrains-mono);
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
@@ -187,14 +188,16 @@ body {
 
 /* ===== 首页品牌字效（从 app/page.tsx 内联 style 抽离） ===== */
 .aster-title {
-  background: linear-gradient(120deg, var(--brand-cyan), var(--brand-violet), var(--brand-indigo));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  font-family: var(--font-orbitron), sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #f5f5ff;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 .aster-slogan {
-  color: rgba(255, 255, 255, 0.55);
-  text-shadow: 0 0 14px rgba(255, 255, 255, 0.06);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* ===== 动效 token ===== */
@@ -287,4 +290,62 @@ body {
 
 .group:hover .lobby-arcade-enter-pill .lobby-arcade-sheen {
   animation: lobby-enter-sheen 0.88s ease-out forwards;
+}
+
+/* ===== 星象观测台:星图坐标网格 + 赤道仪刻度 + 引力扫描(committed 视觉决策) ===== */
+.star-chart-grid {
+  background-image:
+    linear-gradient(to right, rgba(168, 85, 247, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 30%, transparent 85%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 30%, transparent 85%);
+}
+
+.star-chart-grid-fine {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 赤道仪刻度环:围绕焦点元素的坐标刻度(四向准星 + 主环) */
+.reticle-ring {
+  background:
+    radial-gradient(circle, transparent 58%, rgba(168, 85, 247, 0.22) 59%, rgba(168, 85, 247, 0.22) 60%, transparent 61%),
+    conic-gradient(
+      from 0deg,
+      transparent 0deg, transparent 88deg, rgba(56, 189, 248, 0.55) 89deg, rgba(56, 189, 248, 0.55) 91deg, transparent 92deg,
+      transparent 178deg, rgba(56, 189, 248, 0.55) 179deg, rgba(56, 189, 248, 0.55) 181deg, transparent 182deg,
+      transparent 268deg, rgba(56, 189, 248, 0.55) 269deg, rgba(56, 189, 248, 0.55) 271deg, transparent 272deg,
+      transparent 358deg, rgba(56, 189, 248, 0.55) 359deg, rgba(56, 189, 248, 0.55) 360deg
+    );
+}
+
+/* 引力扫描:首页主时刻(一个精心设计的动效,非散布) */
+@keyframes gravity-scan {
+  0% { transform: translateY(-100%) scaleY(0.6); opacity: 0; }
+  12% { opacity: 0.65; }
+  50% { transform: translateY(0%) scaleY(1); opacity: 0.45; }
+  88% { opacity: 0.65; }
+  100% { transform: translateY(100%) scaleY(0.6); opacity: 0; }
+}
+.gravity-scan-line {
+  animation: gravity-scan 7s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+/* 数据 mono:坐标/测量值(craft 允许数据/测量场景用等宽) */
+.font-mono-data {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-feature-settings: "tnum" 1;
+}
+
+/* 观测窗口:卡片底部的星图网格 + 内发光 */
+.observation-window {
+  position: relative;
+  background-color: rgba(8, 8, 20, 0.55);
+  background-image:
+    linear-gradient(to right, rgba(168, 85, 247, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
 }

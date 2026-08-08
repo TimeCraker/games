@@ -259,6 +259,8 @@ export default function ArenaPage() {
       )}
       <CinematicBlackHole interactive={false} intensity={0.95} opacity={0.3} className="pointer-events-none absolute inset-0" />
 
+      <div className="star-chart-grid pointer-events-none absolute inset-0 opacity-40" />
+
       <div
         className={`absolute inset-0 h-full w-full transition-opacity duration-1000 ${isSceneReady ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       >
@@ -339,6 +341,7 @@ export default function ArenaPage() {
       {/* 修改内容：全屏赛博结算遮罩层（仅展示，不改变计时/跳转逻辑） */}
       {matchResult && (
         <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-1000">
+          <div className="star-chart-grid pointer-events-none absolute inset-0 opacity-30" />
           <div
             className={[orbitron.className, "relative flex flex-col items-center gap-6"].join(" ")}
             style={{
