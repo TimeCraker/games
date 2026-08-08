@@ -201,6 +201,7 @@ export default function LobbyPage() {
   const wsRef = React.useRef<WebSocket | null>(null)
   const matchingTimeoutRef = React.useRef<number | null>(null)
   const [matching, setMatching] = React.useState(false)
+  const [navigating, setNavigating] = React.useState<string | null>(null)
   const roleItemRefs = React.useRef<Record<string, HTMLButtonElement | null>>({})
   const selectedRole = React.useMemo(() => ROLES.find((r) => r.id === selectedClass) || ROLES[0], [selectedClass])
 
@@ -395,9 +396,14 @@ export default function LobbyPage() {
                 variants={arcadeTileVariants}
                 initial="hidden"
                 animate="show"
+                disabled={navigating !== null}
                 whileHover={{ y: -5, transition: { type: "spring", stiffness: 420, damping: 22 } }}
                 whileTap={{ scale: 0.97, y: -1 }}
-                onClick={() => router.push(game.href)}
+                onClick={() => {
+                  if (navigating) return
+                  setNavigating(game.href)
+                  router.push(game.href)
+                }}
                 className="group relative flex flex-col overflow-hidden rounded-[1.28rem] border border-white/[0.07] bg-white/[0.035] p-[1.05rem] pb-[1.15rem] text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_2px_24px_rgba(0,0,0,0.25)] transition-[border-color,box-shadow] duration-300 hover:border-white/[0.14] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_12px_40px_rgba(0,0,0,0.35)]"
                 style={{ WebkitBackdropFilter: "blur(26px)" }}
               >
@@ -429,11 +435,17 @@ export default function LobbyPage() {
                     >
                       <span className="lobby-arcade-sheen pointer-events-none absolute left-0 top-0 h-full w-[55%] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                     </span>
-                    <span className="relative drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]">进入</span>
-                    <ChevronRight
-                      className="relative h-4 w-4 text-white transition-transform duration-300 group-hover:translate-x-1"
-                      strokeWidth={2.5}
-                    />
+                    {navigating === game.href ? (
+                      <Loader2 className="relative h-4 w-4 animate-spin" strokeWidth={2.5} />
+                    ) : (
+                      <>
+                        <span className="relative drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]">进入</span>
+                        <ChevronRight
+                          className="relative h-4 w-4 text-white transition-transform duration-300 group-hover:translate-x-1"
+                          strokeWidth={2.5}
+                        />
+                      </>
+                    )}
                   </span>
                 </div>
               </motion.button>
