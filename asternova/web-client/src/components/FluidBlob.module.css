@@ -1,0 +1,76 @@
+.blobWrap {
+  position: relative;
+  width: min(62vw, 560px);
+  aspect-ratio: 1 / 1;
+}
+
+.blob {
+  position: absolute;
+  inset: 10%;
+  border-radius: 44% 56% 58% 42% / 43% 40% 60% 57%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 228, 240, 0.95) 0%, rgba(255, 228, 240, 0) 48%),
+    radial-gradient(circle at 72% 35%, rgba(232, 185, 255, 0.88) 0%, rgba(232, 185, 255, 0) 52%),
+    radial-gradient(circle at 48% 72%, rgba(187, 123, 255, 0.9) 0%, rgba(187, 123, 255, 0) 54%),
+    conic-gradient(
+      from 180deg at 50% 50%,
+      rgba(255, 203, 225, 0.9),
+      rgba(228, 159, 255, 0.88),
+      rgba(157, 112, 255, 0.88),
+      rgba(255, 203, 225, 0.9)
+    );
+  filter: blur(26px) saturate(120%);
+  animation:
+    blobMorph 7.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate,
+    blobSpin 20s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+.blobInnerGlow {
+  position: absolute;
+  inset: 26%;
+  border-radius: 57% 43% 39% 61% / 41% 62% 38% 59%;
+  background: radial-gradient(circle, rgba(255, 245, 255, 0.78) 0%, rgba(255, 245, 255, 0) 72%);
+  filter: blur(18px);
+  animation: blobPulse 4.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes blobMorph {
+  0% {
+    border-radius: 44% 56% 58% 42% / 43% 40% 60% 57%;
+    transform: scale(1) rotate(0deg);
+  }
+  35% {
+    border-radius: 58% 42% 50% 50% / 52% 61% 39% 48%;
+    transform: scale(1.04) rotate(8deg);
+  }
+  70% {
+    border-radius: 39% 61% 46% 54% / 48% 38% 62% 52%;
+    transform: scale(0.98) rotate(-6deg);
+  }
+  100% {
+    border-radius: 54% 46% 61% 39% / 56% 47% 53% 44%;
+    transform: scale(1.03) rotate(4deg);
+  }
+}
+
+@keyframes blobSpin {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes blobPulse {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
