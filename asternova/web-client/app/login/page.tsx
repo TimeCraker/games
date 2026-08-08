@@ -15,9 +15,8 @@ import { Button } from "@/components/ui/button"
 import { getApiErrorMessage, guestLogin, login, loginWithEmail, register, resetPasswordWithEmail, sendCode } from "@/src/api/auth"
 import { extractUserIdFromToken } from "@/src/api/jwt"
 import { useGameStore } from "@/src/store/useGameStore"
+import { cinematicEase } from "@/src/lib/motion"
 import { BluePurpleBlackhole } from "@/src/components/bluePurpleBlackhole"
-
-const cinematicEase = [0.22, 1, 0.36, 1] as const
 
 const loginUiFont =
   'system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", sans-serif'

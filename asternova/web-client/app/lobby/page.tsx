@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner"
 
 import { GlassPanel } from "@/src/components/ui/GlassPanel"
+import { cinematicEase } from "@/src/lib/motion"
 import { LobbyAvatarPickerModal, LobbyPresetAvatar, useLobbyAvatar } from "@/src/components/lobby/LobbyAvatars"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { wsUrl } from "@/src/config/public-env"
@@ -32,7 +33,7 @@ import { useGameStoreRehydrated } from "@/src/store/useGameStoreHydration"
 
 const uiFont = 'system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", sans-serif'
 
-const easeOut = [0.22, 1, 0.36, 1] as const
+const easeOut = cinematicEase
 
 const pageVariants = {
   hidden: { opacity: 0 },
