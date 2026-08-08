@@ -8,6 +8,7 @@ import {
   Cpu,
   Footprints,
   Gamepad2,
+  Gem,
   HeartPulse,
   IdCard,
   Layers,
@@ -147,6 +148,14 @@ const ARCADE: ArcadeTile[] = [
     blurb: "俯视角肉鸽 · 三选一构筑",
     Icon: Orbit,
     accent: "from-sky-400/22 to-indigo-500/12",
+  },
+  {
+    href: "/xiaoxiaole",
+    category: "Match-3",
+    title: "桓睿消消乐",
+    blurb: "立体三消 · 12关闯关",
+    Icon: Gem,
+    accent: "from-amber-400/25 to-orange-400/10",
   },
 ]
 
