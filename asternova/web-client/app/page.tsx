@@ -13,19 +13,6 @@ export default function Home() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-transparent text-white">
-      <style>{`
-        .aster-title {
-          background: linear-gradient(120deg, rgba(56,189,248,0.95), rgba(168,85,247,0.95), rgba(99,102,241,0.95));
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        }
-        .aster-slogan {
-          color: rgba(255,255,255,0.55);
-          text-shadow: 0 0 14px rgba(255,255,255,0.06);
-        }
-      `}</style>
-
       <motion.div
         className="pointer-events-none absolute inset-0 z-0 bg-black"
         initial={{ opacity: 1 }}
