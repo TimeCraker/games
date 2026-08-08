@@ -25,18 +25,11 @@ export default function ArenaPage() {
   const [p2Status, setP2Status] = React.useState({ hp: 100, energy: 0 })
   const [countdown, setCountdown] = React.useState<number | string | null>(null)
   const [loadingProgress, setLoadingProgress] = React.useState(8)
-  // ===== 新增代码 START =====
-  // 修改内容：新增对局结算状态，用于控制结算遮罩 UI
-  // 修改原因：需要在收到 Godot 的 game_over 后展示胜负并保持 4 秒后回大厅
-  // 影响范围：仅渲染层状态与 UI，不影响网络/路由逻辑
   const [matchResult, setMatchResult] = React.useState<'victory' | 'defeat' | null>(null)
-  // ===== 新增代码 END =====
 
   const token = useGameStore((s) => s.token)
   const userId = useGameStore((s) => s.userId)
-  // ===== 新增代码 START =====
   const username = useGameStore((s) => s.username)
-  // ===== 新增代码 END =====
   const currentRoomId = useGameStore((s) => s.currentRoomId)
   const selectedClass = useGameStore((s) => s.selectedClass)
   const sessionReadyForBattle = useGameStore((s) => s.sessionReadyForBattle)
@@ -80,7 +73,6 @@ export default function ArenaPage() {
       console.warn("[ArenaPage] 无法修改 iframe 内部样式 (可能跨域)", err)
     }
 
-    // ===== 新增代码 START =====
     type EnterBattlePayload = {
       token: string
       userId: number
@@ -90,13 +82,10 @@ export default function ArenaPage() {
       wsBase: string
       isMobile: boolean
     }
-    // ===== 新增代码 END =====
     const payload: EnterBattlePayload = {
       token,
       userId,
-      // ===== 新增代码 START =====
       username,
-      // ===== 新增代码 END =====
       roomId: currentRoomId,
       selectedClass,
       wsBase: process.env.NEXT_PUBLIC_WS_URL ?? "",
@@ -149,10 +138,6 @@ export default function ArenaPage() {
         return
       }
 
-      // ===== 新增代码 START =====
-      // 修改内容：拦截 Godot 发来的 game_over 信号，驱动结算 UI 并在演出结束后回大厅
-      // 修改原因：与后端的 game_over 广播对齐，确保慢动作结束后把胜负结果推给 React
-      // 影响范围：仅当 resultType === "game_over" 时中断默认 toast + router 行为
       if (resultType === "game_over") {
         try {
           const data = typeof payload === "string" ? JSON.parse(payload) : payload
@@ -169,7 +154,6 @@ export default function ArenaPage() {
         }
         return
       }
-      // ===== 新增代码 END =====
 
       console.log("收到 Godot 战斗结果:", resultType, payload)
 
@@ -347,7 +331,6 @@ export default function ArenaPage() {
         </>
       )}
 
-      {/* ===== 新增代码 START ===== */}
       {/* 修改内容：全屏赛博结算遮罩层（仅展示，不改变计时/跳转逻辑） */}
       {matchResult && (
         <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-1000">
@@ -421,7 +404,6 @@ export default function ArenaPage() {
           </div>
         </div>
       )}
-      {/* ===== 新增代码 END ===== */}
       <LoopingBgmControl src="/audio/games/arena/Untitled.mp3" storageKey="bgm-volume:arena" />
     </div>
   )

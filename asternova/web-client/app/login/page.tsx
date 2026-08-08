@@ -248,7 +248,6 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-transparent">
-      {/* ===== 新增代码 START ===== */}
       <motion.div
         className="pointer-events-none absolute inset-0 z-0 bg-black"
         initial={{ opacity: 1 }}
@@ -285,7 +284,6 @@ export default function LoginPage() {
           transition={{ duration: 1.25, delay: 0.3, ease: cinematicEase }}
         />
       </motion.div>
-      {/* ===== 新增代码 END ===== */}
 
       <div className="pointer-events-none absolute inset-0 opacity-70">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(56,189,248,0.18),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(168,85,247,0.18),transparent_50%),radial-gradient(circle_at_40%_80%,rgba(34,197,94,0.10),transparent_45%)]" />
