@@ -5,8 +5,13 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Orbitron } from "next/font/google"
 
+import dynamic from "next/dynamic"
 import { PlayerHud, UltimateButton } from "@/src/components/arena/ArenaHud"
-import { CinematicBlackHole } from "@/src/components/CinematicBlackHole"
+
+const CinematicBlackHole = dynamic(
+  () => import("@/src/components/CinematicBlackHole").then((m) => m.CinematicBlackHole),
+  { ssr: false },
+)
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { apiV1BaseUrl } from "@/src/config/public-env"
 import { useMobileGameViewport } from "@/src/hooks/useMobileGameViewport"

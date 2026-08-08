@@ -1,9 +1,13 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 
-import { CinematicBlackHole } from "@/src/components/CinematicBlackHole"
+const CinematicBlackHole = dynamic(
+  () => import("@/src/components/CinematicBlackHole").then((m) => m.CinematicBlackHole),
+  { ssr: false, loading: () => <div className="absolute inset-0 bg-black" /> },
+)
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 
 const cinematicEase = [0.22, 1, 0.36, 1] as const
