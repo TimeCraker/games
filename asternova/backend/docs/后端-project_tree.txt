@@ -1,0 +1,106 @@
+﻿Folder PATH listing
+Volume serial number is B85E-49CE
+C:.
+|   .cursorrules
+|   .gitignore
+|   asternova-server
+|   backend.zip
+|   docker-compose.yml
+|   game-backend-demo.exe
+|   go.mod
+|   go.sum
+|   main.go
+|   README.md
+|   
++---.cursor
++---.roo
+|   \---rules
+|           backend_rules.md
+|           unity_rules.md
+|           
++---.wiki.git
+|       #-??-2026.03.03.02-���翪���ʼ�-A.md
+|       #-??-2026.03.03.04-����-�����ʼ�.md
+|       #-??-2026.03.11-�����ʼ�-����.md
+|       #-??-2026.03.11-�����ʼ�.md
+|       #-??-2026.03.13-���翪���ʼǣ���Ŀ�ܹ��ع��빤�̹淶��.md
+|       #-??-2026.03.13-�����ʼǣ�Unity-ǰ��-UI-�ع���-SPA-�����֤����.md
+|       2026.03.04-�����ʼ�.md
+|       2026.03.10-�����ʼǣ�����������ƽ���ƶ��Ż�.md
+|       Home.md
+|       ������ս��Ϸ���ʵս��Ŀ�滮.md
+|       ??-2026.02.26-����ʼ�.md
+|       ??-2026.02.27-�����ʼ�.md
+|       ??-2026.03.02-�����ʼ�.md
+|       ??-2026.03.02.md
+|       ??-2026.03.03.01-���翪���ʼ�.md
+|       ??-2026.03.03.03-���翪���ʼ�B.md
+|       ??-2026.03.04-�����ʼǣ�Unity-�Խ��������޸�.md
+|       ??-2026.03.08-�����ʼ�.md
+|       ??-2026.03.17-�����ʼǣ��ܹ�ԾǨ����������ֿ���΢������������.md
+|       ??-2026.03.25-�����ʼ�.md
+|       ???2026.02.25-ѧϰ�ʼ�.md
+|       
++---docs
+|       all_wiki_merged.txt
+|       project_tree.txt
+|       roadmap.md
+|       ���-all_code_merged.txt
+|       ���-project_tree.txt
+|       
++---scripts
+|       generate_docs.ps1
+|       local_down.ps1
+|       local_logs.ps1
+|       local_up.ps1
+|       ������Ŀ�ĵ�-generate_docs.bat
+|       
++---services
+|   +---auth
+|   |   +---db
+|   |   |       mysql.go
+|   |   |       redis.go
+|   |   |       
+|   |   +---handlers
+|   |   |   +---account
+|   |   |   |       guest_login.go
+|   |   |   |       login.go
+|   |   |   |       register.go
+|   |   |   |       reset_password.go
+|   |   |   |       user.go
+|   |   |   |       
+|   |   |   \---send_email
+|   |   |           email.go
+|   |   |           
+|   |   +---middleware
+|   |   |       middleware.go
+|   |   |       
+|   |   +---models
+|   |   |       message.go
+|   |   |       player.go
+|   |   |       user.go
+|   |   |       
+|   |   \---utils
+|   |           email.go
+|   |           jwt.go
+|   |           
+|   +---battle
+|   |       math.go
+|   |       player_state.go
+|   |       room.go
+|   |       
+|   +---gateway
+|   |   \---handlers
+|   |           hub.go
+|   |           websocket.go
+|   |           
+|   +---match
+|   |       matcher.go
+|   |       
+|   \---proto
+|           game.pb.go
+|           game.proto
+|           
+\---test
+        test_client.go
+        

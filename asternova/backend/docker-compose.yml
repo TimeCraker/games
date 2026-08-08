@@ -1,0 +1,37 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: game-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: game_dev
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    container_name: game-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  # ===== 新增 Qdrant 向量数据库供 Roo Code 索引使用 =====
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: game-qdrant
+    ports:
+      - "6333:6333" # Roo Code 默认连接的 HTTP 端口
+      - "6334:6334" # gRPC 端口
+    volumes:
+      - qdrant-data:/qdrant/storage
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
+  redis-data:
+  qdrant-data: # 记得在底部加上这个挂载卷，防止重启丢失索引
