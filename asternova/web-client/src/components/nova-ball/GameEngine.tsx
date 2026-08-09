@@ -778,14 +778,21 @@ export function GameEngine() {
   }
 
   if (fatalRuntimeError) {
+    const isDev = process.env.NODE_ENV === "development"
     return (
       <div className="nova-shell-wash relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-space-black px-5 text-white">
         <div className="relative z-10 w-full max-w-md rounded-[1.75rem] border border-glass-border bg-glass-bg p-7 text-left shadow-lg backdrop-blur-glass-lg">
           <div className="font-display text-xl font-bold tracking-wider text-red-400">游戏初始化失败</div>
-          <p className="mt-3 whitespace-pre-wrap break-words text-sm text-white/70">{fatalRuntimeError.message}</p>
-          <p className="mt-2 whitespace-pre-wrap break-words text-xs text-white/40" style={{ opacity: 0.85 }}>
-            {fatalRuntimeError.stack || "(no stack trace)"}
-          </p>
+          {isDev ? (
+            <>
+              <p className="mt-3 whitespace-pre-wrap break-words text-sm text-white/70">{fatalRuntimeError.message}</p>
+              <p className="mt-2 whitespace-pre-wrap break-words text-xs text-white/40" style={{ opacity: 0.85 }}>
+                {fatalRuntimeError.stack || "(no stack trace)"}
+              </p>
+            </>
+          ) : (
+            <p className="mt-3 text-sm text-white/70">游戏加载失败，请刷新页面或返回大厅重试。</p>
+          )}
           <div className="mt-5 flex gap-2.5">
             <Button variant="brand" onClick={() => router.refresh()}>
               重试
