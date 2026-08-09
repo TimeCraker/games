@@ -15,7 +15,11 @@ import Matter, {
 } from "matter-js"
 
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
-import styles from "./GameEngine.module.css"
+import { Button } from "@/components/ui/button"
+import { LiquidBar } from "@/src/components/ui/LiquidBar"
+import { ResultOverlay } from "@/src/components/ui/ResultOverlay"
+import { GameBackButton } from "@/src/components/ui/GameBackButton"
+import { cn } from "@/lib/utils"
 
 const WIDTH = 1180
 const HEIGHT = 700
@@ -42,7 +46,10 @@ function randomInt(min: number, max: number) {
 
 function RulesIconAim() {
   return (
-    <span className={`${styles.rulesIcon} ${styles.rulesIconAim}`} aria-hidden>
+    <span
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,rgba(251,113,133,0.4),rgba(139,92,246,0.36))]"
+      aria-hidden
+    >
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M7 17 L17 7 M17 7 h-4.5 M17 7 v4.5" opacity={0.85} />
         <circle cx="9" cy="15" r="2.2" />
@@ -53,7 +60,10 @@ function RulesIconAim() {
 
 function RulesIconTarget() {
   return (
-    <span className={`${styles.rulesIcon} ${styles.rulesIconTarget}`} aria-hidden>
+    <span
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,rgba(52,211,153,0.35),rgba(56,189,248,0.32))]"
+      aria-hidden
+    >
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.45" strokeLinecap="round">
         <circle cx="12" cy="12" r="7" />
         <circle cx="12" cy="12" r="3.2" />
@@ -65,7 +75,10 @@ function RulesIconTarget() {
 
 function RulesIconAmmo() {
   return (
-    <span className={`${styles.rulesIcon} ${styles.rulesIconAmmo}`} aria-hidden>
+    <span
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,rgba(251,191,36,0.38),rgba(249,115,22,0.32))]"
+      aria-hidden
+    >
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.45" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="9" cy="12" r="3.2" />
         <circle cx="15" cy="12" r="3.2" />
@@ -77,7 +90,10 @@ function RulesIconAmmo() {
 
 function RulesIconTimer() {
   return (
-    <span className={`${styles.rulesIcon} ${styles.rulesIconTimer}`} aria-hidden>
+    <span
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,rgba(167,139,250,0.38),rgba(236,72,153,0.28))]"
+      aria-hidden
+    >
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.45" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="13" r="7" />
         <path d="M12 9.5V13l3 2" />
@@ -763,24 +779,20 @@ export function GameEngine() {
 
   if (fatalRuntimeError) {
     return (
-      <div className={styles.shell}>
-        <div className={styles.overlay}>
-          <div className={styles.panel}>
-            <div className={styles.panelTitle}>游戏初始化失败</div>
-            <div className={styles.panelLine} style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-              {fatalRuntimeError.message}
-            </div>
-            <div className={styles.panelLine} style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", fontSize: 12, opacity: 0.85 }}>
-              {fatalRuntimeError.stack || "(no stack trace)"}
-            </div>
-            <div className={styles.panelActions}>
-              <button type="button" className={`${styles.actionBtn} ${styles.actionPrimary}`} onClick={() => router.refresh()}>
-                重试
-              </button>
-              <button type="button" className={`${styles.actionBtn} ${styles.actionSecondary}`} onClick={() => router.push("/lobby")}>
-                返回大厅
-              </button>
-            </div>
+      <div className="nova-shell-wash relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-space-black px-5 text-white">
+        <div className="relative z-10 w-full max-w-md rounded-[1.75rem] border border-glass-border bg-glass-bg p-7 text-left shadow-lg backdrop-blur-glass-lg">
+          <div className="font-display text-xl font-bold tracking-wider text-red-400">游戏初始化失败</div>
+          <p className="mt-3 whitespace-pre-wrap break-words text-sm text-white/70">{fatalRuntimeError.message}</p>
+          <p className="mt-2 whitespace-pre-wrap break-words text-xs text-white/40" style={{ opacity: 0.85 }}>
+            {fatalRuntimeError.stack || "(no stack trace)"}
+          </p>
+          <div className="mt-5 flex gap-2.5">
+            <Button variant="brand" onClick={() => router.refresh()}>
+              重试
+            </Button>
+            <Button variant="ghost" onClick={() => router.push("/lobby")} className="text-white/70 hover:text-white">
+              返回大厅
+            </Button>
           </div>
         </div>
       </div>
@@ -788,104 +800,106 @@ export function GameEngine() {
   }
 
   return (
-    <div className={styles.shell}>
-      <div className={styles.stars} />
+    <div className="nova-shell-wash relative flex min-h-[100dvh] h-[100dvh] flex-col overflow-hidden bg-space-black text-gray-100 shell-fill:min-h-0 shell-fill:h-full">
+      <div className="nova-stars pointer-events-none absolute inset-0 opacity-40" />
 
       {rulesModalOpen ? (
-        <div className={styles.rulesBackdrop} role="dialog" aria-modal="true" aria-labelledby="sta-rules-title">
-          <div className={styles.rulesPanel}>
-            <h2 id="sta-rules-title" className={styles.rulesTitle}>
+        <div className="absolute inset-0 z-[80] flex items-center justify-center bg-black/55 p-4 backdrop-blur-[10px]" role="dialog" aria-modal="true" aria-labelledby="sta-rules-title">
+          <div className="w-full max-w-[400px] rounded-[2rem] border border-glass-border bg-white/[0.07] p-6 shadow-lg backdrop-blur-2xl">
+            <h2 id="sta-rules-title" className="text-center text-[1.15rem] font-semibold tracking-[-0.02em] text-white">
               规则速览
             </h2>
-            <p className={styles.rulesSubtitle}>Shoot Them All · 物理弹射清场</p>
+            <p className="mt-1 text-center text-[0.78rem] text-white/45">Shoot Them All · 物理弹射清场</p>
 
-            <ul className={styles.rulesList}>
-              <li className={styles.rulesRow}>
+            <ul className="mt-4 flex list-none flex-col gap-2.5 p-0">
+              <li className="flex items-start gap-2.5 rounded-[1rem] bg-white/[0.05] p-2.5">
                 <RulesIconAim />
                 <div>
-                  <div className={styles.rulesRowTitle}>拖拽发射</div>
-                  <p className={styles.rulesRowDesc}>按住左侧 Nova 球向后拉，松手弹出；连锁爆炸可顺带清掉邻近晶体。</p>
+                  <div className="text-[0.84rem] font-semibold text-white/95">拖拽发射</div>
+                  <p className="mt-1 text-[0.74rem] leading-[1.45] text-white/55">按住左侧 Nova 球向后拉，松手弹出；连锁爆炸可顺带清掉邻近晶体。</p>
                 </div>
               </li>
-              <li className={styles.rulesRow}>
+              <li className="flex items-start gap-2.5 rounded-[1rem] bg-white/[0.05] p-2.5">
                 <RulesIconTarget />
                 <div>
-                  <div className={styles.rulesRowTitle}>过关线 60%</div>
-                  <p className={styles.rulesRowDesc}>本关消除晶体达到 60% 即算过关；全清会更快进入结算。</p>
+                  <div className="text-[0.84rem] font-semibold text-white/95">过关线 60%</div>
+                  <p className="mt-1 text-[0.74rem] leading-[1.45] text-white/55">本关消除晶体达到 60% 即算过关；全清会更快进入结算。</p>
                 </div>
               </li>
-              <li className={styles.rulesRow}>
+              <li className="flex items-start gap-2.5 rounded-[1rem] bg-white/[0.05] p-2.5">
                 <RulesIconAmmo />
                 <div>
-                  <div className={styles.rulesRowTitle}>全局球数</div>
-                  <p className={styles.rulesRowDesc}>
-                    每发射 1 次消耗 1 球。<span className={styles.rulesEmphPass}>过关 +1</span>，{" "}
-                    <span className={styles.rulesEmphFail}>未达标 −1</span>。未达标且扣完后球数 ≤0 时游戏结束。
+                  <div className="text-[0.84rem] font-semibold text-white/95">全局球数</div>
+                  <p className="mt-1 text-[0.74rem] leading-[1.45] text-white/55">
+                    每发射 1 次消耗 1 球。<span className="text-[#a7f3d0]/95">过关 +1</span>，{" "}
+                    <span className="text-[#fca5a5]/95">未达标 −1</span>。未达标且扣完后球数 ≤0 时游戏结束。
                   </p>
                 </div>
               </li>
-              <li className={styles.rulesRow}>
+              <li className="flex items-start gap-2.5 rounded-[1rem] bg-white/[0.05] p-2.5">
                 <RulesIconTimer />
                 <div>
-                  <div className={styles.rulesRowTitle}>5 秒未碰晶体</div>
-                  <p className={styles.rulesRowDesc}>单颗球若连续 5 秒没撞到晶体，会自动收回并计作一次出手结束。</p>
+                  <div className="text-[0.84rem] font-semibold text-white/95">5 秒未碰晶体</div>
+                  <p className="mt-1 text-[0.74rem] leading-[1.45] text-white/55">单颗球若连续 5 秒没撞到晶体，会自动收回并计作一次出手结束。</p>
                 </div>
               </li>
             </ul>
 
-            <label className={styles.rulesCheck}>
+            <label className="mt-4 flex cursor-pointer items-center gap-2.5 rounded-[1rem] border border-white/[0.08] bg-white/[0.04] p-2.5 text-[0.78rem] text-white/70 transition-colors duration-fast hover:bg-white/[0.06]">
               <input
                 type="checkbox"
+                className="size-4 rounded accent-[#a78bfa]"
                 checked={dontShowRulesAgain}
                 onChange={(e) => setDontShowRulesAgain(e.target.checked)}
               />
               下次不再显示（仅本机）
             </label>
 
-            <button type="button" className={styles.rulesConfirm} onClick={confirmRules}>
+            <Button variant="brand" size="lg" className="mt-4 w-full" onClick={confirmRules}>
               开始游戏
-            </button>
+            </Button>
           </div>
         </div>
       ) : null}
 
-      <div className={styles.hud}>
-        <div className={styles.topRow}>
-          <div className={styles.title}>Shoot Them All</div>
-          <div className={styles.pillRow}>
-            <span className={styles.pill}>第 {currentLevel} 关</span>
-            <span className={`${styles.pill} ${styles.ammoPill}`} title={`全局剩余球：${ammoPool}`}>
-              <span className={styles.ammoPillMain}>
+      <div className="relative z-[5] mx-auto w-[min(1180px,calc(100%-2rem))] pt-3.5 shell-fill:w-[min(1180px,calc(100%-1rem))] shell-fill:pt-1.5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="bg-[linear-gradient(100deg,#ffd6e8_0%,#e9b7ff_46%,#a78bfa_100%)] bg-clip-text text-[clamp(1.4rem,2.4vw,2.05rem)] font-bold uppercase tracking-[0.1em] text-transparent">Shoot Them All</div>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="inline-flex items-center gap-[0.45rem] rounded-full border border-white/[0.12] bg-surface-2/60 px-3.5 py-[0.46rem] text-[0.8rem] text-white/88">第 {currentLevel} 关</span>
+            <span className="inline-flex flex-wrap items-center gap-[0.45rem] gap-y-1.5 rounded-full border border-white/[0.12] bg-surface-2/60 px-3.5 py-[0.46rem] text-[0.8rem] text-white/88" title={`全局剩余球：${ammoPool}`}>
+              <span className="inline-flex shrink-0 items-baseline gap-[0.35rem]">
                 <span>全局剩余球</span>
-                <span className={styles.ammoNumber}>{ammoPool}</span>
+                <span className="font-mono-data font-bold tracking-[0.02em] text-[#fce7f3]">{ammoPool}</span>
               </span>
-              <span className={styles.ballIcons} aria-hidden>
+              <span className="inline-flex min-h-[12px] shrink-0 items-center gap-[3px] py-px" aria-hidden>
                 {Array.from({ length: ammoIconCount }).map((_, idx) => (
-                  <span key={`ammo-${idx}`} className={styles.ballDot} />
+                  <span key={`ammo-${idx}`} className="size-2.5 shrink-0 rounded-full bg-[radial-gradient(circle_at_35%_30%,#ffe7f5_0%,#f0abfc_45%,#8b5cf6_100%)] shadow-[0_0_8px_rgba(216,140,255,0.7)]" />
                 ))}
-                {ammoPool > 12 ? <span className={styles.ballCountText}>+{ammoPool - 12}</span> : null}
+                {ammoPool > 12 ? <span className="ml-[0.15rem] whitespace-nowrap font-mono-data text-[0.72rem] font-semibold text-white/90">+{ammoPool - 12}</span> : null}
               </span>
             </span>
-            <span className={styles.pill}>得分 {score}</span>
-            <button className={styles.backBtn} onClick={() => router.push("/lobby")} type="button">
-              返回大厅
-            </button>
+            <span className="inline-flex items-center gap-[0.45rem] rounded-full border border-white/[0.12] bg-surface-2/60 px-3.5 py-[0.46rem] text-[0.8rem] text-white/88">得分 {score}</span>
+            <GameBackButton variant="header" />
           </div>
         </div>
 
-        <div className={styles.progressWrap}>
-          <div className={styles.progressLabel}>
+        <div className="mt-2.5">
+          <div className="mb-1.5 flex justify-between text-[0.78rem] text-white/75">
             <span>晶体清除目标：60%</span>
             <span>{progressPercent}%</span>
           </div>
-          <div className={styles.progressTrack}>
-            <div className={`${styles.progressFill} ${passed ? styles.progressFillSuccess : ""}`} style={{ width: `${progressPercent}%` }} />
-          </div>
+          <LiquidBar variant="progress" value={progressPercent} max={100} success={passed} showHighlight={false} className="[border-radius:9999px]" />
         </div>
       </div>
 
       <div
-        className={`${styles.canvasWrap} ${rulesModalOpen ? styles.canvasBlocked : ""}`}
+        className={cn(
+          "nova-canvas-shell relative z-[2] mx-auto mt-2.5 aspect-[1180/700] min-h-[220px] flex-1 overflow-hidden rounded-3xl border border-white/14 [&>canvas]:block [&>canvas]:size-full",
+          "w-[min(1180px,calc(100%-2rem),calc((100dvh-12.2rem)*1180/700))] max-h-[min(100%,720px,calc(100dvh-12.2rem))]",
+          "shell-fill:mt-1.5 shell-fill:w-[min(1180px,calc(100%-1rem))] shell-fill:max-h-[calc(100%-8.6rem)]",
+          rulesModalOpen && "pointer-events-none",
+        )}
         ref={worldRef}
         onPointerDown={(ev) => {
           const ball = currentBallRef.current
@@ -923,25 +937,19 @@ export function GameEngine() {
         }}
         onPointerUp={launchIfDragging}
       >
-        <div className={styles.hint}>拖拽左侧 Nova 发射；过关 +1 球，未达标 −1 球（详见开始前的规则）。</div>
+        <div className="pointer-events-none absolute bottom-4 left-4 z-[4] rounded-xl border border-white/[0.12] bg-[rgba(10,11,18,0.66)] px-3 py-2 text-[0.76rem] text-white/85">拖拽左侧 Nova 发射；过关 +1 球，未达标 −1 球（详见开始前的规则）。</div>
 
         {phase === "game-over" && gameOverStats ? (
-          <div className={styles.overlay}>
-            <div className={styles.panel}>
-              <div className={styles.panelTitle}>游戏结束</div>
-              <div className={styles.panelLine}>生存关数：{gameOverStats.levels}</div>
-              <div className={styles.panelLine}>总得分：{gameOverStats.score}</div>
-              <div className={styles.panelSlogan}>Reach Beyond the Stars</div>
-              <div className={styles.panelActions}>
-                <button type="button" className={`${styles.actionBtn} ${styles.actionPrimary}`} onClick={handleRestart}>
-                  重新开始
-                </button>
-                <button type="button" className={`${styles.actionBtn} ${styles.actionSecondary}`} onClick={() => router.push("/lobby")}>
-                  返回大厅
-                </button>
-              </div>
-            </div>
-          </div>
+          <ResultOverlay
+            victory={false}
+            title="游戏结束"
+            stats={[
+              { label: "生存关数", value: gameOverStats.levels },
+              { label: "总得分", value: gameOverStats.score },
+            ]}
+            actionLabel="重新开始"
+            onAction={handleRestart}
+          />
         ) : null}
       </div>
       <LoopingBgmControl src="/audio/games/shoot-them-all/Untitled.mp3" storageKey="bgm-volume:shoot-them-all" />

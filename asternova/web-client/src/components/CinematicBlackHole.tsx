@@ -33,14 +33,12 @@ export function CinematicBlackHole(props: CinematicBlackHoleProps) {
   const uniformsRef = React.useRef<ShaderUniforms | null>(null)
   const orbitTargetRef = React.useRef({ x: 0, y: 0 })
   const orbitRef = React.useRef({ x: 0, y: 0 })
+  const pausedRef = React.useRef(false)
+  const intersectRef = React.useRef(true)
 
   React.useEffect(() => {
     const wrap = wrapRef.current
     if (!wrap) return
-
-    let renderer: THREE.WebGLRenderer
-    let geometry: THREE.PlaneGeometry
-    let material: THREE.ShaderMaterial
 
     const width = Math.max(1, wrap.clientWidth)
     const height = Math.max(1, wrap.clientHeight)
@@ -51,7 +49,7 @@ export function CinematicBlackHole(props: CinematicBlackHoleProps) {
     camera.position.set(0, 0, 1)
     camera.rotation.set(-0.08, 0.0, 0.0)
 
-    renderer = new THREE.WebGLRenderer({
+    const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
       powerPreference: "high-performance",
@@ -234,8 +232,8 @@ void main() {
     }
     uniformsRef.current = uniforms
 
-    geometry = new THREE.PlaneGeometry(2, 2)
-    material = new THREE.ShaderMaterial({
+    const geometry = new THREE.PlaneGeometry(2, 2)
+    const material = new THREE.ShaderMaterial({
       uniforms,
       vertexShader,
       fragmentShader,
@@ -260,7 +258,7 @@ void main() {
     composerRef.current = composer
 
     const onPointerMove = (ev: PointerEvent) => {
-      if (!interactive) return
+      if (!interactive || pausedRef.current) return
       const rect = wrap.getBoundingClientRect()
       const nx = (ev.clientX - rect.left) / Math.max(1, rect.width)
       const ny = (ev.clientY - rect.top) / Math.max(1, rect.height)
@@ -287,6 +285,10 @@ void main() {
     const clock = new THREE.Clock()
     const viewDir = new THREE.Vector3(0, 0, 1)
     const tick = () => {
+      if (pausedRef.current) {
+        rafRef.current = null
+        return
+      }
       const dt = clock.getDelta()
       const t = clock.elapsedTime
 
@@ -309,11 +311,44 @@ void main() {
       rafRef.current = window.requestAnimationFrame(tick)
     }
 
+    // 视口外 / tab 切走时暂停 RAF + UnrealBloom 渲染，回视口时平滑续接（吞掉累积 dt 避免 u_time 跳变）
+    const startRaf = () => {
+      if (rafRef.current == null && !pausedRef.current) {
+        clock.getDelta()
+        rafRef.current = window.requestAnimationFrame(tick)
+      }
+    }
+    const stopRaf = () => {
+      if (rafRef.current != null) {
+        window.cancelAnimationFrame(rafRef.current)
+        rafRef.current = null
+      }
+    }
+    const updatePause = () => {
+      const next = !intersectRef.current || document.hidden
+      if (next === pausedRef.current) return
+      pausedRef.current = next
+      if (next) stopRaf()
+      else startRaf()
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        intersectRef.current = entries[0]?.isIntersecting ?? true
+        updatePause()
+      },
+      { threshold: 0 },
+    )
+    io.observe(wrap)
+    document.addEventListener("visibilitychange", updatePause)
+
     rafRef.current = window.requestAnimationFrame(tick)
 
     return () => {
       window.removeEventListener("pointermove", onPointerMove)
       window.removeEventListener("resize", onResize)
+      document.removeEventListener("visibilitychange", updatePause)
+      io.disconnect()
       if (rafRef.current) window.cancelAnimationFrame(rafRef.current)
       rafRef.current = null
 
