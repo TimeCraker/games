@@ -16,7 +16,7 @@ export default function Home() {
   const router = useRouter()
 
   return (
-    <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-[#05030f] text-white">
+    <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-space-black text-white">
       {/* 背景:黑洞引力源(品牌资产) */}
       <motion.div
         className="pointer-events-none absolute inset-0 z-0"

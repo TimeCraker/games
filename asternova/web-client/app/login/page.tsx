@@ -16,10 +16,12 @@ import { getApiErrorMessage, guestLogin, login, loginWithEmail, register, resetP
 import { extractUserIdFromToken } from "@/src/api/jwt"
 import { useGameStore } from "@/src/store/useGameStore"
 import { cinematicEase } from "@/src/lib/motion"
-import { BluePurpleBlackhole } from "@/src/components/bluePurpleBlackhole"
+import dynamic from "next/dynamic"
 
-const loginUiFont =
-  'system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", sans-serif'
+const CinematicBlackHole = dynamic(
+  () => import("@/src/components/CinematicBlackHole").then((m) => m.CinematicBlackHole),
+  { ssr: false, loading: () => <div className="absolute inset-0 bg-space-black" /> },
+)
 
 const fieldClass =
   "h-11 rounded-xl border-white/[0.11] bg-black/45 text-[15px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-[border-color,box-shadow] placeholder:text-white/32 focus-visible:border-white/22 focus-visible:ring-2 focus-visible:ring-violet-400/25"
@@ -260,7 +262,7 @@ export default function LoginPage() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.1, delay: 0.12, ease: cinematicEase }}
       >
-        <BluePurpleBlackhole className="pointer-events-none absolute inset-0 opacity-30" intensity={0.8} interactive={false} />
+        <CinematicBlackHole className="pointer-events-none absolute inset-0" interactive={false} intensity={0.8} opacity={0.3} />
       </motion.div>
 
       <motion.div
@@ -293,16 +295,15 @@ export default function LoginPage() {
 
       <motion.div
         className="relative z-10 w-full max-w-[420px] px-5 sm:px-6"
-        style={{ fontFamily: loginUiFont }}
         initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        transition={{ duration: 0.9, delay: 0.9, ease: cinematicEase }}
+        transition={{ duration: 0.7, delay: 0.5, ease: cinematicEase }}
       >
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 1, ease: cinematicEase }}
-          className="relative overflow-hidden rounded-[1.35rem] border border-white/[0.09] bg-[#070708]/[0.78] text-white shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset,0_24px_80px_rgba(0,0,0,0.55),0_0_100px_rgba(139,92,246,0.08)] backdrop-blur-2xl supports-[backdrop-filter]:bg-[#070708]/[0.62]"
+          transition={{ duration: 0.55, delay: 0.6, ease: cinematicEase }}
+          className="relative overflow-hidden rounded-2xl border border-white/[0.09] bg-surface-2/78 text-white shadow-lg backdrop-blur-2xl supports-[backdrop-filter]:bg-surface-2/62"
         >
           <div
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-80"
@@ -315,7 +316,7 @@ export default function LoginPage() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <Link
                   href="/"
-                  className="group/brand inline-flex items-center rounded-md outline-none ring-offset-2 ring-offset-[#070708] focus-visible:ring-2 focus-visible:ring-white/35"
+                  className="group/brand inline-flex items-center rounded-md outline-none ring-offset-2 ring-offset-surface-2 focus-visible:ring-2 focus-visible:ring-white/35"
                   aria-label="返回首页"
                 >
                   <span className="font-mono-data text-[0.65rem] font-medium uppercase tracking-[0.2em] text-white/55 transition-opacity group-hover/brand:opacity-85 sm:text-[11px]">
@@ -329,7 +330,7 @@ export default function LoginPage() {
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, delay: 1.08, ease: cinematicEase }}
+                transition={{ duration: 0.55, delay: 0.68, ease: cinematicEase }}
                 className="space-y-2"
               >
                 <div className="flex items-center gap-2.5">
@@ -349,7 +350,7 @@ export default function LoginPage() {
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 1.14, ease: cinematicEase }}
+              transition={{ duration: 0.6, delay: 0.72, ease: cinematicEase }}
               className="mt-6 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-[1px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
             >
               <div className="flex items-center gap-3 rounded-[0.95rem] bg-black/32 px-3.5 py-2.5 sm:gap-4 sm:px-4 sm:py-3">
@@ -373,7 +374,7 @@ export default function LoginPage() {
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 1.18, ease: cinematicEase }}
+              transition={{ duration: 0.6, delay: 0.76, ease: cinematicEase }}
               className="mt-3 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.045] to-white/[0.01] p-[1px] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
             >
               <form
@@ -402,7 +403,7 @@ export default function LoginPage() {
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 1.24, ease: cinematicEase }}
+              transition={{ duration: 0.6, delay: 0.8, ease: cinematicEase }}
               className="mt-7"
             >
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "password_login" | "email_login")}>
@@ -475,8 +476,9 @@ export default function LoginPage() {
 
                     <Button
                       type="submit"
+                      variant="brand"
                       disabled={passwordSubmitting}
-                      className="mt-1 h-12 w-full rounded-xl bg-cyan-400/90 text-[15px] font-semibold tracking-[-0.02em] text-black shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition hover:bg-cyan-300 disabled:opacity-55"
+                      className="mt-1 h-12 w-full rounded-xl text-[15px] font-semibold tracking-[-0.02em] disabled:opacity-55"
                     >
                       {passwordSubmitting ? "登录中…" : "登录"}
                     </Button>
@@ -564,8 +566,9 @@ export default function LoginPage() {
 
                     <Button
                       type="submit"
+                      variant="brand"
                       disabled={emailSubmitting}
-                      className="mt-1 h-12 w-full rounded-xl bg-violet-400/90 text-[15px] font-semibold tracking-[-0.02em] text-black shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition hover:bg-violet-300 disabled:opacity-55"
+                      className="mt-1 h-12 w-full rounded-xl text-[15px] font-semibold tracking-[-0.02em] disabled:opacity-55"
                     >
                       {emailSubmitting
                         ? "提交中…"
@@ -596,7 +599,7 @@ export default function LoginPage() {
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
               transition={{ type: "spring", stiffness: 360, damping: 28 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-[430px] rounded-[1.5rem] border border-white/[0.12] bg-[#070708]/[0.9] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.62)] backdrop-blur-2xl sm:p-6"
+              className="w-full max-w-[430px] rounded-2xl border border-glass-border bg-surface-2/90 p-5 shadow-lg backdrop-blur-2xl sm:p-6"
             >
               <h3 className="text-[1.15rem] font-semibold tracking-tight text-white">忘记密码</h3>
               <p className="mt-1 text-[12px] text-white/52">邮箱验证通过后即可重置密码</p>
@@ -686,8 +689,9 @@ export default function LoginPage() {
                   </Button>
                   <Button
                     type="submit"
+                    variant="brand"
                     disabled={resetSubmitting}
-                    className="h-11 flex-1 rounded-xl bg-cyan-400/90 text-[14px] font-semibold text-black shadow-[0_6px_18px_rgba(0,0,0,0.4)] transition hover:bg-cyan-300"
+                    className="h-11 flex-1 rounded-xl text-[14px] font-semibold"
                   >
                     {resetSubmitting ? "提交中…" : "确认修改"}
                   </Button>

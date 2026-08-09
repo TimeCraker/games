@@ -30,8 +30,12 @@ import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { wsUrl } from "@/src/config/public-env"
 import { useGameStore } from "@/src/store/useGameStore"
 import { useGameStoreRehydrated } from "@/src/store/useGameStoreHydration"
+import dynamic from "next/dynamic"
 
-const uiFont = 'system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", sans-serif'
+const CinematicBlackHole = dynamic(
+  () => import("@/src/components/CinematicBlackHole").then((m) => m.CinematicBlackHole),
+  { ssr: false, loading: () => <div className="absolute inset-0 bg-space-black" /> },
+)
 
 const easeOut = cinematicEase
 
@@ -278,11 +282,10 @@ export default function LobbyPage() {
   const RoleIcon = selectedRole.Icon
 
   return (
-    <div
-      className="relative min-h-[100dvh] overflow-x-hidden bg-[#030303] text-white selection:bg-white/15"
-      style={{ fontFamily: uiFont }}
-    >
-      <div className="pointer-events-none fixed inset-0">
+    <div className="relative min-h-[100dvh] overflow-x-hidden bg-space-black text-white selection:bg-white/15">
+      <div className="pointer-events-none fixed inset-0 z-0">
+        <CinematicBlackHole interactive={false} intensity={0.6} opacity={0.28} className="pointer-events-none absolute inset-0" />
+        <div className="star-chart-grid absolute inset-0 opacity-50" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_50%_-18%,rgba(120,119,198,0.14),transparent)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(59,130,246,0.055),transparent_52%)]" />
       </div>
@@ -291,7 +294,7 @@ export default function LobbyPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: easeOut }}
-        className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#030303]/78 backdrop-blur-xl supports-[backdrop-filter]:bg-[#030303]/52"
+        className="sticky top-0 z-40 border-b border-white/[0.06] bg-space-black/78 backdrop-blur-xl supports-[backdrop-filter]:bg-space-black/52"
       >
         <div className="mx-auto flex h-[3.25rem] max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
           <motion.button
@@ -329,7 +332,7 @@ export default function LobbyPage() {
               onClick={() => setPickerOpen(true)}
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.92 }}
-              className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/[0.12] ring-2 ring-white/25 ring-offset-2 ring-offset-[#030303] transition hover:ring-white/45"
+              className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/[0.12] ring-2 ring-white/25 ring-offset-2 ring-offset-space-black transition hover:ring-white/45"
             >
               <LobbyPresetAvatar id={avatarId} className="h-8 w-8" />
             </motion.button>
@@ -357,7 +360,8 @@ export default function LobbyPage() {
                 <Gamepad2 className="h-[1.35rem] w-[1.35rem] text-white/82" strokeWidth={1.6} />
               </motion.div>
               <div className="min-w-0 pt-0.5">
-                <h2 className="text-[1.65rem] font-semibold leading-[1.15] tracking-[-0.03em] text-white sm:text-[1.85rem]">
+                <p className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-white/45">Arcade · 本地即玩</p>
+                <h2 className="mt-2 text-[1.65rem] font-semibold leading-[1.15] tracking-[-0.03em] text-white sm:text-[1.85rem]">
                   休闲小游戏
                 </h2>
                 <p className="mt-2 max-w-[26rem] text-[14px] leading-[1.55] text-white/44">
@@ -446,7 +450,8 @@ export default function LobbyPage() {
               <Swords className="h-[1.35rem] w-[1.35rem] text-white/76" strokeWidth={1.6} />
             </motion.div>
             <div className="min-w-0 pt-0.5">
-              <h2 className="text-[1.65rem] font-semibold leading-[1.15] tracking-[-0.03em] text-white sm:text-[1.85rem]">
+              <p className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-white/45">Battle · 联机竞技</p>
+              <h2 className="mt-2 text-[1.65rem] font-semibold leading-[1.15] tracking-[-0.03em] text-white sm:text-[1.85rem]">
                 联机战场
               </h2>
               <p className="mt-2 max-w-[26rem] text-[14px] leading-[1.55] text-white/44">
@@ -490,7 +495,7 @@ export default function LobbyPage() {
                   <IdCard className="h-4 w-4 shrink-0 text-white/32" strokeWidth={1.75} />
                   <div className="min-w-0 flex-1">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/32">User ID</p>
-                    <p className="mt-0.5 truncate font-mono text-[12px] text-white/74">{userId || "—"}</p>
+                    <p className="mt-0.5 truncate font-mono-data text-[12px] text-white/74">{userId || "—"}</p>
                   </div>
                 </motion.div>
                 <motion.div
@@ -500,7 +505,7 @@ export default function LobbyPage() {
                   <Cpu className="h-4 w-4 shrink-0 text-white/32" strokeWidth={1.75} />
                   <div className="min-w-0 flex-1">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/32">Role key</p>
-                    <p className="mt-0.5 truncate font-mono text-[11px] text-white/62">{selectedRole.id}</p>
+                    <p className="mt-0.5 truncate font-mono-data text-[11px] text-white/62">{selectedRole.id}</p>
                   </div>
                 </motion.div>
               </div>
@@ -539,9 +544,9 @@ export default function LobbyPage() {
                       <RoleIcon className="h-8 w-8 text-white/28" strokeWidth={1.2} />
                     </motion.div>
                   </div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/28">Preview</p>
-                  <p className="max-w-[16rem] text-center text-[13px] leading-relaxed text-white/38">
-                    角色展示位 · 待接入模型 / 立绘
+                  <p className="font-mono-data text-[10px] uppercase tracking-[0.3em] text-white/28">Preview</p>
+                  <p className="font-mono-data max-w-[16rem] text-center text-[12px] leading-relaxed text-white/38">
+                    立绘接入中 · 占位观测
                   </p>
                 </div>
               </motion.div>
@@ -622,7 +627,7 @@ export default function LobbyPage() {
         </motion.section>
       </motion.main>
 
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center bg-gradient-to-t from-[#030303] via-[#030303]/92 to-transparent pb-[max(1.1rem,env(safe-area-inset-bottom))] pt-16">
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center bg-gradient-to-t from-space-black via-space-black/92 to-transparent pb-[max(1.1rem,env(safe-area-inset-bottom))] pt-16">
         <motion.button
           type="button"
           disabled={matching}
@@ -637,7 +642,7 @@ export default function LobbyPage() {
           }
           whileTap={matching ? undefined : { scale: 0.96 }}
           transition={{ type: "spring", stiffness: 460, damping: 26 }}
-          className="pointer-events-auto group relative flex min-h-[54px] w-full max-w-[min(100%-2rem,28rem)] items-center justify-center gap-2.5 overflow-hidden rounded-full border border-violet-400/40 bg-white px-8 text-[15px] font-semibold tracking-[-0.02em] text-black shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition-shadow disabled:cursor-not-allowed disabled:opacity-[0.52]"
+          className="pointer-events-auto group relative flex min-h-[54px] w-full max-w-[min(100%-2rem,28rem)] items-center justify-center gap-2.5 overflow-hidden rounded-full border border-violet-400/40 bg-gradient-to-r from-brand-violet via-purple-600 to-brand-indigo px-8 text-[15px] font-semibold tracking-[-0.02em] text-white shadow-[inset_0_1px_0_oklch(1_0_0/0.28),0_8px_24px_rgba(0,0,0,0.4),var(--glow-violet)] transition-shadow disabled:cursor-not-allowed disabled:opacity-[0.52]"
         >
           {!matching ? (
             <span
@@ -650,12 +655,12 @@ export default function LobbyPage() {
           ) : null}
           {matching ? (
             <span className="relative flex items-center gap-2.5">
-              <Loader2 className="h-5 w-5 animate-spin text-black/78" strokeWidth={2} />
+              <Loader2 className="h-5 w-5 animate-spin text-white/78" strokeWidth={2} />
               <span>匹配中…</span>
             </span>
           ) : (
             <span className="relative flex items-center gap-2.5">
-              <Swords className="h-[1.12rem] w-[1.12rem] text-black/88" strokeWidth={2} />
+              <Swords className="h-[1.12rem] w-[1.12rem] text-white/92" strokeWidth={2} />
               <span>开始匹配</span>
             </span>
           )}
