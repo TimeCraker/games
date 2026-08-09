@@ -7,8 +7,9 @@
  */
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
+import { GameBackButton } from "@/src/components/ui/GameBackButton"
+import { cn } from "@/lib/utils"
 
 // —— 可调参数 ——
 const GRAVITY = 2600
@@ -230,7 +231,6 @@ function DashIconStarBurst({ className, iconClass }: { className?: string; iconC
 }
 
 export function StarDashGame() {
-  const router = useRouter()
   const wrapRef = React.useRef<HTMLDivElement | null>(null)
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
   const rafRef = React.useRef<number | null>(null)
@@ -878,20 +878,20 @@ export function StarDashGame() {
         ctx.fillStyle = "rgba(0,0,0,0.55)"
         ctx.fillRect(0, 0, w, h)
         ctx.textAlign = "center"
-        ctx.font = "700 22px system-ui, sans-serif"
+        ctx.font = "700 22px sans-serif"
         ctx.fillStyle = "#fce7f3"
         ctx.fillText("Game Over", w / 2, h * 0.38)
         const finalScore = Math.floor(s.distance + s.scoreStars * 12)
-        ctx.font = "16px system-ui, sans-serif"
+        ctx.font = "16px sans-serif"
         ctx.fillStyle = "rgba(255,255,255,0.85)"
         ctx.fillText(`最终距离 ${finalScore} m · 星尘 ${s.scoreStars}`, w / 2, h * 0.46)
-        ctx.font = "italic 15px system-ui, sans-serif"
+        ctx.font = "italic 15px sans-serif"
         const sg = ctx.createLinearGradient(w / 2 - 140, 0, w / 2 + 140, 0)
         sg.addColorStop(0, "#fbcfe8")
         sg.addColorStop(1, "#c4b5fd")
         ctx.fillStyle = sg
         ctx.fillText("Reach Beyond the Stars", w / 2, h * 0.56)
-        ctx.font = "12px system-ui, sans-serif"
+        ctx.font = "12px sans-serif"
         ctx.fillStyle = "rgba(255,255,255,0.4)"
         ctx.fillText("点击画面或空格 · Restart", w / 2, h * 0.66)
       }
@@ -930,22 +930,15 @@ export function StarDashGame() {
   }
 
   return (
-    <div className="relative flex h-full min-h-0 min-h-full flex-col bg-[#050508] text-white">
-      <div className="relative z-20 flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.08] px-4 py-3 backdrop-blur-xl">
-        <button
-          type="button"
-          onClick={() => router.push("/lobby")}
-          className="rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-sm text-white/90 transition hover:bg-white/10 active:scale-[0.98]"
-        >
-          返回大厅
-        </button>
-        <span className="bg-gradient-to-r from-pink-200 via-fuchsia-200 to-violet-300 bg-clip-text text-sm font-semibold tracking-tight text-transparent">
+    <div className="relative flex h-full min-h-0 min-h-full flex-col bg-space-black text-white">
+      <div className="relative z-20 grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-white/[0.08] px-4 py-3 backdrop-blur-xl">
+        <GameBackButton variant="header" className="justify-self-start" />
+        <span className="justify-self-center bg-[linear-gradient(100deg,#ffd6e8_0%,#e9b7ff_46%,#a78bfa_100%)] bg-clip-text text-sm font-semibold tracking-tight text-transparent">
           AsterNova · Star Dash
         </span>
-        <span className="hidden max-w-[10rem] text-right text-[11px] leading-tight text-white/40 sm:block">
+        <span className="hidden max-w-[10rem] justify-self-end text-right text-[11px] leading-tight text-white/40 sm:block">
           Space 跳 · E 星爆 · ↓ 铲
         </span>
-        <span className="w-14 sm:hidden" aria-hidden />
       </div>
 
       {rulesModalOpen ? (
@@ -955,11 +948,10 @@ export function StarDashGame() {
           aria-modal="true"
           aria-labelledby="star-dash-rules-title"
         >
-          <div className="w-full max-w-[420px] rounded-[2rem] border border-white/[0.12] bg-white/[0.07] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl">
+          <div className="w-full max-w-[420px] rounded-[2rem] border border-glass-border bg-glass-bg p-6 shadow-lg backdrop-blur-glass-lg">
             <h2
               id="star-dash-rules-title"
               className="text-center text-xl font-semibold tracking-tight text-white"
-              style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" }}
             >
               怎么玩
             </h2>
@@ -1017,7 +1009,6 @@ export function StarDashGame() {
               type="button"
               onClick={confirmRules}
               className="mt-5 w-full rounded-2xl bg-gradient-to-r from-pink-400/90 via-fuchsia-400/90 to-violet-500/90 py-3.5 text-[15px] font-semibold text-gray-950 shadow-lg shadow-fuchsia-500/20 transition hover:brightness-105 active:scale-[0.99]"
-              style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" }}
             >
               知道了
             </button>
@@ -1044,7 +1035,7 @@ export function StarDashGame() {
                   e.preventDefault()
                   tryJump()
                 }}
-                className="flex h-[3.25rem] min-w-[5.5rem] shrink-0 items-center gap-2 rounded-2xl border border-pink-300/40 bg-gradient-to-b from-pink-400/35 to-violet-600/25 pl-1.5 pr-2.5 text-xs font-semibold text-white shadow-lg shadow-pink-500/15 backdrop-blur-md sm:h-14 sm:min-w-[6.25rem] sm:gap-2.5 sm:pl-2 sm:pr-3 sm:text-sm active:scale-95"
+                className="flex h-[3.25rem] min-w-[5.5rem] shrink-0 items-center gap-2 rounded-2xl border border-white/10 bg-glass-bg backdrop-blur-glass-md pl-1.5 pr-2.5 text-xs font-semibold text-white/90 shadow-sm transition active:scale-95 sm:h-14 sm:min-w-[6.25rem] sm:gap-2.5 sm:pl-2 sm:pr-3 sm:text-sm"
                 style={{ touchAction: "manipulation" }}
               >
                 <DashIconJump iconClass="h-9 w-9 sm:h-10 sm:w-10" />
@@ -1056,11 +1047,10 @@ export function StarDashGame() {
                   e.preventDefault()
                   tryActivateBoost()
                 }}
-                className={`flex h-[3.25rem] min-w-[6rem] shrink-0 items-center gap-1.5 rounded-2xl border pl-1.5 pr-2 text-[11px] font-bold leading-tight shadow-lg backdrop-blur-md sm:h-14 sm:min-w-[7rem] sm:gap-2 sm:pl-2 sm:pr-2.5 sm:text-xs active:scale-95 ${
-                  boostReadyUi
-                    ? "border-amber-300/50 bg-gradient-to-b from-amber-300/40 to-orange-500/30 text-amber-50 shadow-amber-500/25 animate-pulse"
-                    : "border-white/10 bg-white/5 text-white/40"
-                }`}
+                className={cn(
+                  "flex h-[3.25rem] min-w-[6rem] shrink-0 items-center gap-1.5 rounded-2xl border border-white/10 bg-glass-bg backdrop-blur-glass-md pl-1.5 pr-2 text-xs font-semibold leading-tight shadow-sm transition active:scale-95 sm:h-14 sm:min-w-[7rem] sm:gap-2 sm:pl-2 sm:pr-2.5 sm:text-sm",
+                  boostReadyUi ? "animate-pulse text-white" : "text-white/40",
+                )}
                 style={{ touchAction: "manipulation" }}
               >
                 <span className={boostReadyUi ? "" : "opacity-45"}>
@@ -1077,7 +1067,7 @@ export function StarDashGame() {
                   e.preventDefault()
                   trySlide()
                 }}
-                className="flex h-[3.25rem] min-w-[5.5rem] shrink-0 items-center gap-2 rounded-2xl border border-violet-300/40 bg-gradient-to-b from-violet-400/35 to-fuchsia-600/25 pl-1.5 pr-2.5 text-xs font-semibold text-white shadow-lg shadow-violet-500/15 backdrop-blur-md sm:h-14 sm:min-w-[6.25rem] sm:gap-2.5 sm:pl-2 sm:pr-3 sm:text-sm active:scale-95"
+                className="flex h-[3.25rem] min-w-[5.5rem] shrink-0 items-center gap-2 rounded-2xl border border-white/10 bg-glass-bg backdrop-blur-glass-md pl-1.5 pr-2.5 text-xs font-semibold text-white/90 shadow-sm transition active:scale-95 sm:h-14 sm:min-w-[6.25rem] sm:gap-2.5 sm:pl-2 sm:pr-3 sm:text-sm"
                 style={{ touchAction: "manipulation" }}
               >
                 <DashIconSlide iconClass="h-9 w-9 sm:h-10 sm:w-10" />
