@@ -5,10 +5,12 @@
  */
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
 import { NebulaEngine, type UpgradeOffer } from "./nebulaEngine"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
+import { LiquidBar } from "@/src/components/ui/LiquidBar"
+import { GameBackButton } from "@/src/components/ui/GameBackButton"
+import { ResultOverlay } from "@/src/components/ui/ResultOverlay"
 
 const NEBULA_STORAGE_SKIP_RULES = "nebula-survivor-skip-rules"
 
@@ -239,7 +241,6 @@ function UpgradeCard({
 }
 
 export function NebulaSurvivorGame() {
-  const router = useRouter()
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   const engineRef = React.useRef<NebulaEngine | null>(null)
   const rafRef = React.useRef<number>(0)
@@ -440,21 +441,12 @@ export function NebulaSurvivorGame() {
   const blocked = rulesModalOpen || ui.pausedUpgrade || ui.gameOver
 
   return (
-    <div
-      className="relative flex h-full min-h-0 min-h-full flex-col overflow-hidden bg-[#05040a] text-white"
-      style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif' }}
-    >
+    <div className="relative flex h-full min-h-0 min-h-full flex-col overflow-hidden bg-space-black text-white">
       <div className="relative z-10 flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.07] px-3 py-2.5 backdrop-blur-xl sm:px-5 sm:py-3">
-        <button
-          type="button"
-          onClick={() => router.push("/lobby")}
-          className="rounded-full border-[0.5px] border-white/15 bg-white/[0.06] px-3 py-1.5 text-[12px] font-medium text-white/85 sm:px-4 sm:py-2 sm:text-sm"
-        >
-          大厅
-        </button>
+        <GameBackButton variant="header" label="大厅" />
         <div className="text-center">
           <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/35">AsterNova</div>
-          <div className="bg-gradient-to-r from-pink-200 via-fuchsia-200 to-violet-300 bg-clip-text text-sm font-semibold text-transparent sm:text-base">
+          <div className="bg-[linear-gradient(100deg,#ffd6e8_0%,#e9b7ff_46%,#a78bfa_100%)] bg-clip-text font-display text-sm font-semibold text-transparent sm:text-base">
             Nebula Survivor
           </div>
         </div>
@@ -482,53 +474,34 @@ export function NebulaSurvivorGame() {
           >
             规则
           </button>
-          <div className="text-right text-[11px] tabular-nums text-white/50 sm:text-xs">
-            <div>击杀 {ui.kills}</div>
-            <div className="text-white/70">分 {ui.score}</div>
+          <div className="text-right font-mono-data text-[11px] leading-tight text-white/55 sm:text-xs">
+            <div className="text-white/50">击杀 {ui.kills}</div>
+            <div className="text-white/80">分 {ui.score}</div>
           </div>
         </div>
       </div>
 
       <div className="relative min-h-0 flex-1">
-        <div className="pointer-events-none absolute left-3 top-2 z-10 flex flex-col gap-2 rounded-2xl border-[0.5px] border-white/[0.1] bg-black/35 px-3 py-2 text-[11px] shadow-lg backdrop-blur-md sm:left-5 sm:top-4 sm:text-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-5 shrink-0 text-right text-[10px] font-semibold tracking-wide text-white/50 sm:text-[11px]">
-              HP
-            </span>
-            <div className="relative h-2 w-[6.5rem] shrink-0 overflow-hidden rounded-full border border-white/[0.07] bg-gradient-to-b from-black/55 to-black/80 shadow-[inset_0_2px_5px_rgba(0,0,0,0.72),inset_0_-1px_0_rgba(255,255,255,0.04)] sm:w-36">
-              <div
-                className="relative h-full rounded-full bg-gradient-to-b from-fuchsia-300/95 via-pink-500 to-violet-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.42),inset_0_-3px_6px_rgba(0,0,0,0.35)] transition-[width] duration-150 ease-out"
-                style={{ width: `${Math.max(0, Math.min(100, (ui.hp / ui.maxHp) * 100))}%` }}
-              >
-                <span className="pointer-events-none absolute left-[12%] right-[12%] top-px h-px rounded-full bg-white/35 blur-[0.5px]" />
-              </div>
-            </div>
+        <div className="pointer-events-none absolute left-3 top-2 z-10 flex w-52 flex-col gap-2.5 rounded-2xl border border-glass-border bg-glass-bg px-3 py-2.5 shadow-lg backdrop-blur-glass-md sm:left-5 sm:top-4 sm:w-56">
+          <div className="flex items-center justify-between font-mono-data text-[10px] uppercase tracking-[0.18em] text-white/45">
+            <span>Wave {ui.worldTier}</span>
+            <span>Lv {ui.level}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-5 shrink-0 text-right text-[10px] font-semibold tracking-wide text-emerald-200/55 sm:text-[11px]">
-              XP
-            </span>
-            <div className="relative h-2 w-[6.5rem] shrink-0 overflow-hidden rounded-full border border-emerald-950/40 bg-gradient-to-b from-black/55 to-black/80 shadow-[inset_0_2px_5px_rgba(0,0,0,0.72),inset_0_-1px_0_rgba(52,211,153,0.06)] sm:w-36">
-              <div
-                className="relative h-full min-w-0 rounded-full bg-gradient-to-b from-[#b8ffd9] via-[#34d399] to-[#065f46] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),inset_0_-3px_8px_rgba(0,40,30,0.45),0_0_12px_rgba(52,211,153,0.22)] transition-[width] duration-150 ease-out"
-                style={{
-                  width: `${Math.max(0, Math.min(100, ui.xpToNext > 0 ? (ui.xp / ui.xpToNext) * 100 : 100))}%`,
-                }}
-              >
-                <span className="pointer-events-none absolute left-[10%] right-[10%] top-px h-[2px] rounded-full bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-90" />
-                <span className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-black/25" />
-              </div>
-            </div>
+            <span className="w-4 shrink-0 text-right font-mono-data text-[10px] font-semibold text-white/60">HP</span>
+            <LiquidBar value={ui.hp} max={ui.maxHp} variant="hp" skew={false} className="h-2 flex-1 rounded-full" />
           </div>
-          <div className="text-white/55">
-            Lv.{ui.level}
-            <span className="text-white/35">
-              {" "}
-              · {Math.floor(ui.xp)}/{ui.xpToNext}
-            </span>
+          <div className="flex items-center gap-2">
+            <span className="w-4 shrink-0 text-right font-mono-data text-[10px] font-semibold text-emerald-200/60">XP</span>
+            <LiquidBar value={ui.xp} max={ui.xpToNext} variant="xp" className="flex-1 rounded-full" />
           </div>
-          <div className="text-[10px] text-white/40">波次 {ui.worldTier} · 约每分钟升一档</div>
-          <div className="text-[9px] leading-tight text-emerald-200/50">青绿光球+十字为急救包（极稀有）</div>
+          <div className="flex items-center justify-between font-mono-data text-[10px] tabular-nums text-white/45">
+            <span>
+              {Math.floor(ui.xp)}/{ui.xpToNext}
+            </span>
+            <span className="text-white/30">每分钟升档</span>
+          </div>
+          <p className="text-[9px] leading-tight text-emerald-200/40">青绿光球+十字为急救包（稀有）</p>
         </div>
 
         <canvas
@@ -554,7 +527,7 @@ export function NebulaSurvivorGame() {
 
       {rulesModalOpen ? (
         <div
-          className="fixed inset-0 z-[45] flex items-end justify-center bg-black/58 backdrop-blur-md sm:items-center sm:p-5"
+          className="fixed inset-0 z-40 flex items-end justify-center bg-black/58 backdrop-blur-md sm:items-center sm:p-5"
           role="dialog"
           aria-modal="true"
           aria-labelledby="nebula-rules-title"
@@ -565,10 +538,7 @@ export function NebulaSurvivorGame() {
             paddingTop: "max(0.5rem, env(safe-area-inset-top, 0px))",
           }}
         >
-          <div
-            className="max-h-[min(90dvh,720px)] w-full max-w-[440px] overflow-y-auto overscroll-contain rounded-t-[1.5rem] border-[0.5px] border-white/[0.12] border-b-0 bg-white/[0.07] p-4 shadow-[0_28px_90px_rgba(0,0,0,0.6)] backdrop-blur-2xl sm:rounded-[2rem] sm:border-b sm:p-6"
-            style={{ WebkitBackdropFilter: "blur(28px) saturate(165%)" }}
-          >
+          <div className="max-h-[min(90dvh,720px)] w-full max-w-[440px] overflow-y-auto overscroll-contain rounded-t-[1.5rem] border border-glass-border border-b-0 bg-glass-bg p-4 shadow-lg backdrop-blur-glass-lg sm:rounded-[2rem] sm:border-b sm:p-6">
             <p className="text-center text-[10px] font-semibold uppercase tracking-[0.26em] text-white/38">Briefing</p>
             {rulesModalKind === "pause" ? (
               <div className="mt-2 flex justify-center">
@@ -653,7 +623,7 @@ export function NebulaSurvivorGame() {
       <AnimatePresence>
         {ui.pausedUpgrade && ui.choices.length > 0 ? (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-3 backdrop-blur-xl sm:p-6"
+            className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-3 backdrop-blur-xl sm:p-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -709,42 +679,17 @@ export function NebulaSurvivorGame() {
 
       <AnimatePresence>
         {ui.gameOver ? (
-          <motion.div
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/65 p-5 backdrop-blur-md"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 12 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="w-full max-w-md rounded-[1.75rem] border-[0.5px] border-white/[0.15] bg-white/[0.08] p-7 text-center shadow-[0_24px_90px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
-              style={{ WebkitBackdropFilter: "blur(26px)" }}
-            >
-              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/40">Mission End</p>
-              <h2 className="mt-2 text-2xl font-semibold text-white">信号丢失</h2>
-              <p className="mt-2 text-[13px] text-white/50">暗物质潮淹没宇航服护盾</p>
-              <p className="mt-6 text-4xl font-semibold tabular-nums text-white">{ui.score}</p>
-              <p className="text-[12px] text-white/40">本局得分 · 击杀 {ui.kills}</p>
-              <div className="mt-6 flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={restart}
-                  className="w-full rounded-2xl bg-gradient-to-r from-pink-400 via-fuchsia-500 to-violet-600 py-3.5 text-[15px] font-semibold text-gray-950 shadow-lg shadow-fuchsia-500/20"
-                >
-                  再闯星云
-                </button>
-                <button
-                  type="button"
-                  onClick={() => router.push("/lobby")}
-                  className="w-full rounded-2xl border-[0.5px] border-white/15 bg-white/5 py-3 text-[14px] font-medium text-white/80"
-                >
-                  返回大厅
-                </button>
-              </div>
-              <p className="mt-6 text-[12px] italic text-violet-200/75">Reach Beyond the Stars</p>
-            </motion.div>
-          </motion.div>
+          <ResultOverlay
+            victory={false}
+            title="信号丢失"
+            subtitle="暗物质潮淹没宇航服护盾"
+            stats={[
+              { label: "本局得分", value: ui.score },
+              { label: "击杀", value: ui.kills },
+            ]}
+            actionLabel="再闯星云"
+            onAction={restart}
+          />
         ) : null}
       </AnimatePresence>
       <LoopingBgmControl src="/audio/games/nebula-survivor/Untitled.mp3" storageKey="bgm-volume:nebula-survivor" />
