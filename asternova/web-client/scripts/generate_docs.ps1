@@ -1,4 +1,5 @@
-$ProjectRoot = "C:\Users\TimeCraker\Desktop\asternova-web-client"
+# 基于脚本自身位置定位项目根（scripts/ 的上一级），仓库搬迁后仍可用
+$ProjectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $DocsDir = Join-Path -Path $ProjectRoot -ChildPath "docs"
 $WikiDir = Join-Path -Path $ProjectRoot -ChildPath ".wiki.git"
 # 假设前端项目也有一个 Wiki，如果没有可以把这行改成你实际的 Wiki 地址
