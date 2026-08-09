@@ -35,11 +35,6 @@ export default function Home() {
       {/* 星图坐标网格(committed 视觉决策) */}
       <div className="star-chart-grid pointer-events-none absolute inset-0 z-[1]" />
 
-      {/* 引力扫描:主时刻动效 */}
-      <div className="pointer-events-none absolute inset-0 z-[2] overflow-hidden">
-        <div className="gravity-scan-line absolute left-0 h-[42vh] w-full bg-[linear-gradient(to_bottom,transparent,rgba(56,189,248,0.09),transparent)]" />
-      </div>
-
       {/* 顶部观测台坐标栏 */}
       <motion.header
         initial={{ opacity: 0, y: -8 }}
