@@ -265,26 +265,28 @@ export default function LoginPage() {
         <CinematicBlackHole className="pointer-events-none absolute inset-0" interactive={false} intensity={0.8} opacity={0.3} />
       </motion.div>
 
-      <motion.div
-        className="pointer-events-none absolute left-1/2 top-1/2 z-[1] h-[56vmin] w-[56vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
-        initial={{ opacity: 0, scale: 0.96, rotate: -8 }}
-        animate={{ opacity: 1, scale: 1, rotate: 0 }}
-        transition={{ duration: 1.15, delay: 0.22, ease: cinematicEase }}
-      >
+      <div className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center">
         <motion.div
-          className="absolute inset-0 rounded-full border border-violet-300/35"
-          style={{
-            background:
-              "conic-gradient(from 210deg, rgba(255,182,193,0.0), rgba(255,182,193,0.5), rgba(168,85,247,0.45), rgba(96,165,250,0.0))",
-            maskImage: "radial-gradient(circle, transparent 64%, black 72%, transparent 78%)",
-            WebkitMaskImage: "radial-gradient(circle, transparent 64%, black 72%, transparent 78%)",
-            filter: "blur(1.4px)",
-          }}
-          initial={{ opacity: 0.15, rotate: -42 }}
-          animate={{ opacity: 0.72, rotate: 0 }}
-          transition={{ duration: 1.25, delay: 0.3, ease: cinematicEase }}
-        />
-      </motion.div>
+          className="relative h-[56vmin] w-[56vmin] rounded-full"
+          initial={{ opacity: 0, scale: 0.96, rotate: -8 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ duration: 1.15, delay: 0.22, ease: cinematicEase }}
+        >
+          <motion.div
+            className="absolute inset-0 rounded-full border border-violet-300/35"
+            style={{
+              background:
+                "conic-gradient(from 210deg, rgba(255,182,193,0.0), rgba(255,182,193,0.5), rgba(168,85,247,0.45), rgba(96,165,250,0.0))",
+              maskImage: "radial-gradient(circle, transparent 64%, black 72%, transparent 78%)",
+              WebkitMaskImage: "radial-gradient(circle, transparent 64%, black 72%, transparent 78%)",
+              filter: "blur(1.4px)",
+            }}
+            initial={{ opacity: 0.15, rotate: -42 }}
+            animate={{ opacity: 0.72, rotate: 0 }}
+            transition={{ duration: 1.25, delay: 0.3, ease: cinematicEase }}
+          />
+        </motion.div>
+      </div>
 
       <div className="pointer-events-none absolute inset-0 opacity-70">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(56,189,248,0.18),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(168,85,247,0.18),transparent_50%),radial-gradient(circle_at_40%_80%,rgba(34,197,94,0.10),transparent_45%)]" />
@@ -476,7 +478,6 @@ export default function LoginPage() {
 
                     <Button
                       type="submit"
-                      variant="brand"
                       disabled={passwordSubmitting}
                       className="mt-1 h-12 w-full rounded-xl text-[15px] font-semibold tracking-[-0.02em] disabled:opacity-55"
                     >
@@ -566,7 +567,6 @@ export default function LoginPage() {
 
                     <Button
                       type="submit"
-                      variant="brand"
                       disabled={emailSubmitting}
                       className="mt-1 h-12 w-full rounded-xl text-[15px] font-semibold tracking-[-0.02em] disabled:opacity-55"
                     >
@@ -689,7 +689,7 @@ export default function LoginPage() {
                   </Button>
                   <Button
                     type="submit"
-                    variant="brand"
+                    variant="default"
                     disabled={resetSubmitting}
                     className="h-11 flex-1 rounded-xl text-[14px] font-semibold"
                   >

@@ -446,7 +446,7 @@ export function NebulaSurvivorGame() {
         <GameBackButton variant="header" label="大厅" />
         <div className="text-center">
           <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/35">AsterNova</div>
-          <div className="bg-[linear-gradient(100deg,#ffd6e8_0%,#e9b7ff_46%,#a78bfa_100%)] bg-clip-text font-display text-sm font-semibold text-transparent sm:text-base">
+          <div className="font-display text-sm font-semibold text-white sm:text-base">
             Nebula Survivor
           </div>
         </div>
@@ -612,7 +612,7 @@ export function NebulaSurvivorGame() {
             <button
               type="button"
               onClick={closeRulesPrimary}
-              className="mt-4 w-full rounded-2xl bg-gradient-to-r from-pink-400/90 via-fuchsia-500/88 to-violet-600/88 py-3.5 text-[15px] font-semibold text-gray-950 shadow-lg shadow-fuchsia-500/18"
+              className="mt-4 w-full rounded-2xl bg-white py-3.5 text-[15px] font-semibold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition hover:bg-white/90"
             >
               {rulesModalKind === "briefing" ? "开始任务" : rulesModalKind === "pause" ? "继续游戏" : "返回游戏"}
             </button>

@@ -794,7 +794,7 @@ export function GameEngine() {
             <p className="mt-3 text-sm text-white/70">游戏加载失败，请刷新页面或返回大厅重试。</p>
           )}
           <div className="mt-5 flex gap-2.5">
-            <Button variant="brand" onClick={() => router.refresh()}>
+            <Button variant="default" onClick={() => router.refresh()}>
               重试
             </Button>
             <Button variant="ghost" onClick={() => router.push("/lobby")} className="text-white/70 hover:text-white">
@@ -862,7 +862,7 @@ export function GameEngine() {
               下次不再显示（仅本机）
             </label>
 
-            <Button variant="brand" size="lg" className="mt-4 w-full" onClick={confirmRules}>
+            <Button variant="default" size="lg" className="mt-4 w-full" onClick={confirmRules}>
               开始游戏
             </Button>
           </div>
@@ -871,17 +871,20 @@ export function GameEngine() {
 
       <div className="relative z-[5] mx-auto w-[min(1180px,calc(100%-2rem))] pt-3.5 shell-fill:w-[min(1180px,calc(100%-1rem))] shell-fill:pt-1.5">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="bg-[linear-gradient(100deg,#ffd6e8_0%,#e9b7ff_46%,#a78bfa_100%)] bg-clip-text text-[clamp(1.4rem,2.4vw,2.05rem)] font-bold uppercase tracking-[0.1em] text-transparent">Shoot Them All</div>
+          <div className="flex flex-col">
+            <span className="font-mono-data text-[10px] uppercase tracking-[0.22em] text-white/40">Physics · Arcade</span>
+            <div className="font-display text-[clamp(1.4rem,2.4vw,2.05rem)] font-bold uppercase tracking-[0.1em] text-white">Shoot Them All</div>
+          </div>
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="inline-flex items-center gap-[0.45rem] rounded-full border border-white/[0.12] bg-surface-2/60 px-3.5 py-[0.46rem] text-[0.8rem] text-white/88">第 {currentLevel} 关</span>
             <span className="inline-flex flex-wrap items-center gap-[0.45rem] gap-y-1.5 rounded-full border border-white/[0.12] bg-surface-2/60 px-3.5 py-[0.46rem] text-[0.8rem] text-white/88" title={`全局剩余球：${ammoPool}`}>
               <span className="inline-flex shrink-0 items-baseline gap-[0.35rem]">
                 <span>全局剩余球</span>
-                <span className="font-mono-data font-bold tracking-[0.02em] text-[#fce7f3]">{ammoPool}</span>
+                <span className="font-mono-data font-bold tracking-[0.02em] text-white">{ammoPool}</span>
               </span>
               <span className="inline-flex min-h-[12px] shrink-0 items-center gap-[3px] py-px" aria-hidden>
                 {Array.from({ length: ammoIconCount }).map((_, idx) => (
-                  <span key={`ammo-${idx}`} className="size-2.5 shrink-0 rounded-full bg-[radial-gradient(circle_at_35%_30%,#ffe7f5_0%,#f0abfc_45%,#8b5cf6_100%)] shadow-[0_0_8px_rgba(216,140,255,0.7)]" />
+                  <span key={`ammo-${idx}`} className="size-2.5 shrink-0 rounded-full bg-white/80 shadow-[0_0_6px_rgba(255,255,255,0.5)]" />
                 ))}
                 {ammoPool > 12 ? <span className="ml-[0.15rem] whitespace-nowrap font-mono-data text-[0.72rem] font-semibold text-white/90">+{ammoPool - 12}</span> : null}
               </span>

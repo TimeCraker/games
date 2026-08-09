@@ -129,7 +129,7 @@ export function ShopUI() {
 
                 <Button
                   type="button"
-                  variant="brand"
+                  variant="default"
                   onClick={() => dispatch({ type: "BUY_WEAPON", offerId: offer.id })}
                   className="mt-auto w-full"
                 >

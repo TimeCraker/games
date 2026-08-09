@@ -96,7 +96,7 @@ function CoreDefenseScene() {
               <span className="font-mono-data text-[10px] uppercase tracking-[0.3em] text-white/45">Next Wave</span>
               <Button
                 type="button"
-                variant="brand"
+                variant="default"
                 onClick={() => dispatch({ type: "START_WAVE" })}
                 disabled={!state.equipped.length}
               >
@@ -111,7 +111,7 @@ function CoreDefenseScene() {
               <span className="font-mono-data text-[10px] uppercase tracking-[0.3em] text-white/45">Next Round</span>
               <Button
                 type="button"
-                variant="brand"
+                variant="default"
                 onClick={() => dispatch({ type: "NEXT_ROUND_SETTLEMENT" })}
               >
                 进入下一回合

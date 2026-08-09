@@ -66,9 +66,6 @@ export default function Home() {
           <h1 className="aster-title text-4xl sm:text-6xl md:text-7xl">ASTERNOVA STUDIO</h1>
           <p className="aster-slogan text-sm sm:text-base">Reach Beyond the Stars</p>
           <div className="mx-auto h-px w-24 bg-gradient-to-r from-transparent via-white/35 to-transparent" />
-          <p className="font-mono-data mx-auto max-w-sm text-[11px] leading-relaxed tracking-[0.08em] text-white/40">
-            休闲游戏联机大厅 · 立体三消闯关 · 物理弹射与跑酷
-          </p>
         </motion.div>
 
         <motion.div
@@ -83,7 +80,7 @@ export default function Home() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             transition={{ type: "spring", stiffness: 420, damping: 26 }}
-            className="group relative inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-500/10 px-10 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors duration-300 hover:border-violet-400/55 hover:bg-violet-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/40"
+            className="group relative inline-flex items-center gap-2 rounded-full bg-white px-10 py-3.5 text-sm font-semibold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition-shadow duration-300 hover:bg-white/90 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_8px_30px_-8px_rgba(255,255,255,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
           >
             <span>进入大厅</span>
             <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />

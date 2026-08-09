@@ -632,35 +632,19 @@ export default function LobbyPage() {
           type="button"
           disabled={matching}
           onClick={connectAndMatch}
-          whileHover={
-            matching
-              ? undefined
-              : {
-                  scale: 1.03,
-                  boxShadow: "0 12px 32px rgba(168,85,247,0.16), 0 0 0 1px rgba(168,85,247,0.28) inset",
-                }
-          }
-          whileTap={matching ? undefined : { scale: 0.96 }}
+          whileHover={matching ? undefined : { scale: 1.03 }}
+          whileTap={matching ? undefined : { scale: 0.97 }}
           transition={{ type: "spring", stiffness: 460, damping: 26 }}
-          className="pointer-events-auto group relative flex min-h-[54px] w-full max-w-[min(100%-2rem,28rem)] items-center justify-center gap-2.5 overflow-hidden rounded-full border border-violet-400/40 bg-gradient-to-r from-brand-violet via-purple-600 to-brand-indigo px-8 text-[15px] font-semibold tracking-[-0.02em] text-white shadow-[inset_0_1px_0_oklch(1_0_0/0.28),0_8px_24px_rgba(0,0,0,0.4),var(--glow-violet)] transition-shadow disabled:cursor-not-allowed disabled:opacity-[0.52]"
+          className="pointer-events-auto group relative flex min-h-[54px] w-full max-w-[min(100%-2rem,28rem)] items-center justify-center gap-2.5 rounded-full bg-white px-8 text-[15px] font-semibold tracking-[-0.02em] text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_8px_24px_rgba(0,0,0,0.4)] transition-shadow duration-300 hover:bg-white/90 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_10px_36px_-10px_rgba(255,255,255,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 disabled:cursor-not-allowed disabled:opacity-[0.52]"
         >
-          {!matching ? (
-            <span
-              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              style={{
-                background:
-                  "linear-gradient(105deg, transparent 38%, rgba(255,255,255,0.5) 50%, transparent 62%)",
-              }}
-            />
-          ) : null}
           {matching ? (
             <span className="relative flex items-center gap-2.5">
-              <Loader2 className="h-5 w-5 animate-spin text-white/78" strokeWidth={2} />
+              <Loader2 className="h-5 w-5 animate-spin text-black/70" strokeWidth={2} />
               <span>匹配中…</span>
             </span>
           ) : (
             <span className="relative flex items-center gap-2.5">
-              <Swords className="h-[1.12rem] w-[1.12rem] text-white/92" strokeWidth={2} />
+              <Swords className="h-[1.12rem] w-[1.12rem] text-black/85" strokeWidth={2} />
               <span>开始匹配</span>
             </span>
           )}

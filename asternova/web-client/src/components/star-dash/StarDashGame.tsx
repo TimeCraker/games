@@ -933,7 +933,7 @@ export function StarDashGame() {
     <div className="relative flex h-full min-h-0 min-h-full flex-col bg-space-black text-white">
       <div className="relative z-20 grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-white/[0.08] px-4 py-3 backdrop-blur-xl">
         <GameBackButton variant="header" className="justify-self-start" />
-        <span className="justify-self-center bg-[linear-gradient(100deg,#ffd6e8_0%,#e9b7ff_46%,#a78bfa_100%)] bg-clip-text text-sm font-semibold tracking-tight text-transparent">
+        <span className="justify-self-center font-display text-sm font-semibold tracking-tight text-white">
           AsterNova · Star Dash
         </span>
         <span className="hidden max-w-[10rem] justify-self-end text-right text-[11px] leading-tight text-white/40 sm:block">
@@ -1008,7 +1008,7 @@ export function StarDashGame() {
             <button
               type="button"
               onClick={confirmRules}
-              className="mt-5 w-full rounded-2xl bg-gradient-to-r from-pink-400/90 via-fuchsia-400/90 to-violet-500/90 py-3.5 text-[15px] font-semibold text-gray-950 shadow-lg shadow-fuchsia-500/20 transition hover:brightness-105 active:scale-[0.99]"
+              className="mt-5 w-full rounded-2xl bg-white py-3.5 text-[15px] font-semibold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition hover:bg-white/90 active:scale-[0.99]"
             >
               知道了
             </button>
@@ -1085,7 +1085,7 @@ export function StarDashGame() {
                 const s = stateRef.current
                 if (s) resetPlayingState(s)
               }}
-              className="rounded-full bg-gradient-to-r from-pink-300 via-fuchsia-300 to-violet-400 px-8 py-2.5 text-sm font-semibold text-gray-900 shadow-lg shadow-fuchsia-500/25 transition hover:brightness-105 active:scale-[0.98]"
+              className="rounded-full bg-white px-8 py-2.5 text-sm font-semibold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition hover:bg-white/90 active:scale-[0.98]"
             >
               Restart
             </button>

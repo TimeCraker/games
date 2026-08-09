@@ -110,7 +110,7 @@ export function ResultOverlay({
 
           <div className="mt-8 flex flex-col gap-2.5">
             {onAction && (
-              <Button variant="brand" size="lg" onClick={onAction} className="w-full">
+              <Button variant="default" size="lg" onClick={onAction} className="w-full">
                 {actionLabel}
               </Button>
             )}
