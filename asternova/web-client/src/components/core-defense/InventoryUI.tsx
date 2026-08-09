@@ -14,6 +14,7 @@ import {
 
 import { useCoreDefense } from "./state/coreDefenseContext"
 import type { WeaponClass, WeaponInstance, WeaponLevel } from "./state/coreDefenseTypes"
+import { GlassPanel } from "@/src/components/ui/GlassPanel"
 
 function classIcon(classType: WeaponClass) {
   if (classType === "Warrior") return Swords
@@ -80,7 +81,7 @@ function WeaponSlot({
       </button>
 
       {menuOpen ? (
-        <div className="absolute left-0 top-[104px] z-20 w-40 rounded-xl border border-white/15 bg-black/80 p-2 text-xs backdrop-blur-xl">
+        <div className="absolute left-0 top-full z-20 mt-2 w-40 rounded-xl border border-white/15 bg-black/80 p-2 text-xs backdrop-blur-xl">
           <p className="mb-2 truncate text-white/80">{weaponDisplayName(weapon.classType, weapon.level)}</p>
           {mode === "inventory" ? (
             <button
@@ -113,7 +114,7 @@ function WeaponSlot({
             }}
             className="w-full rounded-lg border border-rose-300/35 px-2 py-1 text-left text-rose-100 hover:bg-rose-400/20"
           >
-            出售 {weapon.sellPrice ?? "X"}
+            出售 {weapon.sellPrice ?? "—"}
           </button>
         </div>
       ) : null}
@@ -125,11 +126,11 @@ export function InventoryUI() {
   const { state } = useCoreDefense()
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
+    <GlassPanel className="p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.28em] text-white/45">Loadout</p>
-          <h3 className="mt-1 text-xl font-semibold tracking-[-0.02em] text-white">装备与背包</h3>
+          <p className="font-mono-data text-[11px] uppercase tracking-[0.28em] text-white/45">Loadout</p>
+          <h3 className="font-display mt-1 text-xl font-semibold tracking-[-0.02em] text-white">装备与背包</h3>
         </div>
         <div className="flex items-center gap-2 text-xs text-white/65">
           <Sparkles className="h-4 w-4" />
@@ -178,6 +179,6 @@ export function InventoryUI() {
           {!state.equipped.length ? <span className="text-white/45">尚未装备武器</span> : null}
         </div>
       </div>
-    </section>
+    </GlassPanel>
   )
 }

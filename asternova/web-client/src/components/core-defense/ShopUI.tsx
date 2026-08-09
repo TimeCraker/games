@@ -13,6 +13,9 @@ import {
 import { useCoreDefense } from "./state/coreDefenseContext"
 import { getRollTableByMaxLevel } from "./state/shopPool"
 import type { WeaponClass, WeaponLevel } from "./state/coreDefenseTypes"
+import { Button } from "@/components/ui/button"
+import { GlassPanel } from "@/src/components/ui/GlassPanel"
+import { cn } from "@/lib/utils"
 
 function classIcon(classType: WeaponClass) {
   if (classType === "Warrior") return Swords
@@ -45,21 +48,22 @@ export function ShopUI() {
   const probability = getRollTableByMaxLevel(maxLevel)
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-2xl">
+    <GlassPanel className="p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.28em] text-white/45">Weapon Bay</p>
-          <h2 className="mt-1 text-2xl font-semibold tracking-[-0.02em] text-white">AsterNova Shop</h2>
+          <p className="font-mono-data text-[11px] uppercase tracking-[0.28em] text-white/45">Weapon Bay</p>
+          <h2 className="font-display mt-1 text-2xl font-semibold tracking-[-0.02em] text-white">武器舱</h2>
         </div>
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={() => dispatch({ type: "REFRESH_SHOP" })}
-          className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.05] px-4 py-2 text-sm font-semibold text-white/90 transition hover:scale-[1.03] hover:border-pink-300/50 hover:bg-gradient-to-r hover:from-pink-300/85 hover:to-purple-600/85 hover:text-black"
+          className="group"
         >
           <RefreshCcw className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
           <Coins className="h-4 w-4" />
           刷新 - {state.refreshCost}
-        </button>
+        </Button>
       </div>
 
       <div className="mb-5 rounded-2xl border border-white/10 bg-black/25 p-3">
@@ -71,6 +75,15 @@ export function ShopUI() {
               className={item.colorClass}
               style={{ width: `${item.weight}%`, boxShadow: "0 0 14px rgba(255,255,255,0.25)" }}
             />
+          ))}
+        </div>
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-white/65">
+          {probability.map((item) => (
+            <span key={item.label} className="inline-flex items-center gap-1.5">
+              <span className={cn("h-2 w-2 rounded-full", item.colorClass)} />
+              <span>{item.label}</span>
+              <span className="font-mono-data text-white/45">{item.weight}%</span>
+            </span>
           ))}
         </div>
       </div>
@@ -114,19 +127,20 @@ export function ShopUI() {
                   </span>
                 </div>
 
-                <button
+                <Button
                   type="button"
+                  variant="brand"
                   onClick={() => dispatch({ type: "BUY_WEAPON", offerId: offer.id })}
-                  className="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-pink-300 to-purple-600 px-4 py-2.5 text-sm font-semibold text-black transition duration-200 hover:scale-[1.03] hover:shadow-[0_0_22px_rgba(221,160,255,0.6)]"
+                  className="mt-auto w-full"
                 >
                   <Coins className="h-4 w-4" />
                   购买 {offer.weapon.buyPrice}
-                </button>
+                </Button>
               </div>
             </article>
           )
         })}
       </div>
-    </section>
+    </GlassPanel>
   )
 }
