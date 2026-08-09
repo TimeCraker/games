@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { LiquidBar } from "@/src/components/ui/LiquidBar"
 
 /**
  * Arena 战斗 HUD 组件（从 app/arena/page.tsx 内联 style 抽离）
@@ -14,64 +15,12 @@ const WAVE_MASK =
 
 /** 血条（skew 液体） */
 export function HpBar({ hp, side }: { hp: number; side: Side }) {
-  const isLeft = side === "left"
-  return (
-    <div
-      style={{
-        height: "28px",
-        width: "100%",
-        transform: `skewX(${isLeft ? -12 : 12}deg)`,
-        overflow: "hidden",
-        borderRadius: "4px",
-        border: "2px solid rgba(255,255,255,0.3)",
-        backgroundColor: "rgba(0,0,0,0.8)",
-        boxShadow: "0 0 15px rgba(0,0,0,0.8)",
-        backdropFilter: "blur(12px)",
-      }}
-    >
-      <div
-        style={{
-          height: "100%",
-          width: `${hp}%`,
-          backgroundImage: isLeft
-            ? "linear-gradient(to right, #db2777, #f43f5e)"
-            : "linear-gradient(to left, #dc2626, #f97316)",
-          transition: "width 0.3s ease-out",
-        }}
-      />
-    </div>
-  )
+  return <LiquidBar value={hp} max={100} variant="hp" side={side} />
 }
 
 /** 能量条（skew 液体） */
 export function EnergyBar({ energy, max = 15, side }: { energy: number; max?: number; side: Side }) {
-  const isLeft = side === "left"
-  return (
-    <div
-      style={{
-        display: isLeft ? undefined : "flex",
-        justifyContent: isLeft ? undefined : "flex-end",
-        height: "12px",
-        width: "100%",
-        transform: `skewX(${isLeft ? -12 : 12}deg)`,
-        overflow: "hidden",
-        borderRadius: "4px",
-        border: "1px solid rgba(255,255,255,0.2)",
-        backgroundColor: "rgba(0,0,0,0.8)",
-        boxShadow: "0 0 10px rgba(0,0,0,0.8)",
-        backdropFilter: "blur(12px)",
-      }}
-    >
-      <div
-        style={{
-          height: "100%",
-          width: `${(energy / max) * 100}%`,
-          backgroundImage: "linear-gradient(to right, #facc15, #22d3ee)",
-          transition: "width 0.3s ease-out",
-        }}
-      />
-    </div>
-  )
+  return <LiquidBar value={energy} max={max} variant="energy" side={side} />
 }
 
 /** 大招 Q 键（液体波纹，能量满时发光） */

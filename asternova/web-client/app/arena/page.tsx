@@ -3,10 +3,9 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Orbitron } from "next/font/google"
-
 import dynamic from "next/dynamic"
 import { PlayerHud, UltimateButton } from "@/src/components/arena/ArenaHud"
+import { ResultOverlay } from "@/src/components/ui/ResultOverlay"
 
 const CinematicBlackHole = dynamic(
   () => import("@/src/components/CinematicBlackHole").then((m) => m.CinematicBlackHole),
@@ -16,11 +15,6 @@ import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { apiV1BaseUrl } from "@/src/config/public-env"
 import { useMobileGameViewport } from "@/src/hooks/useMobileGameViewport"
 import { useGameStore } from "@/src/store/useGameStore"
-
-const orbitron = Orbitron({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-})
 
 export default function ArenaPage() {
   const router = useRouter()
@@ -150,7 +144,7 @@ export default function ArenaPage() {
           const isVictory = Number(winnerId) === userId
           setMatchResult(isVictory ? "victory" : "defeat")
 
-          // 停留 4 秒让玩家装 X，然后自动退回大厅
+          // 停留 4 秒展示结算，然后自动退回大厅
           setTimeout(() => {
             router.replace("/lobby")
           }, 4000)
@@ -240,7 +234,7 @@ export default function ArenaPage() {
   }
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-black text-white">
+    <div className="relative h-screen w-screen overflow-hidden bg-space-black text-white">
       {shouldShowLandscapeHint && (
         <div
           className="absolute inset-0 z-[200] flex flex-col items-center justify-center gap-6 bg-black/92 px-8 text-center backdrop-blur-md"
@@ -249,7 +243,7 @@ export default function ArenaPage() {
           aria-label="请横屏游戏"
         >
           <div
-            className={[orbitron.className, "max-w-md text-lg font-semibold leading-relaxed text-cyan-100/95"].join(" ")}
+            className="font-display max-w-md text-lg font-semibold leading-relaxed text-cyan-100/95"
             style={{ textShadow: "0 0 24px rgba(34,211,238,0.35)" }}
           >
             为了获得最佳游戏体验，请关闭系统的屏幕旋转锁定，并将手机横置。
@@ -275,8 +269,8 @@ export default function ArenaPage() {
       {!isSceneReady && (
         <div className="relative z-10 flex h-full w-full items-center justify-center">
           <div className="w-full max-w-2xl px-6">
-            <div className="mx-auto rounded-[28px] border border-white/20 bg-[linear-gradient(155deg,rgba(255,255,255,0.16),rgba(255,255,255,0.03))] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
-              <div className={[orbitron.className, "text-center"].join(" ")}>
+            <div className="mx-auto rounded-[28px] border border-white/20 bg-[linear-gradient(155deg,rgba(255,255,255,0.16),rgba(255,255,255,0.03))] p-8 shadow-lg backdrop-blur-glass-lg">
+              <div className="font-display text-center">
                 <div className="text-[11px] tracking-[0.38em] text-white/55">ASTER NOVA</div>
                 <div className="mt-3 text-2xl font-semibold tracking-tight text-white drop-shadow-[0_0_24px_rgba(255,255,255,0.14)]">
                   正在进入战场
@@ -314,10 +308,7 @@ export default function ArenaPage() {
         <div className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all duration-300">
           <div
             key={countdown}
-            className={[
-              orbitron.className,
-              "animate-in zoom-in-50 fade-in duration-500 text-[10rem] font-black italic tracking-tighter text-transparent",
-            ].join(" ")}
+            className="font-display animate-in zoom-in-50 fade-in duration-500 text-[10rem] font-black italic tracking-tighter text-transparent"
             style={{
               WebkitTextStroke: "2px rgba(255,255,255,0.8)",
               backgroundImage: "linear-gradient(to bottom right, #f9a8d4, #a855f7, #67e8f9)",
@@ -338,78 +329,15 @@ export default function ArenaPage() {
         </>
       )}
 
-      {/* 修改内容：全屏赛博结算遮罩层（仅展示，不改变计时/跳转逻辑） */}
+      {/* 全屏结算（仅展示，计时/跳转逻辑不变） */}
       {matchResult && (
-        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-1000">
-          <div className="star-chart-grid pointer-events-none absolute inset-0 opacity-30" />
-          <div
-            className={[orbitron.className, "relative flex flex-col items-center gap-6"].join(" ")}
-            style={{
-              padding: "2.2rem 2.4rem",
-              borderRadius: 24,
-              border: "1px solid rgba(255,255,255,0.12)",
-              background:
-                matchResult === "victory"
-                  ? "radial-gradient(1000px 420px at 50% 40%, rgba(34,211,238,0.25), rgba(0,0,0,0) 60%), rgba(0,0,0,0.35)"
-                  : "radial-gradient(1000px 420px at 50% 40%, rgba(220,38,38,0.22), rgba(0,0,0,0) 60%), rgba(0,0,0,0.35)",
-              boxShadow:
-                matchResult === "victory"
-                  ? "0 0 60px rgba(34,211,238,0.20), inset 0 0 0 1px rgba(255,255,255,0.08)"
-                  : "0 0 60px rgba(220,38,38,0.18), inset 0 0 0 1px rgba(255,255,255,0.08)",
-            }}
-          >
-            {/* 背景扫描线 */}
-            <div className="pointer-events-none absolute inset-0 rounded-[24px] overflow-hidden" aria-hidden="true">
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "repeating-linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(255,255,255,0.08) 1px, rgba(0,0,0,0) 3px, rgba(0,0,0,0) 6px)",
-                  opacity: 0.25,
-                  mixBlendMode: "overlay",
-                }}
-              />
-              <div
-                className="absolute left-0 right-0 h-1/3"
-                style={{
-                  top: "25%",
-                  background: matchResult === "victory" ? "rgba(34,211,238,0.25)" : "rgba(220,38,38,0.22)",
-                  filter: "blur(14px)",
-                  transform: "translateY(0)",
-                  animation: "pulse-scan 1.8s ease-in-out infinite",
-                }}
-              />
-            </div>
-
-            <div className="relative">
-              <div
-                className={`text-[6.6rem] font-black italic tracking-widest ${
-                  matchResult === "victory"
-                    ? "text-cyan-400 drop-shadow-[0_0_50px_rgba(34,211,238,0.8)]"
-                    : "text-red-600 drop-shadow-[0_0_50px_rgba(220,38,38,0.8)]"
-                }`}
-              >
-                {matchResult === "victory" ? "VICTORY" : "DEFEAT"}
-              </div>
-              <div className="mt-4 h-1 w-96 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-            </div>
-
-            <div className="relative flex flex-col items-center gap-3">
-              <div
-                className="text-sm font-bold tracking-[0.45em] text-white/70 animate-pulse"
-                style={{ textShadow: "0 0 18px rgba(255,255,255,0.15)" }}
-              >
-                RETURNING TO LOBBY...
-              </div>
-              <div
-                className="h-[2px] w-72 bg-gradient-to-r from-transparent via-white/60 to-transparent"
-                style={{ opacity: 0.55 }}
-              />
-              <div className="text-xs text-white/55 tracking-wide">
-                你看到慢动作不是bug，是结算特效
-              </div>
-            </div>
-          </div>
+        <div className="absolute inset-0 z-[100]">
+          <ResultOverlay
+            victory={matchResult === "victory"}
+            title={matchResult === "victory" ? "VICTORY" : "DEFEAT"}
+            cinematic
+            slogan="RETURNING TO LOBBY…"
+          />
         </div>
       )}
       <LoopingBgmControl src="/audio/games/arena/Untitled.mp3" storageKey="bgm-volume:arena" />
