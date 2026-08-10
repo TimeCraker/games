@@ -3,17 +3,23 @@
 import * as React from "react"
 
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
-
+import { HEIGHT, WIDTH } from "./constants"
 import { StaGameShell } from "./StaGameShell"
 import { StaPixiApp } from "./render/StaPixiApp"
 
 /**
  * Shoot Them All v2 顶层根（Stage Spec §8.11 StaRoot）。
- * PixiCanvasHost + overlay + 与引擎桥接（M1 阶段仅 Pixi 主机 + 星空背景）。
+ * 拥有 Pixi 主机生命周期 + 指针输入 → 引擎桥接 + UI overlay。
+ *
+ * 输入模型（Stage Spec §3.3）：
+ * - 鼠标：悬停瞄准（实时），单击发射。
+ * - 触屏：按下拖动瞄准，松开发射。
+ * 统一为 pointer 事件：move/down 更新瞄准，up 发射。
  */
 export function StaRoot() {
   const hostRef = React.useRef<HTMLDivElement | null>(null)
   const pixiRef = React.useRef<StaPixiApp | null>(null)
+  const engineRef = React.useRef<ReturnType<StaPixiApp["gameEngine"]> | null>(null)
   const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
@@ -27,10 +33,11 @@ export function StaRoot() {
     pixi
       .mount(host)
       .then(() => {
-        // StrictMode 双调用兜底：挂载完成后若已被取消，立即销毁避免孤儿 app
         if (cancelled) {
           pixi.destroy()
+          return
         }
+        engineRef.current = pixi.gameEngine
       })
       .catch((e: unknown) => {
         if (!cancelled) setError(e instanceof Error ? e.message : String(e))
@@ -40,12 +47,52 @@ export function StaRoot() {
       cancelled = true
       pixi.destroy()
       pixiRef.current = null
+      engineRef.current = null
     }
+  }, [])
+
+  /** 客户端坐标 → 逻辑画布坐标（720×1280），补偿 StaGameShell 的等比缩放。 */
+  const toLogical = React.useCallback((clientX: number, clientY: number) => {
+    const host = hostRef.current
+    if (!host) return null
+    const rect = host.getBoundingClientRect()
+    if (rect.width === 0 || rect.height === 0) return null
+    return {
+      x: ((clientX - rect.left) / rect.width) * WIDTH,
+      y: ((clientY - rect.top) / rect.height) * HEIGHT,
+    }
+  }, [])
+
+  const onPointerMove = React.useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const p = toLogical(e.clientX, e.clientY)
+      if (p) engineRef.current?.setAimFromPoint(p.x, p.y)
+    },
+    [toLogical],
+  )
+
+  const onPointerDown = React.useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const p = toLogical(e.clientX, e.clientY)
+      if (p) engineRef.current?.setAimFromPoint(p.x, p.y)
+    },
+    [toLogical],
+  )
+
+  const onPointerUp = React.useCallback(() => {
+    engineRef.current?.launch()
   }, [])
 
   return (
     <StaGameShell>
-      <div ref={hostRef} className="absolute inset-0 z-0" />
+      <div
+        ref={hostRef}
+        className="absolute inset-0 z-0"
+        style={{ touchAction: "none" }}
+        onPointerMove={onPointerMove}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+      />
 
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between p-3">
         <span className="font-mono-data text-[10px] uppercase tracking-[0.22em] text-white/40">

@@ -29,3 +29,31 @@ export const BG_GRADIENT = {
   mid: 0x0e1130,
   bot: 0x05060f,
 } as const
+
+/**
+ * 物理参数（Stage Spec §3.2/§3.3/§3.5/§3.7/§3.10）。
+ * 引擎层与渲染层共享；引擎层零 React/Pixi 依赖。
+ */
+export const PHYS = {
+  // Engine
+  gravityY: 1.15,
+  fixedDelta: 1000 / 60, // 16.667ms，固定步长
+  positionIterations: 8,
+  velocityIterations: 8,
+  constraintIterations: 4,
+  // 陨星（标准）
+  ballRadius: 9,
+  ballRestitution: 0.55, // 核心修复：旧版 0.98 → 0.55
+  ballFriction: 0.001,
+  ballFrictionAir: 0.006,
+  ballDensity: 0.005,
+  ballSlop: 0.02,
+  // 星象仪（发射器）
+  launchAnchor: { x: 360, y: 70 },
+  angleMax: (78 * Math.PI) / 180, // ±78°
+  v0: 14, // 初速度 px/step
+  vMax: 16, // 速度钳制（防穿透：16 < 球9+钉10=19）
+  // 普通晶体钉
+  pegRadius: 10,
+  pegRestitution: 0.5,
+} as const
