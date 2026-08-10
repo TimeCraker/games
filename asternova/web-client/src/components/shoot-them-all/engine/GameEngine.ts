@@ -3,6 +3,7 @@ import Matter from "matter-js"
 import { HEIGHT, PHYS, WIDTH } from "../constants"
 import { generateCrystalCluster } from "./content/pegLayouts"
 import { Entity, EntityRegistry } from "./EntityRegistry"
+import { GhostPredictor, TrajectoryResult } from "./GhostPredictor"
 import { PhysicsWorld } from "./PhysicsWorld"
 
 export type StaPhase = "aiming" | "flying" | "resolving" | "game-over"
@@ -25,15 +26,23 @@ export class GameEngine {
 
   private ball: Entity | null = null
   private ballStopSince = 0
+  private predictor: GhostPredictor
 
   constructor() {
     this.setupCollisions()
     this.spawnPegs()
     this.spawnBall()
+    this.predictor = new GhostPredictor(this.registry)
   }
 
   get ballEntity(): Entity | null {
     return this.ball
+  }
+
+  /** 轨迹预测（仅 aiming 阶段；Stage Spec §3.4，M1 必过验收）。 */
+  predictTrajectory(): TrajectoryResult {
+    if (this.phase !== "aiming") return { points: [], firstHit: -1 }
+    return this.predictor.predict(this.aimAngle)
   }
 
   /** 由指针逻辑坐标设定瞄准角度（仅 aiming 阶段）。 */
@@ -159,6 +168,7 @@ export class GameEngine {
   }
 
   destroy(): void {
+    this.predictor.destroy()
     this.physics.destroy()
     this.registry.clear()
   }

@@ -31,6 +31,9 @@ export class EntityRegistry {
   private byId = new Map<number, Entity>()
   private byKind = new Map<EntityKind, Set<Entity>>()
 
+  /** 变更版本号：register/unregister 自增。GhostPredictor 据此判断是否需重建幽灵钉阵。 */
+  version = 0
+
   register(e: Entity): void {
     this.byId.set(e.id, e)
     let bucket = this.byKind.get(e.kind)
@@ -39,6 +42,7 @@ export class EntityRegistry {
       this.byKind.set(e.kind, bucket)
     }
     bucket.add(e)
+    this.version++
   }
 
   unregister(id: number): void {
@@ -46,6 +50,7 @@ export class EntityRegistry {
     if (!e) return
     this.byId.delete(id)
     this.byKind.get(e.kind)?.delete(e)
+    this.version++
   }
 
   get(id: number): Entity | undefined {

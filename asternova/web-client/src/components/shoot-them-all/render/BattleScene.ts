@@ -29,6 +29,7 @@ export class BattleScene {
   readonly container = new Container()
 
   private pegLayer = new Container()
+  private trajectory = new Graphics()
   private ballLayer = new Container()
   private launcher = new Container()
   private launcherBarrel: Graphics
@@ -37,6 +38,7 @@ export class BattleScene {
 
   constructor(private readonly engine: GameEngine) {
     this.container.addChild(this.pegLayer)
+    this.container.addChild(this.trajectory)
     this.container.addChild(this.ballLayer)
     this.container.addChild(this.launcher)
     this.launcher.position.set(PHYS.launchAnchor.x, PHYS.launchAnchor.y)
@@ -67,9 +69,33 @@ export class BattleScene {
 
   /** 每帧由 Pixi ticker 调用，同步引擎状态到 sprite。 */
   sync(): void {
+    this.syncTrajectory()
     this.syncPegs()
     this.syncBall()
     this.launcherBarrel.rotation = -this.engine.aimAngle
+  }
+
+  /** 轨迹预测线（Stage Spec §3.4）：首碰段亮，首碰后 1 弹射段淡，首碰点金色标记。 */
+  private syncTrajectory(): void {
+    this.trajectory.clear()
+    if (this.engine.phase !== "aiming") return
+    const { points, firstHit } = this.engine.predictTrajectory()
+    if (points.length === 0) return
+
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i]
+      const after = firstHit >= 0 && i > firstHit
+      const alpha = after
+        ? Math.max(0.06, 0.3 - (i - firstHit) * 0.02)
+        : Math.max(0.12, 0.5 - (i / Math.max(1, points.length - 1)) * 0.3)
+      this.trajectory.circle(p.x, p.y, after ? 1.8 : 2.4).fill({ color: 0xc7ecff, alpha })
+    }
+
+    if (firstHit >= 0 && firstHit < points.length) {
+      const p = points[firstHit]
+      this.trajectory.circle(p.x, p.y, 9).stroke({ width: 1.5, color: PALETTE.amber, alpha: 0.9 })
+      this.trajectory.circle(p.x, p.y, 4.5).fill({ color: PALETTE.amber, alpha: 0.5 })
+    }
   }
 
   private syncPegs(): void {
