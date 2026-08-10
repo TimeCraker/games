@@ -6,9 +6,9 @@ import { GlobalRuntimeErrorProbe } from "@/src/components/game-shell/GlobalRunti
 import { GameRuntimeErrorBoundary } from "@/src/components/game-shell/GameRuntimeErrorBoundary"
 import { GameLoadingScreen } from "@/src/components/ui/GameLoadingScreen"
 
-const GameEngine = dynamic(() => import("@/src/components/nova-ball/GameEngine").then((m) => m.GameEngine), {
+const StaRoot = dynamic(() => import("@/src/components/shoot-them-all/StaRoot").then((m) => m.StaRoot), {
   ssr: false,
-  loading: () => <GameLoadingScreen label="加载游戏中" hint="正在准备引擎与资源" />,
+  loading: () => <GameLoadingScreen label="加载星海" hint="正在准备引擎与资源" />,
 })
 
 export function ShootThemAllPageClient() {
@@ -16,7 +16,7 @@ export function ShootThemAllPageClient() {
     <>
       <GlobalRuntimeErrorProbe />
       <GameRuntimeErrorBoundary>
-        <GameEngine />
+        <StaRoot />
       </GameRuntimeErrorBoundary>
     </>
   )
