@@ -51,12 +51,13 @@ export class StaPixiApp {
     this.engine = engine
     const battle = new BattleScene(engine)
     this.battle = battle
+    engine.onEvent = battle.handleEngineEvent
     app.stage.addChild(battle.container)
 
     app.ticker.add((ticker) => {
       starField.update(ticker.deltaMS / 1000)
       engine.update(ticker.deltaMS)
-      battle.sync()
+      battle.sync(ticker.deltaMS / 1000)
     })
   }
 
