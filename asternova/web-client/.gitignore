@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Local AI-agent project state; canonical project instructions live in Git.
 /.pi/
+
+# shoot-them-all 本地草稿素材（M1 代码未引用，正式接入里程碑时再提交）
+/public/shoot-them-all/
