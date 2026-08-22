@@ -65,13 +65,13 @@
 <tr>
 <td width="50%" align="center">
 <a href="https://game.asterforge.top/xiaoxiaole/">
-<img src="asternova/assets/xiaoxiaole-screenshot-menu.jpg" alt="桓睿消消乐" width="360"/>
+<img src="asternova/assets/xiaoxiaole-screenshot-game.jpg" alt="三消游戏" width="360"/>
 </a>
-<p><b>桓睿消消乐</b> — 立体三消 12 关</p>
+<p><b>立体三消</b> — 12 关闯关</p>
 <p><sub>4 连炸弹 · 5 连彩虹 · 连击 · 成就 · 双主题 · PWA 可安装</sub></p>
 </td>
 <td width="50%" align="center">
-<img src="asternova/assets/xiaoxiaole-screenshot-game.jpg" alt="消除特效" width="360"/>
+<img src="asternova/assets/stress-rtt.png" alt="RTT 压测" width="360"/>
 <p><b>shoot-them-all</b> — matter-js 物理弹幕</p>
 <p><sub>另有 lets-running · merge · nebula-survivor</sub></p>
 </td>
