@@ -1,35 +1,79 @@
-# games
+<div align="center">
 
-游戏项目 monorepo —— 把 AsterNova 矩阵整合到一处，各子目录保留原仓库完整 git 历史；桓睿消消乐已作为休闲小游戏集成进 web-client 大厅。
+<img src="assets/banner.svg" alt="AsterNova" width="880"/>
 
-## 结构
+# AsterNova
 
-```
-games/
-└── asternova/              # AsterNova 多客户端矩阵游戏
-    ├── web-client/         # Next.js 前端 (React UI + WASM 战斗引擎, JSBridge; 含消消乐 /lobby 小游戏)
-    ├── backend/            # Go 后端 (服务端权威, 60Hz 帧同步, Gin+WS+MySQL+Redis)
-    ├── client-godot/       # Godot 4 (WASM) 客户端
-    ├── client-unity/       # Unity (WebGL) 客户端
-    └── assets/             # 共享静态资源 (logo/icon/宣传图)
-```
+**服务端权威的实时联机游戏矩阵**
 
-## 子项目说明
+一套协议 · 一个 Go 后端 · 三端客户端（Web / Unity / Godot），外加纯前端休闲 Arcade。
 
-| 子目录 | 技术栈 | 来源仓库 |
-|---|---|---|
-| `asternova/web-client` | Next.js 15 + React + WASM | asternova-web-client |
-| `asternova/backend` | Go + Gin + WebSocket + MySQL + Redis | game-backend-demo |
-| `asternova/client-godot` | Godot 4 (WASM) | go-dot-game |
-| `asternova/client-unity` | Unity (WebGL) | MyGameDemo_Client-unity- |
-| `asternova/assets` | 静态资源 | asternova-assets |
+[在线试玩](https://asterforge.top/game) · [压测报告](#压测) · [架构](#架构)
+
+</div>
+
+---
 
 ## 架构
 
-AsterNova 是服务端权威的实时多人动作游戏：Go 后端跑 60Hz 帧同步与对战逻辑，三个客户端（Web/Unity/Godot）只负责输入捕获与快照插值渲染，通过 JSBridge 与 React 宿主通信。三个客户端共享同一后端协议。
+**后端独占裁决权**：Go 服务跑 60Hz 帧同步，吃输入、推状态、广播快照；客户端只做两件事——采集输入、Lerp 插值渲染快照。Web 外壳（Next.js）负责登录 / 大厅 / HUD，真正的战斗由 WASM 引擎直连后端 WebSocket，绕过 Web 层。
 
-桓睿消消乐（立体三消闯关，纯前端零依赖）已作为休闲小游戏集成进 web-client 大厅 `/lobby`，原独立仓库（huanrui-xiaoxiaole）历史见 git log。
+<div align="center">
+<img src="assets/architecture.svg" alt="AsterNova 架构" width="880"/>
+</div>
 
-## 历史
+| 层 | 技术 | 职责 |
+|---|---|---|
+| Web 外壳 | Next.js 16 · React 19 · Zustand | 登录 / 大厅 / HUD / WASM 容器 · Arcade 休闲区 |
+| 战斗引擎 | Godot 4 (WASM) · Unity (WebGL) | 60Hz 输入收发 · 快照插值 · JSBridge 与外壳通信 |
+| 后端 | Go · Gin · gorilla/ws | **battle** 60Hz 物理状态机 · **match** 1Hz 撮合 · **auth** JWT · **gateway** WS Hub |
+| 存储 | MySQL 8 · Redis 7 | 账户战绩 · 匹配队列与会话态 |
+| 协议 | Protobuf | 三端共享一份 `game.proto`，改协议三端同步 |
 
-本 monorepo 由 6 个独立仓库通过 `git subtree add`（不 squash）合并而成，各子项目的提交历史可在 `git log` 中追溯。原仓库已归档为只读。消消乐子目录后已并入 web-client，其源仓库历史仍可追溯。
+> Godot 端为压榨 WASM 体积，Protobuf 编解码是**几百行纯 GDScript 手写实现**，零第三方依赖。
+
+## 压测
+
+单机腾讯云，Go 后端压测数据（完整图表见 `asternova/assets/`）：
+
+| 指标 | 结果 |
+|---|---|
+| 帧同步稳定性 | 60Hz tick 长尾稳定，无积压 |
+| RTT | 局域网 <10ms · 公网 P95 <80ms |
+| CPU | 满房间并发下单核占用可控 |
+
+## Arcade · 休闲矩阵
+
+大厅 `/lobby` 内置纯前端小游戏（零后端依赖）：立体三消「桓睿消消乐」12 关 · `shoot-them-all` 物理弹幕 · `lets-running` · `merge` · `nebula-survivor`。
+
+## Monorepo 结构
+
+```
+games/
+└── asternova/
+    ├── web-client/     # Next.js 16 Game Shell + Arcade
+    ├── backend/        # Go · Gin · WS · MySQL · Redis
+    ├── client-godot/   # Godot 4 → WASM
+    ├── client-unity/   # Unity → WebGL
+    └── assets/         # 共享静态资源
+```
+
+六个原仓库经 `git subtree add`（保留完整历史）合并而来，各子项目提交历史可在 `git log` 追溯，原仓库已归档只读。
+
+## 快速开始
+
+```bash
+# 后端（:8081）
+cd asternova/backend && docker compose up -d && go run main.go
+
+# 前端外壳
+cd asternova/web-client && npm install && cp .env.development .env.local && npm run dev
+```
+
+客户端独立运行无法移动——服务端权威设计，必须先起后端。
+
+---
+
+<div align="center">
+<sub>AsterForge · <a href="https://asterforge.top">asterforge.top</a></sub>
+</div>

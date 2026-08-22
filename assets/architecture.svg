@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="560" viewBox="0 0 1440 560" role="img" aria-label="AsterNova 架构">
+  <defs>
+    <style>
+      .t   { font: 600 15px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #FAF6F0; }
+      .tw  { font: 600 19px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #FAF6F0; }
+      .s   { font: 400 12.5px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #D6D3D1; }
+      .d   { font: 400 11px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #A8A29E; }
+      .dim { font: 400 11px ui-monospace, 'Cascadia Mono', Consolas, monospace; fill: #78716C; letter-spacing: 1px; }
+      .lab { font: 600 11px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #CC785C; letter-spacing: 2.5px; }
+      .icon{ stroke: #CC785C; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .soft{ stroke: #57534E; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .box { fill: #211D1A; stroke: #2E2A27; stroke-width: 1; }
+      .line{ stroke: #57534E; stroke-width: 1.4; fill: none; }
+    </style>
+    <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#78716C"/>
+    </marker>
+  </defs>
+
+  <rect width="1440" height="560" rx="18" fill="#1C1917"/>
+
+  <!-- ══ 层 1 · 三端客户端 ══ -->
+  <text x="56" y="52" class="lab">CLIENTS · 输入捕获 + 快照渲染</text>
+
+  <!-- Web -->
+  <g transform="translate(56,72)">
+    <rect width="396" height="108" rx="10" class="box"/>
+    <g class="icon" transform="translate(22,24)">
+      <rect x="0" y="0" width="22" height="17" rx="2"/>
+      <line x1="0" y1="5.4" x2="22" y2="5.4"/>
+    </g>
+    <text x="58" y="33" class="t">Web · Next.js 16 Game Shell</text>
+    <text x="24" y="62" class="d">登录 / 大厅 / HUD / WASM 容器 · Arcade 休闲区</text>
+    <text x="24" y="80" class="d">React 19 · Zustand 状态总线 · framer-motion</text>
+    <text x="24" y="98" class="dim">shell 不碰战斗 — WASM 引擎直连 WS</text>
+  </g>
+
+  <!-- Godot -->
+  <g transform="translate(522,72)">
+    <rect width="396" height="108" rx="10" class="box"/>
+    <g class="icon" transform="translate(22,24)">
+      <rect x="0" y="5" width="20" height="13" rx="4"/>
+      <line x1="10" y1="5" x2="10" y2="0"/>
+      <line x1="5" y1="11.5" x2="7" y2="11.5"/>
+      <line x1="13" y1="11.5" x2="15" y2="11.5"/>
+    </g>
+    <text x="58" y="33" class="t">Godot 4 · WASM 客户端</text>
+    <text x="24" y="62" class="d">快照 Lerp 插值 · 60Hz 收发 + 粘包重连</text>
+    <text x="24" y="80" class="d">自研零依赖 Protobuf 编解码（纯 GDScript）</text>
+    <text x="24" y="98" class="dim">体积优先 — 不引第三方插件</text>
+  </g>
+
+  <!-- Unity -->
+  <g transform="translate(988,72)">
+    <rect width="396" height="108" rx="10" class="box"/>
+    <g class="icon" transform="translate(22,24)">
+      <path d="M11 0 L22 6.4 V19.6 L11 26 L0 19.6 V6.4 Z"/>
+      <path d="M0 6.4 L11 12.8 L22 6.4 M11 12.8 V26"/>
+    </g>
+    <text x="58" y="33" class="t">Unity · WebGL 客户端</text>
+    <text x="24" y="62" class="d">高频输入捕获 · 快照插值渲染</text>
+    <text x="24" y="80" class="d">react-unity-webgl 接入外壳</text>
+    <text x="24" y="98" class="dim">共享同一后端协议</text>
+  </g>
+
+  <!-- JSBridge 注释 -->
+  <text x="720" y="208" text-anchor="middle" class="dim">JSBridge 双通道 · Command ↓ 注入 JWT/配置 · Event ↑ 回抛 HP/能量</text>
+
+  <!-- WASM 引擎层 -->
+  <g transform="translate(522,220)">
+    <rect width="396" height="66" rx="10" fill="none" stroke="#57534E" stroke-width="1.2" stroke-dasharray="5 4"/>
+    <text x="24" y="27" class="s" fill="#D6D3D1">WASM 战斗引擎（Godot / Unity 导出）</text>
+    <text x="24" y="47" class="d">绕过 Web 层直连后端 WebSocket · 需 SharedArrayBuffer</text>
+  </g>
+
+  <!-- ══ 连接：WS ══ -->
+  <line x1="254" y1="286" x2="254" y2="330" class="line" marker-end="url(#ar)"/>
+  <line x1="720" y1="286" x2="720" y2="330" class="line" marker-end="url(#ar)"/>
+  <line x1="1186" y1="286" x2="1186" y2="330" class="line" marker-end="url(#ar)"/>
+  <text x="330" y="314" class="dim">WebSocket · Protobuf</text>
+  <text x="796" y="314" class="dim">输入 ↑ 快照 ↓</text>
+
+  <!-- ══ 层 2 · Go 后端 ══ -->
+  <g transform="translate(56,330)">
+    <rect width="1328" height="150" rx="12" fill="#211D1A" stroke="#CC785C" stroke-width="1.2"/>
+    <text x="26" y="34" class="tw">Go 后端 · Gin</text>
+    <text x="26" y="58" class="d">服务端权威 — 客户端只发输入，所有状态由后端裁决下发</text>
+
+    <!-- 四服务 -->
+    <g transform="translate(26,76)">
+      <rect width="296" height="56" rx="8" fill="#1C1917" stroke="#2E2A27"/>
+      <text x="16" y="24" class="s" fill="#CC785C" font-weight="600">battle</text>
+      <text x="16" y="43" class="d">60Hz Tick 物理状态机 · 房间广播</text>
+    </g>
+    <g transform="translate(340,76)">
+      <rect width="296" height="56" rx="8" fill="#1C1917" stroke="#2E2A27"/>
+      <text x="16" y="24" class="s" fill="#CC785C" font-weight="600">match</text>
+      <text x="16" y="43" class="d">1Hz 异步撮合 · room_id 分发</text>
+    </g>
+    <g transform="translate(654,76)">
+      <rect width="296" height="56" rx="8" fill="#1C1917" stroke="#2E2A27"/>
+      <text x="16" y="24" class="s" fill="#CC785C" font-weight="600">auth</text>
+      <text x="16" y="43" class="d">REST + JWT · 验证码限流</text>
+    </g>
+    <g transform="translate(968,76)">
+      <rect width="334" height="56" rx="8" fill="#1C1917" stroke="#2E2A27"/>
+      <text x="16" y="24" class="s" fill="#CC785C" font-weight="600">gateway</text>
+      <text x="16" y="43" class="d">WS 会话 Hub · 撮合结果驱动开房</text>
+    </g>
+  </g>
+
+  <!-- ══ 层 3 · 存储 ══ -->
+  <line x1="720" y1="480" x2="720" y2="502" class="line" marker-end="url(#ar)"/>
+  <g transform="translate(56,502)">
+    <rect width="640" height="38" rx="8" class="box"/>
+    <text x="20" y="24" class="d">MySQL 8 · 账户与战绩（GORM AutoMigrate）</text>
+  </g>
+  <g transform="translate(744,502)">
+    <rect width="640" height="38" rx="8" class="box"/>
+    <text x="20" y="24" class="d">Redis 7 · 匹配队列 · 会话态</text>
+  </g>
+</svg>

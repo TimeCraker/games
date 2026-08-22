@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="300" viewBox="0 0 1440 300" role="img" aria-label="AsterNova 游戏矩阵">
+  <defs>
+    <style>
+      .wm  { font: 900 58px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #FAF6F0; letter-spacing: 1px; }
+      .tag { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #CC785C; letter-spacing: 5px; }
+      .sub { font: 400 15.5px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #A8A29E; letter-spacing: 1px; }
+      .st  { font: 600 13px ui-monospace, 'Cascadia Mono', Consolas, monospace; fill: #D6D3D1; letter-spacing: 1.5px; }
+      .std { font: 400 11px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #78716C; letter-spacing: 1px; }
+      .icon{ stroke: #CC785C; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .soft{ stroke: #57534E; stroke-width: 1.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+  </defs>
+
+  <rect width="1440" height="300" rx="18" fill="#1C1917"/>
+
+  <!-- 背景点阵 -->
+  <g fill="#57534E" opacity="0.5">
+    <circle cx="860" cy="56" r="1"/><circle cx="940" cy="238" r="1.2"/><circle cx="1330" cy="66" r="1"/>
+    <circle cx="1392" cy="182" r="0.8"/><circle cx="822" cy="148" r="0.8"/><circle cx="1258" cy="256" r="1"/>
+  </g>
+
+  <!-- ── 左：wordmark ── -->
+  <rect x="56" y="56" width="26" height="2" fill="#CC785C"/>
+  <text x="56" y="84" class="tag">ASTERNOVA · GAME MATRIX</text>
+  <text x="54" y="156" class="wm">AsterNova</text>
+  <text x="56" y="190" class="sub">服务端权威实时对战 · 一套协议，三端客户端</text>
+
+  <!-- ── 右：三端环绕服务端核心 ── -->
+  <g transform="translate(1130,146)">
+    <!-- 轨道 -->
+    <ellipse cx="0" cy="0" rx="152" ry="84" transform="rotate(-16)" fill="none" stroke="#57534E" stroke-width="1.1" stroke-dasharray="4 5" opacity="0.8"/>
+    <ellipse cx="0" cy="0" rx="62" ry="34" transform="rotate(-16)" fill="none" stroke="#2E2A27" stroke-width="1"/>
+    <!-- 核心：服务端 -->
+    <circle cx="0" cy="0" r="30" fill="none" stroke="#CC785C" stroke-width="1" opacity="0.35"/>
+    <circle cx="0" cy="0" r="45" fill="none" stroke="#CC785C" stroke-width="1" opacity="0.14"/>
+    <circle cx="0" cy="0" r="17" fill="#26221F" stroke="#CC785C" stroke-width="1.6"/>
+    <g class="icon" transform="translate(-7,-5)">
+      <rect x="0" y="0" width="14" height="4" rx="1.2"/>
+      <rect x="0" y="6.5" width="14" height="4" rx="1.2"/>
+    </g>
+    <!-- 节点：浏览器（上） -->
+    <g transform="translate(4,-90)">
+      <circle r="21" fill="#211D1A" stroke="#2E2A27" stroke-width="1"/>
+      <g class="icon" transform="translate(-9.5,-7)">
+        <rect x="0" y="0" width="19" height="14.5" rx="2"/>
+        <line x1="0" y1="4.6" x2="19" y2="4.6"/>
+        <line x1="2.6" y1="2.3" x2="3.4" y2="2.3"/>
+      </g>
+    </g>
+    <!-- 节点：Unity 立方（左下） -->
+    <g transform="translate(-126,64)">
+      <circle r="21" fill="#211D1A" stroke="#2E2A27" stroke-width="1"/>
+      <g class="icon" transform="translate(-7.5,-8)">
+        <path d="M7.5 0 L15 4.4 V13.2 L7.5 17.6 L0 13.2 V4.4 Z"/>
+        <path d="M0 4.4 L7.5 8.8 L15 4.4 M7.5 8.8 V17.6"/>
+      </g>
+    </g>
+    <!-- 节点：Godot 机器人（右下） -->
+    <g transform="translate(130,60)">
+      <circle r="21" fill="#211D1A" stroke="#2E2A27" stroke-width="1"/>
+      <g class="icon" transform="translate(-8,-7.5)">
+        <rect x="0" y="4.5" width="16" height="10.5" rx="3.2"/>
+        <line x1="8" y1="4.5" x2="8" y2="1"/>
+        <line x1="4" y1="9.7" x2="5.4" y2="9.7"/>
+        <line x1="10.6" y1="9.7" x2="12" y2="9.7"/>
+      </g>
+    </g>
+    <!-- 轨道连线 -->
+    <line x1="4" y1="-67" x2="1" y2="-28" stroke="#57534E" stroke-width="1" opacity="0.7"/>
+    <line x1="-104" y1="50" x2="-24" y2="18" stroke="#57534E" stroke-width="1" opacity="0.7"/>
+    <line x1="108" y1="47" x2="26" y2="16" stroke="#57534E" stroke-width="1" opacity="0.7"/>
+  </g>
+
+  <!-- ── 底部 stats ── -->
+  <line x1="56" y1="232" x2="1384" y2="232" stroke="#2E2A27"/>
+  <g transform="translate(56,262)">
+    <circle cx="5" cy="-4" r="3.2" fill="#7BA05B"/>
+    <text x="16" y="0" class="st">60Hz TICK</text>
+    <text x="16" y="17" class="std">帧同步物理</text>
+
+    <g transform="translate(320,0)">
+      <circle cx="5" cy="-4" r="3.2" fill="#CC785C"/>
+      <text x="16" y="0" class="st">SERVER-AUTHORITATIVE</text>
+      <text x="16" y="17" class="std">后端唯一状态源</text>
+    </g>
+
+    <g transform="translate(720,0)">
+      <circle cx="5" cy="-4" r="3.2" fill="#CC785C"/>
+      <text x="16" y="0" class="st">SNAPSHOT LERP</text>
+      <text x="16" y="17" class="std">客户端只渲染</text>
+    </g>
+
+    <g transform="translate(1020,0)">
+      <circle cx="5" cy="-4" r="3.2" fill="#CC785C"/>
+      <text x="16" y="0" class="st">PROTOBUF</text>
+      <text x="16" y="17" class="std">三端共享协议</text>
+    </g>
+  </g>
+</svg>
