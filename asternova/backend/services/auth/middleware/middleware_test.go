@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/TimeCraker/game-backend-demo/services/auth/utils"
@@ -11,6 +12,13 @@ import (
 
 func init() {
 	gin.SetMode(gin.TestMode)
+}
+
+// TestMain 注入 JWT 密钥：AuthMiddleware 走 utils.GenerateToken/ParseToken，
+// 密钥 env 化后未设 JWT_SECRET 会被 fail loud 拒绝
+func TestMain(m *testing.M) {
+	os.Setenv("JWT_SECRET", "unit-test-secret-0123456789abcdef")
+	os.Exit(m.Run())
 }
 
 // perform 构造一个仅挂载被测中间件的上下文并执行。

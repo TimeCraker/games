@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/TimeCraker/game-backend-demo/services/auth/utils"
@@ -11,6 +12,13 @@ import (
 
 func init() {
 	gin.SetMode(gin.TestMode)
+}
+
+// TestMain 注入 JWT 密钥：HandleWS 校验分支走 utils.GenerateToken，
+// 密钥 env 化后未设 JWT_SECRET 会被 fail loud 拒绝
+func TestMain(m *testing.M) {
+	os.Setenv("JWT_SECRET", "unit-test-secret-0123456789abcdef")
+	os.Exit(m.Run())
 }
 
 // performWS 以 query 串调用 HandleWS，仅覆盖 WebSocket 升级之前的入参校验分支。

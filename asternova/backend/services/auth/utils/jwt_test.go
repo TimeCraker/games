@@ -1,11 +1,18 @@
 package utils
 
 import (
+	"os"
 	"testing"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+// TestMain 在任何测试前注入测试密钥，供 jwtSecretKey() 读取
+func TestMain(m *testing.M) {
+	os.Setenv("JWT_SECRET", "unit-test-secret-0123456789abcdef")
+	os.Exit(m.Run())
+}
 
 func TestGenerateAndParseTokenRoundTrip(t *testing.T) {
 	cases := []struct {
@@ -95,7 +102,7 @@ func TestParseTokenRejectsExpired(t *testing.T) {
 			IssuedAt:  jwt.NewNumericDate(time.Now().Add(-2 * time.Hour)),
 		},
 	}
-	expired, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(jwtSecret)
+	expired, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(jwtSecretKey())
 	if err != nil {
 		t.Fatalf("构造过期 token 失败: %v", err)
 	}

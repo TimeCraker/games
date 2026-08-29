@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/joho/godotenv"
+
 	"github.com/TimeCraker/game-backend-demo/services/auth/db"
 	"github.com/TimeCraker/game-backend-demo/services/auth/handlers/account"
 	"github.com/TimeCraker/game-backend-demo/services/auth/handlers/send_email"
@@ -16,6 +18,9 @@ import (
 )
 
 func main() {
+	// 本地开发从 .env 装载环境变量；文件缺失静默跳过（服务器由 systemd EnvironmentFile 提供）
+	_ = godotenv.Load()
+
 	// --- 数据库模块初始化 ---
 	// 修改内容：在 main 最前初始化 MySQL / Redis
 	// 修改原因：后续 account、验证码、会话等均依赖全局 db 客户端
