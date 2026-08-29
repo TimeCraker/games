@@ -2,22 +2,28 @@ package utils
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"log"
 	"net/smtp"
+	"os"
 )
 
-// 发送邮件的真实配置（请替换为你自己的真实配置）
+// 发送邮件的固定配置（授权码等敏感值走环境变量，见 .env.example）
 const (
-	SMTPHost     = "smtp.qq.com"       // QQ邮箱服务器为例
-	SMTPPort     = "465"               // 一般是 465 或 587
-	SenderEmail  = "2645068655@qq.com" // 你的发件邮箱
-	SenderSecret = "wrwynnhosmzxeaja"  // 你的 SMTP 授权码
+	SMTPHost    = "smtp.qq.com"       // QQ邮箱服务器为例
+	SMTPPort    = "465"               // 一般是 465 或 587
+	SenderEmail = "2645068655@qq.com" // 你的发件邮箱
 )
 
 // SendVerificationEmail 通过 SMTP 发送具有 UI 排版的 HTML 验证码邮件
 func SendVerificationEmail(toEmail string, code string) error {
-	auth := smtp.PlainAuth("", SenderEmail, SenderSecret, SMTPHost)
+	// 授权码从环境变量读取；邮件属非关键路径，缺配置返回明确错误而非打死进程
+	smtpSecret := os.Getenv("SMTP_SECRET")
+	if smtpSecret == "" {
+		return errors.New("SMTP_SECRET not set")
+	}
+	auth := smtp.PlainAuth("", SenderEmail, smtpSecret, SMTPHost)
 
 	// ===== 邮件内容构建 START =====
 	from := fmt.Sprintf("From: %s\r\n", SenderEmail)
