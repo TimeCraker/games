@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/TimeCraker/game-backend-demo/services/auth/db"
@@ -24,8 +26,27 @@ const (
 	pongWait   = 60 * time.Second
 )
 
+// originAllowed 判定请求 Origin 是否在允许清单内：
+// 本地开发（localhost/127.0.0.1 任意端口）恒放行，其余按 WS_ORIGIN_ALLOWLIST 逐项匹配，
+// env 缺省时只认线上域。清单外的任意网站一律拒绝，防跨站 WebSocket 劫持。
+func originAllowed(origin string) bool {
+	if strings.HasPrefix(origin, "http://localhost:") || strings.HasPrefix(origin, "http://127.0.0.1:") {
+		return true
+	}
+	list := os.Getenv("WS_ORIGIN_ALLOWLIST")
+	if list == "" {
+		list = "https://game.asterforge.top" // 缺省只认线上域
+	}
+	for _, o := range strings.Split(list, ",") {
+		if strings.TrimSpace(o) == origin {
+			return true
+		}
+	}
+	return false
+}
+
 var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool { return true },
+	CheckOrigin: func(r *http.Request) bool { return originAllowed(r.Header.Get("Origin")) },
 }
 
 func HandleWS() gin.HandlerFunc {
