@@ -38,7 +38,7 @@
 
 | # | 位置 | 问题 | 等级 |
 |---|---|---|---|
-| 1 | `services/auth/utils/email.go:15` | **SMTP 授权码硬编码入库**（`SenderSecret = "wrwynnhosmzxeaja"`）。任何有仓库读权限者可冒用发件箱；建议迁移环境变量并立即吊销该授权码 | 高（安全） |
+| 1 | `services/auth/utils/email.go:15` | **SMTP 授权码硬编码入库**（明文授权码，原文见 git 历史，本报告不重复展示）。任何有仓库读权限者可冒用发件箱；已于 2026-08-29 安全修复中出库至 `SMTP_SECRET` 环境变量，**旧授权码仍需在邮箱后台手动吊销** | 高（安全） |
 | 2 | `services/auth/utils/jwt.go:9` | **JWT 密钥硬编码** `"your-secret-key"`（注释自陈应改环境变量）。持源码者可伪造任意用户 token | 高（安全） |
 | 3 | `services/auth/models/user.go:8` | `Password` 字段无 `json:"-"` 标签，`json.Marshal(User)` 会泄漏密码哈希；当前 handler 均手拼 `gin.H` 未触发，属契约层隐患 | 中（安全） |
 | 4 | `services/gateway/handlers/websocket.go:28` | WebSocket `Upgrader.CheckOrigin` 恒 `true`，存在跨站 WebSocket 劫持（CSWSH）风险 | 中（安全） |
