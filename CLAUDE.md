@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [x] 技术栈定案、client-unity 归档、client-godot 冻结、README/CLAUDE.md 重写
 - [x] **backend 迁移 PostgreSQL**（弃 GORM/MySQL → sqlc + golang-migrate，本地开发数据直接弃，module 改名 `github.com/TimeCraker/asternova-backend`）
 - [ ] STYLE.md 从骨架填充为可执行约束（随 M1 切片）
-- 下一里程碑：**M1 渲染垂直切片**（1 角色 + 1 场景 + NPR 四件套 + 三档画质，出验证件给用户过目后才批量生产）
+- 下一里程碑：**M1 渲染垂直切片**（1 个二次元人形角色 + 1 场景 + 二次元渲染四件套 + 三档画质，出验证件给用户过目后才批量生产）
 
 ## 整体架构（big picture）
 
@@ -26,7 +26,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 3. **UI 混合架构（2026-08-30 定案）**：大厅类 UI（登录/主菜单/背包/设置）= **一份 React 应用**，三端宿主加载（Windows=WebView2 系统自带 / Android=系统 WebView / Web=DOM）；战斗 HUD（血条/技能/小地图/飘字）= **Godot**。战斗时 WebView 挂起。JSBridge 双通道协议（Command 下行 / Event 上行）从 web-client 沿用。⚠️ Godot 嵌 WebView 的社区方案成熟度一般，M3 先 spike，跑不通备胎 = 大厅退回 Godot 自研组件库。
 4. **传输层（新规划）**：客户端 Transport 接口可插拔（可靠有序 + 不可靠高频双通道语义），**WS 先行**统一三端，ENet UDP 后置到 M4（Android 启动前）；接口验收标准 = fake transport 回环测试。
 
-**渲染方向**：NPR 卡通渲染（toon ramp + SDF 面部阴影 + 描边 + 后处理）+ 三档画质（低档=核显/骁龙778G 锁 30/45fps；高档=RTX 3060/骁龙 8 Gen2 解锁 120fps）。美术资产生成的一切约束以 `docs/STYLE.md` 为准，**先出验证件给用户过目再批量生产**。
+**渲染方向**：二次元角色渲染，对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风（toon ramp + SDF 面部阴影 + 描边 + 后处理）+ 三档画质（低档=核显/骁龙778G 锁 30/45fps；高档=RTX 3060/骁龙 8 Gen2 解锁 120fps）。美术资产生成的一切约束以 `docs/STYLE.md` 为准，**先出验证件给用户过目再批量生产**。
 
 ## 子项目与命令
 

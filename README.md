@@ -4,7 +4,7 @@
 
 # AsterNova
 
-**服务端权威的实时联机动作游戏 · NPR 卡通渲染 · 一套后端，三端客户端**
+**服务端权威的实时联机动作游戏 · 二次元角色渲染 · 一套后端，三端客户端**
 
 *"Feel the impact, not the latency."*
 
@@ -16,7 +16,7 @@
 
 ## 🚀 重启与路线图（2026-08 定案）
 
-AsterNova 已按新栈重启：客户端收敛到 **Godot 4（Windows exe / Android APK / Web 三端）**，画面升级为 **NPR 卡通渲染**（toon ramp + SDF 面部阴影 + 描边 + 后处理，三档画质分级），UI 走**混合架构**（大厅 = Web / 战斗 HUD = Godot）。
+AsterNova 已按新栈重启：客户端收敛到 **Godot 4（Windows exe / Android APK / Web 三端）**，画面升级为 **二次元角色渲染**（对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风：toon ramp + SDF 面部阴影 + 描边 + 后处理，三档画质分级），UI 走**混合架构**（大厅 = Web / 战斗 HUD = Godot）。
 
 - 📜 [总蓝图 BLUEPRINT.md](asternova/docs/BLUEPRINT.md) — 愿景、里程碑 M0-M4、验收节奏
 - 🏗️ [技术架构 architecture.md](asternova/docs/architecture.md) — 技术栈定案、性能锚点、安全基线
@@ -50,7 +50,7 @@ AsterNova 已按新栈重启：客户端收敛到 **Godot 4（Windows exe / Andr
 |---|---|---|---|
 | 状态 | **M2 启动开发** | 现役（将演化为官网 + 托管壳） | 冻结为参考实现 |
 | 目标平台 | Windows exe · Android APK · Web WASM | 浏览器 | Web WASM |
-| 技术栈 | GDScript · NPR 卡通渲染 · 三档画质 | Next.js 16 · React 19 · Zustand | GDScript · 自研零依赖 Protobuf |
+| 技术栈 | GDScript · 二次元角色渲染 · 三档画质 | Next.js 16 · React 19 · Zustand | GDScript · 自研零依赖 Protobuf |
 | 目录 | `asternova/client-godot-v2`（规划） | [`asternova/web-client`](asternova/web-client) | [`asternova/client-godot`](asternova/client-godot) |
 
 > Unity WebGL 客户端已归档（2026-08-30），历史可经 `git log` 追溯。

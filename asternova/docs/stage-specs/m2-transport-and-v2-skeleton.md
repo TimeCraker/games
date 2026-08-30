@@ -31,7 +31,7 @@
 
 - ENet UDP、Android、Web WASM 导出（M4）
 - WebView 嵌入、React 大厅（M3）
-- NPR 渲染、正式角色资产（M1 线）
+- 二次元渲染、正式角色资产（M1 线）
 - 打击感/HIT-Stop、特效、音频迁移（M3+）
 - web-client 任何改动（现役不动，M3 才演化）
 
