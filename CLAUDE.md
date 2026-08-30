@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [x] 技术栈定案、client-unity 归档、client-godot 冻结、README/CLAUDE.md 重写
 - [x] **backend 迁移 PostgreSQL**（弃 GORM/MySQL → sqlc + golang-migrate，本地开发数据直接弃，module 改名 `github.com/TimeCraker/asternova-backend`）
 - [ ] STYLE.md 从骨架填充为可执行约束（随 M1 切片）
-- 下一里程碑：**M1 渲染垂直切片**（1 个二次元人形角色 + 1 场景 + 二次元渲染四件套 + 三档画质，出验证件给用户过目后才批量生产）
+- 下一里程碑：**M1 渲染垂直切片**（1 个二次元人形角色 + 黄昏樱花商店街场景 + 二次元渲染四件套 + 三档画质，出验证件给用户过目后才批量生产；场景定案见 STYLE.md §4）
 
 ## 整体架构（big picture）
 
