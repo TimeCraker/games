@@ -3,9 +3,9 @@ package account
 import (
 	"net/http"
 
-	"github.com/TimeCraker/game-backend-demo/services/auth/db"
-	"github.com/TimeCraker/game-backend-demo/services/auth/models"
-	"github.com/TimeCraker/game-backend-demo/services/auth/utils"
+	"github.com/TimeCraker/asternova-backend/services/auth/db"
+	"github.com/TimeCraker/asternova-backend/services/auth/db/sqlc"
+	"github.com/TimeCraker/asternova-backend/services/auth/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -38,15 +38,13 @@ func Register(c *gin.Context) {
 	}
 
 	// 2. 检查用户名是否已存在
-	var existingUser models.User
-	// 替换失效的 DB 为 db.SQLDB
-	if err := db.SQLDB.Where("username = ?", req.Username).First(&existingUser).Error; err == nil {
+	if _, err := db.Q.GetUserByUsername(c.Request.Context(), req.Username); err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "该用户名已被占用"})
 		return
 	}
 
 	// 2.5 检查邮箱是否已被注册
-	if err := db.SQLDB.Where("email = ?", req.Email).First(&existingUser).Error; err == nil {
+	if _, err := db.Q.GetUserByEmail(c.Request.Context(), req.Email); err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "该邮箱已被注册"})
 		return
 	}
@@ -59,21 +57,19 @@ func Register(c *gin.Context) {
 	}
 
 	// 4. 构造用户模型并存入数据库
-	user := models.User{
+	row, err := db.Q.CreateUser(c.Request.Context(), sqlc.CreateUserParams{
 		Username: req.Username,
 		Password: string(hashedPassword),
 		Email:    req.Email,
-	}
-
-	// 替换失效的 DB 为 db.SQLDB
-	if err := db.SQLDB.Create(&user).Error; err != nil {
+	})
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "用户保存失败"})
 		return
 	}
 
 	// 创建成功后删除验证码，并直接签发 token（注册即登录）
 	_ = db.RDB.Del(db.Ctx, codeKey).Err()
-	token, err := utils.GenerateToken(int(user.ID))
+	token, err := utils.GenerateToken(int(row.ID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token生成失败"})
 		return
@@ -83,9 +79,9 @@ func Register(c *gin.Context) {
 		"message": "注册并登录成功",
 		"token":   token,
 		"user": gin.H{
-			"id":       user.ID,
-			"username": user.Username,
-			"email":    user.Email,
+			"id":       row.ID,
+			"username": row.Username,
+			"email":    row.Email,
 		},
 	})
 }

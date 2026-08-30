@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/TimeCraker/game-backend-demo/services/auth/db"
-	"github.com/TimeCraker/game-backend-demo/services/auth/utils"
+	"github.com/TimeCraker/asternova-backend/services/auth/db"
+	"github.com/TimeCraker/asternova-backend/services/auth/utils"
 	"github.com/gin-gonic/gin"
 )
 

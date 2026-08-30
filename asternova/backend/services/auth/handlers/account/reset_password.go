@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/TimeCraker/game-backend-demo/services/auth/db"
-	"github.com/TimeCraker/game-backend-demo/services/auth/models"
+	"github.com/TimeCraker/asternova-backend/services/auth/db"
+	"github.com/TimeCraker/asternova-backend/services/auth/db/sqlc"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -62,8 +62,8 @@ func ResetPasswordWithEmail(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-	if err := db.SQLDB.Where("email = ?", req.Email).First(&user).Error; err != nil {
+	user, err := db.Q.GetUserByEmail(c.Request.Context(), req.Email)
+	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "该邮箱未注册"})
 		return
 	}
@@ -74,7 +74,10 @@ func ResetPasswordWithEmail(c *gin.Context) {
 		return
 	}
 
-	if err := db.SQLDB.Model(&user).Update("password", string(hashed)).Error; err != nil {
+	if err := db.Q.UpdateUserPassword(c.Request.Context(), sqlc.UpdateUserPasswordParams{
+		Password: string(hashed),
+		ID:       user.ID,
+	}); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "密码更新失败"})
 		return
 	}

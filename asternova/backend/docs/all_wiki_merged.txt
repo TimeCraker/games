@@ -761,7 +761,7 @@ services/auth/
 ### 1. 初始化模块与安装依赖
 ```bash
 cd services/auth
-go mod init github.com/TimeCraker/game-backend-demo/services/auth
+go mod init github.com/TimeCraker/asternova-backend/services/auth
 go get -u gorm.io/driver/mysql
 go get -u github.com/redis/go-redis/v9
 go get -u github.com/gin-gonic/gin
@@ -815,9 +815,9 @@ package main
 import (
     "log"
     "github.com/gin-gonic/gin"
-    "github.com/TimeCraker/game-backend-demo/services/auth/handlers"
-    "github.com/TimeCraker/game-backend-demo/services/auth/middleware"
-    "github.com/TimeCraker/game-backend-demo/services/auth/models"
+    "github.com/TimeCraker/asternova-backend/services/auth/handlers"
+    "github.com/TimeCraker/asternova-backend/services/auth/middleware"
+    "github.com/TimeCraker/asternova-backend/services/auth/models"
     "github.com/redis/go-redis/v9"
     "gorm.io/driver/mysql"
     "gorm.io/gorm"

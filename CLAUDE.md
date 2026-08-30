@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 当前状态（M0：蓝图定稿与仓库整理）
 
 - [x] 技术栈定案、client-unity 归档、client-godot 冻结、README/CLAUDE.md 重写
-- [ ] **backend 迁移 PostgreSQL**（弃 GORM/MySQL → sqlc + golang-migrate，本地开发数据直接弃，module 改名 `github.com/TimeCraker/asternova-backend`）
+- [x] **backend 迁移 PostgreSQL**（弃 GORM/MySQL → sqlc + golang-migrate，本地开发数据直接弃，module 改名 `github.com/TimeCraker/asternova-backend`）
 - [ ] STYLE.md 从骨架填充为可执行约束（随 M1 切片）
 - 下一里程碑：**M1 渲染垂直切片**（1 角色 + 1 场景 + NPR 四件套 + 三档画质，出验证件给用户过目后才批量生产）
 
@@ -52,12 +52,14 @@ npm run build && npm run start && npm run lint
 
 ```bash
 cd asternova/backend
-docker compose up -d    # MySQL 8 + Redis 7（PG 迁移完成后此节更新）
-go run main.go          # 监听 :8081，首启 GORM AutoMigrate
+docker compose up -d    # PostgreSQL 16 + Redis 7
+go run main.go          # 监听 :8081，启动时自动 migrate up（内嵌 golang-migrate）
 ./scripts/local_{up,down,logs}.ps1
 ```
 
-`main.go` 唯一入口：`db.InitMySQL()` + `db.InitRedis()` → `match.GlobalMatcher`(1Hz) → `GlobalHub.ListenMatchResults()` → Gin 路由（CORS 通配）。服务四块（`services/`）：`auth/`（账户+JWT+验证码限流）· `gateway/handlers/`（Hub 会话 + WS 收发）· `match/matcher.go`（1Hz 撮合）· `battle/`（60Hz 物理状态机）· `proto/`。
+`main.go` 唯一入口：`db.InitPostgres(migrationsFS)`（内嵌迁移自动 up）+ `db.InitRedis()` → `match.GlobalMatcher`(1Hz) → `GlobalHub.ListenMatchResults()` → Gin 路由（CORS 通配）。服务四块（`services/`）：`auth/`（账户+JWT+验证码限流）· `gateway/handlers/`（Hub 会话 + WS 收发）· `match/matcher.go`（1Hz 撮合）· `battle/`（60Hz 物理状态机）· `proto/`。
+
+**存储层**：SQL 只在 `queries/*.sql` 声明 → `sqlc generate` 生成 `services/auth/db/sqlc/`（产物入库，业务禁止手写内联 SQL）；迁移文件 `migrations/`（golang-migrate 格式，up/down 成对，启动时 embed 后自动 up）；玩家存档类数据用 JSONB 列 + payload 内 schema_version（见 `player_positions` 表与 `posPayload`）。
 
 **测试现状**：`test/` 只有手动压测客户端 `test_client.go`，**无 `*_test.go` 单测**，`go test ./...` 跑不出东西；验证靠起服务 + test_client 打流量。M2 起引入确定性回放测试（输入流回放比对快照 hash）。`docs/`、`*_all_code_merged.txt` 是生成脚本的全量快照，别手改。
 

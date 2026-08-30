@@ -2,7 +2,7 @@
 $DocsDir = Join-Path -Path $ProjectRoot -ChildPath "docs"
 $WikiDir = Join-Path -Path $ProjectRoot -ChildPath ".wiki.git"
 # 定义 GitHub Wiki 仓库的完整地址
-$WikiRepoUrl = "https://github.com/TimeCraker/game-backend-demo.wiki.git"
+$WikiRepoUrl = "https://github.com/TimeCraker/asternova-backend.wiki.git"
 
 if (-not (Test-Path -Path $DocsDir)) {
     New-Item -ItemType Directory -Path $DocsDir | Out-Null

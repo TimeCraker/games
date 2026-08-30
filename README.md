@@ -91,7 +91,7 @@ AsterNova 已按新栈重启：客户端收敛到 **Godot 4（Windows exe / Andr
 ## 快速开始
 
 ```bash
-# 后端（:8081，需 Docker 起 MySQL + Redis；PG 迁移进行中，见 BLUEPRINT M0）
+# 后端（:8081，Docker 起 PostgreSQL + Redis，启动时自动 migrate up）
 cd asternova/backend && docker compose up -d && go run main.go
 
 # Web 外壳
@@ -106,7 +106,7 @@ cd asternova/web-client && npm install && cp .env.development .env.local && npm 
 games/asternova/
 ├── docs/            # 蓝图三件套（BLUEPRINT / architecture / STYLE）← 开发决策锚点
 ├── web-client/      # Next.js 16 Game Shell + Arcade（现役，将演化为官网 + 托管壳）
-├── backend/         # Go · Gin · WS · MySQL→PG(迁移中) · Redis
+├── backend/         # Go · Gin · WS · PostgreSQL(sqlc + golang-migrate) · Redis
 ├── client-godot/    # 一代 Godot 客户端（已冻结，见 FROZEN.md）
 ├── client-godot-v2/ # 新客户端（M2 启动）
 └── assets/          # 共享静态资源

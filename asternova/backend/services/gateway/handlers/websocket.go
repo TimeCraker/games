@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,17 +10,26 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TimeCraker/game-backend-demo/services/auth/db"
-	"github.com/TimeCraker/game-backend-demo/services/auth/models"
-	"github.com/TimeCraker/game-backend-demo/services/auth/utils"
+	"github.com/TimeCraker/asternova-backend/services/auth/db"
+	"github.com/TimeCraker/asternova-backend/services/auth/db/sqlc"
+	"github.com/TimeCraker/asternova-backend/services/auth/utils"
 
-	"github.com/TimeCraker/game-backend-demo/services/battle"
-	"github.com/TimeCraker/game-backend-demo/services/match"
-	pb "github.com/TimeCraker/game-backend-demo/services/proto"
+	"github.com/TimeCraker/asternova-backend/services/battle"
+	"github.com/TimeCraker/asternova-backend/services/match"
+	pb "github.com/TimeCraker/asternova-backend/services/proto"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 )
+
+// posPayload 是玩家位置存档的 JSONB 载荷
+// (architecture.md §5 定案:玩家存档类数据用 JSONB + payload 内 schema_version)
+type posPayload struct {
+	SchemaVersion int     `json:"schema_version"`
+	X             float64 `json:"x"`
+	Y             float64 `json:"y"`
+	Z             float64 `json:"z"`
+}
 
 const (
 	pingPeriod = 20 * time.Second
@@ -224,15 +234,18 @@ func sendInitialPlayersData(client *Client) {
 	var pbPlayers []*pb.PlayerPos
 	GlobalHub.Clients.Range(func(key, value interface{}) bool {
 		id := key.(int)
-		var pos models.PlayerPosition
-		if err := db.SQLDB.Where("user_id = ?", id).First(&pos).Error; err == nil {
-			pbPlayers = append(pbPlayers, &pb.PlayerPos{
-				UserId: uint32(pos.UserID),
-				X:      float32(pos.X),
-				Y:      float32(pos.Y),
-				Z:      float32(pos.Z),
-				RotY:   0,
-			})
+		raw, err := db.Q.GetPlayerPosition(context.Background(), int64(id))
+		if err == nil {
+			var pos posPayload
+			if json.Unmarshal(raw, &pos) == nil {
+				pbPlayers = append(pbPlayers, &pb.PlayerPos{
+					UserId: uint32(id),
+					X:      float32(pos.X),
+					Y:      float32(pos.Y),
+					Z:      float32(pos.Z),
+					RotY:   0,
+				})
+			}
 		}
 		return true
 	})
@@ -244,23 +257,22 @@ func sendInitialPlayersData(client *Client) {
 }
 
 func handleChatLogic(userID int, content string) {
-	msgRecord := models.Message{Sender: fmt.Sprintf("玩家 %d", userID), Content: content}
-	db.SQLDB.Create(&msgRecord)
+	_ = db.Q.InsertMessage(context.Background(), sqlc.InsertMessageParams{
+		Sender:  fmt.Sprintf("玩家 %d", userID),
+		Content: content,
+	})
 	resp := &pb.GameMessage{Type: "chat", Content: content, UserId: uint32(userID)}
 	payload, _ := proto.Marshal(resp)
 	GlobalHub.Broadcast(payload)
 }
 
 func handleMoveLogic(userID int, x, y, z float32) {
-	var pos models.PlayerPosition
-	if err := db.SQLDB.Where("user_id = ?", userID).First(&pos).Error; err != nil {
-		pos = models.PlayerPosition{UserID: uint(userID), X: float64(x), Y: float64(y), Z: float64(z)}
-		db.SQLDB.Create(&pos)
-	} else {
-		pos.X = float64(x)
-		pos.Y = float64(y)
-		pos.Z = float64(z)
-		db.SQLDB.Save(&pos)
+	posBytes, err := json.Marshal(posPayload{SchemaVersion: 1, X: float64(x), Y: float64(y), Z: float64(z)})
+	if err == nil {
+		_ = db.Q.UpsertPlayerPosition(context.Background(), sqlc.UpsertPlayerPositionParams{
+			UserID:  int64(userID),
+			Payload: posBytes,
+		})
 	}
 	resp := &pb.GameMessage{Type: "move", UserId: uint32(userID), X: x, Y: y, Z: z}
 	payload, _ := proto.Marshal(resp)
@@ -268,16 +280,19 @@ func handleMoveLogic(userID int, x, y, z float32) {
 }
 
 func broadcastNewPlayerJoin(userID int) {
-	var pos models.PlayerPosition
-	if err := db.SQLDB.Where("user_id = ?", userID).First(&pos).Error; err == nil {
-		resp := &pb.GameMessage{
-			Type: "init_players",
-			Players: []*pb.PlayerPos{
-				{UserId: uint32(userID), X: float32(pos.X), Y: float32(pos.Y), Z: float32(pos.Z), RotY: 0},
-			},
+	raw, err := db.Q.GetPlayerPosition(context.Background(), int64(userID))
+	if err == nil {
+		var pos posPayload
+		if json.Unmarshal(raw, &pos) == nil {
+			resp := &pb.GameMessage{
+				Type: "init_players",
+				Players: []*pb.PlayerPos{
+					{UserId: uint32(userID), X: float32(pos.X), Y: float32(pos.Y), Z: float32(pos.Z), RotY: 0},
+				},
+			}
+			payload, _ := proto.Marshal(resp)
+			GlobalHub.Broadcast(payload)
 		}
-		payload, _ := proto.Marshal(resp)
-		GlobalHub.Broadcast(payload)
 	}
 }
 

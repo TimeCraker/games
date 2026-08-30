@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	pb "github.com/TimeCraker/game-backend-demo/services/proto"
+	pb "github.com/TimeCraker/asternova-backend/services/proto"
 	"google.golang.org/protobuf/proto"
 )
 

@@ -31,7 +31,7 @@
 - [x] client-unity 归档（2026-08-30，`git log` 可追溯）
 - [x] 旧 client-godot 冻结标记（FROZEN.md）
 - [x] 重写根 README.md 与 games/CLAUDE.md
-- [ ] backend 迁移 PostgreSQL + module 改名 `github.com/TimeCraker/asternova-backend`（本地开发数据直接弃，无痛切换）
+- [x] backend 迁移 PostgreSQL + module 改名 `github.com/TimeCraker/asternova-backend`（本地开发数据直接弃，无痛切换）
 - [ ] STYLE.md 从骨架填充为可执行的资产生成约束
 
 ### M1 渲染垂直切片（美术验证件）

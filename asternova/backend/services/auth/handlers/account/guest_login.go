@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TimeCraker/game-backend-demo/services/auth/db"
-	"github.com/TimeCraker/game-backend-demo/services/auth/models"
-	"github.com/TimeCraker/game-backend-demo/services/auth/utils"
+	"github.com/TimeCraker/asternova-backend/services/auth/db"
+	"github.com/TimeCraker/asternova-backend/services/auth/db/sqlc"
+	"github.com/TimeCraker/asternova-backend/services/auth/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -60,22 +60,20 @@ func GuestLogin(c *gin.Context) {
 		return
 	}
 
-	var created models.User
-	createdOK := false
+	var created *sqlc.CreateUserRow
 	for i := 0; i < 6; i++ {
 		username, email := randomGuestIdentity()
-		user := models.User{
+		row, err := db.Q.CreateUser(c.Request.Context(), sqlc.CreateUserParams{
 			Username: username,
 			Email:    email,
 			Password: string(hashedPassword),
-		}
-		if err := db.SQLDB.Create(&user).Error; err == nil {
-			created = user
-			createdOK = true
+		})
+		if err == nil {
+			created = &row
 			break
 		}
 	}
-	if !createdOK {
+	if created == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "游客身份分配失败，请重试"})
 		return
 	}
@@ -86,7 +84,7 @@ func GuestLogin(c *gin.Context) {
 		return
 	}
 
-	_ = db.SetUserOnline(created.ID)
+	_ = db.SetUserOnline(uint(created.ID))
 	c.JSON(http.StatusOK, gin.H{
 		"message": "游客登录成功",
 		"token":   token,

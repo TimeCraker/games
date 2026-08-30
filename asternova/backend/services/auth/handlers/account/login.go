@@ -1,18 +1,18 @@
 package account
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 
-	"github.com/TimeCraker/game-backend-demo/services/auth/db"
-	"github.com/TimeCraker/game-backend-demo/services/auth/models"
-	"github.com/TimeCraker/game-backend-demo/services/auth/utils"
+	"github.com/TimeCraker/asternova-backend/services/auth/db"
+	"github.com/TimeCraker/asternova-backend/services/auth/utils"
 )
 
 type loginRequest struct {
@@ -58,8 +58,8 @@ func Login(c *gin.Context) {
 		}
 	}
 
-	var user models.User
-	if err := db.SQLDB.Where("username = ? OR email = ?", input.Identifier, input.Identifier).First(&user).Error; err != nil {
+	user, err := db.Q.GetUserByIdentifier(c.Request.Context(), input.Identifier)
+	if err != nil {
 		_ = db.RDB.Incr(db.Ctx, failKey).Err()
 		_ = db.RDB.Expire(db.Ctx, failKey, 5*time.Minute).Err()
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "用户名或密码错误"})
@@ -79,7 +79,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	err = db.SetUserOnline(user.ID)
+	err = db.SetUserOnline(uint(user.ID))
 	if err != nil {
 		log.Printf("⚠️ 警告：无法将用户 %d 标记为在线: %v", user.ID, err)
 	} else {
@@ -114,9 +114,9 @@ func LoginWithEmail(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-	if err := db.SQLDB.Where("email = ?", input.Email).First(&user).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+	user, err := db.Q.GetUserByEmail(c.Request.Context(), input.Email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
 			c.JSON(http.StatusAccepted, gin.H{
 				"action":  "require_setup",
 				"message": "邮箱验证成功，请设置用户名和密码",
@@ -134,7 +134,7 @@ func LoginWithEmail(c *gin.Context) {
 		return
 	}
 
-	_ = db.SetUserOnline(user.ID)
+	_ = db.SetUserOnline(uint(user.ID))
 	c.JSON(http.StatusOK, gin.H{
 		"message": "登录成功",
 		"token":   token,

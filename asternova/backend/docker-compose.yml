@@ -1,14 +1,20 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: game-mysql
+  postgres:
+    image: postgres:16-alpine
+    container_name: game-postgres
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: game_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: game_dev
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d game_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     restart: unless-stopped
 
   redis:
@@ -32,6 +38,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  mysql-data:
+  pg-data:
   redis-data:
   qdrant-data: # 记得在底部加上这个挂载卷，防止重启丢失索引
+  mysql-data: # 旧 MySQL 数据卷:服务定义已移除,历史数据保留不主动删除

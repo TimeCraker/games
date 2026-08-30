@@ -3,9 +3,10 @@ package main
 import (
 	"log"
 	"net/url"
+	"os"
 
 	// 更新 proto 导入路径
-	pb "github.com/TimeCraker/game-backend-demo/services/proto"
+	pb "github.com/TimeCraker/asternova-backend/services/proto"
 	"github.com/gorilla/websocket"
 
 	// 引用 Google 官方库进行二进制转换
@@ -13,8 +14,11 @@ import (
 )
 
 func main() {
-	// ❗请在这里替换为你登录成功的 Token
-	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE3NzI2MDg4ODEsImlhdCI6MTc3MjUyMjQ4MX0.fSHCspqvRCNXSHX3CKeeZsa7YVUJHtfyR3tCi73UyR0"
+	// ❗Token 从环境变量 WS_TOKEN 读取(可用 guest-login / login 接口获取)
+	token := os.Getenv("WS_TOKEN")
+	if token == "" {
+		log.Fatalf("❌ 请设置环境变量 WS_TOKEN(通过 /api/guest-login 或 /api/login 获取)")
+	}
 	u := url.URL{Scheme: "ws", Host: "localhost:8081", Path: "/ws", RawQuery: "token=" + token}
 
 	log.Printf("🚀 正在建立长连接: %s", u.String())

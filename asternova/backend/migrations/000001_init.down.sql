@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS player_positions;
+DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS users;

@@ -1,31 +1,37 @@
 package main
 
 import (
+	"embed"
 	"log"
 	"net/http"
 
 	"github.com/joho/godotenv"
 
-	"github.com/TimeCraker/game-backend-demo/services/auth/db"
-	"github.com/TimeCraker/game-backend-demo/services/auth/handlers/account"
-	"github.com/TimeCraker/game-backend-demo/services/auth/handlers/send_email"
-	"github.com/TimeCraker/game-backend-demo/services/auth/middleware"
+	"github.com/TimeCraker/asternova-backend/services/auth/db"
+	"github.com/TimeCraker/asternova-backend/services/auth/handlers/account"
+	"github.com/TimeCraker/asternova-backend/services/auth/handlers/send_email"
+	"github.com/TimeCraker/asternova-backend/services/auth/middleware"
 	// 引入 gateway 服务的 handlers 包，使用 handlers 别名（网关 WebSocket + GlobalHub）
-	handlers "github.com/TimeCraker/game-backend-demo/services/gateway/handlers"
+	handlers "github.com/TimeCraker/asternova-backend/services/gateway/handlers"
 	// 引入 match 匹配引擎服务：在主进程中启动 Tick 撮合循环，与网关解耦
-	"github.com/TimeCraker/game-backend-demo/services/match"
+	"github.com/TimeCraker/asternova-backend/services/match"
 	"github.com/gin-gonic/gin"
 )
+
+// migrationsFS 内嵌 golang-migrate 迁移文件(启动时自动 migrate up)
+//
+//go:embed migrations/*.sql
+var migrationsFS embed.FS
 
 func main() {
 	// 本地开发从 .env 装载环境变量；文件缺失静默跳过（服务器由 systemd EnvironmentFile 提供）
 	_ = godotenv.Load()
 
 	// --- 数据库模块初始化 ---
-	// 修改内容：在 main 最前初始化 MySQL / Redis
+	// 修改内容：在 main 最前初始化 PostgreSQL / Redis(启动时自动执行 migrations)
 	// 修改原因：后续 account、验证码、会话等均依赖全局 db 客户端
 	// 影响范围：进程级，所有 HTTP / WS 处理链路
-	db.InitMySQL()
+	db.InitPostgres(migrationsFS)
 	db.InitRedis()
 
 	// --- 后台守护：匹配引擎 + 网关监听（动态创建物理房间）---
@@ -60,9 +66,9 @@ func main() {
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"status": "up",
-			"mysql":  "connected",
-			"redis":  "connected",
+			"status":   "up",
+			"postgres": "connected",
+			"redis":    "connected",
 		})
 	})
 

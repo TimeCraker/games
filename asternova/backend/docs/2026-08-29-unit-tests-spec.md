@@ -18,7 +18,7 @@
 | 项 | 事实 |
 |---|---|
 | 仓库 | `C:\Users\TimeCraker\Desktop\my_workspace\games`（monorepo），工作树干净（7e2d389）；backend 在 `asternova/backend/` |
-| 工具链 | go 1.25（go.mod），module `github.com/TimeCraker/game-backend-demo` |
+| 工具链 | go 1.25（go.mod），module `github.com/TimeCraker/asternova-backend` |
 | 依赖栈 | gin / gorilla-websocket / gorm+mysql / go-redis / jwt v5 / protobuf |
 | 现有测试 | `_test.go` 0 个；`test/` 目录只有手动压测客户端 test_client.go（不是单测） |
 | CI | 存在 ci.yml（位置 Stage 0 定位：games 根或 backend 下），现有 vet + build 两步 |

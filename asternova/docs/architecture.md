@@ -69,7 +69,7 @@
 
 ## 5. 数据层迁移（M0 任务）
 
-- 现状：MySQL 8 + GORM AutoMigrate（`gorm.io/driver/mysql`），module 名 `github.com/TimeCraker/game-backend-demo`。
+- 现状：MySQL 8 + GORM AutoMigrate（`gorm.io/driver/mysql`），module 名 `github.com/TimeCraker/asternova-backend`。
 - 目标：**PostgreSQL + sqlc + golang-migrate**，JSONB 存玩家存档（payload 带 schema_version），module 改名 `github.com/TimeCraker/asternova-backend`。
 - 本地开发数据直接弃（无生产数据），无痛切换；auth / gateway / match / battle 逻辑不动。
 - Redis 职责不变：在线状态 / 房间 / 匹配队列 / 排行 ZSET。

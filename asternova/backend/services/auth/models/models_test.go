@@ -42,26 +42,6 @@ func TestMessageJSONContract(t *testing.T) {
 	}
 }
 
-func TestPlayerPositionJSONContract(t *testing.T) {
-	p := PlayerPosition{UserID: 7, X: 1.5, Y: 0, Z: -2.5}
-	data, err := json.Marshal(p)
-	if err != nil {
-		t.Fatalf("Marshal 失败: %v", err)
-	}
-
-	var decoded map[string]interface{}
-	if err := json.Unmarshal(data, &decoded); err != nil {
-		t.Fatalf("Unmarshal 失败: %v", err)
-	}
-	for _, key := range []string{"user_id", "x", "y", "z"} {
-		if _, ok := decoded[key]; !ok {
-			t.Errorf("缺少字段 %q", key)
-		}
-	}
-	if decoded["user_id"] != float64(7) {
-		t.Errorf("user_id = %v, want 7", decoded["user_id"])
-	}
-	if decoded["z"] != -2.5 {
-		t.Errorf("z = %v, want -2.5", decoded["z"])
-	}
-}
+// 原 TestPlayerPositionJSONContract 已随 PlayerPosition struct 移除:
+// 该表按 architecture.md §5 迁移为 player_positions(JSONB payload + schema_version),
+// 载荷契约见 services/gateway/handlers/websocket.go 的 posPayload。

@@ -1,7 +1,5 @@
 ﻿-----
 
-[![CI](https://github.com/TimeCraker/game-backend-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/TimeCraker/game-backend-demo/actions/workflows/ci.yml)
-
 # 🌌 AsterNova Game Server
 
    
@@ -48,7 +46,7 @@ flowchart TD
     subgraph Infra_Layer ["💾 Infrastructure Layer (基础设施层)"]
         direction LR
         Redis[("Redis\n- Rate Limiting\n- Online Presence\n- Match Queue")]:::infra
-        MySQL[("MySQL\n- User Data Persistence")]:::infra
+        PostgreSQL[("PostgreSQL\n- User Data Persistence")]:::infra
     end
 
     %% 跨层通信链路
@@ -63,7 +61,7 @@ flowchart TD
     Battle == "State Snapshot\n(Lerp/HP/Status)" === Router
     
     %% 基础设施交互
-    Auth -. "Read / Write" .-> MySQL
+    Auth -. "Read / Write" .-> PostgreSQL
     Auth -. "Token / Limits" .-> Redis
     Match -. "Queue State" .-> Redis
     Hub -. "Presence" .-> Redis
@@ -105,17 +103,17 @@ AsterNova-Server/
 │   └── battle/         # 60Hz 物理状态机、服务端权威运算逻辑
 ├── test/               # 压测工具与网关路由模拟
 ├── main.go             # 进程入口、DB 挂载与后台守护协程初始化
-└── docker-compose.yml  # 本地容器化基建 (MySQL, Redis)
+└── docker-compose.yml  # 本地容器化基建 (PostgreSQL, Redis)
 ```
 
 ## 🛠️ 快速启动
 
-1.  **拉起基建:** 确保已安装 Docker，启动 MySQL 与 Redis 实例。
+1.  **拉起基建:** 确保已安装 Docker，启动 PostgreSQL 16 与 Redis 实例。
     ```bash
     docker-compose up -d
     ```
-2.  **配置环境:** 于 `services/auth/utils/email.go` 填入 SMTP 授权配置。
-3.  **启动网关与服务:** (进程首次拉起时，将自动完成 GORM 的 `AutoMigrate` 数据库表结构映射)
+2.  **配置环境:** 复制 `.env.example` 为 `.env`,填入 `JWT_SECRET`、`SMTP_SECRET` 等密钥（一律环境变量，永不入库）;数据库连接串 `DATABASE_DSN` 缺省连本地 `game_dev` 库。
+3.  **启动网关与服务:** (进程启动时自动执行内嵌的 golang-migrate 迁移,幂等)
     ```bash
     .\scripts\local_up.ps1   # Windows 快捷部署
     # 或使用标准命令

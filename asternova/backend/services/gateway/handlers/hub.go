@@ -8,9 +8,9 @@ import (
 	"github.com/gorilla/websocket"
 
 	// 引入 battle 引擎与 match
-	"github.com/TimeCraker/game-backend-demo/services/battle"
-	"github.com/TimeCraker/game-backend-demo/services/match"
-	pb "github.com/TimeCraker/game-backend-demo/services/proto"
+	"github.com/TimeCraker/asternova-backend/services/battle"
+	"github.com/TimeCraker/asternova-backend/services/match"
+	pb "github.com/TimeCraker/asternova-backend/services/proto"
 	"google.golang.org/protobuf/proto"
 )
 
