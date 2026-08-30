@@ -25,28 +25,33 @@
 
 ## 里程碑
 
-### M0 蓝图定稿与仓库整理 ← **当前阶段**
+### M0 蓝图定稿与仓库整理 ✅ **已关闭（2026-08-30）**
 
 - [x] 技术栈定案（本文 + architecture.md）
 - [x] client-unity 归档（2026-08-30，`git log` 可追溯）
 - [x] 旧 client-godot 冻结标记（FROZEN.md）
 - [x] 重写根 README.md 与 games/CLAUDE.md
-- [x] backend 迁移 PostgreSQL + module 改名 `github.com/TimeCraker/asternova-backend`（本地开发数据直接弃，无痛切换）
-- [ ] STYLE.md 从骨架填充为可执行的资产生成约束
+- [x] backend 迁移 PostgreSQL + module 改名 `github.com/TimeCraker/asternova-backend`（2026-08-30 验收通过：sqlc + golang-migrate + JSONB，8 包单测全绿，动态冒烟复验；验收修复 `ac56510`：Redis 地址与游客邀请码 env 化）
+- [ ] STYLE.md 从骨架填充为可执行的资产生成约束（**归 M1**，随垂直切片迭代）
+- [x] 收尾清理：.cursorrules ×3、.roo/rules、.wiki.git 出清
 
-### M1 渲染垂直切片（美术验证件）
+### M1 渲染垂直切片（美术验证件）← **当前（与 M2 并行）**
 
 一个角色 + 一个场景走完整条资产管线（原画 → 粗模 → Blender 打磨 → NPR 四件套 → 三档画质），出真机截图 / 视频给用户验收。
 
 - 验收标准：**用户对画面水准说"过"**，才允许批量生产；不过则迭代管线或调 STYLE.md。
 - 同时验证：VRoid / 在线 image-to-3D 出的粗模拓扑是否可用；若角色非日式人形，管线的 VRoid 环要替换。
 
-### M2 Transport 抽象 + client-godot-v2 骨架
+### M2 Transport 抽象 + client-godot-v2 骨架 ← **当前（与 M1 并行）**
 
 - [ ] Transport 抽象接口（可靠有序 / 不可靠高频双通道语义）+ **fake transport 回环测试**作为接口验收标准
 - [ ] 两个槽位先用 WebSocket 实现（Web / 原生统一），ENet 实现后置到 M4
 - [ ] client-godot-v2 场景骨架 → 战斗循环 → 逐功能从旧 client-godot 迁入
 - [ ] UI 先最简（dev 直连模式），大厅 UI 后置到 M3
+- [ ] guest-login 补 IP 限流（M0 验收移交：接口保留，env 门禁已加，限流窗口待补）
+- [ ] RTT P95 公网复测（M0 验收移交：PG 迁移后基准重校，目标仍 <80ms，出对比图表）
+
+> 执行细则见 [stage-specs/m2-transport-and-v2-skeleton.md](stage-specs/m2-transport-and-v2-skeleton.md)
 
 ### M3 Windows exe 首验证 + WebView 嵌入 spike
 
