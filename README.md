@@ -4,17 +4,27 @@
 
 # AsterNova
 
-**服务端权威的实时联机动作游戏 · 一套后端，三端客户端**
+**服务端权威的实时联机动作游戏 · NPR 卡通渲染 · 一套后端，三端客户端**
 
 *"Feel the impact, not the latency."*
 
-[在线试玩](https://asterforge.top/game) · [AsterForge](https://asterforge.top)
+[在线试玩（旧版）](https://asterforge.top/game) · [AsterForge](https://asterforge.top)
 
 </div>
 
 ---
 
-## 战场
+## 🚀 重启与路线图（2026-08 定案）
+
+AsterNova 已按新栈重启：客户端收敛到 **Godot 4（Windows exe / Android APK / Web 三端）**，画面升级为 **NPR 卡通渲染**（toon ramp + SDF 面部阴影 + 描边 + 后处理，三档画质分级），UI 走**混合架构**（大厅 = Web / 战斗 HUD = Godot）。
+
+- 📜 [总蓝图 BLUEPRINT.md](asternova/docs/BLUEPRINT.md) — 愿景、里程碑 M0-M4、验收节奏
+- 🏗️ [技术架构 architecture.md](asternova/docs/architecture.md) — 技术栈定案、性能锚点、安全基线
+- 🎨 [美术风格圣经 STYLE.md](asternova/docs/STYLE.md) — AI 资产管线的风格约束源
+
+里程碑：**M0** 蓝图与仓库整理 → **M1** 渲染垂直切片（美术验证件）→ **M2** Transport 抽象 + client-godot-v2 → **M3** Windows exe 首验证 + WebView 嵌入 spike → **M4** Android + ENet + 真机画质验证。
+
+## 战场（一代战绩，新栈保留后端核心）
 
 <div align="center">
 <img src="asternova/assets/hero-arena.png" alt="AsterNova 竞技场" width="720"/>
@@ -31,21 +41,21 @@
 三条铁律撑起整个系统：
 
 1. **后端独占裁决权** — `battle` 服务跑 60Hz Tick 纯数学物理（矢量 / 碰撞盒 / 状态机），客户端上报输入、接收 `State Snapshot`（Protobuf 编码）、Lerp 插值渲染。
-2. **Web 是外壳不是通道** — Next.js 只管登录 / 大厅 / HUD / WASM 容器；战斗由 WASM 引擎**直连**后端 WebSocket，绕过 Web 层的 HTTP 限制。JSBridge 双通道：Command 下行注入 JWT，Event 上行回抛 HP / 能量。
-3. **一套协议三端共享** — Web / Godot / Unity 共用一份 `game.proto`，改协议三端同步。
+2. **UI 混合架构** — 大厅类界面（登录 / 主菜单 / 背包 / 设置）用 **Web（一份 React 应用）**：Windows 走系统 WebView2、Android 走系统 WebView、Web 端就是 DOM 本身；战斗 HUD（血条 / 技能 / 小地图 / 飘字）归 **Godot**。战斗时 WebView 挂起，引擎独占渲染。
+3. **一套协议多端共享** — `game.proto` 以 backend 侧为源；传输层走可插拔 Transport 抽象（WS 先行，原生端 ENet UDP 后置）。
 
-## 三端实现
+## 客户端矩阵
 
-| | Web Shell | Godot 4 → WASM | Unity → WebGL |
+| | Godot 4（v2，主客户端） | Web Shell | 一代 Godot（冻结） |
 |---|---|---|---|
-| 定位 | 游戏运行时容器 | 主战斗客户端 | 备选战斗客户端 |
-| 技术栈 | Next.js 16 · React 19 · Zustand | GDScript · 零第三方插件 | C# · react-unity-webgl |
-| 工程亮点 | Scale-to-Fit 视口矩阵（移动端物理级自适应）；`.wasm/.pck` Brotli 压缩减体积 30-50%；唯一状态源杜绝 DOM/Canvas 脱节 | **自研零依赖 Protobuf**（几百行纯 GDScript 编解码，压榨 WASM 体积）；0.35s 预测锁防表现回扯；动态虚拟摇杆 | 高频输入捕获 · 快照插值 · WebGL JSBridge |
-| 目录 | [`asternova/web-client`](asternova/web-client) | [`asternova/client-godot`](asternova/client-godot) | [`asternova/client-unity`](asternova/client-unity) |
+| 状态 | **M2 启动开发** | 现役（将演化为官网 + 托管壳） | 冻结为参考实现 |
+| 目标平台 | Windows exe · Android APK · Web WASM | 浏览器 | Web WASM |
+| 技术栈 | GDScript · NPR 卡通渲染 · 三档画质 | Next.js 16 · React 19 · Zustand | GDScript · 自研零依赖 Protobuf |
+| 目录 | `asternova/client-godot-v2`（规划） | [`asternova/web-client`](asternova/web-client) | [`asternova/client-godot`](asternova/client-godot) |
 
-## 压测
+> Unity WebGL 客户端已归档（2026-08-30），历史可经 `git log` 追溯。
 
-单机腾讯云实测（完整图表见 [`asternova/assets/`](asternova/assets/)）：
+## 压测（单机腾讯云实测，完整图表见 [`asternova/assets/`](asternova/assets/)）
 
 <div align="center">
 <img src="asternova/assets/stress-tick.png" alt="帧同步压测" width="560"/>
@@ -59,7 +69,7 @@
 
 ## Arcade · 休闲矩阵
 
-大厅 `/lobby` 内置纯前端小游戏，零后端依赖：
+大厅 `/lobby` 内置纯前端小游戏，零后端依赖，随官网保留作引流位：
 
 <table>
 <tr>
@@ -81,7 +91,7 @@
 ## 快速开始
 
 ```bash
-# 后端（:8081，需 Docker 起 MySQL + Redis）
+# 后端（:8081，需 Docker 起 MySQL + Redis；PG 迁移进行中，见 BLUEPRINT M0）
 cd asternova/backend && docker compose up -d && go run main.go
 
 # Web 外壳
@@ -94,11 +104,12 @@ cd asternova/web-client && npm install && cp .env.development .env.local && npm 
 
 ```
 games/asternova/
-├── web-client/     # Next.js 16 Game Shell + Arcade（原 asternova-web-client）
-├── backend/        # Go · Gin · WS · MySQL · Redis（原 game-backend-demo）
-├── client-godot/   # Godot 4 → WASM（原 go-dot-game）
-├── client-unity/   # Unity → WebGL（原 MyGameDemo_Client-unity-）
-└── assets/         # 共享静态资源（原 asternova-assets）
+├── docs/            # 蓝图三件套（BLUEPRINT / architecture / STYLE）← 开发决策锚点
+├── web-client/      # Next.js 16 Game Shell + Arcade（现役，将演化为官网 + 托管壳）
+├── backend/         # Go · Gin · WS · MySQL→PG(迁移中) · Redis
+├── client-godot/    # 一代 Godot 客户端（已冻结，见 FROZEN.md）
+├── client-godot-v2/ # 新客户端（M2 启动）
+└── assets/          # 共享静态资源
 ```
 
 六仓经 `git subtree add`（保留完整历史）合并，原仓库归档只读，历史可在 `git log` 追溯。
