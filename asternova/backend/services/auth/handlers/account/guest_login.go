@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -14,7 +15,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const guestInviteCode = "77"
+// 邀请码经环境变量 GUEST_INVITE_CODE 下发；未配置则游客通道整体禁用，
+// 防止公开仓库硬编码默认码被脚本刷号
 
 type guestLoginRequest struct {
 	InviteCode string `json:"inviteCode" binding:"required"`
@@ -45,7 +47,12 @@ func GuestLogin(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
 		return
 	}
-	if strings.TrimSpace(req.InviteCode) != guestInviteCode {
+	inviteCode := os.Getenv("GUEST_INVITE_CODE")
+	if inviteCode == "" {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "游客通道未开放"})
+		return
+	}
+	if strings.TrimSpace(req.InviteCode) != inviteCode {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "邀请码无效"})
 		return
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -16,11 +17,16 @@ var RDB *redis.Client
 var Ctx = context.Background()
 
 func InitRedis() {
+	// 地址/密码默认对齐 docker-compose(localhost:6379)；线上或本地特殊端口用 REDIS_ADDR / REDIS_PASSWORD 覆盖
+	addr := os.Getenv("REDIS_ADDR")
+	if addr == "" {
+		addr = "localhost:6379"
+	}
 	// 初始化 Redis 客户端
 	RDB = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6380", // 阿里云 Docker Redis 映射到 6380
-		Password: "",               // 默认没设密码
-		DB:       0,                // 使用 0 号数据库
+		Addr:     addr,
+		Password: os.Getenv("REDIS_PASSWORD"),
+		DB:       0, // 使用 0 号数据库
 	})
 
 	// 关键一步：尝试连接并 Ping 一下，确保 Redis 真的活着

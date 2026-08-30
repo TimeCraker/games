@@ -171,6 +171,7 @@ func TestLoginWithEmailRejectsInvalidPayload(t *testing.T) {
 
 func TestGuestLoginInviteCodeGate(t *testing.T) {
 	t.Run("缺少邀请码", func(t *testing.T) {
+		t.Setenv("GUEST_INVITE_CODE", "test-code")
 		w := postJSON(GuestLogin, `{}`)
 		if w.Code != http.StatusBadRequest {
 			t.Errorf("status = %d, want 400", w.Code)
@@ -179,12 +180,24 @@ func TestGuestLoginInviteCodeGate(t *testing.T) {
 
 	t.Run("邀请码错误", func(t *testing.T) {
 		// 错误邀请码在写入数据库之前即被拒绝
+		t.Setenv("GUEST_INVITE_CODE", "test-code")
 		w := postJSON(GuestLogin, `{"inviteCode":"wrong"}`)
 		if w.Code != http.StatusUnauthorized {
 			t.Errorf("status = %d, want 401", w.Code)
 		}
 		if msg := responseError(t, w); msg != "邀请码无效" {
 			t.Errorf("error = %q, want 邀请码无效", msg)
+		}
+	})
+
+	t.Run("未配置邀请码时通道禁用", func(t *testing.T) {
+		// GUEST_INVITE_CODE 未配置 → 整个游客通道 503，防止公开仓库泄露默认码
+		w := postJSON(GuestLogin, `{"inviteCode":"77"}`)
+		if w.Code != http.StatusServiceUnavailable {
+			t.Errorf("status = %d, want 503", w.Code)
+		}
+		if msg := responseError(t, w); msg != "游客通道未开放" {
+			t.Errorf("error = %q, want 游客通道未开放", msg)
 		}
 	})
 }

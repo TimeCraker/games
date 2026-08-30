@@ -61,7 +61,7 @@ go run main.go          # 监听 :8081，启动时自动 migrate up（内嵌 gol
 
 **存储层**：SQL 只在 `queries/*.sql` 声明 → `sqlc generate` 生成 `services/auth/db/sqlc/`（产物入库，业务禁止手写内联 SQL）；迁移文件 `migrations/`（golang-migrate 格式，up/down 成对，启动时 embed 后自动 up）；玩家存档类数据用 JSONB 列 + payload 内 schema_version（见 `player_positions` 表与 `posPayload`）。
 
-**测试现状**：`test/` 只有手动压测客户端 `test_client.go`，**无 `*_test.go` 单测**，`go test ./...` 跑不出东西；验证靠起服务 + test_client 打流量。M2 起引入确定性回放测试（输入流回放比对快照 hash）。`docs/`、`*_all_code_merged.txt` 是生成脚本的全量快照，别手改。
+**测试现状**：`services/` 下已有 9 包单测（auth 全域 + battle + gateway + match + proto，`go test ./...` 全绿）；端到端验证仍需起服务打真实流量（`/health`、`/api/guest-login`（需 env `GUEST_INVITE_CODE`，未配置返回 503 禁用）、双端进房快照流，`test/test_client.go` 为手动压测客户端）。M2 起引入确定性回放测试（输入流回放比对快照 hash）。`docs/`、`*_all_code_merged.txt` 是生成脚本的全量快照，别手改。
 
 ### `asternova/client-godot/` — 一代 Godot 客户端（❄️ 已冻结）
 
@@ -78,8 +78,6 @@ go run main.go          # 监听 :8081，启动时自动 migrate up（内嵌 gol
 - **旧 AI 规则文件已全部清除**（2026-08-30）：三份 `.cursorrules` 与 `.roo/rules/*`（backend_rules.md 为旧 Cursor 规则的原样复制）均已删除，勿再引入。有效规则 = 全局 rules + 本文件 + docs/ 蓝图。
 - **CI 是死文件**：`backend/.github/workflows/ci.yml` 与 `web-client/.github/workflows/ci.yml` 不被 GitHub 执行（Actions 只认仓库根 `.github/workflows/`，本仓库没有）→ **当前无生效 CI**。建真 CI 时放仓库根，两份旧文件可作模板（backend：vet/test/build；web-client：lint non-blocking + build）。
 - **旧版线上运维知识**在 `backend/.agents/skills/game-asternova/SKILL.md`：线上旧版跑在阿里云（game.asterforge.top → :3001 / api.asterforge.top → :8081，CynosDB MySQL + Redis :6380），服务器内存仅 1.6GB、**禁止在服务器编译**（本地交叉编译后上传）——仅维护线上旧版时参考；新栈部署以工作区 asterforge-deploy 体系为准。
-- `backend/.wiki.git` 是嵌套 git 目录（wiki 备份遗产），无现行作用，待 M0 后清理。
-
 ## 工作约定
 
 - **完成一个独立、可验证单元后即提交**；Conventional Commits + 中英对照，如 `feat(arena): 接入 WASM 战斗 / wire WASM combat engine`。
