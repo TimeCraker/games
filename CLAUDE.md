@@ -24,10 +24,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 1. **模拟核心在 Godot 进程内（GDScript，60Hz 固定步长）**：单机 = 本地直调（零网络零序列化）；联机 = **房主进程即权威端**，广播快照；**客户端分层预测**：自己的位置/出手 = 预测 + 软校正，死亡/受击/拾取等关键结果 = 房主独裁（绝不预测），其他实体 = 快照插值。防作弊按好友场景松弛。
 2. **Go backend 一期封存为二期「大型联机」起点资产**：auth/匹配/PG/Redis 不部署不开发；其 60Hz tick/快照/插值设计作为 GDScript 模拟核心的参考实现。二期切中心服务器时客户端协议层经 Transport 抽象无缝兼容（协议源 `backend/services/proto/game.proto` 演进）。
 3. **UI 分界（React 主方案）**：菜单/设置类 = React（Windows 走 WebView2 嵌入；手柄用空间导航库；Steamworks 由 Godot 进程持有 + 桥接）；游戏内 HUD = Godot。M3 spike 三验收（手柄/成就弹出/嵌入稳定性），不过才退 Godot 菜单。
-4. **传输与连接**：Transport 接口可插拔（WS 先行 / SteamTransport / ENet UDP 后置 M4）。**连接六级降级**：局域网 → IPv6 直连 → UPnP → UDP 打洞 → **Steam 数据中继（Valve 免费，Steam 版主路径）** → 自建中继（后置，二期商业位）。快照热路径 = 手工二进制 + 增量 + 量化（≈20KB/s/人设计目标）；fake transport 回环含延迟/丢包混沌变体。
+4. **传输与连接**：Transport 接口可插拔（WS 先行 / SteamTransport / ENet UDP 后置 M4）。**连接两套栈**：Steam 版 = Steam Networking 一条道（GodotSteam，内部自含「直连优先→自动升 Valve 免费中继」，不叠手搓逻辑）；非 Steam 版（Web demo/官网版）= 手搓降级（局域网 → IPv6 → UPnP → 打洞 → 自建中继后置）。快照热路径 = 手工二进制 + 增量 + 量化（≈20KB/s/人设计目标）；fake transport 回环含延迟/丢包混沌变体。
 5. **渲染**：渲染器**全端 Compatibility**；渲染帧率与模拟解耦——模拟 60Hz 固定，渲染 120 起步上不封顶（低档锁 60 / 中档 120 / 高档解锁至显示器上限，Web demo 锁 60 豁免）。
 
-**渲染方向**：二次元角色渲染，对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风（toon ramp + SDF 面部阴影 + 描边 + 后处理）+ 三档画质（低档=核显/骁龙778G 锁 30/45fps；高档=RTX 3060/骁龙 8 Gen2 解锁 120fps）。美术资产生成的一切约束以 `docs/STYLE.md` 为准，**先出验证件给用户过目再批量生产**。
+**渲染方向**：二次元角色渲染，对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风（toon ramp + SDF 面部阴影 + 描边 inverted hull + 后处理）+ 三档画质（低档=核显/骁龙778G **锁 60**；中档=120；高档=RTX 3060/骁龙 8 Gen2 **解锁至显示器上限**；Web demo 锁 60 豁免），渲染器**全端 Compatibility**。美术资产生成的一切约束以 `docs/STYLE.md` 为准，**先出验证件给用户过目再批量生产**。
 
 ## 子项目与命令
 

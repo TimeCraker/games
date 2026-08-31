@@ -15,6 +15,12 @@
 
 ## 范围内
 
+### A0. 链路先行（第一周目标，2026-08-31 外部审查定案）
+
+先打通 **VRM → Godot 正确显示**：MToon 材质映射到自研 toon shader、blendshape 表情命名约定、SDF 面部阴影贴图按最终拓扑重烘焙、Blender bpy → KTX2 工具环节——**链路通了才进画质调教**（M1 真风险在转换链，不在 shader）。
+
+同周核查：**CompositorEffect 在 Compatibility 渲染器不可用**（GL 路线无 compute）→ 描边锁定 inverted hull、后处理收缩到内置 Environment（glow / tonemap / LUT），实际可用清单记入 STYLE.md §3。
+
 ### A. 资产管线全链路（首次实跑）
 
 1. **角色**：
@@ -29,7 +35,7 @@
 
 载体：新建 `asternova/render-lab/`（独立 Godot 4.5.x 工程，纯渲染试验场，无网络代码；M2 的 client-godot-v2 后续直接搬用其渲染配置）。
 
-1. 二次元渲染四件套：toon ramp 色阶 shader · SDF 面部阴影 · 描边（inverted hull 或后处理）· 后处理（bloom / 色彩分级 LUT / 暗角）
+1. 二次元渲染四件套：toon ramp 色阶 shader · SDF 面部阴影 · 描边（**inverted hull 定案**——Compatibility 无 compute，后处理描边不可用）· 后处理（**内置 Environment：bloom / 色彩分级 / 暗角**——自定义 compute pass 在 Compatibility 不可用）
 2. 樱花花瓣粒子系统（GPU 粒子，风场摆动）
 3. 黄昏光照：主光角度/色温调教 + 灯笼/招牌 emissive 点光
 4. 三档画质（低/中/高）运行时可切：低=关后处理+降分辨率，高=全特效——**每档出独立截图**
