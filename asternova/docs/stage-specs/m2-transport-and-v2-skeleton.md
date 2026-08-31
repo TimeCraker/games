@@ -1,6 +1,8 @@
 # Stage Spec：M2 Transport 抽象 + client-godot-v2 骨架
 
-> 状态：**待用户放行**（2026-08-30 起草）。上游锚点：[BLUEPRINT.md M2](../BLUEPRINT.md) · [architecture.md §2/§4](../architecture.md)。放行后按此执行，验收按本文标准。
+> 状态：**⚠️ 已过时（2026-08-31）**——本文系「中心服务器」旧方向所写；当天项目翻转为**单机优先 + 房主联机**（见 BLUEPRINT「产品形态」），M2 重定义为「战斗骨架 + Transport 抽象」。本文留作参考，随 M2 开工按新方向重写。Transport 抽象 + fake 回环测试的验收思想在新版沿用。
+>
+> 原状态：待用户放行（2026-08-30 起草）。上游锚点：[BLUEPRINT.md M2](../BLUEPRINT.md) · [architecture.md §2/§4](../architecture.md)。
 
 ## 目标（一句话）
 

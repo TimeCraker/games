@@ -15,16 +15,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [x] 技术栈定案、client-unity 归档、client-godot 冻结、README/CLAUDE.md 重写
 - [x] **backend 迁移 PostgreSQL**（弃 GORM/MySQL → sqlc + golang-migrate，本地开发数据直接弃，module 改名 `github.com/TimeCraker/asternova-backend`）
 - [ ] STYLE.md 从骨架填充为可执行约束（随 M1 切片）
-- 下一里程碑：**M1 渲染垂直切片**（1 个二次元人形角色 + 黄昏樱花商店街场景 + 二次元渲染四件套 + 三档画质，出验证件给用户过目后才批量生产；场景定案见 STYLE.md §4）
+- 下一里程碑：**M1 渲染垂直切片**（Aster + 黄昏樱花商店街 + 二次元渲染四件套 + 三档画质，出验证件给用户过目后才批量生产；场景定案见 STYLE.md §4）与 **M2 战斗骨架**（client-godot-v2 + GDScript 模拟核心单机可玩）并行
 
 ## 整体架构（big picture）
 
-**AsterNova 是服务端权威（server-authoritative）的实时多人动作游戏**，三端目标：Windows exe / Android APK / Web。两条不变式 + 两条新定案：
+**AsterNova 是单机为主的 3D 动作游戏（Roguelite，绝区零/鸣潮式自由视角）+ 房主联机（2~6 人 PvE 合作）**（2026-08-31 重大定案）。发布优先级：Steam(Windows) 首发，Web=试玩 demo 引流，Android 后置。核心定案：
 
-1. **后端独占物理裁决权（不变式）**：`battle` 服务 60Hz Tick 吃输入、推状态机、广播 Protobuf 快照；`match` 1Hz 撮合；`auth` HTTP/REST 签 JWT。客户端只做输入采集 + 快照 Lerp 插值，**不修改本地绝对坐标**。
-2. **一套协议多端共享（不变式）**：`backend/services/proto/game.proto` 为协议源（Unity 已归档，现在是 backend ↔ godot 两端；`client-godot/proto/game.proto` 已逐 message 校验一致）。改协议两端同步 + 重新生成 `game.pb.go`。
-3. **UI 混合架构（2026-08-30 定案）**：大厅类 UI（登录/主菜单/背包/设置）= **一份 React 应用**，三端宿主加载（Windows=WebView2 系统自带 / Android=系统 WebView / Web=DOM）；战斗 HUD（血条/技能/小地图/飘字）= **Godot**。战斗时 WebView 挂起。JSBridge 双通道协议（Command 下行 / Event 上行）从 web-client 沿用。⚠️ Godot 嵌 WebView 的社区方案成熟度一般，M3 先 spike，跑不通备胎 = 大厅退回 Godot 自研组件库。
-4. **传输层（新规划）**：客户端 Transport 接口可插拔（可靠有序 + 不可靠高频双通道语义），**WS 先行**统一三端，ENet UDP 后置到 M4（Android 启动前）；接口验收标准 = fake transport 回环测试。
+1. **模拟核心在 Godot 进程内（GDScript，60Hz 固定步长）**：单机 = 本地直调（零网络零序列化）；联机 = **房主进程即权威端**，广播快照；非房主客户端只做输入采集 + Lerp 插值渲染，不修改本地绝对坐标。防作弊按好友场景松弛。
+2. **Go backend 一期封存为二期「大型联机」起点资产**：auth/匹配/PG/Redis 不部署不开发；其 60Hz tick/快照/插值设计作为 GDScript 模拟核心的参考实现。二期切中心服务器时客户端协议层经 Transport 抽象无缝兼容（协议源 `backend/services/proto/game.proto` 演进）。
+3. **UI 分界（维持）**：菜单/设置类 = React（宿主形态 M3 spike：WebView 嵌入 vs 启动器分离，倾向后者）；游戏内 HUD = Godot。JSBridge Command/Event 双通道思想沿用。
+4. **传输层**：Transport 接口可插拔（可靠有序 + 不可靠高频双通道），WS 先行，ENet UDP 后置 M4（模拟核心在 Godot 内置 ENet，无 Go CGo 包袱）；**NAT 穿透基建（聚会码/打洞/中继）是联机真课题**（M3）；接口验收标准 = fake transport 回环测试。
+5. **渲染帧率与模拟解耦**：模拟 60Hz 固定，渲染 120 起步上不封顶（低档锁 60 / 中档 120 / 高档解锁至显示器上限）。
 
 **渲染方向**：二次元角色渲染，对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风（toon ramp + SDF 面部阴影 + 描边 + 后处理）+ 三档画质（低档=核显/骁龙778G 锁 30/45fps；高档=RTX 3060/骁龙 8 Gen2 解锁 120fps）。美术资产生成的一切约束以 `docs/STYLE.md` 为准，**先出验证件给用户过目再批量生产**。
 
@@ -48,7 +49,7 @@ npm run build && npm run start && npm run lint
 
 **角色演化**：随 v2 推进退化为官网 + Web 托管壳；Arcade 保留作引流位；React HUD 在 v2 HUD 就绪后逐步退役。
 
-### `asternova/backend/` — Go 游戏服务端（Gin + gorilla/websocket + Redis + JWT + Protobuf）
+### `asternova/backend/` — Go 游戏服务端（❄️ 一期封存：二期「大型联机」起点资产，不部署不开发）
 
 ```bash
 cd asternova/backend

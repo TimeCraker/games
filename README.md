@@ -4,7 +4,7 @@
 
 # AsterNova
 
-**服务端权威的实时联机动作游戏 · 二次元角色渲染 · 一套后端，三端客户端**
+**单机为主的 3D 动作 Roguelite（绝区零/鸣潮式自由视角）· 房主联机 2~6 人 PvE · 二次元角色渲染 · Steam 首发**
 
 *"Feel the impact, not the latency."*
 
@@ -16,13 +16,13 @@
 
 ## 🚀 重启与路线图（2026-08 定案）
 
-AsterNova 已按新栈重启：客户端收敛到 **Godot 4（Windows exe / Android APK / Web 三端）**，画面升级为 **二次元角色渲染**（对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风：toon ramp + SDF 面部阴影 + 描边 + 后处理，三档画质分级），UI 走**混合架构**（大厅 = Web / 战斗 HUD = Godot）。
+AsterNova 已按新栈重启（2026-08-31 重大定案：**单机优先 + 房主联机**）：客户端 **Godot 4.5（Steam/Windows 首发，Web 试玩 demo，Android 后置）**，**GDScript 模拟核心跑在游戏进程内**（单机本地直调，联机时房主进程即权威端，2~6 人 PvE 合作，零服务器成本），画面为 **二次元角色渲染**（对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风：toon ramp + SDF 面部阴影 + 描边 + 后处理，三档画质，渲染帧率 120 起步上不封顶），UI 走**分界架构**（菜单/设置 = React / 游戏 HUD = Godot）。原 Go 中心服务端基建封存为**二期大型联机游戏**起点资产。
 
 - 📜 [总蓝图 BLUEPRINT.md](asternova/docs/BLUEPRINT.md) — 愿景、里程碑 M0-M4、验收节奏
 - 🏗️ [技术架构 architecture.md](asternova/docs/architecture.md) — 技术栈定案、性能锚点、安全基线
 - 🎨 [美术风格圣经 STYLE.md](asternova/docs/STYLE.md) — AI 资产管线的风格约束源
 
-里程碑：**M0** 蓝图与仓库整理 → **M1** 渲染垂直切片（美术验证件）→ **M2** Transport 抽象 + client-godot-v2 → **M3** Windows exe 首验证 + WebView 嵌入 spike → **M4** Android + ENet + 真机画质验证。
+里程碑：**M0** 蓝图与仓库整理 ✅ → **M1** 渲染垂直切片（美术验证件）→ **M2** 战斗骨架 + Transport 抽象（GDScript 模拟核心单机可玩）→ **M3** 联机闭环（NAT 穿透）+ Windows exe 首发 → **M4** ENet 升级 + 三档画质真机验证。
 
 ## 战场（一代战绩，新栈保留后端核心）
 
@@ -40,7 +40,7 @@ AsterNova 已按新栈重启：客户端收敛到 **Godot 4（Windows exe / Andr
 
 三条铁律撑起整个系统：
 
-1. **后端独占裁决权** — `battle` 服务跑 60Hz Tick 纯数学物理（矢量 / 碰撞盒 / 状态机），客户端上报输入、接收 `State Snapshot`（Protobuf 编码）、Lerp 插值渲染。
+1. **房主权威**（2026-08-31 翻转，原服务端权威思想延续）— GDScript 模拟核心跑 60Hz 固定步长（矢量 / 碰撞盒 / 状态机）：单机 = 进程内直调；联机 = 房主进程为权威端广播快照，其余客户端上报输入、Lerp 插值渲染。二期可经 Transport 抽象整体切回中心服务器。
 2. **UI 混合架构** — 大厅类界面（登录 / 主菜单 / 背包 / 设置）用 **Web（一份 React 应用）**：Windows 走系统 WebView2、Android 走系统 WebView、Web 端就是 DOM 本身；战斗 HUD（血条 / 技能 / 小地图 / 飘字）归 **Godot**。战斗时 WebView 挂起，引擎独占渲染。
 3. **一套协议多端共享** — `game.proto` 以 backend 侧为源；传输层走可插拔 Transport 抽象（WS 先行，原生端 ENet UDP 后置）。
 
@@ -91,14 +91,14 @@ AsterNova 已按新栈重启：客户端收敛到 **Godot 4（Windows exe / Andr
 ## 快速开始
 
 ```bash
-# 后端（:8081，Docker 起 PostgreSQL + Redis，启动时自动 migrate up）
-cd asternova/backend && docker compose up -d && go run main.go
-
-# Web 外壳
+# Web 外壳（官网 / Arcade，现役）
 cd asternova/web-client && npm install && cp .env.development .env.local && npm run dev
+
+# Go 后端（❄️ 一期封存：二期大型联机起点资产，本节仅二期重启时参考）
+# cd asternova/backend && docker compose up -d && go run main.go   # :8081，PG+Redis，自动 migrate up
 ```
 
-> 服务端权威设计：客户端独立运行无法移动，必须先起后端；Godot 端需在 `GameManager.gd` 配 Mock Token。
+> 一期为单机优先架构：游戏本体（client-godot-v2，M2 启动）单机直接可玩，无需起后端。
 
 ## Monorepo
 

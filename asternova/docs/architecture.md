@@ -9,23 +9,25 @@
 | 游戏引擎 | **Godot 4.5.x stable**（钉死当前 stable 线，大版本升级需专项评估） | C++ 引擎内核 + 脚本胶水 |
 | 客户端语言 | **GDScript** | 全平台导出 exe/APK/Web、包体最轻；热点兜底 shader(GPU) → GDExtension（仅原生端） |
 | 渲染风格 | **二次元角色渲染** | 对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风；toon ramp 色阶 + SDF 面部阴影 + 描边 + 后处理调教（见 STYLE.md） |
-| 画质分级 | **三档（低/中/高），运行时可切** | 低：关后处理 + 降分辨率 + 帧率上限 30/45；高：全特效 + 高贴图分辨率 + 帧率解锁 |
-| 后端语言 | **Go**（现有 backend 保留核心） | 60Hz tick、池化控分配；battle tick 热核独立模块，性能红线触发才可 Rust 重写 |
-| 协议 | **Protobuf 消息层 + 双通道语义** | 可靠有序（登录/事件/结算）+ 不可靠高频（60Hz 快照流）；客户端 Transport 接口可插拔 |
-| 传输选路 | **先全 WebSocket，原生端 ENet UDP 后置（M4）** | Web=WS（浏览器唯一选项）；原生首版也走 WS，Android 启动前再落 ENet（Go 侧库选型届时评估，CGo 交叉编译成本为主要风险项）；WebTransport / KCP 为后置升级位 |
-| 数据库 | **PostgreSQL + Redis**（迁移自 MySQL，见 §5） | PG JSONB 玩家存档（schema 版本化）；Redis 在线状态/房间/匹配/排行；Go 侧 sqlc + golang-migrate |
-| UI 架构 | **大厅=Web(React)，HUD=Godot**（见 §3） | 三端宿主：Win=WebView2 / Android=系统 WebView / Web=DOM |
+| 画质分级 | **三档（低/中/高），运行时可切** | 低：关后处理 + 降分辨率 + 锁 60；中：120；高：全特效 + 高贴图 + 解锁至显示器上限（**渲染帧率 120 起步上不封顶**，与模拟 60Hz tick 解耦） |
+| 模拟核心 | **GDScript 战斗核心（Godot 进程内）** | 60Hz 固定步长；单机本地直调 / 联机房主权威广播双出口；性能红线触发再 GDExtension(C++) 补热点 |
+| 后端语言 | **Go（一期封存，二期资产）** | 原 60Hz tick / 快照 / 插值设计作为参考实现；二期大型联机重启中心服务器架构时启用 |
+| 协议 | **Protobuf 消息层 + 双通道语义（联机时）** | 单机进程内直调不走协议；可靠有序（聚会/事件）+ 不可靠高频（60Hz 快照流）；Transport 接口可插拔 |
+| 传输选路 | **房主联机 WS 先行，原生端 ENet UDP 后置（M4）** | NAT 穿透基建（聚会码/打洞/兜底中继）是联机体验关键课题（M3）；WebTransport / KCP 为后置升级位 |
+| 数据库 | **一期无数据库（本地存档文件）**；PG+Redis 封存二期 | PG 迁移已验收（见 §5），二期重启时直接用 |
+| UI 架构 | **菜单/设置=React，游戏内 UI=Godot**（见 §3） | 宿主形态 M3 spike：WebView 嵌入 vs 启动器分离 |
 | 资产管线 | ChatGPT 原画 → VRoid/在线 image-to-3D → Blender bpy → GLB+KTX2 | 零授权成本；本机不跑推理；M1 垂直切片先行验证（见 BLUEPRINT） |
 | agent 接入 | godot-mcp + blender-mcp + GD Agentic Skills | agent 深度参与开发、建模、调试 |
-| 部署 | Docker Compose + GitHub Actions | 沿用工作区约定（asterforge-deploy）；演进：单机 → 分离 → 多地域房间服 |
-| 测试 | Go 确定性回放 + Godot headless (GdUnit4) + CI | 输入流回放比对快照 hash；注意 tick 内浮点/map 遍历顺序的非确定性来源 |
+| 部署 | **一期免服务端部署**（单机+房主联机） | 玩家自主机即服务器；二期中心服务复用 asterforge-deploy 体系 |
+| 测试 | Godot headless (GdUnit4) + 模拟核心确定性测试 | 固定步长 + 种子输入回放比对状态 hash；CI 建真时放仓库根 |
 
-## 2. 服务端权威闭环（不变式，沿用现有架构）
+## 2. 房主权威闭环（2026-08-31 定案；原服务端权威架构翻转为单机优先）
 
-- **后端独占物理裁决权**：`battle` 60Hz Tick 吃输入、推状态机、广播 Protobuf 快照；`match` 1Hz 撮合；`auth` HTTP/REST 签 JWT。
-- **客户端只做两件事**：采集输入 + 渲染快照（Lerp 插值），不修改本地绝对坐标。
-- **唯一状态源**：Web 外壳侧 UI 状态走 Zustand store，避免 DOM 与 Canvas 脱节。
-- 三端共享 `game.proto`（backend ↔ client-godot 逐 message 校验一致）；改协议三端同步 + 重新生成。
+- **模拟核心在 Godot 进程内（GDScript）**：60Hz 固定步长吃输入、推状态机。**单机 = 渲染层本地直调**（零网络参与、零序列化）；**联机 = 房主进程为权威端**，向 2~6 名玩家广播快照。
+- **非房主客户端只做两件事**：采集输入 + 渲染快照（Lerp 插值），不修改本地绝对坐标。
+- **权威思想不变、宿主翻转**：原 Go 后端 60Hz tick / 快照 / 插值设计作为参考实现沿用其思想；二期切回中心服务器时客户端协议层经 Transport 抽象无缝兼容。
+- **防作弊按好友场景松弛**：无天梯无经济系统；输入合法性校验（范围/频率）保留在房主端。
+- 协议：联机用 Protobuf 消息层（一期 = client-godot-v2 ↔ 房主；二期 = ↔ 中心服务器，同一份 `game.proto` 演进）。
 
 ## 3. UI 混合架构（2026-08-30 定案）
 
@@ -33,62 +35,67 @@
 
 | 类型 | 内容 | 实现 | 理由 |
 |---|---|---|---|
-| 大厅类（Meta） | 登录、主菜单、背包、商城、设置 | **一份 React 应用** | 列表/表单/图文，Web 生态效率与审美上限最高，复用既有前端技能与设计资产 |
+| 菜单/设置类（Meta） | 主菜单、设置、存档选择（背包/图鉴后置） | **一份 React 应用** | 列表/表单/图文，Web 生态效率与审美上限最高，复用既有前端技能与设计资产 |
 | 战斗 HUD | 血条、技能冷却、小地图、伤害飘字 | **Godot** | 跟随 3D 世界坐标、60Hz 同步刷新；DOM 每秒改 60 次必卡 |
 
-### 三端宿主
+### 三端宿主（2026-08-31 优先级复核）
 
-| 端 | 大厅宿主 | 战斗 | 备注 |
-|---|---|---|---|
-| Windows exe | WebView2（系统自带，包体≈0 增量）嵌 Godot 窗口 | Godot | 战斗时 WebView 隐藏挂起 |
-| Android APK | 系统 WebView 嵌 Godot 界面 | Godot | Android 是架构决定性约束：无法"网页壳+弹游戏窗口"双进程，只能引擎为主内嵌 |
-| Web | DOM 本身（现 web-client 模式） | Godot WASM | 现有 JSBridge 模式直接沿用 |
+| 端 | 定位 | 备注 |
+|---|---|---|
+| Windows exe | **首发（Steam）** | 菜单宿主形态 M3 spike 定（WebView 嵌入 vs 启动器分离） |
+| Web | 试玩 demo 引流位 | DOM 托管 WASM，现有 web-client 模式沿用 |
+| Android | 后置 | 触屏动作操作适配成本届时评估，一期收尾 or 归二期 |
 
-### 桥接与风险
+### 桥接与形态（2026-08-31 复核）
 
-- **JSBridge**：现有 web-client 的 Command（下行：注入 JWT/配置）/ Event（上行：HP/能量等）双通道协议思想直接复用到原生端。
-- **最大风险**：Godot ↔ WebView 嵌入的社区方案（godot_wry 等 GDExtension）成熟度一般 → **M3 先 spike**（Windows + Android 各跑通"引擎内嵌 WebView 加载 React 页 + 双向传话"最小 demo）；跑不通的备胎：大厅 UI 退回 Godot，用 Web 思维（锚点/容器 ≈ flexbox、theme ≈ design token）先自研组件库 + 主题再铺页面。
-- **web-client 角色演化**：退化为**官网 / 落地页 + Web 端 WASM 托管壳**；现有 Arcade 小游戏保留作引流位；React HUD 层在 v2 HUD 就绪后逐步退役。
-- **内存代价**：WebView 常驻约 50-100MB，大厅阶段无所谓性能；战斗阶段挂起，不占渲染。
+- **UI 分界维持**：菜单 / 设置类 = React（表单效率高，复用前端能力）；游戏内 HUD = Godot（跟随 3D 世界高频刷新，Web 技术做 HUD 是性能灾难）。
+- **宿主形态两案，M3 spike 取成熟者**：① WebView 嵌入（godot_wry 等社区方案，成熟度一般）；② **启动器分离**（启动先出 React 菜单层，点开始进入 Godot——完全避开嵌入风险，倾向此案）。①② 都不成再退 Godot 原生菜单。
+- **JSBridge**：Command（下行）/ Event（上行）双通道协议思想按所选形态复用。
+- **web-client 角色演化**：官网 / 落地页 + Web 试玩 demo 引流位；Arcade 小游戏保留；React HUD 层在 v2 HUD 就绪后退役。
 
 ## 4. 传输层规划
 
 ```
-客户端                          后端
+加入者                          房主（Godot 进程，联机时为权威端）
 ┌─────────────────────┐        ┌──────────────────┐
-│ Transport 接口(可插拔)│        │ gateway          │
-│  ├ ReliableChannel   │◄─WS──►│  会话/登录/结算    │
+│ Transport 接口(可插拔)│        │ GDScript 模拟核心 │
+│  ├ ReliableChannel   │◄─WS──►│  会话/聚会码      │
 │  └ UnreliableChannel │◄─WS──►│  60Hz 快照广播    │
-│   (M4: 原生端换 ENet UDP)      │                  │
-└─────────────────────┘        └──────────────────┘
+│   (M4: 原生端换 ENet UDP)      │ (二期可整体切换到 │
+└─────────────────────┘        │  中心服务器)      │
+                               └──────────────────┘
 ```
 
-- **接口先行**（M2）：`Transport` 抽象 + **fake transport 回环测试**为接口验收标准，保证两种实现语义一致。
-- **WS 先行**：首版 Web / Windows 统一 WebSocket（桌面宽带下延迟足够）。
-- **ENet 后置**（M4）：弱网收益主要在移动端；Go 侧 ENet 服务端库是边缘生态（CGo 绑定为主），届时先做选型 spike 再定，不提前引入 CGo 包袱。
+- **接口先行**（M2）：`Transport` 抽象 + **fake transport 回环测试**为接口验收标准，保证两种实现语义一致。接口不关心对端是谁——一期接房主，二期接中心服务器。
+- **WS 先行**：房主联机首版 WebSocket（好友宽带场景延迟足够）。
+- **NAT 穿透是联机真课题**（M3）：房主在家用路由器后，朋友直连需要聚会码 + 打洞（UDP 成功率高于 TCP）+ 兜底中继——联机体验瓶颈在此，而非 WS/ENet 选型本身。
+- **ENet 后置**（M4）：原生端弱网优化；模拟核心在 Godot 内，直接用 Godot 内置 ENet，无 Go 侧 CGo 包袱。
 
-## 5. 数据层迁移（M0 任务）
+## 5. 数据层（PG 迁移已于 M0 验收；一期封存，二期启用）
 
 - 现状：MySQL 8 + GORM AutoMigrate（`gorm.io/driver/mysql`），module 名 `github.com/TimeCraker/asternova-backend`。
 - 目标：**PostgreSQL + sqlc + golang-migrate**，JSONB 存玩家存档（payload 带 schema_version），module 改名 `github.com/TimeCraker/asternova-backend`。
 - 本地开发数据直接弃（无生产数据），无痛切换；auth / gateway / match / battle 逻辑不动。
 - Redis 职责不变：在线状态 / 房间 / 匹配队列 / 排行 ZSET。
+- **2026-08-31 注**：一期单机用本地存档文件（Godot 侧），上述基建封存为二期「大型联机」资产，重启时直接启用。
 
 ## 6. 性能锚点（验收量化基准）
 
 | 档位 | 基准设备 | 目标 |
 |---|---|---|
-| 低档 | 核显笔记本（Intel Iris Xe / AMD 680M）· 骁龙 778G | 低画质档，帧率上限 30/45，稳定不卡顿 |
-| 高档 | RTX 3060 及以上 · 骁龙 8 Gen2 及以上 | 高画质 + 高贴图分辨率，帧率解锁 120 |
-| 后端 | 单机（沿用腾讯云） | 60Hz tick 预算 16.6ms 内、无积压；RTT 公网 P95 <80ms（旧压测已达标，迁移后复测） |
+| 低档 | 核显笔记本（Intel Iris Xe / AMD 680M）· 骁龙 778G | 低画质档，**锁 60**，稳定不卡顿 |
+| 中档 | 中端独显（GTX 1660 / RTX 3050 档） | 中画质，**120** |
+| 高档 | RTX 3060 及以上 · 骁龙 8 Gen2 及以上 | 高画质 + 高贴图分辨率，**解锁（120 起步，上限=显示器）** |
+| 房主端 | 玩家电脑（开房时） | 模拟 60Hz tick 预算 16.6ms 内（含 2~6 人快照广播）、无积压；联机 RTT P95 <80ms（真机复测） |
 
 > 「低配流畅」不量化就会在验收时扯皮——上表是性能相关改动的验收锚点，写进 CI 基准。
+> 渲染帧率与模拟 tick 解耦：模拟固定 60Hz，渲染 120+ 每帧对快照插值——高帧率丝滑来自渲染层，不需要模拟翻倍。
 
 ## 7. 安全基线
 
 - HTTPS-only；JWT 密钥 / SMTP 授权码等一律环境变量，永不入库（已有改造保持）。
 - WS Origin 白名单校验（已有）；token 轮换机制随 M2 Transport 重构一并落地。
-- 服务端权威本身是防作弊根基（客户端零裁决权）；输入合法性在 gateway 校验（范围/频率）。
+- 房主权威（一期）/ 服务端权威（二期）本身是防作弊根基；一期按好友场景合理松弛（无天梯无经济），输入合法性校验（范围/频率）在房主端执行。
 - 验证码限流（已有）；PG 迁移后账号体系沿用 auth 模块（bcrypt + 邮箱验证）。
 
 ## 8. 红线
