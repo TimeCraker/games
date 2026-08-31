@@ -21,11 +21,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **AsterNova 是单机为主的 3D 动作游戏（Roguelite，绝区零/鸣潮式自由视角）+ 房主联机（2~6 人 PvE 合作）**（2026-08-31 重大定案）。发布优先级：Steam(Windows) 首发，Web=试玩 demo 引流，Android 后置。核心定案：
 
-1. **模拟核心在 Godot 进程内（GDScript，60Hz 固定步长）**：单机 = 本地直调（零网络零序列化）；联机 = **房主进程即权威端**，广播快照；非房主客户端只做输入采集 + Lerp 插值渲染，不修改本地绝对坐标。防作弊按好友场景松弛。
+1. **模拟核心在 Godot 进程内（GDScript，60Hz 固定步长）**：单机 = 本地直调（零网络零序列化）；联机 = **房主进程即权威端**，广播快照；**客户端分层预测**：自己的位置/出手 = 预测 + 软校正，死亡/受击/拾取等关键结果 = 房主独裁（绝不预测），其他实体 = 快照插值。防作弊按好友场景松弛。
 2. **Go backend 一期封存为二期「大型联机」起点资产**：auth/匹配/PG/Redis 不部署不开发；其 60Hz tick/快照/插值设计作为 GDScript 模拟核心的参考实现。二期切中心服务器时客户端协议层经 Transport 抽象无缝兼容（协议源 `backend/services/proto/game.proto` 演进）。
-3. **UI 分界（维持）**：菜单/设置类 = React（宿主形态 M3 spike：WebView 嵌入 vs 启动器分离，倾向后者）；游戏内 HUD = Godot。JSBridge Command/Event 双通道思想沿用。
-4. **传输层**：Transport 接口可插拔（可靠有序 + 不可靠高频双通道），WS 先行，ENet UDP 后置 M4（模拟核心在 Godot 内置 ENet，无 Go CGo 包袱）；**NAT 穿透基建（聚会码/打洞/中继）是联机真课题**（M3）；接口验收标准 = fake transport 回环测试。
-5. **渲染帧率与模拟解耦**：模拟 60Hz 固定，渲染 120 起步上不封顶（低档锁 60 / 中档 120 / 高档解锁至显示器上限）。
+3. **UI 分界（React 主方案）**：菜单/设置类 = React（Windows 走 WebView2 嵌入；手柄用空间导航库；Steamworks 由 Godot 进程持有 + 桥接）；游戏内 HUD = Godot。M3 spike 三验收（手柄/成就弹出/嵌入稳定性），不过才退 Godot 菜单。
+4. **传输与连接**：Transport 接口可插拔（WS 先行 / SteamTransport / ENet UDP 后置 M4）。**连接六级降级**：局域网 → IPv6 直连 → UPnP → UDP 打洞 → **Steam 数据中继（Valve 免费，Steam 版主路径）** → 自建中继（后置，二期商业位）。快照热路径 = 手工二进制 + 增量 + 量化（≈20KB/s/人设计目标）；fake transport 回环含延迟/丢包混沌变体。
+5. **渲染**：渲染器**全端 Compatibility**；渲染帧率与模拟解耦——模拟 60Hz 固定，渲染 120 起步上不封顶（低档锁 60 / 中档 120 / 高档解锁至显示器上限，Web demo 锁 60 豁免）。
 
 **渲染方向**：二次元角色渲染，对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风（toon ramp + SDF 面部阴影 + 描边 + 后处理）+ 三档画质（低档=核显/骁龙778G 锁 30/45fps；高档=RTX 3060/骁龙 8 Gen2 解锁 120fps）。美术资产生成的一切约束以 `docs/STYLE.md` 为准，**先出验证件给用户过目再批量生产**。
 
