@@ -68,11 +68,15 @@ go run main.go          # 监听 :8081，启动时自动 migrate up（内嵌 gol
 
 见其 `FROZEN.md`。不再开发；`ProtoParser.gd`（自研零依赖 Protobuf）、`BattleWsClient.gd`（60Hz WS + 粘包/重连）、`GameManager.gd`（JSBridge 总线）在 client-godot-v2（M2 启动）需要时参考复用。导出预设路径硬编码为 web-client 的 `public/godot/`。
 
-### `asternova/docs/` — 蓝图三件套（决策锚点，改需用户拍板）
+### `asternova/docs/` — 蓝图与设计文档（决策锚点，改需用户拍板）
 
-`BLUEPRINT.md`（愿景+里程碑+验收节奏）· `architecture.md`（技术定案+性能锚点+安全基线+红线）· `STYLE.md`（美术风格圣经）。
+`BLUEPRINT.md`（愿景+里程碑+核心玩法定案+验收节奏）· `architecture.md`（技术定案+性能锚点+安全基线+红线）· `STYLE.md`（美术风格圣经）· `CONTENT_BACKLOG.md`（创意内容池备忘）。角色纯文字档案在 `docs/characters/`。
 
-### `asternova/assets/` — 共享静态资源（logo / 架构图 / 压测图表）
+### `asternova/art/` — 美术与原画源资产库（角色三视图 / 模型 / 场景贴图）
+
+`characters/aster/`（Aster 官方定稿三视图 `turnaround-final.png` 等）· `environments/`（场景原画与贴图）· `ui/`（游戏界面资产）。
+
+### `asternova/assets/` — 共享静态资源（logo / 架构图 / 压测图表 / README 引用）
 
 ## 遗留与陷阱（subtree 带来的旧文件，勿误读）
 

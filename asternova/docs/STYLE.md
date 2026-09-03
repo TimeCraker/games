@@ -24,7 +24,7 @@
   - 发：**珍珠白长发过腰**（pearl white 底 + 冷蓝高光 + 极淡紫渐变，非死白），中分软刘海向两侧分开，两侧 face-framing 长发束垂至胸前，后方多层，发尾柔软微内弯；生图固定关键词 "pearl white / silver-white hair, cool blue highlights"
   - 瞳：**水蓝（aqua-blue）**，虹膜内渐变 + 大而净的高光
   - 肤：白皙偏冷，腮部微粉（渲染期腮红，不进贴图基底）
-  - **服装定稿（2026-08-30，两版生图对比后用户拍板白色常服系；JK 水手服方案否决，否决稿存 `render-lab/art-source/aster-turnaround-jk-rejected.png`）**：
+  - **服装定稿（2026-08-30，两版生图对比后用户拍板白色常服系；JK 水手服方案否决，否决稿存 `asternova/art/characters/aster/turnaround-jk-rejected.png`）**：
     · 上衣：象牙白轻薄上衣（soft blouse），小圆领/柔方领 + 极细淡蓝饰边，微收腰自然垂坠；长袖微泡泡袖（肩至腕渐收，袖口细褶 + 小浅蓝蝴蝶结/珍珠扣）
     · 胸前：领口下方小号双层窄丝带（淡蓝+白）+ 极小珍珠胸针（视觉中心），不用制服式领结
     · 腰：象牙白宽腰封（珍珠小扣 + 金色小搭扣 + 细蓝丝带）；**背后中等软蝴蝶结自然下垂（背影识别度核心）**
@@ -34,7 +34,7 @@
     · 发饰：小型珍珠花卉发饰（克制，不抢发型）
     · **配色比例：白/象牙 70% · 淡蓝 15% · 淡紫 8% · 银 5% · 香槟金 2%**
     · 材质层次：棉/雪纺/丝带/刺绣/珠光皮革以 subtle 色差与软褶区分，防止纯白糊块
-  - 视觉基准：[characters/aster/turnaround-final.png](characters/aster/turnaround-final.png)（官方设定稿 v2，后续建模/立绘/渲染一致性以它为准）；完整档案与生图提示词存档见 [characters/aster/aster.md](characters/aster/aster.md)
+  - 视觉基准：[../art/characters/aster/turnaround-final.png](../art/characters/aster/turnaround-final.png)（官方设定稿 v2，后续建模/立绘/渲染一致性以它为准）；完整档案与生图提示词存档见 [characters/aster/aster.md](characters/aster/aster.md)
   - 气质：清冷克制 · 微暖反差；背景占位：黄昏商店街的转学生
 - 头身比基准：6.5 头身（五作少女标准档；2-3=Q版 / 5-5.5=萌系偏大头 / 7.5+=写实，本项目禁用萌大头档）
 - 面部风格（决定 SDF 面部阴影贴图制作标准）：（M1 切片时随三视图定稿）
