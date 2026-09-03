@@ -1,8 +1,8 @@
 # Aster 角色专档
 
 > 状态：**服装定稿 v2 · 白色常服系**（2026-08-30）
-> 视觉基准：[`turnaround-final.png`](../../../art/characters/aster/turnaround-final.png)（存放于 `asternova/art/characters/aster/`）
-> 本档是 Aster 的**完整生产档案**（人设 + 三张设定稿 + 生图提示词全存档）；全局风格约束见 [STYLE.md](../../STYLE.md) §2。后续任何 Aster 新图（立绘/表情/演出）以 §3.2 提示词为基底派生。
+> 视觉基准：[`turnaround-final.png`](turnaround-final.png)（本目录）
+> 本档是 Aster 的**完整生产档案**（人设 + 三张设定稿 + 生图提示词全存档）；全局风格约束见 [STYLE.md](../../../docs/STYLE.md) §2。后续任何 Aster 新图（立绘/表情/演出）以 §3.2 提示词为基底派生。
 
 ## 1. 人设卡
 
@@ -23,9 +23,9 @@
 | 日期 | 版本 | 产物 | 结论 |
 |---|---|---|---|
 | 2026-08-30 | v0 讨论 | — | JK 水手服方向（藏青+淡樱粉领结）文字定稿 |
-| 2026-08-30 | 生图第一版 | [`turnaround-jk-rejected.png`](../../../art/characters/aster/turnaround-jk-rejected.png) | ❌ 否决：藏青在黄昏樱花场景偏重，白裙气质更贴 |
-| 2026-08-30 | 生图第二版 roll 1 | [`turnaround-v1.png`](../../../art/characters/aster/turnaround-v1.png) | 备选 |
-| 2026-08-30 | 生图第二版 roll 2 | [`turnaround-final.png`](../../../art/characters/aster/turnaround-final.png) | ✅ **现行基准**（三视角一致性/裙层细节/发丝分组更优，视觉评估 9.5/10；A-pose 手臂微垂约 30°，利于建模绑定） |
+| 2026-08-30 | 生图第一版 | [`turnaround-jk-rejected.png`](turnaround-jk-rejected.png) | ❌ 否决：藏青在黄昏樱花场景偏重，白裙气质更贴 |
+| 2026-08-30 | 生图第二版 roll 1 | [`turnaround-v1.png`](turnaround-v1.png) | 备选 |
+| 2026-08-30 | 生图第二版 roll 2 | [`turnaround-final.png`](turnaround-final.png) | ✅ **现行基准**（三视角一致性/裙层细节/发丝分组更优，视觉评估 9.5/10；A-pose 手臂微垂约 30°，利于建模绑定） |
 
 ## 3. 生图提示词存档
 

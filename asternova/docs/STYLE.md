@@ -34,7 +34,7 @@
     · 发饰：小型珍珠花卉发饰（克制，不抢发型）
     · **配色比例：白/象牙 70% · 淡蓝 15% · 淡紫 8% · 银 5% · 香槟金 2%**
     · 材质层次：棉/雪纺/丝带/刺绣/珠光皮革以 subtle 色差与软褶区分，防止纯白糊块
-  - 视觉基准：[../art/characters/aster/turnaround-final.png](../art/characters/aster/turnaround-final.png)（官方设定稿 v2，后续建模/立绘/渲染一致性以它为准）；完整档案与生图提示词存档见 [characters/aster/aster.md](characters/aster/aster.md)
+  - 视觉基准：[../art/characters/aster/turnaround-final.png](../art/characters/aster/turnaround-final.png)（官方设定稿 v2，后续建模/立绘/渲染一致性以它为准）；完整档案与生图提示词存档见 [../art/characters/aster/aster.md](../art/characters/aster/aster.md)
   - 气质：清冷克制 · 微暖反差；背景占位：黄昏商店街的转学生
 - 头身比基准：6.5 头身（五作少女标准档；2-3=Q版 / 5-5.5=萌系偏大头 / 7.5+=写实，本项目禁用萌大头档）
 - 面部风格（决定 SDF 面部阴影贴图制作标准）：（M1 切片时随三视图定稿）

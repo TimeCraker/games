@@ -70,11 +70,11 @@ go run main.go          # 监听 :8081，启动时自动 migrate up（内嵌 gol
 
 ### `asternova/docs/` — 蓝图与设计文档（决策锚点，改需用户拍板）
 
-`BLUEPRINT.md`（愿景+里程碑+核心玩法定案+验收节奏）· `architecture.md`（技术定案+性能锚点+安全基线+红线）· `STYLE.md`（美术风格圣经）· `CONTENT_BACKLOG.md`（创意内容池备忘）。角色纯文字档案在 `docs/characters/`。
+`BLUEPRINT.md`（愿景+里程碑+核心玩法定案+验收节奏）· `architecture.md`（技术定案+性能锚点+安全基线+红线）· `STYLE.md`（美术风格圣经）· `CONTENT_BACKLOG.md`（创意内容池备忘）。
 
-### `asternova/art/` — 美术与原画源资产库（角色三视图 / 模型 / 场景贴图）
+### `asternova/art/` — 美术与角色资产库（自包含角色包 / 模型 / 场景贴图）
 
-`characters/aster/`（Aster 官方定稿三视图 `turnaround-final.png` 等）· `environments/`（场景原画与贴图）· `ui/`（游戏界面资产）。
+`characters/aster/`（Aster 完整自包含包：设定档 `aster.md` + 官方定稿三视图 `turnaround-final.png`）· `environments/`（场景原画与贴图）· `ui/`（游戏界面资产）。
 
 ### `asternova/assets/` — 共享静态资源（logo / 架构图 / 压测图表 / README 引用）
 
