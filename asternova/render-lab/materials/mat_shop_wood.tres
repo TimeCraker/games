@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://mat_wood_01"]
+
+[ext_resource type="Texture2D" path="res://textures/shop_wood.png" id="1_tex"]
+
+[resource]
+albedo_texture = ExtResource("1_tex")
+roughness = 0.8
+uv1_scale = Vector3(2, 4, 1)

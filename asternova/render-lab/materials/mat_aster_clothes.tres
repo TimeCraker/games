@@ -1,0 +1,30 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://mat_aster_clothes_01"]
+
+[ext_resource type="Shader" path="res://shaders/outline.gdshader" id="1_outline"]
+[ext_resource type="Shader" path="res://shaders/toon_character.gdshader" id="2_toon"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_outline"]
+render_priority = 1
+shader = ExtResource("1_outline")
+shader_parameter/outline_color = Color(0.24, 0.28, 0.40, 1)
+shader_parameter/outline_thickness = 0.0035
+shader_parameter/distance_scaling = true
+
+[resource]
+render_priority = 0
+next_pass = SubResource("ShaderMaterial_outline")
+shader = ExtResource("2_toon")
+shader_parameter/albedo_color = Color(0.97, 0.96, 0.95, 1)
+shader_parameter/shadow_tint = Color(0.80, 0.84, 0.95, 1)
+shader_parameter/deep_shadow_tint = Color(0.66, 0.70, 0.86, 1)
+shader_parameter/ramp_threshold = 0.15
+shader_parameter/ramp_smoothness = 0.02
+shader_parameter/deep_shadow_threshold = -0.35
+shader_parameter/enable_rim = true
+shader_parameter/rim_color = Color(0.90, 0.94, 1, 1)
+shader_parameter/rim_threshold = 0.65
+shader_parameter/rim_smoothness = 0.04
+shader_parameter/rim_spread = 2.0
+shader_parameter/specular_color = Color(1, 1, 1, 1)
+shader_parameter/specular_size = 0.06
+shader_parameter/specular_smoothness = 0.01

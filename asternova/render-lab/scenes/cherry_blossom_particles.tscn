@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://cb_particles_01"]
+
+[ext_resource type="Material" uid="uid://mat_petal_01" path="res://materials/mat_cherry_petal.tres" id="1_mat"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_petal"]
+emission_shape = 3
+emission_box_extents = Vector3(10, 5, 10)
+direction = Vector3(0.5, -1, 0.3)
+spread = 25.0
+initial_velocity_min = 0.8
+initial_velocity_max = 2.2
+angular_velocity_min = -60.0
+angular_velocity_max = 60.0
+linear_accel_min = -0.2
+linear_accel_max = 0.2
+scale_min = 0.6
+scale_max = 1.3
+turbulence_enabled = true
+turbulence_noise_strength = 0.4
+
+[sub_resource type="QuadMesh" id="QuadMesh_petal"]
+material = ExtResource("1_mat")
+size = Vector2(0.22, 0.22)
+
+[node name="CherryBlossomParticles" type="GPUParticles3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+amount = 160
+lifetime = 7.0
+preprocess = 4.0
+randomness = 0.6
+visibility_aabb = AABB(-15, -10, -15, 30, 20, 30)
+process_material = SubResource("ParticleProcessMaterial_petal")
+draw_pass_1 = SubResource("QuadMesh_petal")

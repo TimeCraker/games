@@ -32,7 +32,7 @@
 - [x] 旧 client-godot 冻结标记（FROZEN.md）
 - [x] 重写根 README.md 与 games/CLAUDE.md
 - [x] backend 迁移 PostgreSQL + module 改名 `github.com/TimeCraker/asternova-backend`（2026-08-30 验收通过：sqlc + golang-migrate + JSONB，8 包单测全绿，动态冒烟复验；验收修复 `ac56510`：Redis 地址与游客邀请码 env 化）
-- [ ] STYLE.md 从骨架填充为可执行的资产生成约束（**归 M1**，随垂直切片迭代）
+- [x] STYLE.md 从骨架填充为可执行的资产生成约束（**归 M1**，2026-09-04 随渲染切片回填定稿 ✅）
 - [x] 收尾清理：.cursorrules ×3、.roo/rules、.wiki.git 出清
 
 ### M1 渲染垂直切片（美术验证件）← **当前（与 M2 并行）**

@@ -1,0 +1,34 @@
+[gd_resource type="Environment" load_steps=3 format=3 uid="uid://rl_sunset_env_01"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sunset"]
+sky_top_color = Color(0.20, 0.24, 0.42, 1)
+sky_horizon_color = Color(0.98, 0.62, 0.46, 1)
+sky_curve = 0.14
+ground_bottom_color = Color(0.14, 0.14, 0.20, 1)
+ground_horizon_color = Color(0.98, 0.62, 0.46, 1)
+ground_curve = 0.18
+sun_angle_max = 25.0
+sun_curve = 0.2
+
+[sub_resource type="Sky" id="Sky_sunset"]
+sky_material = SubResource("ProceduralSkyMaterial_sunset")
+
+[resource]
+background_mode = 2
+sky = SubResource("Sky_sunset")
+ambient_light_source = 2
+ambient_light_color = Color(0.52, 0.48, 0.62, 1)
+ambient_light_energy = 0.28
+reflected_light_source = 2
+tonemap_mode = 3
+tonemap_exposure = 1.0
+glow_enabled = true
+glow_intensity = 0.35
+glow_strength = 0.85
+glow_bloom = 0.02
+glow_blend_mode = 2
+glow_hdr_threshold = 1.35
+adjustment_enabled = true
+adjustment_brightness = 1.0
+adjustment_contrast = 1.05
+adjustment_saturation = 1.08
