@@ -1,0 +1,231 @@
+[gd_scene load_steps=6 format=3 uid="uid://bhud_v2_core"]
+
+[ext_resource type="Script" path="res://scripts/ui/hud_controller.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.06, 0.08, 0.12, 0.82)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.5, 0.85, 0.55)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_charge_bg"]
+bg_color = Color(0.1, 0.12, 0.16, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_charge_fill"]
+bg_color = Color(1, 0.85, 0.2, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.2, 0.8, 0.45, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="HUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_hud")
+
+[node name="TopStatus" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 32.0
+offset_right = 380.0
+offset_bottom = 150.0
+theme_override_constants/separation = 6
+
+[node name="SystemTitle" type="Label" parent="TopStatus"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "AST Nova M2 · 核心战斗系统"
+
+[node name="StateLabel" type="Label" parent="TopStatus"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "动作状态: 待命 (IDLE)"
+
+[node name="SpeedLabel" type="Label" parent="TopStatus"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.95, 0.8, 1)
+theme_override_font_sizes/font_size = 15
+text = "速度: 0.0 m/s (水平)"
+
+[node name="ViewModeLabel" type="Label" parent="TopStatus"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 0.9)
+theme_override_font_sizes/font_size = 14
+text = "当前视角: 第三人称越肩跟随 (按 V 键切换)"
+
+[node name="CenterNotice" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = 60.0
+offset_right = 300.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="FeedbackNotice" type="Label" parent="CenterNotice"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
+text = "⚡ 完美弹刀 (PERFECT PARRY)!"
+horizontal_alignment = 1
+
+[node name="ChargeBar" type="ProgressBar" parent="CenterNotice"]
+custom_minimum_size = Vector2(300, 16)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_charge_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_charge_fill")
+max_value = 3.0
+step = 1.0
+show_percentage = false
+
+[node name="Crosshair" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Dot" type="ColorRect" parent="Crosshair"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.9)
+
+[node name="BottomStatus" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -80.0
+offset_right = 350.0
+offset_bottom = -32.0
+grow_vertical = 0
+theme_override_constants/separation = 4
+
+[node name="HPLabel" type="Label" parent="BottomStatus"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Aster 护盾同步率"
+
+[node name="HPBar" type="ProgressBar" parent="BottomStatus"]
+custom_minimum_size = Vector2(300, 16)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+value = 100.0
+
+[node name="KeyGuidePanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -370.0
+offset_top = 32.0
+offset_right = -32.0
+offset_bottom = 310.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="KeyGuidePanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="GuideTitle" type="Label" parent="KeyGuidePanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.75, 0.2, 1)
+theme_override_font_sizes/font_size = 16
+text = "【操作按键看板 · PC 端游标准】"
+
+[node name="Key1" type="Label" parent="KeyGuidePanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "WASD : 平面移动 (走 4.5m/s)"
+
+[node name="Key2" type="Label" parent="KeyGuidePanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Shift : 疾跑(7m/s) / 极限闪避(0.16s无敌帧)"
+
+[node name="Key3" type="Label" parent="KeyGuidePanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "C / Ctrl : 贴地滑铲 (25°下坡重力无限滑)"
+
+[node name="Key4" type="Label" parent="KeyGuidePanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Space : 一段跳(3.2m)/二段跳(5.7m)/连续3次蹬墙跳"
+
+[node name="Key5" type="Label" parent="KeyGuidePanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "LMB : 4段流光刀术(智能软吸附) / 空中星坠下砸"
+
+[node name="Key6" type="Label" parent="KeyGuidePanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "RMB : 长按3阶居合蓄力 / 0.15s完美弹刀"
+
+[node name="Key7" type="Label" parent="KeyGuidePanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "V 键 : 越肩(TPP) / 第一人称(FPP)平滑切换"
+
+[node name="Key8" type="Label" parent="KeyGuidePanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Esc : 释放/锁定鼠标光标"

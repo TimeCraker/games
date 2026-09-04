@@ -1,0 +1,245 @@
+[gd_scene load_steps=22 format=3 uid="uid://bplayground_v2_core"]
+
+[ext_resource type="PackedScene" uid="uid://bplayer_v2_core" path="res://scenes/entities/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://bdummy_v2_core" path="res://scenes/entities/training_dummy.tscn" id="2_dummy"]
+[ext_resource type="PackedScene" uid="uid://bdrone_v2_core" path="res://scenes/entities/training_drone.tscn" id="3_drone"]
+[ext_resource type="PackedScene" uid="uid://bhud_v2_core" path="res://scenes/ui/hud.tscn" id="4_hud"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_env"]
+sky_top_color = Color(0.35, 0.65, 0.95, 1)
+sky_horizon_color = Color(0.75, 0.85, 0.95, 1)
+ground_bottom_color = Color(0.15, 0.18, 0.22, 1)
+ground_horizon_color = Color(0.75, 0.85, 0.95, 1)
+
+[sub_resource type="Sky" id="Sky_env"]
+sky_material = SubResource("ProceduralSkyMaterial_env")
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 2
+sky = SubResource("Sky_env")
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.6
+glow_bloom = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.18, 0.22, 0.26, 1)
+roughness = 0.75
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(120, 2, 120)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+material = SubResource("StandardMaterial3D_ground")
+size = Vector3(120, 2, 120)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_slope"]
+albedo_color = Color(0.25, 0.35, 0.45, 1)
+roughness = 0.5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_slope"]
+size = Vector3(8, 1, 45)
+
+[sub_resource type="BoxMesh" id="BoxMesh_slope"]
+material = SubResource("StandardMaterial3D_slope")
+size = Vector3(8, 1, 45)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_box1"]
+albedo_color = Color(0.8, 0.45, 0.2, 1)
+roughness = 0.6
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_box1"]
+size = Vector3(8, 3.2, 6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_box1"]
+material = SubResource("StandardMaterial3D_box1")
+size = Vector3(8, 3.2, 6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_box2"]
+albedo_color = Color(0.2, 0.55, 0.8, 1)
+roughness = 0.6
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_box2"]
+size = Vector3(8, 5.7, 6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_box2"]
+material = SubResource("StandardMaterial3D_box2")
+size = Vector3(8, 5.7, 6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall"]
+albedo_color = Color(0.28, 0.3, 0.36, 1)
+roughness = 0.4
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall"]
+size = Vector3(1, 14, 22)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall"]
+material = SubResource("StandardMaterial3D_wall")
+size = Vector3(1, 14, 22)
+
+[node name="CombatPlayground" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 15, 30, 20)
+shadow_enabled = true
+directional_shadow_max_distance = 100.0
+
+[node name="HUDLayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="HUDLayer" instance=ExtResource("4_hud")]
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 4)
+
+[node name="MainFloor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MainFloor"]
+shape = SubResource("BoxShape3D_ground")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MainFloor"]
+mesh = SubResource("BoxMesh_ground")
+
+[node name="Zone1_Combat" type="Node3D" parent="."]
+
+[node name="TrainingDummy" parent="Zone1_Combat" instance=ExtResource("2_dummy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+
+[node name="DummyLabel" type="Label3D" parent="Zone1_Combat"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, -5)
+billboard = 1
+no_depth_test = true
+text = "【1. 索敌与连招测试区】
+鼠标左键 4段流光刀术 | 准星软吸附微滑步
+普攻后半段(0.15s)随时切断滑铲/闪避"
+font_size = 24
+outline_size = 6
+
+[node name="Zone2_Slope" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0, 0)
+
+[node name="SlopeRamp" type="StaticBody3D" parent="Zone2_Slope"]
+transform = Transform3D(1, 0, 0, 0, 0.906308, 0.422618, 0, -0.422618, 0.906308, 0, 7.8, -5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone2_Slope/SlopeRamp"]
+shape = SubResource("BoxShape3D_slope")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zone2_Slope/SlopeRamp"]
+mesh = SubResource("BoxMesh_slope")
+
+[node name="TopPlatform" type="StaticBody3D" parent="Zone2_Slope"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16.8, -27)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone2_Slope/TopPlatform"]
+shape = SubResource("BoxShape3D_box1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zone2_Slope/TopPlatform"]
+mesh = SubResource("BoxMesh_box1")
+
+[node name="SlopeLabel" type="Label3D" parent="Zone2_Slope"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 14)
+billboard = 1
+no_depth_test = true
+text = "【2. 25° 下坡极速滑道】
+长按疾跑 + C 贴地滑铲
+地面法线重力分量持续加速，实现无限长滑！
+滑铲中按跳跃键触发「滑铲跳」，保留 90% 前冲动量"
+font_size = 24
+outline_size = 6
+
+[node name="Zone3_Vertical" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 0, 0)
+
+[node name="Container_3m2" type="StaticBody3D" parent="Zone3_Vertical"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -3)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone3_Vertical/Container_3m2"]
+shape = SubResource("BoxShape3D_box1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zone3_Vertical/Container_3m2"]
+mesh = SubResource("BoxMesh_box1")
+
+[node name="Container_5m7" type="StaticBody3D" parent="Zone3_Vertical"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.85, -11)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone3_Vertical/Container_5m7"]
+shape = SubResource("BoxShape3D_box2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zone3_Vertical/Container_5m7"]
+mesh = SubResource("BoxMesh_box2")
+
+[node name="VerticalLabel" type="Label3D" parent="Zone3_Vertical"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 4)
+billboard = 1
+no_depth_test = true
+text = "【3. 阶梯机能平台 · 一段跳/二段跳/星坠】
+一段跳 3.2m 轻松翻越前箱
+二段跳(空中再按Space踏出星环)登顶 5.7m 后箱
+从顶台下跃按下蹲或攻击：24m/s 垂直下砸冲击波！"
+font_size = 24
+outline_size = 6
+
+[node name="Zone4_WallBounce" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 22)
+
+[node name="LeftWall" type="StaticBody3D" parent="Zone4_WallBounce"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 7, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone4_WallBounce/LeftWall"]
+shape = SubResource("BoxShape3D_wall")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zone4_WallBounce/LeftWall"]
+mesh = SubResource("BoxMesh_wall")
+
+[node name="RightWall" type="StaticBody3D" parent="Zone4_WallBounce"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 7, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zone4_WallBounce/RightWall"]
+shape = SubResource("BoxShape3D_wall")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zone4_WallBounce/RightWall"]
+mesh = SubResource("BoxMesh_wall")
+
+[node name="WallLabel" type="Label3D" parent="Zone4_WallBounce"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -12)
+billboard = 1
+no_depth_test = true
+text = "【4. 双面垂直夹墙 (间距 4 米)】
+贴墙按跳跃键朝法线外斜上方弹射 4.5m
+支持在双墙间连续左右折返蹬墙跳 3 次！"
+font_size = 24
+outline_size = 6
+
+[node name="Zone5_Drone" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 18)
+
+[node name="TrainingDrone" parent="Zone5_Drone" instance=ExtResource("3_drone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="DroneLabel" type="Label3D" parent="Zone5_Drone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.6, -5)
+billboard = 1
+no_depth_test = true
+text = "【5. 红光攻击傀儡 · 弹刀与极闪】
+每隔 3.5s 红光警示(抬手0.75s)并突刺出招
+► 0.15s 窗口按 RMB：完美弹刀 (震飞傀儡大硬直，伤害翻倍)
+► 0.12s 窗口闪避：星闪极避 (全场减速 0.25x 时停 0.5s)"
+font_size = 24
+outline_size = 6
