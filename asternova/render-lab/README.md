@@ -10,9 +10,16 @@
 asternova/render-lab/
 ├── project.godot              # Godot 4.7.2 独立工程根配置
 ├── models/                    # 3D 建模源工程与参考模型
-│   └── aster/                 # Aster 角色模型
-│       ├── aster_head_base_v2.blend   # 👑 当前最新工业级块面基模工程
-│       └── textures/          # 贴图（干净瓷肌 aster_body_texture.png 等）
+│   ├── aster/                 # Aster 角色模型（基模工程与贴图）
+│   │   ├── aster_head_base_v2.blend   # 👑 当前最新工业级块面基模工程
+│   │   └── textures/          # 贴图（干净瓷肌 aster_body_texture.png 等）
+│   └── weapons/               # 武器与道具 3D 资产库
+│       └── aster_katana/      # Aster 专属佩刀「星霜月华」全套资产
+│           ├── aster_katana.blend         # 🗡️ Blender 5.2 建模源工程（双分件+描边）
+│           ├── aster_katana.glb           # 📦 游戏标准 glTF 资产（899 面，116KB）
+│           ├── aster_katana_3d_viewer.html # 🌐 自包含 3D Web 检视器（双击秒开）
+│           ├── katana_preview.png         # 🖼️ 五视角高清合成验收看板
+│           └── textures/                  # 2K NPR 贴图图集（tex_katana_basecolor.png）
 ├── shaders/                   # 二次元卡渲着色器（Toon Shader）
 │   ├── toon_character.gdshader        # 角色主着色器（Toon Ramp + 色偏映射）
 │   ├── toon_hair.gdshader             # 头发着色器（各向异性天使光环）
@@ -20,11 +27,15 @@ asternova/render-lab/
 │   └── outline.gdshader               # 背面扩张法描边着色器（Inverted Hull）
 ├── scenes/                    # 场景与舞台
 │   ├── turnaround_stage.tscn  # 三视图同框验证专用舞台（前/后/侧/特写四机位）
+│   ├── weapon_viewer.tscn     # 🗡️ 武器 360° 实时交互检视舞台（支持拔刀/特写）
 │   └── street_sunset.tscn     # 黄昏樱花商店街切片场景
 └── scripts/                   # 自动化批处理与截图脚本
     ├── turnaround_capture.gd  # Godot 自动化三视图捕获脚本
     ├── screenshot_capture.gd  # Godot 三档画质自动跑分与截图脚本
-    └── *.py                   # Blender bpy 自动化拓扑/贴图批处理工具
+    ├── weapon_viewer.gd       # 🗡️ 武器 360° Orbit 相机与 Tween 拔刀驱动脚本
+    ├── build_aster_katana_mesh.py # 佩刀自动化建模与 GLB 导出
+    ├── build_katana_texture.py    # 佩刀 2K NPR 贴图程序化绘制
+    └── generate_katana_web_viewer.py # 佩刀 3D Web 检视器生成器
 ```
 
 ---
@@ -33,6 +44,9 @@ asternova/render-lab/
 
 ### 1. CLI 模式（后台自动化批处理）
 ```powershell
+# 运行武器 360° 实时交互检视窗口（支持鼠标拖拽、滚轮缩放、空格拔刀）
+godot --path "asternova/render-lab" "res://scenes/weapon_viewer.tscn"
+
 # 运行三视图比对舞台自动化截屏
 godot --path "asternova/render-lab" "res://scenes/turnaround_stage.tscn"
 
@@ -40,7 +54,7 @@ godot --path "asternova/render-lab" "res://scenes/turnaround_stage.tscn"
 godot --path "asternova/render-lab" "res://scenes/street_sunset.tscn"
 
 # 使用本地 Blender 5.2.1 LTS 后台无头运行 Python 拓扑/贴图批处理脚本
-& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b "asternova/render-lab/models/aster/aster_head_base_v2.blend" -P "asternova/render-lab/scripts/your_script.py"
+& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b "asternova/render-lab/models/weapons/aster_katana/aster_katana.blend" -P "asternova/render-lab/scripts/build_aster_katana_mesh.py"
 ```
 
 ### 2. MCP 模式（前台可视化交互式协同）

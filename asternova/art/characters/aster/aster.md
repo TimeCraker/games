@@ -15,6 +15,7 @@
 | 肤 | 白皙偏冷，腮部微粉 |
 | 服装 | 白色少女常服系（象牙白轻薄上衣 + 泡泡袖 + 淡蓝饰边 / 小丝带+珍珠胸针 / 象牙宽腰封 + 背后软蝶结 / 多层白裙+淡蓝半透明层+刺绣 / 白短袜 / 白 Mary Jane）· 配色比 70% 白 / 15% 淡蓝 / 8% 淡紫 / 5% 银 / 2% 香槟金 |
 | 发饰 | 小型珍珠花卉发饰（克制） |
+| 专属武器 | 佩刀「[星霜月华](weapon.md)」（Seisou Gekka · 899面 · 可拔刀双分件 · 设定图见 [`weapon-turnaround-final.png`](weapon-turnaround-final.png)） |
 | 气质 | 清冷克制 · 微暖反差 · ethereal |
 | 背景占位 | 黄昏商店街的转学生（世界观定稿时改写） |
 
@@ -26,6 +27,7 @@
 | 2026-08-30 | 生图第一版 | [`turnaround-jk-rejected.png`](turnaround-jk-rejected.png) | ❌ 否决：藏青在黄昏樱花场景偏重，白裙气质更贴 |
 | 2026-08-30 | 生图第二版 roll 1 | [`turnaround-v1.png`](turnaround-v1.png) | 备选 |
 | 2026-08-30 | 生图第二版 roll 2 | [`turnaround-final.png`](turnaround-final.png) | ✅ **现行基准**（三视角一致性/裙层细节/发丝分组更优，视觉评估 9.5/10；A-pose 手臂微垂约 30°，利于建模绑定） |
+| 2026-09-04 | 专属武器 3D 定稿 | [`weapon.md`](weapon.md) | ✅ **验收通过**：899 面低模、零偏置双分件拔刀装配、2K NPR 贴图图集、360° 交互检视完成 |
 
 ## 3. 生图提示词存档
 
