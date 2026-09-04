@@ -47,6 +47,13 @@
    - Phase 1（建筑与地形底座）：1张 2K Trim 图集 + 3栋一户建与坡顶小鸟居，立刻无头渲染 3 视角截图自检清晰度与比例；
    - Phase 2（樱花树与街道道具）：制作块面法线樱花树、电线杆拉线、自动贩卖机与反光镜，渲染街区生活感全景截图；
    - Phase 3（沙盒组装与实机对比）：在 Godot 中配上晴空下午阳光与隐形平滑碰撞体，摆放打怪靶子，输出最终实机画面对比验收。
+5. **专属佩刀「星霜月华」3D 低模与拔刀分件装配定稿（2026-09-04 回填）**：
+   - **设计基准**：严格锚定 `art/characters/aster/weapon-turnaround-final.png` 官方 2D 正交全分件设定图。
+   - **性能与拓扑**：总面数 **899 三角面**（刀身组 503 面，刀鞘组 396 面），彻底杜绝繁复微观雕花的性能浪费，为 120 FPS 留足预算。
+   - **分件装配**：刀身组（`Blade_Mesh`）与刀鞘组（`Scabbard_Mesh`）独立拆分，局部原点统一锁定在【刀鞘口】`(0, 0, 0)`，实现出入鞘零偏置线性移动。
+   - **材质图集**：单张 `2048x2048` BaseColor Atlas（象牙白微珠光鞘、深蓝柄卷、浅蓝蝴蝶结系绪、冷天蓝刃纹、香槟金四芒星护手）。
+   - **交付产物**：工程源文件 `aster_katana.blend`、游戏通用资产 `aster_katana.glb`、贴图 `tex_katana_basecolor.png`、高精对比看板 `katana_preview.png`、以及自包含 3D Web 检视器 `aster_katana_3d_viewer.html`。
+   - **工业化实践 SOP 详见**：[docs/pipeline/weapon-modeling-pipeline.md](../pipeline/weapon-modeling-pipeline.md)。
 
 ### B. 渲染（Godot 4.7.2 Stable）
 

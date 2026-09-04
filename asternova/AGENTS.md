@@ -56,4 +56,8 @@
 5. **验证闭环与提交规范**：
    - 独立可验证单元完成后立即提交：Conventional Commits + 中英对照（如 `feat(art): ... / ...`）。
    - 渲染与美术改动必须先出可验证件（截图对比、真机跑分、弹出窗口供用户检阅），严禁凭模型自我声称通过。
+6. **武器与道具建模管线（SOP 必读）**：
+   - 所有武器与穿戴道具制作必须严格遵循 [`docs/pipeline/weapon-modeling-pipeline.md`](docs/pipeline/weapon-modeling-pipeline.md)；
+   - 核心铁律：① 严控 800~1,500 三角面（120 FPS 性能红线）；② 双分件原点必须绝对锁定在刀鞘口/锁扣 `(0, 0, 0)` 实现拔刀零偏置；③ 单张 2K Atlas 贴图；④ 提供 360° 交互检视件（自包含 Web 检视器 + Godot 视口）。
+
 
