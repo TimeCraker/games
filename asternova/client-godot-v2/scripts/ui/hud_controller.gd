@@ -40,6 +40,13 @@ func _process(delta: float) -> void:
 	# 实时速度与状态显示
 	var horiz_vel: float = Vector2(player.velocity.x, player.velocity.z).length()
 	speed_label.text = "速度: %.1f m/s (水平)" % horiz_vel
+
+	# 鼠标释放与视角提示
+	if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
+		view_mode_label.text = "【鼠标已释放】点击画面或按 Esc 重新锁定视角"
+	elif player and player.camera_controller:
+		var is_fpp: bool = player.camera_controller.current_mode == CameraController.CameraMode.FPP
+		view_mode_label.text = "当前视角: %s (按 V 键平滑切换)" % ("第一人称主观" if is_fpp else "第三人称越肩跟随")
 	
 	# 准星近战软吸附视觉反馈
 	if player.combat_fsm and player.combat_fsm.soft_lock_target:

@@ -7,6 +7,7 @@ height = 2.0
 radius = 0.5
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dummy"]
+resource_local_to_scene = true
 albedo_color = Color(0.75, 0.55, 0.35, 1)
 roughness = 0.8
 

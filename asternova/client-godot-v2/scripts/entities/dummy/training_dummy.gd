@@ -5,15 +5,19 @@ extends StaticBody3D
 
 @onready var mesh_root: Node3D = $MeshRoot
 @onready var info_label: Label3D = $InfoLabel
+@onready var post_mesh: MeshInstance3D = $MeshRoot/PostMesh
 
 var total_damage: float = 0.0
 var hit_count: int = 0
 var original_mesh_pos: Vector3 = Vector3.ZERO
 var reset_timer: float = 0.0
+var dummy_mat: StandardMaterial3D = null
 
 func _ready() -> void:
 	add_to_group("target_dummy")
 	original_mesh_pos = mesh_root.position
+	if post_mesh and post_mesh.mesh and post_mesh.mesh.material:
+		dummy_mat = post_mesh.mesh.material as StandardMaterial3D
 	update_info_display()
 
 func _process(delta: float) -> void:
@@ -32,6 +36,14 @@ func take_hit(damage: float, hit_dir: Vector3, is_heavy: bool) -> void:
 
 	# 生成伤害飘字
 	spawn_damage_number(damage, is_heavy)
+
+	# 受击材质闪白 (Hit Flash)
+	if dummy_mat:
+		dummy_mat.emission_enabled = true
+		dummy_mat.emission = Color(1.0, 1.0, 1.0)
+		dummy_mat.emission_energy_multiplier = 4.0 if is_heavy else 2.5
+		var flash_tween: Tween = create_tween()
+		flash_tween.tween_property(dummy_mat, "emission_energy_multiplier", 0.0, 0.09)
 
 	# 受击倾斜晃动反馈 (Tween)
 	var tween: Tween = create_tween()

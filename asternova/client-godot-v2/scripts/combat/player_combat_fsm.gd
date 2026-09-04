@@ -210,17 +210,27 @@ func process_airborne(delta: float) -> void:
 		change_state(State.FALL)
 		return
 
-	# 6. 着陆清空计数
+	# 6. 着陆清空计数并顺滑衔接地面移动
 	if player.is_on_floor():
 		wall_jump_count = 0
 		can_double_jump = true
-		change_state(State.IDLE)
+		if Input.is_action_pressed("sprint") and player.input_direction.length_squared() > 0.01:
+			change_state(State.SPRINT)
+		elif player.input_direction.length_squared() > 0.01:
+			change_state(State.MOVE)
+		else:
+			change_state(State.IDLE)
 
 func process_plunge(delta: float) -> void:
 	# 下砸直到落地
 	if player.is_on_floor():
 		player.trigger_plunge_impact()
-		change_state(State.IDLE)
+		if Input.is_action_pressed("sprint") and player.input_direction.length_squared() > 0.01:
+			change_state(State.SPRINT)
+		elif player.input_direction.length_squared() > 0.01:
+			change_state(State.MOVE)
+		else:
+			change_state(State.IDLE)
 
 func process_dash(delta: float) -> void:
 	# 维护无敌帧

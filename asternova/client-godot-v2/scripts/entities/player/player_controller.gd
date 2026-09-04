@@ -26,6 +26,10 @@ var slide_speed: float = 0.0
 var hp: float = 100.0
 var max_hp: float = 100.0
 
+# 蹬墙跳物理缓冲
+var wall_contact_timer: float = 0.0
+var cached_wall_normal: Vector3 = Vector3.ZERO
+
 # 视觉表现与动效
 var original_blade_transform: Transform3D
 var blade_material: StandardMaterial3D
@@ -79,12 +83,31 @@ func _physics_process(delta: float) -> void:
 	# 执行 Godot 底层 C++ 物理移动与滑动
 	move_and_slide()
 
+	# 贴墙接触缓冲维护 (0.18s 容错窗口)
+	if is_on_wall():
+		wall_contact_timer = 0.18
+		cached_wall_normal = get_wall_normal()
+	elif wall_contact_timer > 0.0:
+		wall_contact_timer -= delta
+
 	# 通知运镜系统当前速度与状态 (驱动动态 FOV 与贴地俯冲)
 	var horizontal_speed: float = Vector2(velocity.x, velocity.z).length()
 	camera_controller.update_speed_feel(horizontal_speed, is_sliding, delta)
 
 	# 朝向插值旋转
 	align_visual_rotation(delta)
+
+	# 虚空坠落保护（防从平台或滑道掉出世界）
+	if global_position.y < -15.0:
+		respawn()
+
+func respawn() -> void:
+	global_position = Vector3(0.0, 0.5, 4.0)
+	velocity = Vector3.ZERO
+	hp = max_hp
+	hp_changed.emit(hp, max_hp)
+	combat_fsm.change_state(PlayerCombatFSM.State.IDLE)
+	camera_controller.add_trauma(0.1)
 
 func update_input_direction() -> void:
 	var raw_input: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
@@ -119,22 +142,28 @@ func apply_standard_movement(delta: float) -> void:
 
 func apply_slide_physics(delta: float) -> void:
 	# 斜坡检测：下坡重力加速加成
-	var floor_normal: Vector3 = get_floor_normal()
-	var slope_angle: float = floor_normal.angle_to(Vector3.UP)
+	var floor_norm: Vector3 = get_floor_normal()
+	var slope_angle: float = floor_norm.angle_to(Vector3.UP)
 	var is_downhill: bool = false
-	if slope_angle > deg_to_rad(5.0):
+	if is_on_floor() and slope_angle > deg_to_rad(4.0):
 		# 判断滑行方向是否顺着斜坡向下
-		var downhill_dir: Vector3 = (Vector3.DOWN - floor_normal * Vector3.DOWN.dot(floor_normal)).normalized()
-		if slide_direction.dot(downhill_dir) > 0.3:
+		var downhill_dir: Vector3 = (Vector3.DOWN - floor_norm * Vector3.DOWN.dot(floor_norm)).normalized()
+		if slide_direction.dot(downhill_dir) > 0.2:
 			is_downhill = true
 			slide_speed += combat_data.slide_slope_acceleration * delta
 
 	if not is_downhill:
 		slide_speed = move_toward(slide_speed, 0.0, combat_data.slide_friction * delta)
 
-	velocity.x = slide_direction.x * slide_speed
-	velocity.z = slide_direction.z * slide_speed
-	# 保持紧贴地面
+	# 将滑行速度投影在地面斜坡切平面上，紧贴坡面防止颠簸脱地
+	var move_dir: Vector3 = slide_direction
+	if is_on_floor() and floor_norm.length_squared() > 0.01:
+		move_dir = (slide_direction - floor_norm * slide_direction.dot(floor_norm)).normalized()
+		floor_snap_length = 0.5
+	else:
+		floor_snap_length = 0.0
+
+	velocity = move_dir * slide_speed
 	if not is_on_floor():
 		velocity.y -= combat_data.base_gravity * delta
 
@@ -193,30 +222,46 @@ func start_slide() -> void:
 	is_sliding = true
 	slide_direction = input_direction if input_direction.length_squared() > 0.01 else -visual_root.global_transform.basis.z
 	slide_speed = combat_data.slide_initial_speed
-	# 压低胶囊体碰撞高度
+	# 压低胶囊体碰撞高度与贴地吸附
 	set_capsule_height(combat_data.slide_height)
+	floor_snap_length = 0.5
+	
+	# 视觉根节点贴地俯冲姿态 (更强推背感)
+	var tween: Tween = create_tween()
+	tween.tween_property(visual_root, "position:y", -0.45, 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(visual_root, "rotation:x", deg_to_rad(-12.0), 0.08)
 
 func end_slide() -> void:
 	is_sliding = false
 	set_capsule_height(original_capsule_height)
+	floor_snap_length = 0.1
+	
+	var tween: Tween = create_tween()
+	tween.tween_property(visual_root, "position:y", 0.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(visual_root, "rotation:x", 0.0, 0.12)
 
 func preserve_slide_jump_momentum() -> void:
 	# 滑铲跳保留 90% 前冲动量
+	floor_snap_length = 0.0
 	velocity.x = slide_direction.x * (slide_speed * combat_data.slide_jump_momentum_keep)
 	velocity.z = slide_direction.z * (slide_speed * combat_data.slide_jump_momentum_keep)
 	end_slide()
 
 func apply_jump(jump_vel: float) -> void:
+	floor_snap_length = 0.0
 	velocity.y = jump_vel
 
 func apply_wall_jump() -> void:
-	var wall_normal: Vector3 = get_wall_normal()
-	var bounce_dir: Vector3 = (wall_normal + Vector3.UP * 0.8).normalized()
+	var wall_norm: Vector3 = cached_wall_normal if cached_wall_normal.length_squared() > 0.01 else get_wall_normal()
+	var bounce_dir: Vector3 = (wall_norm + Vector3.UP * 0.8).normalized()
+	floor_snap_length = 0.0
 	velocity = bounce_dir * combat_data.wall_jump_out_speed
 	velocity.y = combat_data.wall_jump_up_speed
-	slide_direction = wall_normal
-	# 触发蹬墙微镜头晃动
+	slide_direction = wall_norm
+	wall_contact_timer = 0.0
+	# 触发蹬墙微镜头晃动与脚底反冲光环
 	camera_controller.add_trauma(0.2)
+	spawn_jump_ring()
 
 func start_plunge() -> void:
 	velocity.y = -5.0
@@ -280,8 +325,10 @@ func execute_attack_step(stage: int, soft_target: Node3D) -> void:
 		lunge_dir = to_target.normalized()
 		lunge_pwr = minf(lunge_pwr + combat_data.soft_lock_pull_speed, to_target.length() * 8.0)
 
-	velocity.x = lunge_dir.x * lunge_pwr
-	velocity.z = lunge_dir.z * lunge_pwr
+	# 滑铲横扫出刀时保留滑铲动量与顺坡加速，站立普攻才施加微突进位移
+	if not (is_sliding_attack and is_sliding):
+		velocity.x = lunge_dir.x * lunge_pwr
+		velocity.z = lunge_dir.z * lunge_pwr
 
 	# 程序化刀光动效 (Procedural Blade Animation)
 	if attack_tween and attack_tween.is_valid():
@@ -325,7 +372,8 @@ func execute_attack_step(stage: int, soft_target: Node3D) -> void:
 			attack_tween.tween_property(blade_visual, "transform", original_blade_transform, 0.15)
 			attack_tween.parallel().tween_property(blade_material, "emission_energy_multiplier", 2.0, 0.15)
 
-	# 开启 Hitbox 判定
+	# 产生刀光弧刃与 Hitbox 判定
+	spawn_slash_arc(stage)
 	check_blade_hits(combat_data.combo_damage[stage], stage == 3)
 
 func execute_iaijutsu(tier: int) -> void:
@@ -349,7 +397,8 @@ func execute_iaijutsu(tier: int) -> void:
 	attack_tween.parallel().tween_property(blade_visual, "rotation_degrees", Vector3(0, -90, 0), 0.15)
 	attack_tween.tween_property(blade_visual, "transform", original_blade_transform, 0.12)
 
-	# 判定路径上全部敌人
+	# 判定路径上全部敌人并释放居合光芒
+	spawn_slash_arc(3)
 	check_blade_hits(dmg, true)
 
 func check_blade_hits(damage: float, is_heavy: bool) -> void:
@@ -368,6 +417,7 @@ func check_blade_hits(damage: float, is_heavy: bool) -> void:
 		if collider.has_method("take_hit") and collider != self:
 			collider.take_hit(damage, -visual_root.global_transform.basis.z, is_heavy)
 			attack_hit_target.emit(collider, damage, is_heavy)
+			spawn_hit_spark(collider.global_position + Vector3(0, 1.2, 0), is_heavy)
 			hit_count += 1
 
 	if hit_count > 0:
@@ -376,6 +426,7 @@ func check_blade_hits(damage: float, is_heavy: bool) -> void:
 
 func play_parry_fx() -> void:
 	camera_controller.trigger_hit_impact(true)
+	spawn_hit_spark(blade_visual.global_position, true)
 	if blade_material:
 		blade_material.emission = Color(1.0, 0.9, 0.2)
 		blade_material.emission_energy_multiplier = 10.0
@@ -387,6 +438,67 @@ func play_parry_fx() -> void:
 	var recoil_tween: Tween = create_tween()
 	recoil_tween.tween_property(visual_root, "position:z", 0.25, 0.06)
 	recoil_tween.tween_property(visual_root, "position:z", 0.0, 0.2).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+
+func spawn_slash_arc(stage: int) -> void:
+	var arc: MeshInstance3D = MeshInstance3D.new()
+	var torus: TorusMesh = TorusMesh.new()
+	torus.inner_radius = 1.0
+	torus.outer_radius = 1.7
+	arc.mesh = torus
+	
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	
+	match stage:
+		0: mat.albedo_color = Color(0.35, 0.85, 1.0, 0.75)
+		1: mat.albedo_color = Color(0.25, 0.95, 0.85, 0.8)
+		2: mat.albedo_color = Color(0.65, 0.8, 1.0, 0.85)
+		3: mat.albedo_color = Color(1.0, 0.85, 0.2, 0.9)
+	
+	arc.material_override = mat
+	visual_root.add_child(arc)
+	if camera_controller and camera_controller.current_mode == CameraController.CameraMode.FPP:
+		arc.position = Vector3(0, 1.35, -0.65)
+	else:
+		arc.position = Vector3(0, 0.9, -0.6)
+	
+	match stage:
+		0: arc.rotation_degrees = Vector3(35, 45, -20)
+		1: arc.rotation_degrees = Vector3(0, 0, 15)
+		2: arc.rotation_degrees = Vector3(90, 0, 0)
+		3: arc.rotation_degrees = Vector3(0, 0, 0)
+		
+	var tween: Tween = arc.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(arc, "scale", Vector3(1.3, 1.3, 1.3), 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(mat, "albedo_color:a", 0.0, 0.16)
+	tween.finished.connect(arc.queue_free)
+
+func spawn_hit_spark(hit_pos: Vector3, is_heavy: bool) -> void:
+	var spark: Node3D = Node3D.new()
+	var mesh_inst: MeshInstance3D = MeshInstance3D.new()
+	var quad: QuadMesh = QuadMesh.new()
+	quad.size = Vector2(1.2, 0.22) if is_heavy else Vector2(0.65, 0.14)
+	mesh_inst.mesh = quad
+	
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = Color(1.0, 0.9, 0.2, 1.0) if is_heavy else Color(0.4, 0.85, 1.0, 1.0)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	mesh_inst.material_override = mat
+	
+	spark.add_child(mesh_inst)
+	get_parent().add_child(spark)
+	spark.global_position = hit_pos
+	spark.rotation.z = randf_range(-PI, PI)
+	
+	var tween: Tween = spark.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(mesh_inst, "scale", Vector3(1.6, 0.1, 1.0), 0.15).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+	tween.tween_property(mat, "albedo_color:a", 0.0, 0.15)
+	tween.finished.connect(spark.queue_free)
 
 func spawn_shockwave(max_radius: float) -> void:
 	var ring: MeshInstance3D = MeshInstance3D.new()
