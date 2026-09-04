@@ -9,6 +9,8 @@ extends Control
 @onready var charge_bar: ProgressBar = $CenterNotice/ChargeBar
 @onready var feedback_notice: Label = $CenterNotice/FeedbackNotice
 @onready var crosshair: Control = $Crosshair
+@onready var crosshair_dot: ColorRect = $Crosshair/Dot
+@onready var lock_bracket: Label = $Crosshair/LockBracket
 @onready var hp_bar: ProgressBar = $BottomStatus/HPBar
 
 var player: PlayerController = null
@@ -38,6 +40,22 @@ func _process(delta: float) -> void:
 	# 实时速度与状态显示
 	var horiz_vel: float = Vector2(player.velocity.x, player.velocity.z).length()
 	speed_label.text = "速度: %.1f m/s (水平)" % horiz_vel
+	
+	# 准星近战软吸附视觉反馈
+	if player.combat_fsm and player.combat_fsm.soft_lock_target:
+		if crosshair_dot:
+			crosshair_dot.color = Color(0.2, 1.0, 0.85, 1.0)
+		if lock_bracket:
+			lock_bracket.add_theme_color_override("font_color", Color(0.2, 1.0, 0.85, 0.95))
+			var pulse: float = 1.0 + sin(Time.get_ticks_msec() * 0.008) * 0.08
+			lock_bracket.scale = Vector2(pulse, pulse)
+			lock_bracket.pivot_offset = lock_bracket.size * 0.5
+	else:
+		if crosshair_dot:
+			crosshair_dot.color = Color(1.0, 1.0, 1.0, 0.85)
+		if lock_bracket:
+			lock_bracket.add_theme_color_override("font_color", Color(0.2, 1.0, 0.85, 0.0))
+			lock_bracket.scale = Vector2.ONE
 	
 	if notice_timer > 0.0:
 		notice_timer -= delta

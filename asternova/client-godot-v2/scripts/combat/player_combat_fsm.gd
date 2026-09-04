@@ -89,6 +89,9 @@ func _physics_process(delta: float) -> void:
 	if dash_cooldown_timer > 0.0:
 		dash_cooldown_timer -= delta
 
+	# 持续探测准星前方软锁定目标
+	find_soft_lock_target()
+
 	# 状态特异性物理逻辑
 	match current_state:
 		State.IDLE, State.MOVE, State.SPRINT:
@@ -179,8 +182,8 @@ func process_slide(delta: float) -> void:
 		change_state(State.FALL)
 
 func process_airborne(delta: float) -> void:
-	# 1. 优先判定贴墙跳 (蹬墙跳 Wall Bounce，间距夹墙连续左右折返)
-	if player.is_on_wall() and wall_jump_count < combat_data.max_wall_jumps:
+	# 1. 优先判定贴墙跳 (蹬墙跳 Wall Bounce，支持 0.18s 贴墙容错缓冲与夹墙连续折返)
+	if (player.is_on_wall() or player.wall_contact_timer > 0.0) and wall_jump_count < combat_data.max_wall_jumps:
 		if consume_buffer("jump"):
 			change_state(State.WALL_JUMP)
 			return
@@ -401,6 +404,8 @@ func trigger_time_dilation() -> void:
 
 func find_soft_lock_target() -> void:
 	soft_lock_target = null
+	if not player or not player.camera_controller or not player.camera_controller.camera:
+		return
 	var camera_fwd: Vector3 = -player.camera_controller.camera.global_transform.basis.z
 	camera_fwd.y = 0.0
 	camera_fwd = camera_fwd.normalized()

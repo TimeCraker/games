@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://bsimulated_playtest_core"]
+
+[ext_resource type="PackedScene" uid="uid://bplayground_v2_core" path="res://scenes/levels/combat_playground.tscn" id="1_playground"]
+[ext_resource type="Script" path="res://tests/simulated_playtest_driver.gd" id="2_driver"]
+
+[node name="SimulatedPlaytest" instance=ExtResource("1_playground")]
+
+[node name="PlaytestDriver" type="Node" parent="." index="8"]
+script = ExtResource("2_driver")
