@@ -18,12 +18,13 @@
 | 数据库 | **一期无数据库（本地存档文件）**；PG+Redis 封存二期 | PG 迁移已验收（见 §5），二期重启时直接用 |
 | UI 架构 | **菜单/设置=React（主案），游戏内 UI=Godot**（见 §3） | Windows 走 WebView2 嵌入；手柄空间导航库；Steamworks 由 Godot 进程持有 + 桥接；M3 spike 三验收，不过才退 Godot 菜单 |
 | 资产管线 | 原画定稿 → 工业级块面基模 → Blender 5.2.1 LTS (bpy + mmd_tools) → GLB + KTX2 | 零授权成本；沙盒位于 `render-lab/`；M1 垂直切片打磨达标后同步进 `client-godot` |
-| agent 接入 | 本地 CLI (`godot`, `blender`) + GD Agentic Skills | agent 深度参与开发、建模、调试（工作准则见 AGENTS.md） |
+| agent 接入 | **MCP (godot-mcp + blender-mcp) + 本地底层 CLI 双模协同** | 见 §9 与 AGENTS.md；前台视口走 MCP 实时协同，批量拓扑走 CLI 无头脚本 |
 | 部署 | **一期免服务端部署**（单机+房主联机） | 玩家自主机即服务器；二期中心服务复用 asterforge-deploy 体系 |
 | 测试 | Godot headless (GdUnit4) + 模拟核心确定性测试 | 固定步长 + 种子输入回放比对状态 hash（跨机器浮点不稳定，**固定同一环境跑**或量化后比对）；CI 建真时放仓库根 |
 | 音频资产 | **CC0 素材库优先**（kenney.nl / freesound.org CC0 区） | M2 反馈层音效与视觉同步接；AI 生成音乐的商用授权多数免费档不含——使用前必核授权，单独决策后置 |
 
 ## 2. 房主权威闭环（2026-08-31 定案；原服务端权威架构翻转为单机优先）
+
 
 - **模拟核心在 Godot 进程内（GDScript）**：60Hz 固定步长吃输入、推状态机；**敌群 AI 分层降频**（决策 10Hz / 移动与物理 60Hz）控 16.6ms 预算。**单机 = 渲染层本地直调**（零网络参与、零序列化）；**联机 = 房主进程为权威端**，向 2~6 名玩家广播快照。
 - **非房主客户端职责（2026-08-31 修订：分层预测——纯「零预测」对动作游戏手感不可用，客人延迟 ≈100-150ms 会「发飘」）**：
@@ -129,3 +130,34 @@
 2. 破坏性操作先确认；不混仓库提交；切换工具前检查 `git status`。
 3. 渲染与资产必须先出验证件给用户过目，验收通过才批量生产。
 4. 玩法方向变化导致的架构级调整（如快照频率），先改 BLUEPRINT.md 再动代码。
+
+## 9. Agent 自动化接入与 MCP 连接架构（双模协同）
+
+为支持 AI Agent（Antigravity, Claude Code, Cursor 等）全生命周期自动化开发、3D 建模与引擎调试，架构明确采用**「前台交互 MCP 协议 + 后台底层 CLI/bpy」的双模协同体系**。
+
+### ① MCP 协议连接规范（Model Context Protocol）
+
+- **全局配置文件**：`~/.gemini/config/mcp_config.json`
+- **Godot 游戏引擎 MCP (`@coding-solo/godot-mcp`)**：
+  - 启动方式：`npx -y @coding-solo/godot-mcp`
+  - 环境变量：`GODOT_PATH = "C:\\Users\\TimeCraker\\tools\\godot\\Godot_v4.7.2-stable_win64.exe"`
+  - 核心职责：前台拉起 Godot 编辑器、运行指定工程/场景、实时捕获控制台日志与崩溃堆栈、动态创建场景、增删节点、管理资源 UID。
+- **Blender 3D 建模 MCP (`blender-mcp`)**：
+  - 服务端：`uvx blender-mcp`（配置 `DISABLE_TELEMETRY=true`）
+  - 视口端插件：安装于 `AppData/Roaming/Blender Foundation/Blender/5.2/scripts/addons/blender_mcp.py`
+  - 核心职责：当用户在前台打开 Blender GUI 时，在右侧 N 面板点击启动 MCP Server，Agent 可通过 JSON-RPC 实时读取视口对象、自然语言修改材质与灯光、调用 `execute_blender_code` 产生即时交互。
+
+### ② 本地底层脚本与 CLI 规范（无头工业生产）
+
+- **Blender 无头 Python 脚本 (`bpy`)**：
+  - 运行命令：`& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b <工程.blend> -P <脚本.py>`
+  - 核心职责：处理大规模顶点几何运算（如数万面顶点切除、倒 V 型刘海空气雕刻、法线球面化 Data Transfer、贴图像素清洗），零网络开销、秒级完成。
+- **Godot 自动化命令行执行**：
+  - 运行命令：`godot --path <工程路径> <场景.tscn>`
+  - 核心职责：无头执行自动化渲染、多相机 Viewport 截图与三档画质自动化跑分。
+
+### ③ 双模协同决策原则
+
+- **何时用 CLI/bpy**：执行复杂模型拓扑修改、资产格式转换（GLB/KTX2）、批量贴图处理、CI/CD 自动化跑分时。
+- **何时用 MCP**：用户在前台打开图形界面、需要“所见即所得”实时伴随式调参、排查当前场景层级、或需要让 Agent 操作编辑器时。
+
