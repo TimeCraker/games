@@ -13,6 +13,7 @@ asternova/art/
 │   └── aster/                 # 女主角 Aster 专档包
 │       ├── aster.md                   # 📝 人设档案 / 身材数值 / 生图提示词
 │       ├── turnaround-final.png       # ✅ 官方角色定稿三视图（正/侧/背，建模与验收绝对基准）
+│       ├── weapon.md                  # 🗡️ Aster 专属佩刀「星霜月华」美术专档（3D 资产与检视指引）
 │       ├── weapon-turnaround-final.png # 🗡️ Aster 专属佩刀「星霜月华」定稿全部分件设定图
 │       ├── turnaround-v1.png          # 历史备选版本
 │       ├── turnaround-jk-rejected.png # 历史否决版本（JK 水手服，留档防走样）
