@@ -4,14 +4,21 @@
 
 ---
 
-## 0. 本地环境与工具路径（已配置就绪，直接调用）
+## 0. 本地基础设施与工具调用规范（CLI 与 MCP 双模就绪 · 必读基础）
 
-| 工具 | 本地绝对路径 | 版本与状态 | 快捷命令 / 说明 |
-| :--- | :--- | :--- | :--- |
-| **Godot Engine** | `C:\Users\TimeCraker\tools\godot\Godot_v4.7.2-stable_win64.exe` | **v4.7.2-stable.official**（最新正式稳定版） | 命令行全局可用 `godot`（通过 `godot.cmd` 桥接）；桌面有快捷方式 `Godot 4.7.lnk` |
-| **Blender** | `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe` | **Blender 5.2.1 LTS**（官方长期支持稳定版） | 内置 Python 3.11，已启用 `mmd_tools v4.5.14` 插件；桌面有 `Blender 5.2.lnk` |
-| **Godot MCP** | `~/.gemini/config/mcp_config.json` (`@coding-solo/godot-mcp`) | ✅ 已配置并连接本地 Godot | 供 Agent 通过 MCP 协议启动场景、运行调试、增删节点与捕获报错 |
-| **Blender MCP** | `~/.gemini/config/mcp_config.json` (`blender-mcp`) | ✅ 已配置，Add-on 插件已装入 Blender 5.2 | 插件位于 `Blender/5.2/scripts/addons/blender_mcp.py`，支持前台视口实时双向交互 |
+开发工具链已建立**「底层无头 CLI 脚本 + 前台交互 MCP 协议」双模体系**，两者皆为工程基础知识，Agent 应根据任务类型自由选用、互为补充：
+
+| 模式 | 工具 / 服务 | 本地绝对路径 / 配置源 | 状态与版本 | 核心使用场景与规范 |
+| :--- | :--- | :--- | :--- | :--- |
+| **CLI 模式**<br>(底层无头批处理) | **Godot 4.7** | `C:\Users\TimeCraker\tools\godot\Godot_v4.7.2-stable_win64.exe` | **v4.7.2 stable** | 全局 `godot` 命令行可用；用于无头执行测试脚本、三视图截屏与场景跑分。 |
+| **CLI 模式**<br>(底层无头批处理) | **Blender 5.2** | `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe` | **5.2.1 LTS** | 内置 Python 3.11 + `mmd_tools v4.5.14`；`blender.exe -b ... -P script.py` 秒级处理几万面顶点拓扑、UV 变换与贴图像素清洗。 |
+| **MCP 模式**<br>(前台可视化交互) | **Godot MCP** | `~/.gemini/config/mcp_config.json` (`@coding-solo/godot-mcp`) | ✅ 已连通本地引擎 | 供 Agent 通过 MCP 协议前台唤起 Godot 编辑器、运行调试、动态增删节点与实时抓取控制台报错。 |
+| **MCP 模式**<br>(前台可视化交互) | **Blender MCP** | `~/.gemini/config/mcp_config.json` (`blender-mcp`) | ✅ 插件已装入 5.2 | 插件位于 `Blender/5.2/scripts/addons/blender_mcp.py`；用户前台打开 Blender 界面时，Agent 可通过 MCP 协议与视口实时双向通信。 |
+
+> **调用准则**：
+> 1. **复杂拓扑算法 / 贴图重绘 / 自动化出图**：优先使用 **CLI + Python 脚本**（无头运行、零通信损耗、秒级完成）；
+> 2. **前台人工协同 / 场景属性审查 / 编辑器操作**：优先使用 **MCP 协议工具**（所见即所得、直观联动）。
+
 
 ---
 

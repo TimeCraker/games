@@ -29,22 +29,24 @@ asternova/render-lab/
 
 ---
 
-## 常用开发命令（自动化调用）
+## 常用开发命令（CLI 与 MCP 双模调用）
 
-### 1. 启动 Godot 渲染场景
+### 1. CLI 模式（后台自动化批处理）
 ```powershell
-# 运行三视图比对舞台
+# 运行三视图比对舞台自动化截屏
 godot --path "asternova/render-lab" "res://scenes/turnaround_stage.tscn"
 
 # 运行黄昏商店街切片场景
 godot --path "asternova/render-lab" "res://scenes/street_sunset.tscn"
-```
 
-### 2. 调用 Blender 5.2 后台批处理
-```powershell
-# 使用本地 Blender 5.2.1 LTS 后台无头运行 Python 脚本
+# 使用本地 Blender 5.2.1 LTS 后台无头运行 Python 拓扑/贴图批处理脚本
 & "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b "asternova/render-lab/models/aster/aster_head_base_v2.blend" -P "asternova/render-lab/scripts/your_script.py"
 ```
+
+### 2. MCP 模式（前台可视化交互式协同）
+- **Godot MCP**：通过 `@coding-solo/godot-mcp` 协议工具随时拉起编辑器、运行调试、动态审查场景节点或实时读取运行报错。
+- **Blender MCP**：用户双击桌面快捷方式打开 Blender 界面后，按键盘 `N` 键打开右侧栏，在 **MCP for Blender** 面板点击 **Start MCP Server**，Agent 即可通过 MCP 协议对活动视口实时发送指令并所见即所得修改模型。
+
 
 ---
 
