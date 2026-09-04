@@ -1,0 +1,164 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_viewer.gd" id="1_tudo4"]
+[ext_resource type="Environment" path="res://environments/sunset_environment.tres" id="2_w6dh7"]
+
+[node name="WeaponViewer" type="Node3D" unique_id=1065660930]
+script = ExtResource("1_tudo4")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2147143844]
+environment = ExtResource("2_w6dh7")
+
+[node name="KeyLight" type="DirectionalLight3D" parent="." unique_id=2083925020]
+transform = Transform3D(0.70710677, -0.4055798, 0.579228, 0, 0.81915206, 0.57357645, -0.70710677, -0.4055798, 0.579228, 0, 0, 0)
+light_color = Color(1, 0.96, 0.9, 1)
+light_energy = 0.85
+
+[node name="RimLight" type="DirectionalLight3D" parent="." unique_id=644925041]
+transform = Transform3D(-0.70710677, -0.35355338, -0.6123724, 0, 0.8660254, -0.5, 0.70710677, -0.35355338, -0.6123724, 0, 0, 0)
+light_color = Color(0.7, 0.88, 1, 1)
+light_energy = 0.65
+
+[node name="FillLight" type="DirectionalLight3D" parent="." unique_id=1693734096]
+transform = Transform3D(0.70710677, 0.61237246, -0.35355335, 0, 0.49999997, 0.86602545, 0.70710677, -0.61237246, 0.35355335, 0, 0, 0)
+light_color = Color(0.85, 0.82, 0.95, 1)
+light_energy = 0.35
+
+[node name="WeaponAnchor" type="Node3D" parent="." unique_id=190983348]
+transform = Transform3D(0.9659258, -0.022557564, -0.25783417, 0, 0.9961947, -0.08715574, 0.25881904, 0.08418597, 0.9622502, 0, 0, 0)
+
+[node name="CameraPivot" type="Node3D" parent="." unique_id=737036943]
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot" unique_id=1864453380]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.35)
+current = true
+fov = 42.0
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=588437332]
+
+[node name="InfoPanel" type="PanelContainer" parent="UI" unique_id=781669002]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 380.0
+offset_bottom = 160.0
+
+[node name="Margin" type="MarginContainer" parent="UI/InfoPanel" unique_id=324909475]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="UI/InfoPanel/Margin" unique_id=1380212786]
+layout_mode = 2
+
+[node name="LblTitle" type="Label" parent="UI/InfoPanel/Margin/VBox" unique_id=533286864]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "✦ 星霜月华 · 佩刀全景 ✦"
+
+[node name="LblSub" type="Label" parent="UI/InfoPanel/Margin/VBox" unique_id=1837357429]
+modulate = Color(0.8, 0.85, 0.95, 0.85)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Aster's Signature Katana · 3D Realtime Inspector"
+
+[node name="LblStats" type="Label" parent="UI/InfoPanel/Margin/VBox" unique_id=158068378]
+modulate = Color(0.75, 0.9, 1, 0.9)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "面数: 899 Tris | 分件: 独立刀鞘 + 刀刃
+贴图: 2048x2048 Atlas | 轮廓: Inverted Hull"
+
+[node name="ControlPanel" type="PanelContainer" parent="UI" unique_id=1630500161]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -320.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 320.0
+
+[node name="Margin" type="MarginContainer" parent="UI/ControlPanel" unique_id=1007694760]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="UI/ControlPanel/Margin" unique_id=1815081158]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BtnDraw" type="Button" parent="UI/ControlPanel/Margin/VBox" unique_id=1903213386]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "拔刀出鞘 (Space)"
+
+[node name="BtnAutoRotate" type="Button" parent="UI/ControlPanel/Margin/VBox" unique_id=177577958]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "自动旋转: ON"
+
+[node name="LblPresets" type="Label" parent="UI/ControlPanel/Margin/VBox" unique_id=1890530031]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "特写视角切换 [1 - 5]:"
+
+[node name="HBoxPresets" type="HBoxContainer" parent="UI/ControlPanel/Margin/VBox" unique_id=430553514]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BtnPreset1" type="Button" parent="UI/ControlPanel/Margin/VBox/HBoxPresets" unique_id=1823992376]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "1 全景"
+
+[node name="BtnPreset2" type="Button" parent="UI/ControlPanel/Margin/VBox/HBoxPresets" unique_id=109768460]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "2 护手"
+
+[node name="BtnPreset3" type="Button" parent="UI/ControlPanel/Margin/VBox/HBoxPresets" unique_id=1476359841]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "3 刀尖"
+
+[node name="BtnPreset4" type="Button" parent="UI/ControlPanel/Margin/VBox/HBoxPresets" unique_id=949175042]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "4 刀柄"
+
+[node name="BtnPreset5" type="Button" parent="UI/ControlPanel/Margin/VBox/HBoxPresets" unique_id=512068370]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "5 系绪"
+
+[node name="BtnReset" type="Button" parent="UI/ControlPanel/Margin/VBox" unique_id=1562900602]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "重置视角 (C)"
+
+[node name="HelpBar" type="PanelContainer" parent="UI" unique_id=372077060]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = -56.0
+offset_right = -30.0
+offset_bottom = -16.0
+
+[node name="Margin" type="MarginContainer" parent="UI/HelpBar" unique_id=2097333710]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 8
+
+[node name="LblHelp" type="Label" parent="UI/HelpBar/Margin" unique_id=1611881247]
+modulate = Color(0.9, 0.95, 1, 0.95)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "🖱️ 鼠标左键: 360°旋转  |  滚轮: 缩放  |  右键: 平移  |  空格: 拔刀/收刀  |  R: 自动旋转  |  1~5: 特写视角  |  ESC: 退出"
+horizontal_alignment = 1
