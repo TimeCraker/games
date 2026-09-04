@@ -43,6 +43,8 @@ func _ready() -> void:
 	current_arm_offset = target_arm_offset
 	spring_arm.spring_length = target_arm_length
 	spring_arm.position = current_arm_offset
+	if get_parent() is CollisionObject3D:
+		spring_arm.add_excluded_object((get_parent() as CollisionObject3D).get_rid())
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
