@@ -7,20 +7,24 @@
 | 层 | 选型 | 关键说明 |
 |---|---|---|
 | 游戏引擎 | **Godot 4.7.x stable**（实际部署 `v4.7.2-stable.official`，钉死当前 stable 线） | C++ 引擎内核 + 脚本胶水；全局命令行通过 `godot.cmd` 调用 |
-| 客户端语言 | **GDScript** | 全平台导出 exe/APK/Web、包体最轻；热点兜底 shader(GPU) → GDExtension（仅原生端） |
-| 渲染风格 | **二次元角色渲染** | 对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风；toon ramp 色阶 + SDF 面部阴影 + 描边 + 后处理调教（见 STYLE.md） |
-| 渲染器 | **全端 Compatibility（2026-08-31 定案）** | 三端一套 shader 同效果；二次元 toon 不依赖 Forward+ 的高级特效（那是写实向吃的）；Web 导出稳定、包体小启动快；⚠️ CompositorEffect（compute 后处理）在 Compatibility 不可用（GL 无 compute）——**描边锁定 inverted hull，后处理收缩到内置 Environment**（可用性 M1 第一周核查）；Windows 高档画质未来可单独升 Forward+（一期不做） |
+| 层 | 选型 | 关键说明 |
+|---|---|---|
+| 游戏引擎 | **Godot 4.7.x stable**（实际部署 `v4.7.2-stable.official`，钉死当前 stable 线） | C++ 引擎内核 + 脚本胶水；全局命令行通过 `godot.cmd` 调用 |
+| 客户端语言 | **GDScript 2.0（全静态强类型）** | 纯 PC 端游标准，零编译等待、秒级热重载手感调教；全变量/函数强制声明静态类型；预留未来 GDExtension C++/Rust 接口 |
+| 渲染风格 | **二次元清新日漫渲染** | 对标《原神》《秒速五厘米》《咒术回战》；下午 14:30 晴空少云光照 + ACES 色调映射 + Inverted Hull 描边 + SDF 面部阴影（见 STYLE.md） |
+| 渲染器 | **全端 Compatibility（2026-08-31 定案）** | 三端一套 shader 同效果；二次元 toon 不依赖 Forward+ 的高级特效；包体小启动快；⚠️ CompositorEffect 在 Compatibility 不可用——**描边锁定 inverted hull，后处理收缩到内置 Environment**；Windows 高档未来可单独升 Forward+ |
 | 画质分级 | **三档（低/中/高），运行时可切** | 低：关后处理 + 降分辨率 + 锁 60；中：120；高：全特效 + 高贴图 + 解锁至显示器上限（**渲染帧率 120 起步上不封顶**，与模拟 60Hz tick 解耦） |
-| 模拟核心 | **GDScript 战斗核心（Godot 进程内）** | 60Hz 固定步长；单机本地直调 / 联机房主权威广播双出口；**客户端分层预测**（位置预测 + 软校正 / 关键结果房主独裁，见 §2）；性能红线触发再 GDExtension（C++ 或 Rust）补热点 |
+| 模拟核心 | **GDScript 战斗核心（代码物理驱动解耦）** | 身法（跑跳滑闪）纯代码驱动，换模型 0 返工；60Hz 固定步长；现代高响应 ACT 状态机（0.18s 缓冲 + 随时切断后摇 + 闪避无敌帧）+ 4 段流光刀术软吸附 + 居合蓄力弹刀；单机直调 / 房主广播双出口 |
+| 场景管线 | **CS2 (Source 2) 级模块化与 2K Trim Sheet** | 现代日本一户建住宅街区（一户建 + 40m 樱花长坡道 + 坡顶朱红鸟居地标）；CS2 级高复用低显存；二次元块面法线传递樱花树（Normal Transfer） |
 | 后端语言 | **Go（一期封存，二期资产）** | 原 60Hz tick / 快照 / 插值设计作为参考实现；二期大型联机重启中心服务器架构时启用 |
 | 协议 | **Protobuf 消息层 + 双通道语义（联机时）** | 单机进程内直调不走协议；可靠有序（聚会/事件）+ 不可靠高频（60Hz 快照流）；Transport 接口可插拔 |
 | 传输选路 | **Steam 中继优先 + WS 先行，原生端 ENet UDP 后置（M4）** | 连接策略六级降级（局域网 / IPv6 / UPnP / 打洞 / **Steam 数据中继（Valve 免费，Steam 版主路径）** / 自建后置），见 §4 |
 | 数据库 | **一期无数据库（本地存档文件）**；PG+Redis 封存二期 | PG 迁移已验收（见 §5），二期重启时直接用 |
 | UI 架构 | **菜单/设置=React（主案），游戏内 UI=Godot**（见 §3） | Windows 走 WebView2 嵌入；手柄空间导航库；Steamworks 由 Godot 进程持有 + 桥接；M3 spike 三验收，不过才退 Godot 菜单 |
-| 资产管线 | 原画定稿 → 工业级块面基模 → Blender 5.2.1 LTS (bpy + mmd_tools) → GLB + KTX2 | 零授权成本；沙盒位于 `render-lab/`；M1 垂直切片打磨达标后同步进 `client-godot` |
+| 资产管线 | 原画定稿 → 工业级块面基模 → Blender 5.2.1 LTS (bpy + mmd_tools) → GLB + KTX2 | 零授权成本；沙盒位于 `render-lab/`；M1 垂直切片打磨达标后同步进 `client-godot-v2` |
 | agent 接入 | **MCP (godot-mcp + blender-mcp) + 本地底层 CLI 双模协同** | 见 §9 与 AGENTS.md；前台视口走 MCP 实时协同，批量拓扑走 CLI 无头脚本 |
 | 部署 | **一期免服务端部署**（单机+房主联机） | 玩家自主机即服务器；二期中心服务复用 asterforge-deploy 体系 |
-| 测试 | Godot headless (GdUnit4) + 模拟核心确定性测试 | 固定步长 + 种子输入回放比对状态 hash（跨机器浮点不稳定，**固定同一环境跑**或量化后比对）；CI 建真时放仓库根 |
+| 测试 | Godot headless (GdUnit4) + 模拟核心确定性测试 | 固定步长 + 种子输入回放比对状态 hash；三阶段截图自检闭环 |
 | 音频资产 | **CC0 素材库优先**（kenney.nl / freesound.org CC0 区） | M2 反馈层音效与视觉同步接；AI 生成音乐的商用授权多数免费档不含——使用前必核授权，单独决策后置 |
 
 ## 2. 房主权威闭环（2026-08-31 定案；原服务端权威架构翻转为单机优先）
