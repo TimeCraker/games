@@ -10,6 +10,8 @@
 | :--- | :--- | :--- | :--- |
 | **Godot Engine** | `C:\Users\TimeCraker\tools\godot\Godot_v4.7.2-stable_win64.exe` | **v4.7.2-stable.official**（最新正式稳定版） | 命令行全局可用 `godot`（通过 `godot.cmd` 桥接）；桌面有快捷方式 `Godot 4.7.lnk` |
 | **Blender** | `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe` | **Blender 5.2.1 LTS**（官方长期支持稳定版） | 内置 Python 3.11，已启用 `mmd_tools v4.5.14` 插件；桌面有 `Blender 5.2.lnk` |
+| **Godot MCP** | `~/.gemini/config/mcp_config.json` (`@coding-solo/godot-mcp`) | ✅ 已配置并连接本地 Godot | 供 Agent 通过 MCP 协议启动场景、运行调试、增删节点与捕获报错 |
+| **Blender MCP** | `~/.gemini/config/mcp_config.json` (`blender-mcp`) | ✅ 已配置，Add-on 插件已装入 Blender 5.2 | 插件位于 `Blender/5.2/scripts/addons/blender_mcp.py`，支持前台视口实时双向交互 |
 
 ---
 
