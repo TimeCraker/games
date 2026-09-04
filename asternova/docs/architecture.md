@@ -6,7 +6,7 @@
 
 | 层 | 选型 | 关键说明 |
 |---|---|---|
-| 游戏引擎 | **Godot 4.5.x stable**（钉死当前 stable 线，大版本升级需专项评估） | C++ 引擎内核 + 脚本胶水 |
+| 游戏引擎 | **Godot 4.7.x stable**（实际部署 `v4.7.2-stable.official`，钉死当前 stable 线） | C++ 引擎内核 + 脚本胶水；全局命令行通过 `godot.cmd` 调用 |
 | 客户端语言 | **GDScript** | 全平台导出 exe/APK/Web、包体最轻；热点兜底 shader(GPU) → GDExtension（仅原生端） |
 | 渲染风格 | **二次元角色渲染** | 对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风；toon ramp 色阶 + SDF 面部阴影 + 描边 + 后处理调教（见 STYLE.md） |
 | 渲染器 | **全端 Compatibility（2026-08-31 定案）** | 三端一套 shader 同效果；二次元 toon 不依赖 Forward+ 的高级特效（那是写实向吃的）；Web 导出稳定、包体小启动快；⚠️ CompositorEffect（compute 后处理）在 Compatibility 不可用（GL 无 compute）——**描边锁定 inverted hull，后处理收缩到内置 Environment**（可用性 M1 第一周核查）；Windows 高档画质未来可单独升 Forward+（一期不做） |
@@ -17,8 +17,8 @@
 | 传输选路 | **Steam 中继优先 + WS 先行，原生端 ENet UDP 后置（M4）** | 连接策略六级降级（局域网 / IPv6 / UPnP / 打洞 / **Steam 数据中继（Valve 免费，Steam 版主路径）** / 自建后置），见 §4 |
 | 数据库 | **一期无数据库（本地存档文件）**；PG+Redis 封存二期 | PG 迁移已验收（见 §5），二期重启时直接用 |
 | UI 架构 | **菜单/设置=React（主案），游戏内 UI=Godot**（见 §3） | Windows 走 WebView2 嵌入；手柄空间导航库；Steamworks 由 Godot 进程持有 + 桥接；M3 spike 三验收，不过才退 Godot 菜单 |
-| 资产管线 | ChatGPT 原画 → VRoid/在线 image-to-3D → Blender bpy → GLB+KTX2 | 零授权成本；本机不跑推理；M1 垂直切片先行验证（见 BLUEPRINT） |
-| agent 接入 | godot-mcp + blender-mcp + GD Agentic Skills | agent 深度参与开发、建模、调试 |
+| 资产管线 | 原画定稿 → 工业级块面基模 → Blender 5.2.1 LTS (bpy + mmd_tools) → GLB + KTX2 | 零授权成本；沙盒位于 `render-lab/`；M1 垂直切片打磨达标后同步进 `client-godot` |
+| agent 接入 | 本地 CLI (`godot`, `blender`) + GD Agentic Skills | agent 深度参与开发、建模、调试（工作准则见 AGENTS.md） |
 | 部署 | **一期免服务端部署**（单机+房主联机） | 玩家自主机即服务器；二期中心服务复用 asterforge-deploy 体系 |
 | 测试 | Godot headless (GdUnit4) + 模拟核心确定性测试 | 固定步长 + 种子输入回放比对状态 hash（跨机器浮点不稳定，**固定同一环境跑**或量化后比对）；CI 建真时放仓库根 |
 | 音频资产 | **CC0 素材库优先**（kenney.nl / freesound.org CC0 区） | M2 反馈层音效与视觉同步接；AI 生成音乐的商用授权多数免费档不含——使用前必核授权，单独决策后置 |

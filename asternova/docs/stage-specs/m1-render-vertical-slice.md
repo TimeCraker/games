@@ -31,13 +31,13 @@
    - **视口布光避坑规范**：规避太阳光欧拉角指向脑后导致的前脸死灰判定（NdotL < 0），确立正面主光 + 辅助冷光 + 顶侧轮廓光的标准审查光照。
 2. **必配饰件装配与验收加固**：
    - 严禁半成品无饰件验收：Aster 必须完整装配①左鬓双层白花+缎带、②领口维多利亚小圆领、③胸前浅蓝双层领结+珍珠胸针、④后腰蝴蝶结。
-   - 验收证据链：在 Godot 4.5 与 Blender 中以 2D 原画 `turnaround-final.png` 同款透视（中景半身 1:1 窗位）同框对比，视觉相似度 ≥ 90% 方可放行。
+   - 验收证据链：在 Godot 4.7.2 与 Blender 5.2.1 中以 2D 原画 `turnaround-final.png` 同款透视（中景半身 1:1 窗位）同框对比，视觉相似度 ≥ 90% 方可放行。
 3. **场景**：坡道商店街模块化资产（店面 ×2-3 / 招牌灯笼 / 樱花树 / 路灯 / 电线杆）、天空盒（黄昏渐变 + 云）
 4. **里程碑式小批交付**：角色粗模先出一次预览截图（不过管线后段），用户可中途看方向对不对，但不做正式验收
 
-### B. 渲染（Godot 4.5）
+### B. 渲染（Godot 4.7.2 Stable）
 
-载体：新建 `asternova/render-lab/`（独立 Godot 4.5.x 工程，纯渲染试验场，无网络代码；M2 的 client-godot-v2 后续直接搬用其渲染配置）。
+载体：新建 `asternova/render-lab/`（独立 Godot 4.7.2 工程，纯渲染试验场，无网络代码；M2 的 client-godot 后续直接搬用其渲染配置）。
 
 1. 二次元渲染四件套：toon ramp 色阶 shader · SDF 面部阴影 · 描边（**inverted hull 定案**——Compatibility 无 compute，后处理描边不可用）· 后处理（**内置 Environment：bloom / 色彩分级 / 暗角**——自定义 compute pass 在 Compatibility 不可用）
 2. 樱花花瓣粒子系统（GPU 粒子，风场摆动）
@@ -75,7 +75,7 @@
 
 ## 交付物
 
-- `asternova/render-lab/`（Godot 4.5 工程：场景 + 角色 + 四件套 + 三档画质）
+- `asternova/render-lab/`（Godot 4.7.2 工程：场景 + 角色 + 四件套 + 三档画质）
 - 资产源文件（原画 / Blender 工程 / GLB+KTX2）
 - STYLE.md 定稿回填 + 三档截图/录屏
 - 更新 BLUEPRINT M1 checkbox
