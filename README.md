@@ -16,7 +16,7 @@
 
 ## 🚀 重启与路线图（2026-08 定案）
 
-AsterNova 已按新栈重启（2026-08-31 重大定案：**单机优先 + 房主联机**）：客户端 **Godot 4.5（Steam/Windows 首发，Web 试玩 demo，Android 后置，渲染器全端 Compatibility）**，**GDScript 模拟核心跑在游戏进程内**（单机本地直调，联机时房主进程即权威端，2~6 人 PvE 合作；分层预测保动作手感；**Steam 版联机走 Valve 免费中继，零自建服务器**），画面为 **二次元角色渲染**（对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风：toon ramp + SDF 面部阴影 + 描边 + 后处理，三档画质，渲染帧率 120 起步上不封顶），UI 走**分界架构**（菜单/设置 = React / 游戏 HUD = Godot）。原 Go 中心服务端基建封存为**二期大型联机游戏**起点资产。
+AsterNova 已按新栈重启（2026-08-31 重大定案：**单机优先 + 房主联机**）：客户端 **Godot 4.7.2（Steam/Windows 首发，Web 试玩 demo，Android 后置，渲染器全端 Compatibility）**，**GDScript 模拟核心跑在游戏进程内**（单机本地直调，联机时房主进程即权威端，2~6 人 PvE 合作；分层预测保动作手感；**Steam 版联机走 Valve 免费中继，零自建服务器**），画面为 **二次元角色渲染**（对标崩铁 / 原神 / 绝区零 / 终末地 / 鸣潮画风：toon ramp + SDF 面部阴影 + 描边 + 后处理，三档画质，渲染帧率 120 起步上不封顶），UI 走**分界架构**（菜单/设置 = React / 游戏 HUD = Godot）。原 Go 中心服务端基建封存为**二期大型联机游戏**起点资产。
 
 - 📜 [总蓝图 BLUEPRINT.md](asternova/docs/BLUEPRINT.md) — 愿景、里程碑 M0-M4、验收节奏
 - 🏗️ [技术架构 architecture.md](asternova/docs/architecture.md) — 技术栈定案、性能锚点、安全基线

@@ -27,7 +27,7 @@ asternova/art/
 │   ├── compare_back.png               # 背影与发流对比
 │   └── compare_closeup.png            # 面部特写对比
 │
-└── render_previews/           # 阶段性正式真机渲染件（Godot 4.5 引擎捕获）
+└── render_previews/           # 阶段性正式真机渲染件（Godot 4.7 引擎捕获）
     ├── screenshot_high.png            # 高画质展示图（全后处理/光照）
     ├── screenshot_medium.png          # 中画质展示图（平衡档）
     ├── screenshot_low.png             # 低画质基准图（核显/锁 60 FPS）

@@ -67,4 +67,4 @@ godot --path "asternova/render-lab" "res://scenes/street_sunset.tscn"
 ## 阶段验收与主客户端迁移
 
 - **验收基准**：严格以 `asternova/art/characters/aster/turnaround-final.png` 为唯一 1:1 对比基准，要求面部、发型、发饰、领结全部就位后综合相似度 ≥ 90%。
-- **迁移路径**：在 `render-lab` 验收通过后，模型 GLB 文件、KTX2 压缩贴图以及 Shader 文件将直接同步复制搬入 `asternova/client-godot/` 正式客户端工程。
+- **迁移路径**：在 `render-lab` 验收通过后，模型 GLB 文件、KTX2 压缩贴图以及 Shader 文件将直接同步复制搬入 `asternova/client-godot-v2/` 正式客户端工程。

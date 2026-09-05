@@ -15,13 +15,13 @@
 | 渲染器 | **全端 Compatibility（2026-08-31 定案）** | 三端一套 shader 同效果；二次元 toon 不依赖 Forward+ 的高级特效；包体小启动快；⚠️ CompositorEffect 在 Compatibility 不可用——**描边锁定 inverted hull，后处理收缩到内置 Environment**；Windows 高档未来可单独升 Forward+ |
 | 画质分级 | **三档（低/中/高），运行时可切** | 低：关后处理 + 降分辨率 + 锁 60；中：120；高：全特效 + 高贴图 + 解锁至显示器上限（**渲染帧率 120 起步上不封顶**，与模拟 60Hz tick 解耦） |
 | 模拟核心 | **GDScript 战斗核心（代码物理驱动解耦）** | 身法（跑跳滑闪）纯代码驱动，换模型 0 返工；60Hz 固定步长；现代高响应 ACT 状态机（0.18s 缓冲 + 随时切断后摇 + 闪避无敌帧）+ 4 段流光刀术软吸附 + 居合蓄力弹刀；单机直调 / 房主广播双出口 |
-| 场景管线 | **CS2 (Source 2) 级模块化与 2K Trim Sheet** | 现代日本一户建住宅街区（一户建 + 40m 樱花长坡道 + 坡顶朱红鸟居地标）；CS2 级高复用低显存；二次元块面法线传递樱花树（Normal Transfer） |
+| 场景管线 | **终末地级四级工业化资产架构（Tier 1~4）** | Tier 1 地面道路走 CS2 级 2K Trim Sheet / 平铺 PBR；Tier 2 核心特色建筑与 Tier 3 街景高频小道具走 GPT 原画 ➔ Tripo3D 2.0 原生单体生成 ➔ Blender 网格尺寸规整与 Quad 减面 ➔ 引擎 Prefab 自由组装；Tier 4 远景天际线体块。详见 [modular_art_and_asset_production_sop.md](pipeline/modular_art_and_asset_production_sop.md) |
 | 后端语言 | **Go（一期封存，二期资产）** | 原 60Hz tick / 快照 / 插值设计作为参考实现；二期大型联机重启中心服务器架构时启用 |
 | 协议 | **Protobuf 消息层 + 双通道语义（联机时）** | 单机进程内直调不走协议；可靠有序（聚会/事件）+ 不可靠高频（60Hz 快照流）；Transport 接口可插拔 |
 | 传输选路 | **Steam 中继优先 + WS 先行，原生端 ENet UDP 后置（M4）** | 连接策略六级降级（局域网 / IPv6 / UPnP / 打洞 / **Steam 数据中继（Valve 免费，Steam 版主路径）** / 自建后置），见 §4 |
 | 数据库 | **一期无数据库（本地存档文件）**；PG+Redis 封存二期 | PG 迁移已验收（见 §5），二期重启时直接用 |
 | UI 架构 | **菜单/设置=React（主案），游戏内 UI=Godot**（见 §3） | Windows 走 WebView2 嵌入；手柄空间导航库；Steamworks 由 Godot 进程持有 + 桥接；M3 spike 三验收，不过才退 Godot 菜单 |
-| 资产管线 | 原画定稿 → 工业级块面基模 → Blender 5.2.1 LTS (bpy + mmd_tools) → GLB + KTX2 | 零授权成本；沙盒位于 `render-lab/`；M1 垂直切片打磨达标后同步进 `client-godot-v2` |
+| 资产管线 | **2D 三视图定稿 → 3D AI 原生生成 (Tripo3D 2.0) → Blender 5.2 Quad 重拓扑与分件装配 → GLB + KTX2** | 彻底告别代码手搓白模与碎片拼接；以 `turnaround-final.png` 1:1 出原生雕刻网格；沙盒位于 `render-lab/`；M1 垂直切片打磨达标后同步进 `client-godot-v2` |
 | agent 接入 | **MCP (godot-mcp + blender-mcp) + 本地底层 CLI 双模协同** | 见 §9 与 AGENTS.md；前台视口走 MCP 实时协同，批量拓扑走 CLI 无头脚本 |
 | 部署 | **一期免服务端部署**（单机+房主联机） | 玩家自主机即服务器；二期中心服务复用 asterforge-deploy 体系 |
 | 测试 | Godot headless (GdUnit4) + 模拟核心确定性测试 | 固定步长 + 种子输入回放比对状态 hash；三阶段截图自检闭环 |
