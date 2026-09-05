@@ -1,4 +1,4 @@
-# AsterNova - Milestone 1: 8.5 Head-to-Body Base & NPR Face Pipeline
+# AsterNova - Milestone 1: Perfected 8.5 Head Base Body & Master NPR Facial Pipeline
 import bpy, addon_utils, bmesh, os, mathutils
 
 for o in list(bpy.data.objects):
@@ -28,8 +28,8 @@ bpy.ops.mmd_tools.import_model(filepath=columbina_path, types={'MESH'})
 body_obj = bpy.data.objects['columbina_mesh']
 body_obj.name = 'Body_Base'
 
-# Strip cloak, coat, accessories, face/hair from Columbina, keeping body base & choker
-keep_body_keywords = ['肌', '体', '鞋']
+# Keep skin (肌, 肌2) and undergarment (体), strip heavy coat/cloak/hair/face
+keep_body_keywords = ['肌', '体']
 del_body_mats = []
 for i, m in enumerate(body_obj.data.materials):
     base = m.name.split('.')[0]
@@ -71,7 +71,7 @@ for v in bm.verts:
     v.co.y += dy
     v.co.z += dz
 
-# Offset Star Highlights forward in Y (CRITICAL: use set of unique vertices to avoid duplicate shift!)
+# Offset Star Highlights forward in Y
 idx_star = find_mat_idx(head_obj, '星目')
 idx_eye = find_mat_idx(head_obj, '目')
 if idx_star >= 0 and idx_eye >= 0:
@@ -109,8 +109,8 @@ bm.to_mesh(head_obj.data)
 bm.free()
 head_obj.data.update()
 
-# 3. Shaders Setup
-# Face NPR
+# 3. Master NPR Shaders Setup
+# A. Face NPR Shader (Clean anime shading, zero dirty artifacts)
 mat_face = find_mat(head_obj, '颜')
 if mat_face:
     mat_face.use_nodes = True
@@ -127,10 +127,10 @@ if mat_face:
     ramp = nodes.new('ShaderNodeValToRGB')
     ramp.color_ramp.interpolation = 'EASE'
     ramp.color_ramp.elements[0].position = 0.44
-    ramp.color_ramp.elements[0].color = (0.90, 0.85, 0.87, 1.0)
+    ramp.color_ramp.elements[0].color = (0.91, 0.86, 0.88, 1.0)
     ramp.color_ramp.elements[1].position = 0.52
     ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
-    links.new(s2rgb.outputs['Color'], ramp.inputs['Fac'])
+    links.new(s2rgb.outputs['Color'], ramp.inputs['Factor'])
     mix = nodes.new('ShaderNodeMix')
     mix.data_type = 'RGBA'
     mix.blend_type = 'MULTIPLY'
@@ -142,7 +142,7 @@ if mat_face:
     links.new(mix.outputs[2], em_face.inputs['Color'])
     links.new(em_face.outputs['Emission'], out.inputs['Surface'])
 
-# Eye Iris
+# B. Crystalline Starry Eye Iris (Sapphire Blue to Ice Cyan)
 mat_eye = find_mat(head_obj, '目')
 if mat_eye:
     mat_eye.use_nodes = True
@@ -158,11 +158,11 @@ if mat_eye:
     hsv.inputs['Value'].default_value = 1.08
     links.new(tex_eye.outputs['Color'], hsv.inputs['Color'])
     em_eye = nodes.new('ShaderNodeEmission')
-    em_eye.inputs['Strength'].default_value = 1.20
+    em_eye.inputs['Strength'].default_value = 1.25
     links.new(hsv.outputs['Color'], em_eye.inputs['Color'])
     links.new(em_eye.outputs['Emission'], out.inputs['Surface'])
 
-# Star Highlight
+# C. Star Highlight (Radiant 4-Point Star)
 mat_star = find_mat(head_obj, '星目')
 if mat_star:
     mat_star.use_nodes = True
@@ -175,7 +175,7 @@ if mat_star:
     em_star.inputs['Strength'].default_value = 4.5
     links.new(em_star.outputs['Emission'], out.inputs['Surface'])
 
-# Eyebrows & Lashes
+# D. Eyebrows (Aster Silvery-Lilac Taupe) & Eyelashes
 for m in head_obj.data.materials:
     base = m.name.split('.')[0]
     if any(k in base for k in ['眉', '睫', '二重']):
@@ -187,15 +187,10 @@ for m in head_obj.data.materials:
         tex = nodes.new('ShaderNodeTexImage')
         tex.image = bpy.data.images.load(r'c:\Users\TimeCraker\Desktop\my-workspace\games\asternova\render-lab\models\layla\tex\颜.png')
         if '眉' in base:
-            mix_color = nodes.new('ShaderNodeMix')
-            mix_color.data_type = 'RGBA'
-            mix_color.blend_type = 'COLOR'
-            mix_color.inputs['Factor'].default_value = 0.90
-            mix_color.inputs[7].default_value = (0.55, 0.60, 0.70, 1.0)
-            links.new(tex.outputs['Color'], mix_color.inputs[6])
+            # Elegant silvery-lilac eyebrow tone matching Aster's official hair color
             em = nodes.new('ShaderNodeEmission')
+            em.inputs['Color'].default_value = (0.58, 0.54, 0.65, 1.0) # Silvery-lilac taupe #948AA6
             em.inputs['Strength'].default_value = 1.0
-            links.new(mix_color.outputs[2], em.inputs['Color'])
         else:
             em = nodes.new('ShaderNodeEmission')
             em.inputs['Strength'].default_value = 1.0
@@ -209,7 +204,7 @@ for m in head_obj.data.materials:
         if hasattr(m, 'blend_method'):
             m.blend_method = 'CLIP'
 
-# Sclera
+# E. Sclera
 mat_sclera = find_mat(head_obj, '白目')
 if mat_sclera:
     mat_sclera.use_nodes = True
@@ -222,7 +217,7 @@ if mat_sclera:
     em.inputs['Strength'].default_value = 1.0
     links.new(em.outputs['Emission'], out.inputs['Surface'])
 
-# Mouth & Teeth
+# F. Mouth & Teeth
 for m in head_obj.data.materials:
     base = m.name.split('.')[0]
     if any(k in base for k in ['口舌', '齿']):
@@ -238,40 +233,88 @@ for m in head_obj.data.materials:
         links.new(tex.outputs['Color'], em.inputs['Color'])
         links.new(em.outputs['Emission'], out.inputs['Surface'])
 
-# Body Skin, Tights & Choker
+# G. Body Skin (Cold White Porcelain Alabaster Tone with Dark Strap Filter)
 for m in body_obj.data.materials:
     base = m.name.split('.')[0]
-    if any(k in base for k in ['肌', '体', '鞋']):
+    if '肌' in base:
         m.use_nodes = True
         nodes = m.node_tree.nodes
         links = m.node_tree.links
-        img_node = [n for n in nodes if n.type == 'TEX_IMAGE' and n.image]
-        if img_node:
-            img = img_node[0].image
-            nodes.clear()
-            out = nodes.new('ShaderNodeOutputMaterial')
-            tex = nodes.new('ShaderNodeTexImage')
-            tex.image = img
-            diffuse = nodes.new('ShaderNodeBsdfDiffuse')
-            s2rgb = nodes.new('ShaderNodeShaderToRGB')
-            links.new(diffuse.outputs['BSDF'], s2rgb.inputs['Shader'])
-            ramp = nodes.new('ShaderNodeValToRGB')
-            ramp.color_ramp.interpolation = 'EASE'
-            ramp.color_ramp.elements[0].position = 0.45
-            ramp.color_ramp.elements[0].color = (0.88, 0.85, 0.88, 1.0)
-            ramp.color_ramp.elements[1].position = 0.52
-            ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
-            links.new(s2rgb.outputs['Color'], ramp.inputs['Fac'])
-            mix = nodes.new('ShaderNodeMix')
-            mix.data_type = 'RGBA'
-            mix.blend_type = 'MULTIPLY'
-            mix.inputs['Factor'].default_value = 1.0
-            links.new(tex.outputs['Color'], mix.inputs[6])
-            links.new(ramp.outputs['Color'], mix.inputs[7])
-            em = nodes.new('ShaderNodeEmission')
-            em.inputs['Strength'].default_value = 1.0
-            links.new(mix.outputs[2], em.inputs['Color'])
-            links.new(em.outputs['Emission'], out.inputs['Surface'])
+        nodes.clear()
+        out = nodes.new('ShaderNodeOutputMaterial')
+        tex = nodes.new('ShaderNodeTexImage')
+        tex.image = bpy.data.images.load(r'c:\Users\TimeCraker\Desktop\my-workspace\games\asternova\render-lab\models\columbina\tex\肌.png')
+        
+        # Filter ramp: eliminate dark straps, keeping pure porcelain skin
+        filter_ramp = nodes.new('ShaderNodeValToRGB')
+        filter_ramp.color_ramp.elements[0].position = 0.0
+        filter_ramp.color_ramp.elements[0].color = (0.97, 0.93, 0.91, 1.0) # Cold porcelain base
+        filter_ramp.color_ramp.elements[1].position = 0.35
+        filter_ramp.color_ramp.elements[1].color = (0.98, 0.94, 0.92, 1.0)
+        links.new(tex.outputs['Color'], filter_ramp.inputs['Factor'])
+        
+        diffuse = nodes.new('ShaderNodeBsdfDiffuse')
+        s2rgb = nodes.new('ShaderNodeShaderToRGB')
+        links.new(diffuse.outputs['BSDF'], s2rgb.inputs['Shader'])
+        ramp = nodes.new('ShaderNodeValToRGB')
+        ramp.color_ramp.interpolation = 'EASE'
+        ramp.color_ramp.elements[0].position = 0.45
+        ramp.color_ramp.elements[0].color = (0.88, 0.83, 0.86, 1.0) # Soft rosy shadow
+        ramp.color_ramp.elements[1].position = 0.52
+        ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+        links.new(s2rgb.outputs['Color'], ramp.inputs['Factor'])
+        
+        mix = nodes.new('ShaderNodeMix')
+        mix.data_type = 'RGBA'
+        mix.blend_type = 'MULTIPLY'
+        mix.inputs['Factor'].default_value = 1.0
+        links.new(filter_ramp.outputs['Color'], mix.inputs[6])
+        links.new(ramp.outputs['Color'], mix.inputs[7])
+        
+        em = nodes.new('ShaderNodeEmission')
+        em.inputs['Strength'].default_value = 1.0
+        links.new(mix.outputs[2], em.inputs['Color'])
+        links.new(em.outputs['Emission'], out.inputs['Surface'])
+
+    elif '体' in base:
+        # Undergarment: Ivory White Silk Corset (replaces black bondage straps)
+        m.use_nodes = True
+        nodes = m.node_tree.nodes
+        links = m.node_tree.links
+        nodes.clear()
+        out = nodes.new('ShaderNodeOutputMaterial')
+        tex = nodes.new('ShaderNodeTexImage')
+        tex.image = bpy.data.images.load(r'c:\Users\TimeCraker\Desktop\my-workspace\games\asternova\render-lab\models\columbina\tex\体.png')
+        
+        ramp = nodes.new('ShaderNodeValToRGB')
+        ramp.color_ramp.elements[0].position = 0.0
+        ramp.color_ramp.elements[0].color = (0.95, 0.94, 0.97, 1.0) # Ivory White Silk
+        ramp.color_ramp.elements[1].position = 0.35
+        ramp.color_ramp.elements[1].color = (0.98, 0.98, 1.0, 1.0)
+        links.new(tex.outputs['Color'], ramp.inputs['Factor'])
+        
+        diffuse = nodes.new('ShaderNodeBsdfDiffuse')
+        s2rgb = nodes.new('ShaderNodeShaderToRGB')
+        links.new(diffuse.outputs['BSDF'], s2rgb.inputs['Shader'])
+        cel_ramp = nodes.new('ShaderNodeValToRGB')
+        cel_ramp.color_ramp.interpolation = 'EASE'
+        cel_ramp.color_ramp.elements[0].position = 0.45
+        cel_ramp.color_ramp.elements[0].color = (0.86, 0.84, 0.90, 1.0) # Soft lavender shadow
+        cel_ramp.color_ramp.elements[1].position = 0.52
+        cel_ramp.color_ramp.elements[1].color = (1.0, 1.0, 1.0, 1.0)
+        links.new(s2rgb.outputs['Color'], cel_ramp.inputs['Factor'])
+        
+        mix = nodes.new('ShaderNodeMix')
+        mix.data_type = 'RGBA'
+        mix.blend_type = 'MULTIPLY'
+        mix.inputs['Factor'].default_value = 1.0
+        links.new(ramp.outputs['Color'], mix.inputs[6])
+        links.new(cel_ramp.outputs['Color'], mix.inputs[7])
+        
+        em = nodes.new('ShaderNodeEmission')
+        em.inputs['Strength'].default_value = 1.0
+        links.new(mix.outputs[2], em.inputs['Color'])
+        links.new(em.outputs['Emission'], out.inputs['Surface'])
 
 # 4. Lighting & Environment
 bpy.context.scene.world.color = (0.75, 0.77, 0.82)
@@ -298,7 +341,7 @@ rim_obj.rotation_euler = (-0.8, 0.0, 2.8)
 out_dir = r'c:\Users\TimeCraker\Desktop\my-workspace\games\asternova\art\render_previews\milestone1'
 os.makedirs(out_dir, exist_ok=True)
 
-# Render 1: Front Full Body
+# Render 1: Front Full Body Silhouette & Proportions
 cam1_data = bpy.data.cameras.new('Cam1_Front')
 cam1_data.lens = 52
 cam1_obj = bpy.data.objects.new('Cam1_Front', cam1_data)
@@ -330,7 +373,7 @@ bpy.context.scene.render.filepath = p2
 bpy.ops.render.render(write_still=True)
 print('[Pipeline] Render 2 3/4 Face:', os.path.exists(p2), p2)
 
-# Render 3: Eye Macro Closeup (Lens 85mm at Y=-0.46m for perfect framing of both eyes, nose bridge and eyebrows)
+# Render 3: Eye Macro Closeup
 cam3_data = bpy.data.cameras.new('Cam3_Eye')
 cam3_data.lens = 85
 cam3_obj = bpy.data.objects.new('Cam3_Eye', cam3_data)
