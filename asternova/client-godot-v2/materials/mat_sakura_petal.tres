@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bsakura_petal"]
+
+[resource]
+resource_name = "Mat_Sakura_Petal"
+albedo_color = Color(1.0, 0.72, 0.84, 1.0)
+roughness = 0.80
+subsurf_scatter_enabled = true
+subsurf_scatter_strength = 0.35
+subsurf_scatter_skin_mode = true

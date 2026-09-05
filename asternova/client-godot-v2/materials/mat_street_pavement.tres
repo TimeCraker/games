@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://mat_pavement_01"]
+
+[ext_resource type="Texture2D" path="res://textures/pavement_stones.png" id="1_tex"]
+
+[resource]
+albedo_texture = ExtResource("1_tex")
+roughness = 0.55
+specular_mode = 1
+uv1_scale = Vector3(8, 20, 1)
