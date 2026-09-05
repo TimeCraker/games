@@ -83,7 +83,7 @@ void light() {
 	float spec_intensity = smoothstep(1.0 - specular_size - 0.01, 1.0 - specular_size + 0.01, NdotH);
 	vec3 specular_contribution = spec_intensity * specular_color.rgb * LIGHT_COLOR * 0.45 * lit_mask;
 
-	// 5. 漫反射贡献累加（乘以 0.72 控光系数，配合环境光维持最高亮度在 0.85~0.90，细腻保留高光与布纹细节）
-	DIFFUSE_LIGHT += ALBEDO * LIGHT_COLOR * light_mult * ATTENUATION * 0.72;
+	// 5. 漫反射贡献累加（乘以 0.90 控光系数，配合环境光维持最高亮度在 0.88~0.92，细腻保留高光与布纹细节）
+	DIFFUSE_LIGHT += ALBEDO * LIGHT_COLOR * light_mult * ATTENUATION * 0.90;
 	SPECULAR_LIGHT += specular_contribution + rim_contribution;
 }

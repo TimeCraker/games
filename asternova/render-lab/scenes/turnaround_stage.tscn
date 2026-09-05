@@ -1,0 +1,54 @@
+[gd_scene load_steps=5 format=3 uid="uid://turnaround_stage_01"]
+
+[ext_resource type="PackedScene" uid="uid://char_aster_01" path="res://scenes/character_aster.tscn" id="1_aster"]
+[ext_resource type="Script" path="res://scripts/turnaround_capture.gd" id="2_capture"]
+
+[sub_resource type="Environment" id="Environment_studio"]
+background_mode = 1
+background_color = Color(0.985, 0.985, 0.99, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.94, 0.94, 0.97, 1)
+ambient_light_energy = 0.18
+tonemap_mode = 2
+tonemap_exposure = 0.85
+
+[node name="TurnaroundStage" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_studio")
+
+[node name="KeyLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.939693, -0.11736, 0.321394, 0, 0.939693, 0.34202, -0.34202, -0.321394, 0.883022, 0, 2.5, 0)
+light_color = Color(1, 0.99, 0.98, 1)
+light_energy = 0.55
+shadow_enabled = false
+
+[node name="FillLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.939693, 0.11736, -0.321394, 0, 0.939693, 0.34202, 0.34202, -0.321394, 0.883022, 0, 2.5, 0)
+light_color = Color(0.92, 0.94, 1, 1)
+light_energy = 0.30
+shadow_enabled = false
+
+[node name="CharacterAster" parent="." instance=ExtResource("1_aster")]
+
+[node name="CamFront" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, -2.4)
+rotation_degrees = Vector3(0, 180, 0)
+fov = 40.0
+
+[node name="CamBack" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 2.4)
+fov = 40.0
+
+[node name="CamSide" type="Camera3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 2.4, 0.95, 0)
+rotation_degrees = Vector3(0, 90, 0)
+fov = 40.0
+
+[node name="CamCloseup" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.54, -0.92)
+rotation_degrees = Vector3(0, 180, 0)
+fov = 30.0
+
+[node name="TurnaroundCapture" type="Node" parent="."]
+script = ExtResource("2_capture")

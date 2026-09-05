@@ -12,7 +12,7 @@ func _init() -> void:
 
 func _print_tree(node: Node, indent: String) -> void:
 	var info: String = indent + node.name + " (" + node.get_class() + ")"
-	if node is MeshInstance3D and node.name in ["Face", "Body"]:
+	if node is MeshInstance3D and node.name in ["Face", "Body", "Hair001"]:
 		info += " [MeshInstance3D, surfaces=" + str(node.mesh.get_surface_count() if node.mesh else 0) + "]"
 		if node.mesh:
 			for i in range(node.mesh.get_surface_count()):

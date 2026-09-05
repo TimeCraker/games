@@ -2,13 +2,10 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kdn38n7yr8x2"
+uid="uid://dmna2tyajjhpp"
 path="res://.godot/imported/aster_model_F00_000_EyeIris_00.png-8edc252467c6ce8deeb19d12580378fe.ctex"
 metadata={
 "vram_texture": false
-}
-generator_parameters={
-"md5": "d60a6d77515b6b4b4e3d2fc99b39bcee"
 }
 
 [deps]
@@ -26,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
