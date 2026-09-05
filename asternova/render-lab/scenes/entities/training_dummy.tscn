@@ -1,0 +1,49 @@
+[gd_scene load_steps=6 format=3 uid="uid://bdummy_v2_core"]
+
+[ext_resource type="Script" path="res://scripts/entities/dummy/training_dummy.gd" id="1_td"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_dummy"]
+height = 2.0
+radius = 0.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dummy"]
+resource_local_to_scene = true
+albedo_color = Color(0.75, 0.55, 0.35, 1)
+roughness = 0.8
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_dummy"]
+material = SubResource("StandardMaterial3D_dummy")
+top_radius = 0.45
+bottom_radius = 0.45
+height = 1.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_head"]
+material = SubResource("StandardMaterial3D_dummy")
+size = Vector3(0.5, 0.4, 0.4)
+
+[node name="TrainingDummy" type="StaticBody3D" groups=["target_dummy"]]
+collision_layer = 3
+collision_mask = 0
+script = ExtResource("1_td")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_dummy")
+
+[node name="MeshRoot" type="Node3D" parent="."]
+
+[node name="PostMesh" type="MeshInstance3D" parent="MeshRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+mesh = SubResource("CylinderMesh_dummy")
+
+[node name="HeadMesh" type="MeshInstance3D" parent="MeshRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+mesh = SubResource("BoxMesh_head")
+
+[node name="InfoLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+billboard = 1
+no_depth_test = true
+text = "【受击测试木桩】"
+font_size = 28
+outline_size = 8

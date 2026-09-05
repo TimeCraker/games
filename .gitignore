@@ -13,6 +13,10 @@ Desktop.ini
 *.swp
 *~
 
+# 工具自动生成
+__pycache__/
+*.blend1
+
 # 编辑器 / IDE 配置（各端工程会重新生成）
 .idea/
 .vscode/

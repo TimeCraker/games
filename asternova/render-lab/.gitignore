@@ -1,2 +1,17 @@
 .godot/
 *.translation
+
+# 第三方参考模型库（版权素材，仅本地参考，永不入库）
+/models/*.zip
+/models/amshani.blend
+/models/hina.blend
+/models/keqing.blend
+/models/new_mika.fbx
+/models/ayaka/
+/models/columbina/
+/models/furina/
+/models/ganyu/
+/models/kokomi/
+/models/layla/
+/models/raiden/
+/models/shenhe/
