@@ -16,8 +16,8 @@ from mathutils import Vector, Matrix, Euler
 import os
 
 # --- Configurations & Paths ---
-PROJECT_DIR = r"c:\Users\TimeCraker\Desktop\my-workspace\games\asternova"
-OUT_DIR = os.path.join(PROJECT_DIR, r"render-lab\models\weapons\aster_katana")
+PROJECT_DIR = r"c:\Users\TimeCraker\Desktop\my_workspace\games\asternova"
+OUT_DIR = os.path.join(PROJECT_DIR, r"art\models\weapons\aster_katana")
 TEX_DIR = os.path.join(OUT_DIR, "textures")
 TEX_PATH = os.path.join(TEX_DIR, "tex_katana_basecolor.png")
 BLEND_OUT = os.path.join(OUT_DIR, "aster_katana.blend")

@@ -6,7 +6,7 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 
 def composite_showcase():
-    base_dir = r"c:\Users\TimeCraker\Desktop\my-workspace\games\asternova\render-lab\models\weapons\aster_katana"
+    base_dir = r"c:\Users\TimeCraker\Desktop\my_workspace\games\asternova\art\models\weapons\aster_katana"
     temp_dir = os.path.join(base_dir, "temp_renders")
     out_path = os.path.join(base_dir, "katana_preview.png")
 

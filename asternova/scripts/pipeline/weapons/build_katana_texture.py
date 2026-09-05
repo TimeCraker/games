@@ -177,7 +177,7 @@ def create_texture():
     return img
 
 if __name__ == "__main__":
-    out_dir = r"c:\Users\TimeCraker\Desktop\my-workspace\games\asternova\render-lab\models\weapons\aster_katana\textures"
+    out_dir = r"c:\Users\TimeCraker\Desktop\my_workspace\games\asternova\art\models\weapons\aster_katana\textures"
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, "tex_katana_basecolor.png")
     

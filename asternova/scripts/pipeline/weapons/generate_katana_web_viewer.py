@@ -1,9 +1,9 @@
 import base64
 import os
 
-PROJECT_DIR = r"c:\Users\TimeCraker\Desktop\my-workspace\games\asternova"
-GLB_PATH = os.path.join(PROJECT_DIR, r"render-lab\models\weapons\aster_katana\aster_katana.glb")
-HTML_OUT = os.path.join(PROJECT_DIR, r"render-lab\models\weapons\aster_katana\aster_katana_3d_viewer.html")
+PROJECT_DIR = r"c:\Users\TimeCraker\Desktop\my_workspace\games\asternova"
+GLB_PATH = os.path.join(PROJECT_DIR, r"art\models\weapons\aster_katana\aster_katana.glb")
+HTML_OUT = os.path.join(PROJECT_DIR, r"art\models\weapons\aster_katana\aster_katana_3d_viewer.html")
 
 with open(GLB_PATH, "rb") as f:
     glb_base64 = base64.b64encode(f.read()).decode("utf-8")
