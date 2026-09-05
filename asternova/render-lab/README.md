@@ -54,7 +54,7 @@ godot --path "asternova/render-lab" "res://scenes/turnaround_stage.tscn"
 godot --path "asternova/render-lab" "res://scenes/street_sunset.tscn"
 
 # 使用本地 Blender 5.2.1 LTS 后台无头运行 Python 拓扑/贴图批处理脚本
-& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b "asternova/render-lab/models/weapons/aster_katana/aster_katana.blend" -P "asternova/render-lab/scripts/build_aster_katana_mesh.py"
+& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b "asternova/art/models/weapons/aster_katana/aster_katana.blend" -P "asternova/scripts/pipeline/weapons/build_aster_katana_mesh.py"
 ```
 
 ### 2. MCP 模式（前台可视化交互式协同）

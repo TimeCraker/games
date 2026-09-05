@@ -42,14 +42,14 @@ asternova/
 │   ├── weapon-turnaround-final.png       # 🎨 官方 2D 正交全分件设定图（美术源头）
 │   └── weapon.md                         # 📝 本文档（武器美术资产专档）
 │
-├── render-lab/models/weapons/aster_katana/
+├── art/models/weapons/aster_katana/      # 🗡️ 武器定稿资产归位（三权分立：资产归 art）
 │   ├── aster_katana.blend                # 🛠️ Blender 5.2 建模源工程（双分件+描边）
 │   ├── aster_katana.glb                  # 📦 游戏通用 glTF 2.0 资产（899 面，116KB）
 │   ├── textures/tex_katana_basecolor.png # 🎨 2048x2048 NPR 贴图图集
 │   ├── katana_preview.png                # 🖼️ 官方五视角高清合成验收看板
 │   └── aster_katana_3d_viewer.html       # 🌐 自包含 3D Web 检视器（双击浏览器秒开）
 │
-├── render-lab/scripts/                    # ⚙️ 自动化构建与生成脚本
+├── scripts/pipeline/weapons/              # ⚙️ 武器自动化构建与生成脚本（工具归 scripts/pipeline）
 │   ├── build_aster_katana_mesh.py        # Blender 自动化拓扑与导出脚本
 │   ├── build_katana_texture.py           # 2K NPR 贴图程序化绘制脚本
 │   ├── composite_katana_showcase.py      # 自动化多视角出图与合成看板脚本
@@ -68,12 +68,12 @@ asternova/
 ## 3. 怎样进行 360° 交互检视？
 
 1. **方式 1：双击 Web 3D 检视器（最轻量推荐）**：
-   - 文件：[`render-lab/models/weapons/aster_katana/aster_katana_3d_viewer.html`](../../../render-lab/models/weapons/aster_katana/aster_katana_3d_viewer.html)
+   - 文件：[`art/models/weapons/aster_katana/aster_katana_3d_viewer.html`](../../models/weapons/aster_katana/aster_katana_3d_viewer.html)
    - 效果：在 Edge / Chrome 浏览器中秒开，支持鼠标 360° 拖拽旋转、滚轮变焦、按空格键拔刀/收刀、按 `W` 切换线框拓扑、按 `1~5` 特写对焦。
 2. **方式 2：Godot 引擎原生场景**：
    - 场景文件：[`render-lab/scenes/weapon_viewer.tscn`](../../../render-lab/scenes/weapon_viewer.tscn)
 3. **方式 3：Blender 5.2 视口**：
-   - 源工程：[`render-lab/models/weapons/aster_katana/aster_katana.blend`](../../../render-lab/models/weapons/aster_katana/aster_katana.blend)
+   - 源工程：[`art/models/weapons/aster_katana/aster_katana.blend`](../../models/weapons/aster_katana/aster_katana.blend)
 
 ---
 
