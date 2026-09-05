@@ -69,7 +69,9 @@ func _ready() -> void:
 func _load_weapon_model() -> void:
 	var gltf = GLTFDocument.new()
 	var state = GLTFState.new()
-	var err = gltf.append_from_file("res://models/weapons/aster_katana/aster_katana.glb", state)
+	var art_path = ProjectSettings.globalize_path("res://").path_join("../art/models/weapons/aster_katana/aster_katana.glb").simplify_path()
+	var load_path = art_path if FileAccess.file_exists(art_path) else "res://models/weapons/aster_katana/aster_katana.glb"
+	var err = gltf.append_from_file(load_path, state)
 	if err == OK:
 		var katana_root = gltf.generate_scene(state)
 		weapon_anchor.add_child(katana_root)

@@ -3,7 +3,7 @@ import bpy, addon_utils, bmesh, os, math
 from mathutils import Vector, Euler, Matrix
 
 # 1. Open Milestone 2 Blend File
-m2_path = r'c:\Users\TimeCraker\Desktop\my-workspace\games\asternova\art\models\aster_milestone2_hair.blend'
+m2_path = r'c:\Users\TimeCraker\Desktop\my_workspace\games\asternova\art\models\aster_milestone2_hair.blend'
 bpy.ops.wm.open_mainfile(filepath=m2_path)
 
 addon_utils.enable('mmd_tools')
@@ -11,8 +11,8 @@ addon_utils.enable('mmd_tools')
 print('=== AsterNova: Executing Milestone 3 Costume Pipeline ===')
 
 # Ensure directories exist
-models_dir = r'c:\Users\TimeCraker\Desktop\my-workspace\games\asternova\art\models'
-preview_dir = r'c:\Users\TimeCraker\Desktop\my-workspace\games\asternova\art\render_previews\milestone3'
+models_dir = r'c:\Users\TimeCraker\Desktop\my_workspace\games\asternova\art\models'
+preview_dir = r'c:\Users\TimeCraker\Desktop\my_workspace\games\asternova\art\render_previews\milestone3'
 os.makedirs(preview_dir, exist_ok=True)
 
 # -------------------------------------------------------------
@@ -52,7 +52,7 @@ print('-> Body skin calibrated to pure radiant porcelain tone.')
 # 3. Import Columbina Clothing Components (Dress, Sleeves, Shoes)
 # -------------------------------------------------------------
 existing_objs = set(bpy.data.objects.keys())
-col_pmx = r'c:\Users\TimeCraker\Desktop\my-workspace\games\asternova\render-lab\models\columbina\columbina.pmx'
+col_pmx = r'c:\Users\TimeCraker\Desktop\my_workspace\games\asternova\render-lab\models\columbina\columbina.pmx'
 bpy.ops.mmd_tools.import_model(filepath=col_pmx, types={'MESH'})
 new_objs = [bpy.data.objects[k] for k in bpy.data.objects.keys() if k not in existing_objs]
 imported_mesh = [o for o in new_objs if o.type == 'MESH'][0]
