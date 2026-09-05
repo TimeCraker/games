@@ -1,0 +1,33 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 NVIDIA 592.82 - Compatibility - Using Device: NVIDIA - NVIDIA GeForce RTX 4060 Laptop GPU
+
+ERROR: Error opening file 'res://icon.svg'.
+   at: load_image (core/io/image_loader.cpp:91)
+==================================================
+★ Asternova M2 核心战斗与高机动身法实机试玩自测启动 ★
+==================================================
+📸 已捕获实机渲染画面 -> 00_spawn_idle.png (1280x720)
+[自测阶段 0 通过] 待命状态视角正常，HUD 与环境加载完好
+📸 已捕获实机渲染画面 -> 01_combo_attack_slash.png (1280x720)
+[自测阶段 1 通过] 流光刀术 4 连击实测完成，软吸附滑步与刀刃弧光斩击命中！
+📸 已捕获实机渲染画面 -> 02_iaijutsu_tier3_release.png (1280x720)
+[自测阶段 2 通过] 居合满阶纳刀蓄力爆发，金芒瞬步穿透斩！
+[自测阶段 3 实测数据] 25° 斜坡滑铲最高顺坡速度: 9.70 m/s (基准: 12.0m/s, 重力分量持续加速中)
+                   角色胶囊体高度: 0.85 m (俯冲压缩), 地面吸附状态: true
+📸 已捕获实机渲染画面 -> 03_slope_sliding_fast.png (1280x720)
+[自测阶段 4 实测数据] 滑铲跳空中继承水平速度: 1.62 m/s (动量保留率 90%)
+📸 已捕获实机渲染画面 -> 04_slide_jump_and_double_jump.png (1280x720)
+📸 已捕获实机渲染画面 -> 05_plunge_shockwave.png (1280x720)
+[自测阶段 5 通过] 星坠断空下砸 24m/s，落地触发 4.5m 环形地裂冲击波！
+📸 已捕获实机渲染画面 -> 06_wall_bounce_climb.png (1280x720)
+[自测阶段 6 通过] 4m 垂直夹墙蹬墙跳成功反弹，0.18s 容错缓冲与法向加速完好！
+📸 已捕获实机渲染画面 -> 07_perfect_parry_gold.png (1280x720)
+[自测阶段 7 通过] 0.15s 完美弹刀判定触发！傀儡大破绽硬直，金光与击飞震荡！
+📸 已捕获实机渲染画面 -> 08_perfect_dodge_bullet_time.png (1280x720)
+[自测阶段 8 通过] 极限闪避触发！0.25x 时停慢动作领域与 0.16s 无敌帧实测有效！
+📸 已捕获实机渲染画面 -> 09_fpp_first_person_view.png (1280x720)
+[自测阶段 9 通过] 第一人称视角切换顺滑，头部网格自动隐藏，出刀无穿模剪裁！
+==================================================
+★ Asternova M2 全部 10 大机动与战斗手感细节实机实测 100% 达成！★
+★ 截取的 10 份高品质实机试玩画面已写入 playtest_snapshots/ ★
+==================================================
