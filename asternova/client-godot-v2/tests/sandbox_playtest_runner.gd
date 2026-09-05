@@ -139,14 +139,14 @@ func _physics_process(delta: float) -> void:
 
 		5: # 阶段 6: 北侧山顶鸟居鸟瞰全景 (验证 360° 天际线封闭无虚空与 ACES 通透光影)
 			if phase_timer < 0.05:
-				player.global_position = Vector3(0.0, 7.8, -28.0)
+				player.global_position = Vector3(0.0, 7.2, -25.5)
 				player.camera_controller.current_mode = CameraController.CameraMode.FPP
 				player.camera_controller.target_arm_length = 0.0
 				player.camera_controller.spring_arm.spring_length = 0.0
 				player.camera_controller.rotation.y = deg_to_rad(180.0)
 				player.camera_controller.current_yaw = deg_to_rad(180.0)
-				player.camera_controller.spring_arm.rotation.x = deg_to_rad(-14.0)
-				player.camera_controller.current_pitch = deg_to_rad(-14.0)
+				player.camera_controller.spring_arm.rotation.x = deg_to_rad(-18.0)
+				player.camera_controller.current_pitch = deg_to_rad(-18.0)
 			elif phase_timer >= 0.6:
 				capture_snapshot("06_north_torii_panorama_aces.png")
 				print("[机位 6 通过] 北侧高台鸟瞰全景、360° 封闭天际线与 ACES 通透光影捕获！")
