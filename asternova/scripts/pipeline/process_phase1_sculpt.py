@@ -144,7 +144,8 @@ def process_raw_sculpt(raw_glb_path, output_dir, render_dir):
     return True
 
 if __name__ == "__main__":
-    base_dir = r"c:\Users\TimeCraker\Desktop\my-workspace\games\asternova"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    base_dir = os.path.abspath(os.path.join(script_dir, "..", ".."))
     raw_glb = os.path.join(base_dir, "art", "models", "raw_ai_sculpt", "aster_raw_sculpt.glb")
     out_dir = os.path.join(base_dir, "art", "models")
     rnd_dir = os.path.join(base_dir, "art", "render_previews", "milestone1")
