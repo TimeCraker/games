@@ -107,7 +107,7 @@ func _physics_process(delta: float) -> void:
 
 		3: # 阶段 4: 3.5m 战术小巷横条砖与清水混凝土外立面 (对标 CS2 10 / ZZZ 13)
 			if phase_timer < 0.05:
-				player.global_position = Vector3(-6.5, 1.3, 0.1)
+				player.global_position = Vector3(-8.8, 1.3, -0.5)
 				player.velocity = Vector3.ZERO
 				player.camera_controller.current_mode = CameraController.CameraMode.FPP
 				player.camera_controller.target_arm_length = 0.0
