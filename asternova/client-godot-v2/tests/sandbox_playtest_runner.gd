@@ -13,16 +13,19 @@ var current_phase: int = 0
 var phase_timer: float = 0.0
 
 var primary_snapshot_dir: String = "res://playtest_snapshots/sandbox/"
-var export_dirs: Array[String] = [
-	"c:/Users/TimeCraker/Desktop/my-workspace/games/asternova/render-lab/screenshots/playtest_v2/",
-	"c:/Users/TimeCraker/Desktop/my-workspace/games/render-lab/screenshots/playtest_v2/"
-]
+var export_dirs: Array[String] = []
 var subaction_step: int = 0
 
 func _ready() -> void:
 	print("======================================================================")
 	print("★ Asternova M1/M2 次世代日式都市街区 (CS2 PBR + ZZZ 生活气息) 实机验收启动 ★")
 	print("======================================================================")
+	
+	# 动态解析全项目唯一视觉验收真理源目录 (art/render_previews/scenes/playtest/)
+	var target_export: String = ProjectSettings.globalize_path("res://../art/render_previews/scenes/playtest/")
+	if not target_export.ends_with("/"):
+		target_export += "/"
+	export_dirs.append(target_export)
 	
 	var dir: DirAccess = DirAccess.open("res://")
 	if not dir.dir_exists("playtest_snapshots"):
@@ -155,7 +158,7 @@ func _physics_process(delta: float) -> void:
 		6: # 阶段 7: 测试汇总与安全退出
 			print("======================================================================")
 			print("★ Asternova 次世代日式都市街区 (CS2 PBR + ZZZ 生活气息) 全部 6 大视角验收完成！★")
-			print("★ 验收截图已完整导出至 render-lab/screenshots/playtest_v2/ ★")
+			print("★ 验收截图已完整导出至唯一权威真理源: art/render_previews/scenes/playtest/ ★")
 			print("======================================================================")
 			advance_phase()
 			get_tree().quit(0)

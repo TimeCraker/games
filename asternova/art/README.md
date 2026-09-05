@@ -27,16 +27,18 @@ asternova/art/
 │   ├── compare_back.png               # 背影与发流对比
 │   └── compare_closeup.png            # 面部特写对比
 │
-└── render_previews/           # 阶段性正式真机渲染件（Godot 4.7 引擎捕获）
-    ├── screenshot_high.png            # 高画质展示图（全后处理/光照）
-    ├── screenshot_medium.png          # 中画质展示图（平衡档）
-    ├── screenshot_low.png             # 低画质基准图（核显/锁 60 FPS）
-    ├── screenshot_street_wide.png     # 黄昏樱花商店街全景展示
-    ├── screenshot_aster_closeup.png   # 角色半身特写展示
-    ├── aster_front.png                # 三视图引擎正面捕获
-    ├── aster_side.png                 # 三视图引擎侧面捕获
-    ├── aster_back.png                 # 三视图引擎背面捕获
-    └── aster_closeup.png              # 三视图引擎特写捕获
+└── render_previews/           # 唯一权威真机渲染件（Godot 4.7 引擎捕获与 Blender 阶段验收）
+    ├── characters/            # 角色阶段验收与正式定稿展示
+    │   └── aster/             # Aster 正式全身/特写/三视角 2K 成图 (13 张)
+    └── scenes/                # 场景工业化验收成图
+        ├── golden_slice/      # 黄金切片街景 4K 级细节图 (4 张)
+        ├── modular_kit/       # 终末地级模块化单体与全景图 (5 张)
+        ├── playtest/          # 6 大机位实机沙盒动线检验图 (6 张)
+        ├── stage_inspection/  # 阶段巡检视察图 (9 张)
+        ├── screenshot_high.png # 高画质展示图（全后处理/光照）
+        ├── screenshot_medium.png # 中画质展示图（平衡档）
+        ├── screenshot_low.png  # 低画质基准图（核显/锁 60 FPS）
+        └── screenshot_street_wide.png # 黄昏樱花商店街全景展示
 ```
 
 ---
@@ -45,9 +47,14 @@ asternova/art/
 
 1. **绝对整洁原则**：
    - 严禁在 `art/` 根目录及子目录随意堆放 `debug_*`、`crop_*`、`test_*`、`extract_*` 等临时脚本调试图片。
-   - 建模调试、UV 裁剪、贴图提取的中间临时文件必须写入临时目录或内存，调试完毕立即清除，不得提交进 `art/`。
-2. **单一真相源（SSOT）**：
+   - 建模调试、UV 裁剪、贴图提取的中间临时文件必须写入系统临时目录或内存，调试完毕立即清除，不得提交进 `art/`。
+2. **唯一权威真理源（SSOT）**：
    - 角色建模与风格验收以 `characters/aster/turnaround-final.png` 为唯一视觉基准。
-3. **成果存档规范**：
-   - `render_previews/` 仅保留具有里程碑验收意义的高清成图（三档画质截图、全景图与三视图正式捕获图）。
+   - 真机与阶段渲染验收图唯一存放在 `art/render_previews/`，严禁在其他工程（如 `render-lab/`）建立并行的截图目录。
+3. **脚本绝对隔离纪律（Script Segregation）**：
+   - **`art/` 目录永久禁止存放任何可执行脚本（`.py`, `.sh`, `.bat` 等）**。
+   - 所有模型重拓扑、烘焙、材质生成与批处理流水线脚本，必须统一收敛在 `asternova/scripts/pipeline/` 或 `asternova/scripts/` 下维护。
+4. **成果存档规范**：
+   - `render_previews/` 仅保留具有里程碑验收意义的高清成图，杜绝未成型的草稿碎片入库。
+
 
