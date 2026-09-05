@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://bsandbox_playtest_runner_scene"]
+
+[ext_resource type="PackedScene" uid="uid://bmodern_japan_sandbox" path="res://scenes/levels/modern_residential_sandbox.tscn" id="1_sandbox"]
+[ext_resource type="Script" path="res://tests/sandbox_playtest_runner.gd" id="2_driver"]
+
+[node name="SandboxPlaytest" instance=ExtResource("1_sandbox")]
+
+[node name="PlaytestDriver" type="Node" parent="." index="9"]
+script = ExtResource("2_driver")
