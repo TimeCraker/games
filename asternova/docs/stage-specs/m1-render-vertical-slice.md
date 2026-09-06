@@ -18,7 +18,7 @@
 
 ### A0. 链路先行（2026-09-05 全面重构定案）
 
-打通 **Tripo3D 2.0 原生 GLB → Blender Quad 重拓扑 → Godot 4.7 二次元着色器与装配链路**（彻底废黜早期 VRoid / VRM 玩具链路与第三方 MMD 拆件拼接）：自研 Toon Shader 映射、SDF 面部平滑阴影贴图、内凹视差星空眼、Blender bpy → KTX2 贴图压缩——**链路通了才进画质调教**（M1 真风险在规范对齐，不在 shader）。
+打通 **Tripo3D 2.0 / Studio（Smart Mesh Quad 拓扑 + Auto-Rig 骨骼直出）→ Blender 比例与佩刀插槽装配 → Godot 4.7 二次元着色器与装配链路**（彻底废黜早期 VRoid / VRM 玩具链路与第三方 MMD 拆件拼接）：自研 Toon Shader 映射、SDF 面部平滑阴影贴图、内凹视差星空眼、Blender bpy → KTX2 贴图压缩——**链路通了才进画质调教**（M1 真风险在规范对齐，不在 shader）。
 
 同周核查：**CompositorEffect 在 Compatibility 渲染器不可用**（GL 路线无 compute）→ 描边锁定 inverted hull、后处理收缩到内置 Environment（glow / tonemap / LUT），实际可用清单记入 STYLE.md §3。
 
