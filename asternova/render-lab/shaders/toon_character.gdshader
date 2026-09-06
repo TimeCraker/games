@@ -74,16 +74,31 @@ void light() {
 		float NdotV = dot(NORMAL, VIEW);
 		float rim_raw = clamp(1.0 - clamp(NdotV, 0.0, 1.0), 0.0, 1.0);
 		float rim_intensity = smoothstep(rim_threshold - 0.03, rim_threshold + 0.03, pow(rim_raw, rim_spread));
-		rim_contribution = rim_intensity * rim_color.rgb * LIGHT_COLOR * 0.35 * lit_mask;
+		rim_contribution = rim_intensity * rim_color.rgb * LIGHT_COLOR * 0.07 * lit_mask;
 	}
 
 	// 4. 二次元高光 (Specular)
 	vec3 half_vector = normalize(VIEW + LIGHT);
 	float NdotH = dot(NORMAL, half_vector);
 	float spec_intensity = smoothstep(1.0 - specular_size - 0.01, 1.0 - specular_size + 0.01, NdotH);
-	vec3 specular_contribution = spec_intensity * specular_color.rgb * LIGHT_COLOR * 0.45 * lit_mask;
+	vec3 specular_contribution = spec_intensity * specular_color.rgb * LIGHT_COLOR * 0.07 * lit_mask;
 
-	// 5. 漫反射贡献累加（乘以 0.90 控光系数，配合环境光维持最高亮度在 0.88~0.92，细腻保留高光与布纹细节）
-	DIFFUSE_LIGHT += ALBEDO * LIGHT_COLOR * light_mult * ATTENUATION * 0.90;
+	// 5. HDR 余量控制（实测标定）：本机 gl_compatibility 合成管线对 light() 直接光
+	//    叠加约 2.88x 增益（天空背景与环境光不受影响），白色材质受光面会被截断成
+	//    255 死白。漫反射系数按标定下调，高光/边缘光按剩余亮度余量衰减，
+	//    保证受光面合成亮度 <= 0.84 线性（sRGB ~244），杜绝死白。
+	float diffuse_scale = 0.20;
+	float light_gain = 2.88;
+	float luma_ceiling = 0.80;
+	float ambient_luma = 0.23; // 场景 Environment ambient_light 的等效亮度估计
+	float albedo_lum = dot(ALBEDO, vec3(0.299, 0.587, 0.114));
+	float light_lum = dot(LIGHT_COLOR, vec3(0.299, 0.587, 0.114));
+	float mult_lum = dot(light_mult, vec3(0.299, 0.587, 0.114));
+	float used_luma = albedo_lum * (light_gain * light_lum * mult_lum * diffuse_scale + ambient_luma);
+	float headroom = clamp((luma_ceiling - used_luma) / max(light_gain * light_lum, 1e-4), 0.0, 1.0);
+	specular_contribution *= headroom;
+	rim_contribution *= headroom;
+
+	DIFFUSE_LIGHT += ALBEDO * LIGHT_COLOR * light_mult * ATTENUATION * diffuse_scale;
 	SPECULAR_LIGHT += specular_contribution + rim_contribution;
 }

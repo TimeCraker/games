@@ -40,7 +40,7 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 		var mat := ShaderMaterial.new()
 		mat.render_priority = 0
 		mat.shader = SHADER_TOON
-		mat.set_shader_parameter("albedo_color", Color(1, 1, 1, 1))
+		mat.set_shader_parameter("albedo_color", Color(0.78, 0.78, 0.78, 1))
 		mat.set_shader_parameter("albedo_texture", albedo_tex)
 		mat.set_shader_parameter("desaturation", 0.0)
 		mat.set_shader_parameter("use_alpha_scissor", false)
@@ -64,7 +64,7 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 		mat.set_shader_parameter("use_emission_mask", mask_tex != null)
 		mat.set_shader_parameter("emission_mask_texture", mask_tex)
 		mat.set_shader_parameter("emission_color", Color(1.0, 0.95, 0.88, 1.0))
-		mat.set_shader_parameter("emission_energy", 1.2)
+		mat.set_shader_parameter("emission_energy", 0.6)
 		# 深灰蓝 next_pass 描边
 		var outline := ShaderMaterial.new()
 		outline.render_priority = 1

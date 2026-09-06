@@ -23,7 +23,8 @@ func _ready() -> void:
 	cam.current = true
 
 	var sun: DirectionalLight3D = stage.get_node("SunLight")
-	sun.look_at_from_position(Vector3(-3.2, 5.6, -3.8), Vector3(0, 0.6, 0))
+	# 太阳置于左侧偏上 (X=-5.0, Y=6.0, Z=2.5)，向场景中心打出 45° 侧逆立体光
+	sun.look_at_from_position(Vector3(-5.0, 6.0, 2.5), Vector3(0.0, 0.9, 0.0))
 
 	print("[review] scene ready, window=", win.size)
 

@@ -45,7 +45,7 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 		var mat := ShaderMaterial.new()
 		mat.render_priority = 0
 		mat.shader = SHADER_TOON
-		mat.set_shader_parameter("albedo_color", Color(1, 1, 1, 1))
+		mat.set_shader_parameter("albedo_color", Color(0.78, 0.78, 0.78, 1))
 		mat.set_shader_parameter("albedo_texture", albedo_tex)
 		mat.set_shader_parameter("desaturation", 0.0)
 		mat.set_shader_parameter("use_alpha_scissor", false)
