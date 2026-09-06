@@ -143,6 +143,6 @@ omni_attenuation = 0.5
 [node name="InteriorLight_Register" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 2.7, 2.2)
 light_color = Color(1, 0.8, 0.58, 1)
-light_energy = 2.0
+light_energy = 1.8
 omni_range = 5.5
 omni_attenuation = 0.7

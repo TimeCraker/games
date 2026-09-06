@@ -80,7 +80,7 @@ body = [o for o in bpy.context.scene.objects if o.type == "MESH" and "Body" in o
 # idempotent pre-clean: drop anything a previous run generated
 STALE_PREFIX = ("SignPanel", "SignText", "SignBand", "Gondola", "Counter",
                 "Register", "Scanner", "LEDStrip", "Products_", "Fittings_",
-                "ConvenienceStore_Glass")
+                "EntryMat", "PromoTable", "PromoTop", "Promo_prod", "ConvenienceStore_Glass")
 stale = [o for o in bpy.context.scene.objects
          if o.type == "MESH" and o.name.startswith(STALE_PREFIX)]
 for o in stale:
@@ -89,7 +89,7 @@ log(f"pre-clean removed {len(stale)} stale objects")
 
 MAT_CONCRETE = flat_mat("mat_pbr_concrete", (0.66, 0.68, 0.70), rough=0.80)
 MAT_ALU = flat_mat("mat_pbr_aluminum", (0.16, 0.17, 0.19), rough=0.40, metal=0.85)
-MAT_LIGHTBOX = flat_mat("mat_pbr_lightbox", (0.82, 0.81, 0.79), rough=0.5,
+MAT_LIGHTBOX = flat_mat("mat_pbr_lightbox", (0.45, 0.45, 0.44), rough=0.5,
                         emit=(0.95, 0.93, 0.88), emit_str=1.0)
 MAT_SIGN_TEXT = flat_mat("mat_pbr_sign_text", (0.05, 0.06, 0.07), rough=0.6)
 MAT_GONDOLA = flat_mat("mat_pbr_gondola", (0.55, 0.57, 0.60), rough=0.55)
@@ -147,6 +147,20 @@ bm.to_mesh(body.data)
 bm.free()
 body.data.update()
 
+# 店内地板：素色混凝土材质槽（PBR rough 0.92 无镜面 hot-spot，消阳光穿门死白）
+floor_mat = flat_mat("mat_pbr_floor", (0.42, 0.41, 0.40), rough=0.92)
+if "mat_pbr_floor" not in [m.name for m in body.data.materials]:
+    body.data.materials.append(floor_mat)
+floor_idx = [m.name for m in body.data.materials].index("mat_pbr_floor")
+n_floor = 0
+for poly in body.data.polygons:
+    c = poly.center
+    n = poly.normal
+    if (n.z > 0.7 and c.z < 0.30 and abs(c.x) < 6.4 and -5.6 < c.y < 5.6):
+        poly.material_index = floor_idx
+        n_floor += 1
+log(f"interior floor faces -> mat_pbr_floor: {n_floor}")
+
 # 左墙外侧旧 24 招牌（-X 朝外面板）：并入冠部素色材质，消店内透视镜像旧牌
 crown_idx = None
 for mi_, m_ in enumerate(body.data.materials):
@@ -173,8 +187,8 @@ gobj.name = "ConvenienceStore_Glass"
 # storefront spans x -6.35..1.10 (left of door) and 2.85..3.35 (right pane)
 # built in two halves via one grid then split: simpler -> scale a full grid to
 # the left pane and add a small right pane object
-gobj.scale = ((1.10 - (-6.35)), 1.0, (2.58 - 0.55))
-gobj.location = ((-6.35 + 1.10) / 2, 5.45, (0.55 + 2.58) / 2)
+gobj.scale = ((1.10 - (-6.35)), 1.0, (2.68 - 0.55))
+gobj.location = ((-6.35 + 1.10) / 2, 5.45, (0.55 + 2.68) / 2)
 bpy.ops.object.transform_apply(scale=True, location=True)
 gobj.data.materials.append(glass_mat)
 bpy.ops.object.mode_set(mode="EDIT")
@@ -186,8 +200,8 @@ pane2 = bpy.ops.mesh.primitive_grid_add(x_subdivisions=1, y_subdivisions=3,
                                         size=1, calc_uvs=True)
 p2 = bpy.context.active_object
 p2.name = "ConvenienceStore_GlassR"
-p2.scale = (3.35 - 2.85, 1.0, 2.58 - 0.55)
-p2.location = ((2.85 + 3.35) / 2, 5.45, (0.55 + 2.58) / 2)
+p2.scale = (3.35 - 2.85, 1.0, 2.68 - 0.55)
+p2.location = ((2.85 + 3.35) / 2, 5.45, (0.55 + 2.68) / 2)
 bpy.ops.object.transform_apply(scale=True, location=True)
 p2.data.materials.append(glass_mat)
 bpy.ops.object.mode_set(mode="EDIT")
@@ -210,7 +224,7 @@ bm.to_mesh(body.data)
 bm.free()
 
 # lightbox: white panel box across the front crown (full width), dark text
-sign_panel = box("SignPanel", 12.9, 0.10, 2.10, (0.0, 5.98, 3.55), MAT_LIGHTBOX)
+sign_panel = box("SignPanel", 12.9, 0.10, 1.94, (0.0, 5.98, 3.63), MAT_LIGHTBOX)
 # dark text: two extruded text objects
 def add_text(name, body_str, size, pos, mat, extrude=0.02, align_x="CENTER"):
     bpy.ops.object.text_add(location=pos)
@@ -285,6 +299,17 @@ box("Counter_ReturnTop", 0.8, 1.0, 0.05, (5.15, 4.9, 0.945), MAT_COUNTER)
 box("Register_Screen", 0.42, 0.06, 0.34, (3.15, 4.78, 1.28), MAT_SCREEN)
 box("Register_Stand", 0.06, 0.06, 0.30, (3.15, 4.78, 1.05), MAT_ALU)
 box("Scanner", 0.24, 0.20, 0.08, (3.7, 4.72, 1.005), MAT_SCREEN)
+
+# promo stack-out table over the sun-patch inside the door (diegetic)
+box("PromoTable", 1.0, 0.62, 0.46, (0.8, 1.8, 0.23), MAT_COUNTER_BODY)
+box("PromoTop", 1.1, 0.7, 0.04, (0.8, 1.8, 0.48), MAT_COUNTER)
+for k in range(6):
+    make_prod("Promo_prod", PROD_COLORS[k % 4], 0.16, 0.12, 0.20,
+              (0.45 + k * 0.14, 1.8, 0.60))
+
+# entry doormat inside the door (kills sun spec hotspot, diegetic)
+MAT_MAT = flat_mat("mat_pbr_doormat", (0.24, 0.25, 0.27), rough=0.95)
+box("EntryMat", 2.3, 1.1, 0.02, (1.97, 4.9, 0.012), MAT_MAT)
 
 # 3 ceiling LED strip panels along the central aisle
 for i, (lx, ly) in enumerate(((0.6, 2.6), (0.2, 0.3), (-0.2, -2.2))):
