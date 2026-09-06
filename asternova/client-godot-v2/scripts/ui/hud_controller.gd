@@ -15,14 +15,31 @@ extends Control
 
 var player: PlayerController = null
 var notice_timer: float = 0.0
+var flash_rect: ColorRect = null
 
 func _ready() -> void:
 	charge_bar.visible = false
 	feedback_notice.visible = false
+	# 居合全屏闪白层（默认完全透明，不拦截输入）
+	flash_rect = ColorRect.new()
+	flash_rect.name = "IaiFlash"
+	flash_rect.color = Color(1, 1, 1, 1)
+	flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	flash_rect.modulate.a = 0.0
+	add_child(flash_rect)
 	await get_tree().process_frame
 	var players: Array = get_tree().get_nodes_in_group("player")
 	if players.size() > 0:
 		bind_player(players[0] as PlayerController)
+
+func flash_white(duration: float) -> void:
+	## 居合穿透斩全屏闪白：瞬时白场后顺滑淡出
+	if flash_rect == null:
+		return
+	flash_rect.modulate.a = 1.0
+	var tween: Tween = create_tween()
+	tween.tween_property(flash_rect, "modulate:a", 0.0, maxf(duration, 0.01))
 
 func bind_player(p: PlayerController) -> void:
 	player = p

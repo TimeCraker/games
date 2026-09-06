@@ -33,6 +33,9 @@ var cached_wall_normal: Vector3 = Vector3.ZERO
 var attack_lunge_timer: float = 0.0
 var attack_lunge_velocity: Vector3 = Vector3.ZERO
 
+# 单体局部卡肉：命中瞬间冻结自身位姿与位移，倒计时后恢复（全局 time_scale 恒为 1.0）
+var hitstop_timer: float = 0.0
+
 # 视觉表现与动效
 var attack_tween: Tween = null
 
@@ -51,6 +54,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	combat_fsm.handle_input(event)
 
 func _physics_process(delta: float) -> void:
+	# 单体局部卡肉：冻结期间暂停位移速度向量与位姿结算，摄像机与世界时间保持 1.0 满帧
+	if hitstop_timer > 0.0:
+		hitstop_timer -= delta
+		velocity = Vector3.ZERO
+		move_and_slide()
+		return
+
 	update_input_direction()
 	
 	# 状态机驱动不同运动模式
@@ -306,6 +316,24 @@ func begin_attack_lunge(lunge_dir: Vector3, distance: float, windup: float) -> v
 	attack_lunge_timer = windup
 	attack_lunge_velocity = lunge_dir * (distance / maxf(windup, 0.01))
 
+func freeze_pose(duration: float) -> void:
+	## 单体局部卡肉：冻结自身位移与骨骼位姿，同时暂停挥刀姿态与回旋位移动画
+	hitstop_timer = maxf(hitstop_timer, duration)
+	aster_rig.freeze_pose(duration)
+	if attack_tween and attack_tween.is_valid():
+		attack_tween.pause()
+	get_tree().create_timer(duration).timeout.connect(_unfreeze_attack_motion)
+
+func _unfreeze_attack_motion() -> void:
+	if attack_tween and attack_tween.is_valid():
+		attack_tween.play()
+
+func _trigger_screen_flash(duration: float) -> void:
+	## 全屏闪白（居合穿透斩）：交由 HUD 层执行
+	for hud in get_tree().get_nodes_in_group("hud"):
+		if hud.has_method("flash_white"):
+			hud.flash_white(duration)
+
 func execute_attack_step(stage: int, soft_target: Node3D) -> void:
 	# 出刀瞬间：刀身切换至右手掌心插槽
 	update_blade_stance(true)
@@ -343,12 +371,11 @@ func execute_attack_step(stage: int, soft_target: Node3D) -> void:
 		attack_tween = create_tween()
 		attack_tween.tween_property(visual_root, "rotation:y", visual_root.rotation.y + TAU, 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
-	# 程序化握点挥刀（纯骨骼姿态，无特效）
+	# 程序化握点挥刀（月华刀光条带由 rig 内 BladeRibbonTrail 生成）
 	aster_rig.play_swing(stage)
 
-	# 产生刀光弧刃与 Hitbox 判定
-	spawn_slash_arc(stage)
-	check_blade_hits(combat_data.combo_damage[stage], stage == 3)
+	# Hitbox 判定与分级单体卡肉响应
+	check_blade_hits(stage)
 
 func execute_iaijutsu(tier: int) -> void:
 	if tier < 1:
@@ -361,16 +388,45 @@ func execute_iaijutsu(tier: int) -> void:
 	# 极速瞬步穿透
 	velocity = fwd * (dash_dist / 0.22)
 
-	# 居合拔刀横斩（出刀瞬间切换右手插槽）
+	# 居合拔刀横斩（出刀瞬间切换右手插槽 + 全屏闪白）
 	update_blade_stance(true)
 	aster_rig.play_iaijutsu_swing()
+	_trigger_screen_flash(combat_data.iai_flash_duration)
 
-	# 判定路径上全部敌人
-	spawn_slash_arc(3)
-	check_blade_hits(dmg, true)
+	# 判定路径上全部敌人（居合重卡肉 0.15s）
+	check_blade_hits_iai()
 
-func check_blade_hits(damage: float, is_heavy: bool) -> void:
-	# 沿刀刃挥击范围进行球形/扇形重叠检测
+func check_blade_hits(stage: int) -> void:
+	## 沿刀刃挥击范围做球形重叠检测，并按段位施加分级单体卡肉与震屏
+	var damage: float = combat_data.combo_damage[stage]
+	var freeze: float = combat_data.hitstop_stage_freeze[stage]
+	var trauma: float = combat_data.hit_trauma_stage[stage]
+	var knock: float = combat_data.finisher_knock_distance if stage == 3 else -1.0
+	var hit_colliders: Array = _query_blade_hits(damage, -visual_root.global_transform.basis.z, stage == 3, freeze, knock)
+
+	if not hit_colliders.is_empty():
+		camera_controller.add_trauma(trauma)
+		freeze_pose(freeze)
+		if stage == 2:
+			# 3段双穿刺：0.03s + 0.06s 双段微卡肉
+			var second_freeze: float = combat_data.hitstop_stage2_second
+			get_tree().create_timer(combat_data.hitstop_stage2_gap).timeout.connect(func() -> void:
+				freeze_pose(second_freeze)
+				for collider in hit_colliders:
+					if is_instance_valid(collider) and collider.has_method("apply_freeze"):
+						collider.apply_freeze(second_freeze)
+			)
+
+func check_blade_hits_iai() -> void:
+	## 居合穿透斩：路径上全部敌人，重卡肉 0.15s
+	var dmg: float = combat_data.charge_damages[combat_data.charge_damages.size() - 1]
+	var hit_colliders: Array = _query_blade_hits(dmg, -visual_root.global_transform.basis.z, true, combat_data.hitstop_iaijutsu, -1.0)
+	if not hit_colliders.is_empty():
+		camera_controller.add_trauma(combat_data.hit_trauma_iaijutsu)
+		freeze_pose(combat_data.hitstop_iaijutsu)
+
+func _query_blade_hits(damage: float, hit_dir: Vector3, is_heavy: bool, freeze: float, knock: float) -> Array:
+	## 球形重叠检测并结算伤害/单体冻结/击退，返回受击者列表
 	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
 	var query: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
 	var sphere: SphereShape3D = SphereShape3D.new()
@@ -378,19 +434,16 @@ func check_blade_hits(damage: float, is_heavy: bool) -> void:
 	query.shape = sphere
 	query.transform = Transform3D(Basis(), global_position + -visual_root.global_transform.basis.z * 1.5 + Vector3.UP * 1.0)
 	var hits: Array[Dictionary] = space_state.intersect_shape(query)
-	
-	var hit_count: int = 0
+
+	var hit_colliders: Array = []
 	for hit in hits:
 		var collider: Object = hit.collider
 		if collider.has_method("take_hit") and collider != self:
-			collider.take_hit(damage, -visual_root.global_transform.basis.z, is_heavy)
+			collider.take_hit(damage, hit_dir, is_heavy, freeze, knock)
 			attack_hit_target.emit(collider, damage, is_heavy)
 			spawn_hit_spark(collider.global_position + Vector3(0, 1.2, 0), is_heavy)
-			hit_count += 1
-
-	if hit_count > 0:
-		# 触发卡肉顿帧与震屏
-		camera_controller.trigger_hit_impact(is_heavy)
+			hit_colliders.append(collider)
+	return hit_colliders
 
 func play_parry_fx() -> void:
 	camera_controller.trigger_hit_impact(true)
@@ -400,42 +453,6 @@ func play_parry_fx() -> void:
 	var recoil_tween: Tween = create_tween()
 	recoil_tween.tween_property(visual_root, "position:z", 0.25, 0.06)
 	recoil_tween.tween_property(visual_root, "position:z", 0.0, 0.2).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
-
-func spawn_slash_arc(stage: int) -> void:
-	var arc: MeshInstance3D = MeshInstance3D.new()
-	var torus: TorusMesh = TorusMesh.new()
-	torus.inner_radius = 1.0
-	torus.outer_radius = 1.7
-	arc.mesh = torus
-	
-	var mat: StandardMaterial3D = StandardMaterial3D.new()
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	
-	match stage:
-		0: mat.albedo_color = Color(0.35, 0.85, 1.0, 0.75)
-		1: mat.albedo_color = Color(0.25, 0.95, 0.85, 0.8)
-		2: mat.albedo_color = Color(0.65, 0.8, 1.0, 0.85)
-		3: mat.albedo_color = Color(1.0, 0.85, 0.2, 0.9)
-	
-	arc.material_override = mat
-	visual_root.add_child(arc)
-	if camera_controller and camera_controller.current_mode == CameraController.CameraMode.FPP:
-		arc.position = Vector3(0, 1.35, -0.65)
-	else:
-		arc.position = Vector3(0, 0.9, -0.6)
-	
-	match stage:
-		0: arc.rotation_degrees = Vector3(35, 45, -20)
-		1: arc.rotation_degrees = Vector3(0, 0, 15)
-		2: arc.rotation_degrees = Vector3(90, 0, 0)
-		3: arc.rotation_degrees = Vector3(0, 0, 0)
-		
-	var tween: Tween = arc.create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(arc, "scale", Vector3(1.3, 1.3, 1.3), 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(mat, "albedo_color:a", 0.0, 0.16)
-	tween.finished.connect(arc.queue_free)
 
 func spawn_hit_spark(hit_pos: Vector3, is_heavy: bool) -> void:
 	var spark: Node3D = Node3D.new()

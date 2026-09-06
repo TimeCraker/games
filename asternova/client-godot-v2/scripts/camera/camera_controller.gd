@@ -117,17 +117,9 @@ func update_speed_feel(speed: float, is_sliding: bool, delta: float) -> void:
 		else:
 			target_arm_offset.y = combat_data.camera_tpp_offset.y
 
-## 触发打击卡肉顿帧与震屏
+## 触发打击震屏（单体局部卡肉系统已接管顿帧，摄像机与世界时间恒定 1.0 满帧）
 func trigger_hit_impact(is_heavy: bool = false) -> void:
-	var hitstop_dur: float = combat_data.hitstop_heavy if is_heavy else combat_data.hitstop_light
-	var shake_power: float = 0.75 if is_heavy else 0.35
-	add_trauma(shake_power)
-	
-	# 触发微顿帧 (局部时间缩放，忽略 time_scale 的真实计时恢复)
-	Engine.time_scale = 0.05
-	get_tree().create_timer(hitstop_dur, true, false, true).timeout.connect(
-		func(): Engine.time_scale = 1.0
-	)
+	add_trauma(0.75 if is_heavy else 0.35)
 
 func add_trauma(amount: float) -> void:
 	trauma = clampf(trauma + amount, 0.0, 1.0)

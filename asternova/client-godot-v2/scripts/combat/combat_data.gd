@@ -66,6 +66,15 @@ extends Resource
 @export var camera_fpp_offset: Vector3 = Vector3(0.0, 1.45, -0.15) ## 第一人称视线位置
 @export var fov_base: float = 75.0
 @export var fov_max: float = 88.0 ## 极速滑铲与居合冲刺时最大 FOV
-@export var hitstop_light: float = 0.05 ## 轻击顿帧时长(秒)
-@export var hitstop_heavy: float = 0.10 ## 居合/重击卡肉顿帧时长
+
+@export_group("单体局部卡肉与受击反馈 (Local Hitstop & Hit Feedback)")
+@export var hitstop_stage_freeze: Array[float] = [0.04, 0.04, 0.03, 0.10] ## 各段普攻命中单体冻结时长(秒)
+@export var hitstop_stage2_second: float = 0.06 ## 3段双穿刺第二段微卡肉时长(秒)
+@export var hitstop_stage2_gap: float = 0.09 ## 3段双刺两次卡肉的间隔(秒)
+@export var hitstop_iaijutsu: float = 0.15 ## 居合穿透斩重卡肉时长(秒)
+@export var hit_trauma_stage: Array[float] = [0.15, 0.15, 0.15, 0.65] ## 各段命中镜头震动量(4段终结大震屏)
+@export var hit_trauma_iaijutsu: float = 0.5 ## 居合穿透斩镜头震动量
+@export var finisher_knock_distance: float = 0.45 ## 4段终结木桩击退后仰距离(米)
+@export var hit_flash_duration: float = 0.06 ## 受击漫反射闪白时长(秒)
+@export var iai_flash_duration: float = 0.06 ## 居合全屏闪白时长(秒)
 @export var trauma_decay: float = 2.2 ## 震屏能量衰减速度

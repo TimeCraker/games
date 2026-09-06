@@ -23,6 +23,20 @@ func _physics_process(_delta: float) -> void:
 			rig = player.aster_rig
 		return
 
+	# 落地回正确认后自动缓冲攻击，并连拍择优
+	if _pending_attack_at_ground and player.is_on_floor() and player.combat_fsm.current_state == PlayerCombatFSM.State.IDLE:
+		_pending_attack_at_ground = false
+		_attack_fired_frame = frame_count + 1
+		player.combat_fsm.buffer_input("attack")
+	if not _pending_burst.is_empty() and _attack_fired_frame > 0:
+		var rel: int = frame_count - _attack_fired_frame
+		if _pending_burst.has(rel):
+			# 仅内存取帧（同步写盘会卡死渲染循环导致连拍重复帧），退出时统一写盘
+			var vp: Viewport = get_viewport()
+			if vp:
+				_burst_images[_pending_burst[rel]] = vp.get_texture().get_image()
+			_pending_burst.erase(rel)
+
 	match frame_count:
 		20:
 			_frame_camera(PI, -8.0, 2.6)
@@ -96,7 +110,7 @@ func _physics_process(_delta: float) -> void:
 			_check("离地跳跃", player.global_position.y > 0.3 or player.velocity.y > 0.0)
 		160:
 			_check("存活未坠崖", player.global_position.y > -5.0)
-		# ============ 打击手感数值验证：磁性吸附 + 卡肉顿帧 + 震屏 ============
+		# ============ 打击手感数值验证：磁性吸附 + 单体局部卡肉 + 震屏 ============
 		170:
 			# 传送到木桩前 2.5m (4.5m 软锁距离内、正前方扇形)
 			player.global_position = Vector3(0, 0.1, -2.5)
@@ -104,30 +118,112 @@ func _physics_process(_delta: float) -> void:
 			player.visual_root.rotation.y = 0.0
 			player.combat_fsm.change_state(PlayerCombatFSM.State.IDLE)
 			pre_lunge_dist = _dummy_dist()
-			_hit_min_time_scale = 1.0
+			_saw_player_freeze = false
+			_saw_dummy_freeze = false
+			_max_trauma = 0.0
 		176:
 			# 确认已落地回正再出刀，防止缓冲被空中星坠抢走
 			_check("落定进入待命", player.is_on_floor() and player.combat_fsm.current_state == PlayerCombatFSM.State.IDLE)
+			_check("刀光标记点就绪", rig.blade_base_marker != null and rig.blade_tip_marker != null)
 			player.combat_fsm.buffer_input("attack")
 		177:
-			_hit_min_time_scale = minf(_hit_min_time_scale, Engine.time_scale)
+			_saw_player_freeze = _saw_player_freeze or player.hitstop_timer > 0.0
+			_saw_dummy_freeze = _saw_dummy_freeze or _dummy().freeze_timer > 0.0
+			_max_trauma = maxf(_max_trauma, player.camera_controller.trauma)
 		178:
-			_hit_min_time_scale = minf(_hit_min_time_scale, Engine.time_scale)
+			_saw_player_freeze = _saw_player_freeze or player.hitstop_timer > 0.0
+			_saw_dummy_freeze = _saw_dummy_freeze or _dummy().freeze_timer > 0.0
+			_max_trauma = maxf(_max_trauma, player.camera_controller.trauma)
 		179:
-			_hit_min_time_scale = minf(_hit_min_time_scale, Engine.time_scale)
+			_saw_player_freeze = _saw_player_freeze or player.hitstop_timer > 0.0
+			_saw_dummy_freeze = _saw_dummy_freeze or _dummy().freeze_timer > 0.0
+			_max_trauma = maxf(_max_trauma, player.camera_controller.trauma)
 		182:
-			_check("卡肉顿帧触发 (time_scale<1)", _hit_min_time_scale < 1.0)
-			_check("震屏 trauma>0.1", player.camera_controller.trauma > 0.1)
+			_check("主角单体冻结 (time_scale 恒 1.0)", _saw_player_freeze and Engine.time_scale == 1.0)
+			_check("木桩单体冻结", _saw_dummy_freeze)
+			_check("震屏 trauma>0.1 (峰值 %.2f)" % _max_trauma, _max_trauma > 0.1)
 			_check("木桩受击", _dummy().hit_count >= 1)
 		192:
 			var closed: float = pre_lunge_dist - _dummy_dist()
 			_check("磁性吸附前突 0.3~0.5m (实测 %.2fm)" % closed, closed > 0.25 and closed < 0.55)
-			_snap("calib_09_magnetic_lunge_hit.png")
-			print("--- 真身标定实跑完成 ---")
+		# ============ 太刀月华刀光 + 卡肉闪白 2K 抓拍 ============
+		200:
+			# 第2段挥刀纯刀光抓拍：拉远到软锁距离外空挥，避免卡肉冻结定格
+			# 传送后有 1~5 帧空中 FALL 窗口，必须落地确认后再缓冲攻击（防被星坠抢走）
+			player.global_position = Vector3(0, 0.1, 5.5)
+			player.velocity = Vector3.ZERO
+			player.visual_root.rotation.y = 0.0
+			player.combat_fsm.change_state(PlayerCombatFSM.State.IDLE)
+			player.combat_fsm.combo_index = 1
+			player.update_blade_stance(true)
+			_frame_camera(PI, -28.0, 2.6)
+			_queue_ground_attack({
+				4: "trail_s2_b4.png", 5: "trail_s2_b5.png", 6: "trail_s2_b6.png",
+				7: "trail_s2_b7.png", 8: "trail_s2_b8.png", 9: "trail_s2_b9.png",
+				10: "trail_s2_b10.png", 11: "trail_s2_b11.png"})
+		232:
+			# 4段终结命中抓拍：贴近木桩，重卡肉 0.10s + 闪白 0.06s + 击退 0.45m
+			# (232 > 第2段挥刀自然结束帧，避免掐断刀光采样)
+			player.global_position = Vector3(0, 0.1, -2.6)
+			player.velocity = Vector3.ZERO
+			player.visual_root.rotation.y = 0.0
+			player.combat_fsm.change_state(PlayerCombatFSM.State.IDLE)
+			player.combat_fsm.combo_index = 3
+			player.update_blade_stance(true)
+			_frame_camera(PI * 0.62, -6.0, 2.9)
+			_queue_ground_attack({})
+		272:
+			# 侧面全景机位重拍终结命中：等上一段攻击自然收招后再出刀，闪白最强帧
+			# 抓拍时隐藏键位面板，避免遮挡伤害浮字
+			var hud_node: CanvasItem = get_tree().get_first_node_in_group("hud") as CanvasItem
+			var guide: Control = hud_node.get_node_or_null("KeyGuidePanel") as Control
+			if guide:
+				guide.visible = false
+			# 重置木桩计数并隐藏其信息牌，保证命中反馈画面干净
+			var dummy_node: TrainingDummy = _dummy()
+			dummy_node.hit_count = 0
+			dummy_node.total_damage = 0.0
+			dummy_node.update_info_display()
+			if dummy_node.info_label:
+				dummy_node.info_label.visible = false
+			player.global_position = Vector3(0, 0.1, -2.6)
+			player.velocity = Vector3.ZERO
+			player.visual_root.rotation.y = 0.0
+			player.combat_fsm.combo_index = 3
+			player.update_blade_stance(true)
+			_frame_camera(-PI * 0.44, -4.0, 3.4)
+			_queue_ground_attack({
+				1: "trail_fin_b1.png", 2: "trail_fin_b2.png", 3: "trail_fin_b3.png",
+				4: "trail_fin_b4.png", 5: "trail_fin_b5.png"})
+		240:
+			_check("终结命中后仰 0.45m", _dummy().mesh_root.position.distance_to(_dummy().original_mesh_pos) > 0.2 or _dummy().hit_count >= 2)
+		285:
+			_flush_burst_images()
+			print("--- 刀光与卡肉实跑验证完成 ---")
 			get_tree().quit(0)
 
 var pre_lunge_dist: float = 0.0
-var _hit_min_time_scale: float = 1.0
+var _saw_player_freeze: bool = false
+var _saw_dummy_freeze: bool = false
+var _max_trauma: float = 0.0
+var _pending_attack_at_ground: bool = false
+var _attack_fired_frame: int = -1
+var _pending_burst: Dictionary = {} # 相对出刀帧的偏移 -> 文件名
+var _burst_images: Dictionary = {} # 文件名 -> Image
+
+## 落地回正确认后自动缓冲攻击，并在挥击段逐帧连拍
+func _queue_ground_attack(captures: Dictionary) -> void:
+	_pending_attack_at_ground = true
+	_pending_burst = captures
+	_attack_fired_frame = -1
+
+func _flush_burst_images() -> void:
+	for filename in _burst_images:
+		var img: Image = _burst_images[filename]
+		if img and not img.is_empty():
+			img.save_png(snapshot_dir + filename)
+			print("📸 %s (%dx%d)" % [filename, img.get_width(), img.get_height()])
+	_burst_images.clear()
 
 func _dummy() -> TrainingDummy:
 	return get_tree().get_first_node_in_group("target_dummy") as TrainingDummy

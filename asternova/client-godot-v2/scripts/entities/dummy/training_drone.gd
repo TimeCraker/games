@@ -25,12 +25,32 @@ var total_damage_taken: float = 0.0
 var has_hit_player: bool = false
 var eye_mat: StandardMaterial3D = null
 
+# 单体局部卡肉与漫反射闪白
+var freeze_timer: float = 0.0
+var _pending_knock: Vector3 = Vector3.ZERO
+var _flash_mats: Array[StandardMaterial3D] = []
+var _flash_orig: Array[Color] = []
+var _flash_tween: Tween = null
+
 func _ready() -> void:
 	add_to_group("target_dummy")
 	if core_eye and core_eye.mesh and core_eye.mesh.material:
 		eye_mat = core_eye.mesh.material as StandardMaterial3D
 	set_eye_visual(Color(0.2, 0.7, 1.0), 3.0)
+	_collect_flash_materials()
 	update_state_label("待机观察中...")
+
+func _collect_flash_materials() -> void:
+	## 收集机身漫反射材质用于受击闪白（跳过状态色驱动的核心眼）
+	for mi in mesh_root.find_children("*", "MeshInstance3D", true, false):
+		var mesh_inst := mi as MeshInstance3D
+		if mesh_inst == core_eye or mesh_inst.mesh == null:
+			continue
+		for i in mesh_inst.mesh.get_surface_count():
+			var mat := mesh_inst.get_active_material(i)
+			if mat is StandardMaterial3D:
+				_flash_mats.append(mat)
+				_flash_orig.append((mat as StandardMaterial3D).albedo_color)
 
 func set_eye_visual(col: Color, energy: float) -> void:
 	if indicator_light:
@@ -43,7 +63,17 @@ func set_eye_visual(col: Color, energy: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	state_timer += delta
-	
+
+	# 单体局部卡肉：仅冻结自身位移与受击后仰，状态计时照常
+	if freeze_timer > 0.0:
+		freeze_timer -= delta
+		velocity = Vector3.ZERO
+		if freeze_timer <= 0.0:
+			velocity += _pending_knock
+			_pending_knock = Vector3.ZERO
+		move_and_slide()
+		return
+
 	if not target_player:
 		var players: Array = get_tree().get_nodes_in_group("player")
 		if players.size() > 0:
@@ -129,18 +159,42 @@ func on_parried() -> void:
 	velocity = -transform.basis.z * 7.0 # 被震飞后仰
 	update_state_label("⚡ PARRIED! 弹刀大破绽！受到伤害翻倍！")
 
-func take_hit(damage: float, hit_dir: Vector3, is_heavy: bool) -> void:
+func take_hit(damage: float, hit_dir: Vector3, is_heavy: bool, freeze_time: float = 0.0, _knock_dist: float = -1.0, flash_time: float = 0.06) -> void:
 	var final_damage: float = damage
 	if current_state == DroneState.PARRIED:
 		final_damage *= 2.0 # 破绽状态下双倍暴击伤害！
-	
+
 	total_damage_taken += final_damage
 	var text_node: FloatingDamageText = FloatingDamageText.new()
 	add_child(text_node)
 	text_node.setup(final_damage, current_state == DroneState.PARRIED or is_heavy, global_position + Vector3(0, 2.0, 0))
 
-	# 受击微后仰
-	velocity += hit_dir * (6.0 if is_heavy else 3.0)
+	# 受击漫反射闪白 + 单体冻结（后仰位移延后到冻结结束）
+	flash_albedo(flash_time)
+	_pending_knock = hit_dir * (6.0 if is_heavy else 3.0)
+	apply_freeze(freeze_time)
+	if freeze_timer <= 0.0:
+		velocity += _pending_knock
+		_pending_knock = Vector3.ZERO
+
+func apply_freeze(duration: float) -> void:
+	## 单体局部卡肉：冻结自身位移
+	if duration <= 0.0:
+		return
+	freeze_timer = maxf(freeze_timer, duration)
+
+func flash_albedo(duration: float) -> void:
+	## 漫反射叠纯白高光，线性衰减回原材质
+	if _flash_mats.is_empty():
+		return
+	if _flash_tween and _flash_tween.is_valid():
+		_flash_tween.kill()
+	_flash_tween = create_tween()
+	_flash_tween.tween_method(_set_albedo_flash, 1.0, 0.0, maxf(duration, 0.01))
+
+func _set_albedo_flash(flash_factor: float) -> void:
+	for i in _flash_mats.size():
+		_flash_mats[i].albedo_color = _flash_orig[i].lerp(Color(1, 1, 1, 1), flash_factor)
 
 func look_at_player(delta: float) -> void:
 	if not target_player:

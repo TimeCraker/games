@@ -19,6 +19,10 @@ const KATANA_ATLAS_FALLBACK := "res://models/aster/katana_basecolor.png"
 ## 纳刀位姿（刀身相对左腰鞘插槽的局部变换，工程标定用）
 @export var sheathe_transform: Transform3D = Transform3D.IDENTITY
 
+## 刀身采样标记偏移（Katana_Blade 网格空间：原点≈护手，-Y 为实际刀尖延伸端）
+@export var blade_base_offset: Vector3 = Vector3.ZERO
+@export var blade_tip_offset: Vector3 = Vector3(0.0, -0.7, 0.0)
+
 signal blade_drawn_changed(is_drawn: bool)
 
 @onready var skeleton: Skeleton3D = $Aster_Armature/Skeleton3D
@@ -28,6 +32,9 @@ signal blade_drawn_changed(is_drawn: bool)
 var katana_blade: MeshInstance3D = null
 var hand_drawn_transform: Transform3D = Transform3D.IDENTITY
 var is_drawn: bool = false
+var blade_base_marker: Marker3D = null
+var blade_tip_marker: Marker3D = null
+var blade_trail: BladeRibbonTrail = null
 
 # 程序化挥刀：以右手腕握点为轴心的骨骼姿态偏移（欧拉角，度）
 const SOCKET_BONE := "Hand_R_Weapon_Socket"
@@ -47,7 +54,7 @@ const GUARD_POSE := Vector3(15, 40, 45)                        # 纳刀架刀：
 # 手臂挥动关键帧：肩→手期望方向（骨架空间，-Z 前方 / +X 右侧 / +Y 上）
 const SWING_ARM_DIRS := {
 	0: [Vector3(0.7, -0.5, 0.3), Vector3(0.15, 0.55, -0.82)],  # 1段挑击：右手低后位撩至前上
-	1: [Vector3(-0.5, -0.1, -0.6), Vector3(0.75, -0.05, -0.5)], # 2段反削：左前横扫至右前
+	1: [Vector3(0.6, 0.0, -0.8), Vector3(0.65, 0.1, -0.75)], # 2段反削：手臂稳持前举，身体横扫出弧
 	2: [Vector3(0.5, -0.25, 0.2), Vector3(0.05, 0.05, -1.0)],  # 3段双连刺：收手回拉直刺前方
 	3: [Vector3(0.95, -0.1, -0.2), Vector3(0.95, 0.15, -0.35)], # 4段回旋：手臂平展右侧随体旋转
 }
@@ -61,13 +68,60 @@ var _upperarm_parent_idx: int = -1
 var _upperarm_rest_quat: Quaternion = Quaternion.IDENTITY
 var _rest_arm_dir: Vector3 = Vector3(0.79, -0.62, 0.0)
 var _swing_tween: Tween = null
+var _freeze_tween: Tween = null
+var _body_sweep_tween: Tween = null
+
+## 单体局部卡肉：命中瞬间冻结骨骼位姿（暂停挥刀姿态动画），倒计时后恢复
+func freeze_pose(duration: float) -> void:
+	if _swing_tween and _swing_tween.is_valid():
+		_swing_tween.pause()
+	if _freeze_tween and _freeze_tween.is_valid():
+		_freeze_tween.kill()
+	_freeze_tween = create_tween()
+	_freeze_tween.tween_interval(duration)
+	_freeze_tween.tween_callback(_unfreeze_pose)
+
+func _unfreeze_pose() -> void:
+	if _swing_tween and _swing_tween.is_valid():
+		_swing_tween.play()
 
 func _ready() -> void:
 	_apply_npr(self)
 	_locate_katana()
+	_setup_blade_markers_and_trail()
 	_capture_socket_rest()
 	# 玩家日常为纳刀态：入场即回鞘
 	sheathe_sword(false)
+
+func _setup_blade_markers_and_trail() -> void:
+	if katana_blade == null:
+		return
+	blade_base_marker = Marker3D.new()
+	blade_base_marker.name = "Blade_Base"
+	blade_base_marker.position = blade_base_offset
+	katana_blade.add_child(blade_base_marker)
+	blade_tip_marker = Marker3D.new()
+	blade_tip_marker.name = "Blade_Tip"
+	blade_tip_marker.position = blade_tip_offset
+	katana_blade.add_child(blade_tip_marker)
+	blade_trail = BladeRibbonTrail.new()
+	blade_trail.name = "BladeRibbonTrail"
+	add_child(blade_trail)
+	blade_trail.setup(blade_base_marker, blade_tip_marker, skeleton)
+
+func set_trail_active(active: bool) -> void:
+	if blade_trail:
+		blade_trail.set_active(active)
+
+func clear_trail() -> void:
+	if blade_trail:
+		blade_trail.clear_trail()
+
+func get_blade_base_position() -> Vector3:
+	return blade_base_marker.global_position if blade_base_marker else get_katana_position()
+
+func get_blade_tip_position() -> Vector3:
+	return blade_tip_marker.global_position if blade_tip_marker else get_katana_position()
 
 func _locate_katana() -> void:
 	katana_blade = hand_socket.get_node_or_null("Katana_Blade") as MeshInstance3D
@@ -168,6 +222,22 @@ func play_swing(stage: int) -> void:
 	var keyframes: Array = SWING_POSES.get(stage, SWING_POSES[0])
 	var arm_dirs: Array = SWING_ARM_DIRS.get(stage, SWING_ARM_DIRS[0])
 	_start_swing_timeline(keyframes[0], keyframes[1], arm_dirs[0], arm_dirs[1])
+	# 2段反削：身体刚体横扫（左转蓄势右转挥出），刀尖划出宽阔水平弧线
+	if stage == 1:
+		_start_body_sweep(-28.0, 42.0)
+
+func _start_body_sweep(from_deg: float, to_deg: float) -> void:
+	_kill_body_sweep_tween()
+	_body_sweep_tween = create_tween()
+	_body_sweep_tween.tween_property(self, "rotation:y", deg_to_rad(from_deg), 0.05)
+	_body_sweep_tween.tween_property(self, "rotation:y", deg_to_rad(to_deg), 0.12)
+	_body_sweep_tween.tween_property(self, "rotation:y", 0.0, 0.18)
+
+func _kill_body_sweep_tween() -> void:
+	if _body_sweep_tween and _body_sweep_tween.is_valid():
+		_body_sweep_tween.kill()
+		_body_sweep_tween = null
+	rotation.y = 0.0
 
 func play_iaijutsu_swing() -> void:
 	if _socket_bone_idx < 0:
@@ -184,6 +254,7 @@ func play_guard_pose() -> void:
 
 func _start_swing_timeline(windup_pose: Vector3, strike_pose: Vector3, windup_dir: Vector3, strike_dir: Vector3) -> void:
 	_kill_swing_tween()
+	set_trail_active(true)
 	_swing_tween = create_tween()
 	# 前举蓄势 0.05s -> 挥出 0.12s -> 平滑回位 0.18s
 	_swing_tween.tween_method(_apply_swing_euler, SWING_REST, windup_pose, 0.05)
@@ -192,12 +263,17 @@ func _start_swing_timeline(windup_pose: Vector3, strike_pose: Vector3, windup_di
 	_swing_tween.parallel().tween_method(_apply_arm_dir, windup_dir, strike_dir, 0.12)
 	_swing_tween.tween_method(_apply_swing_euler, strike_pose, SWING_REST, 0.18)
 	_swing_tween.parallel().tween_method(_apply_arm_dir, strike_dir, _rest_arm_dir, 0.18)
+	# 挥刀结束停止采样，尾迹随后自然淡出
+	_swing_tween.tween_callback(set_trail_active.bind(false))
 
 func _reset_swing_pose() -> void:
 	_kill_swing_tween()
+	_kill_body_sweep_tween()
 	_apply_swing_euler(SWING_REST)
 	if _upperarm_idx >= 0:
 		skeleton.set_bone_pose_rotation(_upperarm_idx, _upperarm_rest_quat)
+	set_trail_active(false)
+	clear_trail()
 
 func _kill_swing_tween() -> void:
 	if _swing_tween and _swing_tween.is_valid():

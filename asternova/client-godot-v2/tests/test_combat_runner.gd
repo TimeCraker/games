@@ -71,12 +71,16 @@ func _process(_delta: float) -> bool:
 		assert(cd.max_wall_jumps == 3)
 		assert(cd.perfect_dodge_window == 0.12)
 		assert(cd.parry_window == 0.15)
-		assert(cd.hitstop_light == 0.05)
-		assert(cd.hitstop_heavy == 0.10)
+		assert(cd.hitstop_stage_freeze[0] == 0.04 and cd.hitstop_stage_freeze[1] == 0.04)
+		assert(cd.hitstop_stage_freeze[2] == 0.03 and cd.hitstop_stage2_second == 0.06)
+		assert(cd.hitstop_stage_freeze[3] == 0.10 and cd.hitstop_iaijutsu == 0.15)
+		assert(cd.hit_trauma_stage[0] == 0.15 and cd.hit_trauma_stage[3] == 0.65)
+		assert(cd.finisher_knock_distance == 0.45)
+		assert(cd.hit_flash_duration == 0.06 and cd.iai_flash_duration == 0.06)
 		assert(cd.magnetic_lunge_distance == 0.4)
 		assert(cd.magnetic_lunge_cone_deg == 45.0)
 		assert(cd.magnetic_lunge_windup == 0.12)
-		print("✔ 打击手感参数校验通过: hitstop=0.05/0.10, 磁性吸附=0.4m/45°/0.12s")
+		print("✔ 分级单体卡肉参数校验通过: 0.04/0.04/0.03+0.06/0.10/0.15s, 击退0.45m, 闪白0.06s")
 
 		# 检查 HUD
 		var hud: HUDController = scene.get_node_or_null("HUDLayer/HUD") as HUDController
