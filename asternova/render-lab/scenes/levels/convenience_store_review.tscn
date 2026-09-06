@@ -1,0 +1,61 @@
+[gd_scene load_steps=10 format=3 uid="uid://cs_store_review"]
+
+[ext_resource type="Texture2D" path="res://textures/pavement_stones.png" id="1_tex"]
+[ext_resource type="PackedScene" path="res://scenes/entities/buildings/convenience_store.tscn" id="2_store"]
+[ext_resource type="PackedScene" path="res://scenes/character_aster.tscn" id="3_aster"]
+[ext_resource type="Script" path="res://scripts/buildings/convenience_store_review_capture.gd" id="4_capture"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
+sky_top_color = Color(0.32, 0.52, 0.82, 1)
+sky_horizon_color = Color(0.84, 0.87, 0.92, 1)
+ground_bottom_color = Color(0.3, 0.32, 0.36, 1)
+ground_horizon_color = Color(0.84, 0.87, 0.92, 1)
+
+[sub_resource type="Sky" id="Sky"]
+sky_material = SubResource("SkyMat")
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 2
+sky = SubResource("Sky")
+ambient_light_source = 3
+ambient_light_sky_contribution = 1.0
+ambient_light_energy = 0.35
+tonemap_mode = 3
+glow_enabled = true
+glow_intensity = 0.4
+glow_hdr_threshold = 1.6
+
+[sub_resource type="StandardMaterial3D" id="GroundMat"]
+albedo_texture = ExtResource("1_tex")
+roughness = 0.85
+uv1_scale = Vector3(8, 8, 1)
+
+[sub_resource type="PlaneMesh" id="GroundMesh"]
+material = SubResource("GroundMat")
+size = Vector2(40, 40)
+
+[node name="ConvenienceStoreReview" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env")
+
+[node name="SunLight" type="DirectionalLight3D" parent="."]
+light_color = Color(1, 0.93, 0.82, 1)
+light_energy = 1.15
+shadow_enabled = true
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("GroundMesh")
+
+[node name="ConvenienceStore" parent="." instance=ExtResource("2_store")]
+
+[node name="Aster_Front" parent="." instance=ExtResource("3_aster")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 1.97, 0, -7.6)
+
+[node name="Aster_Inside" parent="." instance=ExtResource("3_aster")]
+transform = Transform3D(-0.737, 0, 0.676, 0, 1, 0, -0.676, 0, -0.737, 2, 0.2, -2.2)
+
+[node name="ReviewCamera" type="Camera3D" parent="."]
+
+[node name="Capture" type="Node" parent="."]
+script = ExtResource("4_capture")
