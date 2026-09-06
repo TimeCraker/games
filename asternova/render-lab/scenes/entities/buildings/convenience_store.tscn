@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cs_store_prefab"]
+[gd_scene load_steps=17 format=3 uid="uid://cs_store_prefab"]
 
 [ext_resource type="Script" path="res://scripts/buildings/convenience_store_npr_setup.gd" id="1_setup"]
 [ext_resource type="PackedScene" path="res://models/environment/convenience_store/convenience_store.glb" id="2_glb"]
@@ -22,7 +22,7 @@ size = Vector3(3.73, 4.5, 0.3)
 size = Vector3(12.5, 0.08, 11.5)
 
 [sub_resource type="StandardMaterial3D" id="CeilMat"]
-albedo_color = Color(0.93, 0.91, 0.87, 1)
+albedo_color = Color(0.55, 0.55, 0.57, 1)
 roughness = 0.95
 
 [sub_resource type="BoxMesh" id="FixtureMesh"]
@@ -33,6 +33,18 @@ albedo_color = Color(1, 0.98, 0.92, 1)
 emission_enabled = true
 emission = Color(1, 0.95, 0.85, 1)
 emission_energy_multiplier = 1.2
+
+[sub_resource type="BoxShape3D" id="Box_Gondola"]
+size = Vector3(0.65, 2.0, 3.7)
+
+[sub_resource type="BoxShape3D" id="Box_GondolaC"]
+size = Vector3(3.1, 2.0, 0.7)
+
+[sub_resource type="BoxShape3D" id="Box_CounterMain"]
+size = Vector3(2.75, 1.0, 0.85)
+
+[sub_resource type="BoxShape3D" id="Box_CounterRet"]
+size = Vector3(0.85, 1.0, 1.05)
 
 [sub_resource type="BoxShape3D" id="Box_Floor"]
 size = Vector3(12.4, 0.2, 11.4)
@@ -90,23 +102,47 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, 3.38, -4.5)
 mesh = SubResource("FixtureMesh")
 surface_material_override/0 = SubResource("FixtureMat")
 
+[node name="Collision_Gondola_L" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.35, 1.0, 0)
+shape = SubResource("Box_Gondola")
+
+[node name="Collision_Gondola_R" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.35, 1.0, 0)
+shape = SubResource("Box_Gondola")
+
+[node name="Collision_Gondola_C1" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.0, -1.2)
+shape = SubResource("Box_GondolaC")
+
+[node name="Collision_Gondola_C2" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.0, 1.4)
+shape = SubResource("Box_GondolaC")
+
+[node name="Collision_Counter_Main" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9, 0.5, -4.7)
+shape = SubResource("Box_CounterMain")
+
+[node name="Collision_Counter_Return" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.15, 0.5, -4.9)
+shape = SubResource("Box_CounterRet")
+
 [node name="InteriorLight_Front" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 3.05, -2.6)
-light_color = Color(1, 0.78, 0.55, 1)
-light_energy = 4.2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 2.7, -1.3)
+light_color = Color(1, 0.82, 0.6, 1)
+light_energy = 2.0
 omni_range = 11.0
 omni_attenuation = 0.5
 
 [node name="InteriorLight_Back" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 2.95, -2.8)
-light_color = Color(1, 0.78, 0.55, 1)
-light_energy = 8.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 2.7, -0.3)
+light_color = Color(1, 0.82, 0.6, 1)
+light_energy = 2.4
 omni_range = 11.0
 omni_attenuation = 0.5
 
 [node name="InteriorLight_Register" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, 2.55, -4.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 2.7, 2.2)
 light_color = Color(1, 0.8, 0.58, 1)
-light_energy = 3.2
+light_energy = 2.0
 omni_range = 5.5
 omni_attenuation = 0.7

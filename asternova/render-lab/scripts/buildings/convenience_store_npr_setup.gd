@@ -36,6 +36,9 @@ func _apply_npr(root: Node) -> void:
 
 
 func _setup_mesh(mi: MeshInstance3D) -> void:
+	# PBR 实装面（混凝土/铝/灯箱/文字/货架/LED）保留 Blender 端材质，不做 NPR 覆盖
+	if mi.name.begins_with("Sign") or mi.name.begins_with("Fittings") 			or mi.name.begins_with("LEDStrip") or mi.name.begins_with("Products_"):
+		return
 	for i in mi.mesh.get_surface_count():
 		var src := mi.get_active_material(i)
 		var mat_name := ""
@@ -50,7 +53,7 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 			var glass := ShaderMaterial.new()
 			glass.render_priority = 0
 			glass.shader = SHADER_GLASS
-			glass.set_shader_parameter("albedo_color", Color(0.85, 0.95, 1.0, 0.22))
+			glass.set_shader_parameter("albedo_color", Color(0.85, 0.95, 1.0, 0.12))
 			glass.set_shader_parameter("metallic", 0.35)
 			glass.set_shader_parameter("roughness", 0.06)
 			glass.set_shader_parameter("fresnel_power", 3.0)
@@ -58,6 +61,12 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 			glass.set_shader_parameter("reflection_tint", Color(0.9, 0.96, 1.0))
 			glass.set_shader_parameter("reflection_glow", 0.25)
 			mi.set_surface_override_material(i, glass)
+			continue
+		if mat_name.begins_with("mat_pbr_"):
+			# Phase 2/3 PBR 面（混凝土/铝型材/灯箱/货架/LED）：Blender 端已按
+			# 终末地工业风配好 PBR 参数，保留导入材质不做 NPR 覆盖
+			continue
+		if mat_name.containsn("mat_prod_"):
 			continue
 		if mat_name.containsn("crown"):
 			# 冠部/雨棚端头薄板：原图集 UV 退化呈噪点马赛克，改素色暖灰材质
