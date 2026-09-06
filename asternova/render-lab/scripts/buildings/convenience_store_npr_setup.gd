@@ -11,6 +11,8 @@ extends StaticBody3D
 const SHADER_TOON := preload("res://shaders/toon_prop.gdshader")
 const SHADER_OUTLINE := preload("res://shaders/outline.gdshader")
 const SHADER_GLASS := preload("res://shaders/glass_facade.gdshader")
+const EMISSION_MASK := preload("res://models/environment/convenience_store/convenience_store_emission_mask.png")
+const ALBEDO_GAME := preload("res://models/environment/convenience_store/convenience_store_albedo_game.jpg")
 
 const OUTLINE_COLOR := Color(0.22, 0.25, 0.34, 1.0)
 const OUTLINE_THICKNESS := 0.0022
@@ -20,7 +22,10 @@ const RAMP_SMOOTHNESS := 0.05
 
 
 func _ready() -> void:
-	_apply_npr(self)
+	# 只装配便利店 glb 子树；吊顶/灯具等附属网格保持自带材质
+	var building := get_node_or_null("Building")
+	if building:
+		_apply_npr(building)
 
 
 func _apply_npr(root: Node) -> void:
@@ -54,18 +59,27 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 			glass.set_shader_parameter("reflection_glow", 0.25)
 			mi.set_surface_override_material(i, glass)
 			continue
+		if mat_name.containsn("crown"):
+			# 冠部/雨棚端头薄板：原图集 UV 退化呈噪点马赛克，改素色暖灰材质
+			var crown := StandardMaterial3D.new()
+			crown.albedo_color = Color(0.62, 0.60, 0.57, 1.0)
+			crown.roughness = 0.9
+			mi.set_surface_override_material(i, crown)
+			continue
 		var mat := ShaderMaterial.new()
 		mat.render_priority = 0
 		mat.shader = SHADER_TOON
+		# 统一改绑店内提亮后的衍生贴图（Tripo 图集的店内墙面烘焙偏暗）
 		mat.set_shader_parameter("albedo_color", Color(1, 1, 1, 1))
-		mat.set_shader_parameter("albedo_texture", albedo_tex)
+		mat.set_shader_parameter("albedo_texture", ALBEDO_GAME)
 		mat.set_shader_parameter("desaturation", 0.0)
 		mat.set_shader_parameter("use_alpha_scissor", false)
-		# 建筑外墙：明暗交界偏硬、浅冷调阴影，维持二次元硬表面体积感
+		# 建筑外墙：明暗交界偏硬、浅冷调阴影；ramp 阈值较道具下调，
+		# 避免平方衰减下的店内墙面整体跌进阴影档变成靛蓝死区
 		mat.set_shader_parameter("shadow_tint", SHADOW_TINT)
-		mat.set_shader_parameter("ramp_threshold", RAMP_THRESHOLD)
+		mat.set_shader_parameter("ramp_threshold", 0.42)
 		mat.set_shader_parameter("ramp_smoothness", RAMP_SMOOTHNESS)
-		mat.set_shader_parameter("shadow_strength", 0.38)
+		mat.set_shader_parameter("shadow_strength", 0.34)
 		mat.set_shader_parameter("enable_rim", true)
 		mat.set_shader_parameter("rim_color", Color(0.85, 0.92, 1.0, 1.0))
 		mat.set_shader_parameter("rim_threshold", 0.70)
@@ -74,13 +88,14 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 		mat.set_shader_parameter("specular_color", Color(0.95, 0.97, 1.0, 1.0))
 		mat.set_shader_parameter("specular_size", 0.08)
 		mat.set_shader_parameter("specular_smoothness", 0.02)
-		# 门头灯箱浅暖白微光：亮部贴图（24 コンビニ 灯箱、白条纹）柔和溢出，
-		# 阈值抬高避免白色外饰（回收箱/机身）一起泛光
+		# 门头灯箱浅暖白微光：烘焙 UV 几何遮罩只点亮 24 コンビニ 招牌白带，
+		# 瓷砖墙/回收箱/踢脚面板零泄漏（用户硬底线：禁止亮度提取式发光）
 		mat.set_shader_parameter("enable_emission", true)
-		mat.set_shader_parameter("emission_color", Color(1.0, 0.93, 0.82, 1.0))
-		mat.set_shader_parameter("emission_energy", 0.38)
-		mat.set_shader_parameter("emission_min_luminance", 0.80)
-		mat.set_shader_parameter("emission_mask_softness", 0.18)
+		mat.set_shader_parameter("use_emission_mask", true)
+		mat.set_shader_parameter("emission_mask_texture", EMISSION_MASK)
+		mat.set_shader_parameter("emission_color", Color(1.0, 0.95, 0.88, 1.0))
+		mat.set_shader_parameter("emission_energy", 1.2)
+		mat.set_shader_parameter("emission_mask_softness", 0.2)
 		# 深灰蓝 next_pass 描边
 		var outline := ShaderMaterial.new()
 		outline.render_priority = 1

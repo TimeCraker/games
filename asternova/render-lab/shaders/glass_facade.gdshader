@@ -13,7 +13,13 @@ uniform vec3 reflection_tint : source_color = vec3(0.9, 0.96, 1.0);
 uniform float reflection_glow : hint_range(0.0, 1.0) = 0.25;
 
 void fragment() {
-	float fresnel = pow(1.0 - clamp(dot(normalize(NORMAL), normalize(VIEW)), 0.0, 1.0), fresnel_power);
+	// 双面玻璃：背面（店内视角）翻转法线，否则 dot(NORMAL,VIEW)<0 被钳到 0，
+	// fresnel 恒为 1，整面玻璃从店内看会变成 0.77 不透明靛蓝板
+	vec3 n = normalize(NORMAL);
+	if (!FRONT_FACING) {
+		n = -n;
+	}
+	float fresnel = pow(1.0 - clamp(dot(n, normalize(VIEW)), 0.0, 1.0), fresnel_power);
 	ALBEDO = albedo_color.rgb;
 	ALPHA = clamp(albedo_color.a + fresnel * fresnel_boost, 0.0, 1.0);
 	METALLIC = metallic;

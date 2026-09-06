@@ -17,17 +17,18 @@ sky_material = SubResource("SkyMat")
 [sub_resource type="Environment" id="Env"]
 background_mode = 2
 sky = SubResource("Sky")
-ambient_light_source = 3
-ambient_light_sky_contribution = 1.0
-ambient_light_energy = 0.35
+ambient_light_source = 2
+ambient_light_color = Color(0.72, 0.82, 0.94, 1)
+ambient_light_energy = 0.45
 tonemap_mode = 3
+tonemap_exposure = 1.05
 glow_enabled = true
-glow_intensity = 0.4
+glow_intensity = 0.2
 glow_hdr_threshold = 1.6
 
 [sub_resource type="StandardMaterial3D" id="GroundMat"]
 albedo_texture = ExtResource("1_tex")
-roughness = 0.85
+roughness = 0.45
 uv1_scale = Vector3(8, 8, 1)
 
 [sub_resource type="PlaneMesh" id="GroundMesh"]
@@ -40,9 +41,11 @@ size = Vector2(40, 40)
 environment = SubResource("Env")
 
 [node name="SunLight" type="DirectionalLight3D" parent="."]
-light_color = Color(1, 0.93, 0.82, 1)
-light_energy = 1.15
+light_color = Color(1, 0.98, 0.94, 1)
+light_energy = 1.8
 shadow_enabled = true
+directional_shadow_mode = 2
+shadow_blur = 1.6
 
 [node name="Ground" type="MeshInstance3D" parent="."]
 mesh = SubResource("GroundMesh")
@@ -53,7 +56,7 @@ mesh = SubResource("GroundMesh")
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 1.97, 0, -7.6)
 
 [node name="Aster_Inside" parent="." instance=ExtResource("3_aster")]
-transform = Transform3D(-0.737, 0, 0.676, 0, 1, 0, -0.676, 0, -0.737, 2, 0.2, -2.2)
+transform = Transform3D(0.966, 0, 0.259, 0, 1, 0, -0.259, 0, 0.966, 1.35, 0.2, -3.3)
 
 [node name="ReviewCamera" type="Camera3D" parent="."]
 

@@ -1,9 +1,11 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_back;
+render_mode blend_mix, depth_draw_opaque, cull_disabled;
 
 // 二次元道具/环境 Toon 着色器：基于 toon_character.gdshader 的赛璐璐阶梯，
 // 为自动贩卖机等街道道具增加「橱窗自发光」支持（亮部贴图微光溢出），
 // 让夜间街景呈现赛博通透感。Aster 角色请继续使用 toon_character.gdshader。
+// cull_disabled：Tripo 单面片（货架背板/墙板）从背面也要呈现；背面法线
+// 在 fragment 里翻转，保证赛璐璐光照方向正确。封闭网格不受影响。
 
 // --- 基础属性 ---
 group_uniforms BaseColor;
@@ -52,6 +54,9 @@ uniform float emission_min_luminance : hint_range(0.0, 1.0, 0.01) = 0.60;
 uniform float emission_mask_softness : hint_range(0.01, 0.5, 0.01) = 0.20;
 
 void fragment() {
+	if (!FRONT_FACING) {
+		NORMAL = -NORMAL;
+	}
 	vec4 tex_color = texture(albedo_texture, UV);
 	vec3 desat = mix(tex_color.rgb, vec3(dot(tex_color.rgb, vec3(0.299, 0.587, 0.114))), desaturation);
 	vec3 base = desat * albedo_color.rgb;

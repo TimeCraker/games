@@ -26,14 +26,15 @@ func _process(_delta: float) -> void:
 	frame += 1
 	var cam: Camera3D = get_tree().current_scene.get_node("ReviewCamera")
 	if frame == 30:
-		cam.look_at_from_position(Vector3(0.3, 1.5, -12.6), Vector3(1.9, 1.35, -4.0))
-		cam.fov = 45.0
+		cam.look_at_from_position(Vector3(0.35, 1.42, -12.0), Vector3(2.3, 1.18, -4.0))
+		cam.fov = 44.0
 		cam.current = true
 	elif frame == 90:
 		_capture(OUT_A)
 	elif frame == 120:
-		cam.look_at_from_position(Vector3(-2.4, 1.6, 2.6), Vector3(2.0, 1.15, -2.2))
-		cam.fov = 50.0
+		# 机位B：柜台视角——Aster 站收银台前，下摇收紧到柜台/货架带
+		cam.look_at_from_position(Vector3(2.6, 1.55, -1.5), Vector3(0.75, 0.9, -4.8))
+		cam.fov = 44.0
 	elif frame == 180:
 		_capture(OUT_B)
 	elif frame > 185:
