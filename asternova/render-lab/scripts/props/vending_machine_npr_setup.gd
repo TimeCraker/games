@@ -7,6 +7,7 @@ extends StaticBody3D
 const SHADER_TOON := preload("res://shaders/toon_prop.gdshader")
 const SHADER_OUTLINE := preload("res://shaders/outline.gdshader")
 const ALBEDO_FALLBACK := "res://models/environment/vending_machine_dual_4k_albedo.jpg"
+const EMISSION_MASK := "res://models/environment/vending_machine_dual_emission_mask.png"
 
 const OUTLINE_COLOR := Color(0.22, 0.25, 0.34, 1.0)
 const OUTLINE_THICKNESS := 0.0028
@@ -56,12 +57,14 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 		mat.set_shader_parameter("specular_color", Color(0.95, 0.97, 1.0, 1.0))
 		mat.set_shader_parameter("specular_size", 0.08)
 		mat.set_shader_parameter("specular_smoothness", 0.02)
-		# 橱窗自发光微光：亮部贴图（窗柜、数屏、海报）柔和溢出
-		mat.set_shader_parameter("enable_emission", true)
-		mat.set_shader_parameter("emission_color", Color(1, 1, 1, 1))
-		mat.set_shader_parameter("emission_energy", 0.40)
-		mat.set_shader_parameter("emission_min_luminance", 0.70)
-		mat.set_shader_parameter("emission_mask_softness", 0.18)
+		# 橱窗自发光：仅饮料展示窗内部灯带（烘焙 UV 遮罩几何门控），
+		# 暖白偏淡金灯色；机身、投币口、数屏、回收桶严禁发光
+		var mask_tex: Texture2D = load(EMISSION_MASK)
+		mat.set_shader_parameter("enable_emission", mask_tex != null)
+		mat.set_shader_parameter("use_emission_mask", mask_tex != null)
+		mat.set_shader_parameter("emission_mask_texture", mask_tex)
+		mat.set_shader_parameter("emission_color", Color(1.0, 0.95, 0.88, 1.0))
+		mat.set_shader_parameter("emission_energy", 1.2)
 		# 深灰蓝 next_pass 描边
 		var outline := ShaderMaterial.new()
 		outline.render_priority = 1

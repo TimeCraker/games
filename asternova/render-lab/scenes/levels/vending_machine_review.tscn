@@ -17,17 +17,19 @@ sky_material = SubResource("SkyMat")
 [sub_resource type="Environment" id="Env"]
 background_mode = 2
 sky = SubResource("Sky")
-ambient_light_source = 3
-ambient_light_sky_contribution = 1.0
-ambient_light_energy = 0.65
+ambient_light_source = 2
+ambient_light_color = Color(0.72, 0.82, 0.94, 1)
+ambient_light_energy = 0.45
 tonemap_mode = 3
+tonemap_exposure = 1.05
 glow_enabled = true
-glow_intensity = 0.5
-glow_hdr_threshold = 0.92
+glow_intensity = 0.2
+glow_hdr_threshold = 1.6
 
 [sub_resource type="StandardMaterial3D" id="GroundMat"]
 albedo_texture = ExtResource("1_tex")
-roughness = 0.85
+roughness = 0.45
+metallic_specular = 0.4
 uv1_scale = Vector3(5, 5, 1)
 
 [sub_resource type="PlaneMesh" id="GroundMesh"]
@@ -40,9 +42,12 @@ size = Vector2(12, 12)
 environment = SubResource("Env")
 
 [node name="SunLight" type="DirectionalLight3D" parent="."]
-light_color = Color(1, 0.90, 0.78, 1)
-light_energy = 0.95
+light_color = Color(1, 0.98, 0.94, 1)
+light_energy = 1.8
 shadow_enabled = true
+directional_shadow_mode = 2
+directional_shadow_max_distance = 20.0
+shadow_blur = 1.6
 
 [node name="Ground" type="MeshInstance3D" parent="."]
 mesh = SubResource("GroundMesh")

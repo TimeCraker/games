@@ -40,9 +40,12 @@ uniform vec4 specular_color : source_color = vec4(0.92, 0.95, 1.0, 1.0);
 uniform float specular_size : hint_range(0.01, 1.0, 0.01) = 0.06;
 uniform float specular_smoothness : hint_range(0.001, 0.2, 0.005) = 0.01;
 
-// --- 橱窗自发光 (Showcase Emission)：按贴图亮度提取发光遮罩 ---
+// --- 橱窗自发光 (Showcase Emission)：优先使用烘焙遮罩（仅饮料展示窗灯带），
+//     未绑定遮罩时回退为按贴图亮度提取（仅供通用道具，机身类道具禁用） ---
 group_uniforms Emission;
 uniform bool enable_emission = false;
+uniform bool use_emission_mask = false;
+uniform sampler2D emission_mask_texture : filter_linear_mipmap;
 uniform vec4 emission_color : source_color = vec4(1.0, 1.0, 1.0, 1.0);
 uniform float emission_energy : hint_range(0.0, 4.0, 0.05) = 0.0;
 uniform float emission_min_luminance : hint_range(0.0, 1.0, 0.01) = 0.60;
@@ -64,9 +67,14 @@ void fragment() {
 	ROUGHNESS = 0.85;
 	SPECULAR = 0.0;
 	if (enable_emission) {
-		float lum = dot(base, vec3(0.299, 0.587, 0.114));
-		float emask = smoothstep(emission_min_luminance, emission_min_luminance + emission_mask_softness, lum);
-		EMISSION += base * emission_color.rgb * emission_energy * emask;
+		float emask = 0.0;
+		if (use_emission_mask) {
+			emask = texture(emission_mask_texture, UV).r;
+		} else {
+			float lum = dot(base, vec3(0.299, 0.587, 0.114));
+			emask = smoothstep(emission_min_luminance, emission_min_luminance + emission_mask_softness, lum);
+		}
+		EMISSION += emission_color.rgb * tex_color.rgb * emission_energy * emask;
 	}
 }
 
