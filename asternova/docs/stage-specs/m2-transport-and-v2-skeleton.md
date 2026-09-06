@@ -8,7 +8,7 @@
 
 ## 目标（一句话）
 
-在 Godot 4.7.2（Compatibility 渲染器）下建立 `client-godot-v2` 客户端骨架，落地单机可跑的 3D 自由视角动作战斗核心（Apex/Titanfall 式滑铲蹬墙身法 + 纯手动准星瞄准 + 居合拔刀/分段蓄力 + 4+1 槽位解耦 + 杂兵/炮手/格挡精英怪三合一），并提供可插拔 Transport 抽象（单机直调 / 房主广播）及含延迟丢包注入的 Fake 回环测试。
+在 Godot 4.7.2（Forward+ 渲染器）下建立 `client-godot-v2` 客户端骨架，落地单机可跑的 3D 自由视角动作战斗核心（Apex/Titanfall 式滑铲蹬墙身法 + 纯手动准星瞄准 + 居合拔刀/分段蓄力 + 4+1 槽位解耦 + 杂兵/炮手/格挡精英怪三合一），并提供可插拔 Transport 抽象（单机直调 / 房主广播）及含延迟丢包注入的 Fake 回环测试。
 
 ---
 
@@ -17,7 +17,7 @@
 ### A. 客户端工程骨架（新建 `asternova/client-godot-v2/`）
 
 1. **Godot 4.7.x stable（部署 v4.7.2-stable.official）** 项目：
-   - 渲染器全端统一锁定 **Compatibility**；
+   - 渲染器确立为 **Forward+ (Vulkan Clustered)**（与 `render-lab` 统一，PC 端游高刷基线，支持 AgX 色调映射、全分辨率 SSAO 与 SSR）；
    - 目录规范：`scenes/`、`scripts/core/`、`scripts/combat/`、`scripts/entities/`、`scripts/transport/`；
    - `.gitignore`（过滤 `.godot/` 缓存）；
 2. **默认输入与按键映射（支持玩家自定义）**：
