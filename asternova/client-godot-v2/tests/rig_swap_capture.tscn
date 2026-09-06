@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://brigswap_capture1"]
+
+[ext_resource type="PackedScene" uid="uid://bplayground_v2_core" path="res://scenes/levels/combat_playground.tscn" id="1_playground"]
+[ext_resource type="Script" path="res://tests/rig_swap_capture.gd" id="2_driver"]
+
+[node name="RigSwapCapture" instance=ExtResource("1_playground")]
+
+[node name="RigSwapDriver" type="Node" parent="." index="8"]
+script = ExtResource("2_driver")

@@ -24,11 +24,38 @@ func _process(_delta: float) -> bool:
 			return true
 		print("✔ PlayerController 存在且就绪")
 
-		# 检查头部节点及材质
-		var head: Node3D = player.visual_root.get_node_or_null("HeadPlaceholder")
-		assert(head != null, "HeadPlaceholder 不存在")
-		assert(head.has_node("HeadMesh"), "HeadMesh 不存在")
-		print("✔ HeadPlaceholder 与 HeadMesh 配置完好")
+		# 检查 Aster 真身视觉骨架（NPR 实装 + 双插槽）
+		var rig: AsterRig = player.visual_root.get_node_or_null("CharacterAster") as AsterRig
+		assert(rig != null, "Aster 真身 rig 不存在")
+		assert(rig.skeleton != null and rig.skeleton.get_bone_count() == 43, "Aster 骨骼数量异常")
+		assert(rig.hand_socket != null and rig.hand_socket is BoneAttachment3D, "Hand_R_Weapon_Socket 插槽缺失")
+		assert(rig.scabbard_socket != null and rig.scabbard_socket is BoneAttachment3D, "Pelvis_L_Scabbard_Socket 插槽缺失")
+		assert(rig.katana_blade != null, "Katana_Blade 刀身网格缺失")
+		print("✔ Aster 真身 rig 就绪: 43 骨骼 / 双插槽 / 刀身网格齐备")
+
+		# 检查拔刀/纳刀插槽切换
+		assert(not rig.is_drawn, "入场默认应为纳刀态")
+		assert(rig.katana_blade.get_parent() == rig.scabbard_socket, "纳刀态刀身未挂在左腰鞘插槽")
+		rig.draw_sword()
+		assert(rig.is_drawn and rig.katana_blade.get_parent() == rig.hand_socket, "拔刀后刀身未切换至右手插槽")
+		rig.sheathe_sword()
+		assert(not rig.is_drawn and rig.katana_blade.get_parent() == rig.scabbard_socket, "纳刀回鞘失败")
+		print("✔ 拔刀/纳刀双插槽切换检验通过 (Hand_R ↔ Pelvis_L_Scabbard)")
+
+		# 检查 NPR 着色实装（toon + outline）
+		var body_mi: MeshInstance3D = rig.skeleton.get_node_or_null("Aster_Body") as MeshInstance3D
+		assert(body_mi != null, "Aster_Body 网格缺失")
+		var body_mat: Material = body_mi.get_surface_override_material(0)
+		assert(body_mat is ShaderMaterial and (body_mat as ShaderMaterial).shader != null, "Aster_Body 未实装着色器材质")
+		print("✔ NPR toon+outline 着色实装检验通过")
+
+		# 检查真身碰撞胶囊体 (贴合 1.65m Aster 人体)
+		var capsule: CapsuleShape3D = player.collision_shape.shape as CapsuleShape3D
+		assert(capsule != null, "碰撞体不是胶囊体")
+		assert(is_equal_approx(capsule.radius, 0.38), "胶囊半径应为 0.38m")
+		assert(is_equal_approx(capsule.height, 1.65), "胶囊高度应为 1.65m")
+		assert(is_equal_approx(player.collision_shape.position.y, 0.825), "胶囊中心高应为 0.825m")
+		print("✔ 真身胶囊碰撞体校验通过: r=0.38 h=1.65 c=0.825")
 
 		# 检查 CombatData 关键数值
 		var cd: CombatData = player.combat_data
@@ -44,7 +71,12 @@ func _process(_delta: float) -> bool:
 		assert(cd.max_wall_jumps == 3)
 		assert(cd.perfect_dodge_window == 0.12)
 		assert(cd.parry_window == 0.15)
+		assert(cd.hitstop_light == 0.05)
 		assert(cd.hitstop_heavy == 0.10)
+		assert(cd.magnetic_lunge_distance == 0.4)
+		assert(cd.magnetic_lunge_cone_deg == 45.0)
+		assert(cd.magnetic_lunge_windup == 0.12)
+		print("✔ 打击手感参数校验通过: hitstop=0.05/0.10, 磁性吸附=0.4m/45°/0.12s")
 
 		# 检查 HUD
 		var hud: HUDController = scene.get_node_or_null("HUDLayer/HUD") as HUDController
@@ -70,13 +102,13 @@ func _process(_delta: float) -> bool:
 		# 测试视角切换
 		player.camera_controller.toggle_camera_mode()
 		assert(player.camera_controller.current_mode == CameraController.CameraMode.FPP, "切换至 FPP 失败")
-		assert(not head.visible, "第一人称下头部未隐藏")
-		print("✔ FPP 视角切换及头部隐藏检验通过")
+		assert(not rig.visible, "第一人称下真身模型未隐藏")
+		print("✔ FPP 视角切换及真身隐藏检验通过")
 
 		player.camera_controller.toggle_camera_mode()
 		assert(player.camera_controller.current_mode == CameraController.CameraMode.TPP, "切换回 TPP 失败")
-		assert(head.visible, "第三人称下头部未重新显示")
-		print("✔ TPP 视角恢复及头部显示检验通过")
+		assert(rig.visible, "第三人称下真身模型未恢复显示")
+		print("✔ TPP 视角恢复及真身显示检验通过")
 
 		# 测试木桩受击机制
 		var dummy: TrainingDummy = scene.get_node_or_null("Zone1_Combat/TrainingDummy") as TrainingDummy
