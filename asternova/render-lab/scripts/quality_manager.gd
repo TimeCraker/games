@@ -40,38 +40,42 @@ func _process(_delta: float) -> void:
 	if fps_label:
 		fps_label.text = "FPS: %d  |  当前画质: %s" % [fps, tier_name]
 	if info_label:
-		info_label.text = "渲染器: GL Compatibility | 平台: Windows 64-bit\n快捷键: [1] 低档  [2] 中档  [3] 高档  | 鼠标拖拽: 360°环视  滚轮: 缩放"
+		var method := RenderingServer.get_current_rendering_method()
+		var method_name := "Forward+ (Vulkan Clustered)" if method == "forward_plus" \
+				else method.to_upper()
+		info_label.text = "渲染器: %s | 平台: Windows 64-bit\n快捷键: [1] 低档  [2] 中档  [3] 高档  | 鼠标拖拽: 360°环视  滚轮: 缩放" % method_name
 
 func set_quality_tier(tier: QualityTier) -> void:
 	current_tier = tier
+	# 泛光/SSAO/SSR 参数一律以官方母版 endfield_studio_environment.tres 的法定值为准,
+	# 三档切换只拨动开关与帧率/MSAA/粒子数, 严禁手改母版材质参数
+	var env: Environment = world_environment.environment if world_environment else null
 	match tier:
 		QualityTier.LOW:
 			Engine.max_fps = 60
 			get_viewport().msaa_3d = Viewport.MSAA_DISABLED
-			if world_environment and world_environment.environment:
-				world_environment.environment.glow_enabled = false
+			if env:
+				env.glow_enabled = false
+				env.ssao_enabled = false
+				env.ssr_enabled = false
 			if cherry_particles:
 				cherry_particles.amount = 40
 		QualityTier.MEDIUM:
 			Engine.max_fps = 120
 			get_viewport().msaa_3d = Viewport.MSAA_2X
-			if world_environment and world_environment.environment:
-				world_environment.environment.glow_enabled = true
-				world_environment.environment.glow_intensity = 0.35
-				world_environment.environment.glow_hdr_threshold = 1.3
-				world_environment.environment.glow_bloom = 0.02
-				world_environment.environment.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+			if env:
+				env.glow_enabled = true
+				env.ssao_enabled = true
+				env.ssr_enabled = true
 			if cherry_particles:
 				cherry_particles.amount = 100
 		QualityTier.HIGH:
 			Engine.max_fps = 0 # 解锁至显示器上限
 			get_viewport().msaa_3d = Viewport.MSAA_4X
-			if world_environment and world_environment.environment:
-				world_environment.environment.glow_enabled = true
-				world_environment.environment.glow_intensity = 0.45
-				world_environment.environment.glow_hdr_threshold = 1.25
-				world_environment.environment.glow_bloom = 0.03
-				world_environment.environment.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+			if env:
+				env.glow_enabled = true
+				env.ssao_enabled = true
+				env.ssr_enabled = true
 			if cherry_particles:
 				cherry_particles.amount = 200
 	_update_hud_label()

@@ -1,0 +1,139 @@
+[gd_scene load_steps=13 format=3 uid="uid://m1_endfield_street"]
+
+[ext_resource type="PackedScene" uid="uid://ast_endfield_lighting_studio" path="res://scenes/lighting/endfield_lighting_studio.tscn" id="1_light"]
+[ext_resource type="PackedScene" uid="uid://p7p6ww5uril8" path="res://models/environment/modern_japan_neighborhood.glb" id="2_env_mesh"]
+[ext_resource type="Script" path="res://scripts/environment/ground_npr_setup.gd" id="3_ground_npr"]
+[ext_resource type="Script" path="res://scripts/environment/m1_street_setup.gd" id="4_m1_purge"]
+[ext_resource type="PackedScene" path="res://scenes/entities/buildings/convenience_store.tscn" id="5_store"]
+[ext_resource type="PackedScene" path="res://scenes/entities/props/vending_machine_dual.tscn" id="6_vending"]
+[ext_resource type="PackedScene" path="res://models/environment/cherry_blossom_tree.glb" id="7_sakura"]
+[ext_resource type="PackedScene" uid="uid://cb_particles_01" path="res://scenes/cherry_blossom_particles.tscn" id="8_petals"]
+[ext_resource type="PackedScene" uid="uid://char_aster_01" path="res://scenes/character_aster.tscn" id="9_aster"]
+[ext_resource type="Script" path="res://scripts/quality_manager.gd" id="10_quality"]
+[ext_resource type="Script" path="res://scripts/environment/m1_review_capture.gd" id="11_capture"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud"]
+bg_color = Color(0.08, 0.1, 0.16, 0.75)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="M1EndfieldStreet" type="Node3D"]
+
+[node name="EndfieldLighting" parent="." instance=ExtResource("1_light")]
+
+[node name="NeighborhoodMesh" parent="." instance=ExtResource("2_env_mesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="GroundNPRSetup" type="Node" parent="."]
+script = ExtResource("3_ground_npr")
+agx_light_master = true
+
+[node name="M1StreetSetup" type="Node" parent="."]
+script = ExtResource("4_m1_purge")
+
+[node name="ConvenienceStore" parent="." instance=ExtResource("5_store")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -16.05, 0, 20)
+
+[node name="WelcomeLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.8, 1.1, 20.8)
+light_color = Color(1, 0.72, 0.42, 1)
+light_energy = 2.4
+omni_range = 4.5
+omni_attenuation = 1.6
+
+[node name="VendingMachineDual" parent="." instance=ExtResource("6_vending")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -8.6, 0.18, 16.2)
+
+[node name="VendingGlowLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 1.3, 16.2)
+light_color = Color(0.55, 0.75, 1, 1)
+light_energy = 1.2
+omni_range = 2.5
+omni_attenuation = 1.5
+
+[node name="SakuraTree_West" parent="." instance=ExtResource("7_sakura")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -2.63, 2.545, -44.2)
+
+[node name="SakuraTree_East" parent="." instance=ExtResource("7_sakura")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.1, 2.05, -47)
+
+[node name="SakuraTree_Store" parent="." instance=ExtResource("7_sakura")]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 0.85, -3.145, -4.21, 10.7)
+
+[node name="CherryBlossomParticles" parent="." instance=ExtResource("8_petals")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 17)
+
+[node name="CharacterAster" parent="." instance=ExtResource("9_aster")]
+transform = Transform3D(-0.42262, 0, -0.90631, 0, 1, 0, 0.90631, 0, -0.42262, 0.2, 0.02, 20.6)
+
+[node name="ReviewCamera" type="Camera3D" parent="."]
+
+[node name="QualityManager" type="CanvasLayer" parent="." node_paths=PackedStringArray("world_environment", "cherry_particles")]
+script = ExtResource("10_quality")
+world_environment = NodePath("../EndfieldLighting/WorldEnvironment")
+cherry_particles = NodePath("../CherryBlossomParticles")
+
+[node name="MarginContainer" type="MarginContainer" parent="QualityManager"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 120.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+
+[node name="PanelContainer" type="PanelContainer" parent="QualityManager/MarginContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
+
+[node name="MarginContainer" type="MarginContainer" parent="QualityManager/MarginContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="QualityManager/MarginContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TitleLabel" type="Label" parent="QualityManager/MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "AsterNova · M1 终极街区沙盒 (Forward+ AgX · 终末地清冷天光)"
+
+[node name="FpsLabel" type="Label" parent="QualityManager/MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.95, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "FPS: -- | 当前画质: 高档"
+
+[node name="InfoLabel" type="Label" parent="QualityManager/MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.88, 0.95, 0.9)
+theme_override_font_sizes/font_size = 13
+text = "渲染器: Forward+ (Vulkan Clustered)"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="QualityManager/MarginContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BtnLow" type="Button" parent="QualityManager/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(110, 32)
+layout_mode = 2
+text = "[1] 低画质 (60)"
+
+[node name="BtnMed" type="Button" parent="QualityManager/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(110, 32)
+layout_mode = 2
+text = "[2] 中画质 (120)"
+
+[node name="BtnHigh" type="Button" parent="QualityManager/MarginContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(110, 32)
+layout_mode = 2
+text = "[3] 高画质 (解锁)"
+
+[node name="Capture" type="Node" parent="."]
+script = ExtResource("11_capture")

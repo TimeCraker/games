@@ -27,6 +27,11 @@ const MANHOLE_COVER_SIZE := 1.01        # 圆盘边长: 贴花圆盘直径 0.956
 var _textures: Dictionary = {}
 var _cover_sealed := false          # 086/087 共用一枚井盖圆盘, 防同位双盘 z-fighting
 
+## M1 Forward+ AgX 母版标定: AgX 压中调 + 太阳 45° 直射, 方砖/盲道白场按新响应
+## 曲线重标 (0.45 -> 0.24, 乘性材质校准非后期压暗); 沥青取纠偏令区间上沿 1.0。
+## Tier 1 地面评审场景 (Filmic + 65° 高阳) 保持默认 false 的历史标定值。
+@export var agx_light_master := false
+
 
 func _ready() -> void:
 	_load_textures()
@@ -47,6 +52,10 @@ func _load_textures() -> void:
 
 func _apply(root: Node) -> void:
 	for child in root.get_children():
+		# 自管 gameplay 预制体 (便利店/贩卖机等 StaticBody3D, 自带 NPR 脚本) 整树跳过:
+		# 防止本驱动的日景熄灯/材质处理污染其橱窗自发光与 toon 绑定
+		if child is StaticBody3D:
+			continue
 		if child is MeshInstance3D:
 			var node_name := String(child.name)
 			for zone_name in ZONE_MAP:
@@ -59,19 +68,6 @@ func _apply(root: Node) -> void:
 			if node_name.findn("Store") < 0 and node_name.findn("Vending") < 0 \
 					and node_name.findn("Sign") < 0 and node_name.findn("Billboard") < 0:
 				_suppress_emission(child)
-			# GLB 全材质日光白场钳制 (消直射死白): 所有 StandardMaterial 乘性 x0.84,
-			# 招牌/贩卖机等功能光节点保持原样; ZONE 五网格已被 ShaderMaterial 覆盖不受影响
-			var is_zone := true
-			for zone_name in ZONE_MAP:
-				if node_name == zone_name:
-					is_zone = false
-			if not is_zone and node_name.findn("Cylinder_0") != 0 					and node_name.findn("Store") < 0 and node_name.findn("Vending") < 0 					and node_name.findn("Sign") < 0 and node_name.findn("Billboard") < 0 					and child.mesh != null:
-				for mi_i in child.mesh.get_surface_count():
-					var sm: Material = child.mesh.surface_get_material(mi_i)
-					if sm is StandardMaterial3D:
-						var dimmed: StandardMaterial3D = sm.duplicate()
-						dimmed.albedo_color = Color(0.84, 0.845, 0.85)
-						child.set_surface_override_material(mi_i, dimmed)
 			# 悬空伪影按节点名消灭 (纠偏令, 禁用 AABB 世界坐标猜测):
 			# 交通凸面镜/环/圆环道具, 以及 Cylinder_16/17/18/19/Cylinder_2 开头的
 			# 电线杆悬空装饰圆柱片 (红环本体), 一律隐藏。
@@ -112,10 +108,21 @@ func _setup_mesh(mi: MeshInstance3D, zone_name: String) -> void:
 	var tex: Dictionary = _textures[group]
 	# 沥青法线深度 0.8~1.0 (纠偏令: 骨料咬合感 + SSAO); 方砖/盲道保持 0.14 细腻微倒角
 	var normal_depth := 0.9 if group == "asphalt" else 0.14
-	# 沥青 gain 0.85 (纠偏令正常物理区间); 方砖/盲道白场亮 (STYLE #D5D8DC~#E0E0E8),
-	# 用 0.5 调和 217 (0.85) 像素硬线 => 强光下砖面纹理与拼缝依然可读
-	var gain := 0.85 if group == "asphalt" else 0.45
-	var fill := 1.4 if group == "asphalt" else 0.15
+	# 地面材质增益按官方母版 (AgX 4 + 曝光 1.0 + 太阳 1.1) 标定:
+	# 方砖白场阳面目标 ~205 (STYLE #D5D8DC~#E0E0E8), 沥青深灰骨料 #34373D 取
+	# 纠偏令区间上沿的直射可读值; 只动本材质参数, 严禁改官方灯光/环境
+	var gain: float
+	if agx_light_master:
+		gain = 1.35 if group == "asphalt" else 0.30
+	elif group == "tactile":
+		gain = 0.33
+	else:
+		gain = 0.85 if group == "asphalt" else 0.28
+	var fill: float
+	if agx_light_master:
+		fill = 0.55 if group == "asphalt" else 0.15
+	else:
+		fill = 1.4 if group == "asphalt" else 0.15
 	for i in mi.mesh.get_surface_count():
 		var mat := ShaderMaterial.new()
 		mat.shader = SHADER_GROUND
