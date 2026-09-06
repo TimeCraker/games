@@ -1,0 +1,59 @@
+[gd_scene load_steps=10 format=3 uid="uid://vending_review_01"]
+
+[ext_resource type="Texture2D" path="res://textures/pavement_stones.png" id="1_tex"]
+[ext_resource type="PackedScene" path="res://scenes/entities/props/vending_machine_dual.tscn" id="2_prefab"]
+[ext_resource type="PackedScene" path="res://scenes/character_aster.tscn" id="3_aster"]
+[ext_resource type="Script" path="res://scripts/props/vending_review_capture.gd" id="4_capture"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
+sky_top_color = Color(0.36, 0.55, 0.80, 1)
+sky_horizon_color = Color(0.80, 0.84, 0.90, 1)
+ground_bottom_color = Color(0.30, 0.32, 0.36, 1)
+ground_horizon_color = Color(0.80, 0.84, 0.90, 1)
+
+[sub_resource type="Sky" id="Sky"]
+sky_material = SubResource("SkyMat")
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 2
+sky = SubResource("Sky")
+ambient_light_source = 3
+ambient_light_sky_contribution = 1.0
+ambient_light_energy = 0.65
+tonemap_mode = 3
+glow_enabled = true
+glow_intensity = 0.5
+glow_hdr_threshold = 0.92
+
+[sub_resource type="StandardMaterial3D" id="GroundMat"]
+albedo_texture = ExtResource("1_tex")
+roughness = 0.85
+uv1_scale = Vector3(5, 5, 1)
+
+[sub_resource type="PlaneMesh" id="GroundMesh"]
+material = SubResource("GroundMat")
+size = Vector2(12, 12)
+
+[node name="VendingMachineReview" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env")
+
+[node name="SunLight" type="DirectionalLight3D" parent="."]
+light_color = Color(1, 0.90, 0.78, 1)
+light_energy = 0.95
+shadow_enabled = true
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("GroundMesh")
+
+[node name="VendingMachine" parent="." instance=ExtResource("2_prefab")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 0, 0)
+
+[node name="CharacterAster" parent="." instance=ExtResource("3_aster")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, 0, 0)
+
+[node name="ReviewCamera" type="Camera3D" parent="."]
+
+[node name="Capture" type="Node" parent="."]
+script = ExtResource("4_capture")

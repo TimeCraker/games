@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/props/vending_machine_npr_setup.gd" id="1_3nb47"]
+[ext_resource type="ArrayMesh" path="res://models/environment/vending_machine_dual_mesh.res" id="2_4vwxa"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_grtym"]
+size = Vector3(2.2205157, 1.8299999, 0.92747474)
+
+[node name="VendingMachineDual" type="StaticBody3D" unique_id=642301345]
+script = ExtResource("1_3nb47")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=150449724]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.91499996, -1.4901161e-07)
+shape = SubResource("BoxShape3D_grtym")
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=589786690]
+mesh = ExtResource("2_4vwxa")
