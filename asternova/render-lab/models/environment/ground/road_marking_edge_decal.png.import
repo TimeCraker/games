@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dkoqy2ndfw72l"
-path="res://.godot/imported/asphalt_white_stripe.png-24c8d6b1dbaf1c90b063ead4be04dd54.ctex"
+uid="uid://di1wn00ig4aj3"
+path="res://.godot/imported/road_marking_edge_decal.png-c1580be381b6d2b4698b6fabb7fe3153.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/textures/ground/asphalt_white_stripe.png"
-dest_files=["res://.godot/imported/asphalt_white_stripe.png-24c8d6b1dbaf1c90b063ead4be04dd54.ctex"]
+source_file="res://models/environment/ground/road_marking_edge_decal.png"
+dest_files=["res://.godot/imported/road_marking_edge_decal.png-c1580be381b6d2b4698b6fabb7fe3153.ctex"]
 
 [params]
 

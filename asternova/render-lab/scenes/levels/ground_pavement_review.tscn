@@ -16,14 +16,14 @@ background_mode = 2
 sky = SubResource("SkyMat")
 ambient_light_source = 2
 ambient_light_color = Color(0.74, 0.80, 0.92, 1)
-ambient_light_energy = 0.5
+ambient_light_energy = 0.42
 tonemap_mode = 3
-tonemap_exposure = 0.8
+tonemap_exposure = 1.0
 ssao_enabled = true
 ssao_radius = 1.6
 ssao_intensity = 0.9
 ssao_power = 1.5
-glow_enabled = true
+glow_enabled = false
 glow_intensity = 0.2
 glow_hdr_threshold = 1.6
 
@@ -34,11 +34,18 @@ environment = SubResource("Env")
 
 [node name="SunLight" type="DirectionalLight3D" parent="."]
 light_color = Color(1, 0.97, 0.92, 1)
-light_energy = 1.4
+light_energy = 1.1
 shadow_enabled = true
 directional_shadow_mode = 2
 directional_shadow_max_distance = 60.0
-shadow_blur = 1.4
+shadow_blur = 1.5
+
+[node name="ReflectionProbe" type="ReflectionProbe" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 13, 20)
+update_mode = 0
+box_projection = true
+intensity = 0.7
+size = Vector3(22, 10, 26)
 
 [node name="NeighborhoodMesh" parent="." instance=ExtResource("1_env_mesh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
@@ -47,7 +54,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 script = ExtResource("2_ground_npr")
 
 [node name="CharacterAster" parent="." instance=ExtResource("3_aster")]
-transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0.8, 0.1, 17.5)
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0.2, 0.02, 20.6)
 
 [node name="ReviewCamera" type="Camera3D" parent="."]
 

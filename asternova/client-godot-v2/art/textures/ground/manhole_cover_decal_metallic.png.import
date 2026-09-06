@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cknt25hgmudl3"
-path="res://.godot/imported/asphalt_white_stripe_roughness.png-2cb85de7147e79bd81c30898f45bbeeb.ctex"
+uid="uid://d2ria8abhmo4q"
+path="res://.godot/imported/manhole_cover_decal_metallic.png-c54ca97bccd5b0d97b40c6751948f33f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/textures/ground/asphalt_white_stripe_roughness.png"
-dest_files=["res://.godot/imported/asphalt_white_stripe_roughness.png-2cb85de7147e79bd81c30898f45bbeeb.ctex"]
+source_file="res://art/textures/ground/manhole_cover_decal_metallic.png"
+dest_files=["res://.godot/imported/manhole_cover_decal_metallic.png-c54ca97bccd5b0d97b40c6751948f33f.ctex"]
 
 [params]
 

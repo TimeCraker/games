@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dvdtcj466hqd1"
-path="res://.godot/imported/ground_trim_sheet_2k.png-535f1fcd4dd8741ee32ccc97eb10bfec.ctex"
+uid="uid://dvexd5gtej8or"
+path="res://.godot/imported/manhole_cover_decal_normal.png-32ce835717a58e345527d60292eac0c8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/textures/ground/ground_trim_sheet_2k.png"
-dest_files=["res://.godot/imported/ground_trim_sheet_2k.png-535f1fcd4dd8741ee32ccc97eb10bfec.ctex"]
+source_file="res://art/textures/ground/manhole_cover_decal_normal.png"
+dest_files=["res://.godot/imported/manhole_cover_decal_normal.png-32ce835717a58e345527d60292eac0c8.ctex"]
 
 [params]
 

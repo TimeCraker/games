@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bhjn581n7riss"
-path="res://.godot/imported/asphalt_clean_albedo.png-4598a61b3b51b26127b6c9a15610db6b.ctex"
+uid="uid://btp636vew77mq"
+path="res://.godot/imported/manhole_cover_decal_roughness.png-16e5ebc2b123eb9f41d11db8ed4530df.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://models/environment/ground/asphalt_clean_albedo.png"
-dest_files=["res://.godot/imported/asphalt_clean_albedo.png-4598a61b3b51b26127b6c9a15610db6b.ctex"]
+source_file="res://art/textures/ground/manhole_cover_decal_roughness.png"
+dest_files=["res://.godot/imported/manhole_cover_decal_roughness.png-16e5ebc2b123eb9f41d11db8ed4530df.ctex"]
 
 [params]
 
