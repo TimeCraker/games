@@ -46,6 +46,12 @@ extends Resource
 @export var combo_damage: Array[float] = [25.0, 30.0, 45.0, 75.0]
 @export var combo_lunge_speed: Array[float] = [3.5, 3.0, 6.0, 8.5] ## 每段出刀前冲推力
 
+@export_group("近身索敌吸附 (Magnetic Lunge)")
+@export var magnetic_lunge_distance: float = 0.4 ## 挥刀时自动向目标平滑前突距离(米)
+@export var magnetic_lunge_cone_deg: float = 45.0 ## 角色前方扇形吸附判定半角(度)
+@export var magnetic_lunge_windup: float = 0.12 ## 前突加速窗口时长(秒,对齐出刀前摇)
+@export var magnetic_lunge_stop_margin: float = 1.1 ## 距目标近于此距离则不再前突(防顶脸穿模)
+
 @export_group("纳刀架刀与居合蓄力 (Guard & Iaijutsu)")
 @export var parry_window: float = 0.15 ## 架刀前 0.15s 完美弹刀判定窗口
 @export var charge_tier_1_time: float = 0.40 ## 1阶轻拔刀耗时

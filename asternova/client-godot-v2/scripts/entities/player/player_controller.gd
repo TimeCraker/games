@@ -7,17 +7,16 @@ extends CharacterBody3D
 
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
 @onready var visual_root: Node3D = $VisualRoot
+@onready var aster_rig: AsterRig = $VisualRoot/CharacterAster
 @onready var camera_controller: CameraController = $CameraController
 @onready var combat_fsm: PlayerCombatFSM = $PlayerCombatFSM
-@onready var blade_hitbox: Area3D = $VisualRoot/BladeHitbox
-@onready var blade_visual: MeshInstance3D = $VisualRoot/BladeVisual
 
 var input_direction: Vector3 = Vector3.ZERO
 var move_velocity: Vector3 = Vector3.ZERO
 var slide_direction: Vector3 = Vector3.FORWARD
 var current_max_speed: float = 4.5
-var original_capsule_height: float = 1.8
-var original_capsule_radius: float = 0.4
+var original_capsule_height: float = 1.65
+var original_capsule_radius: float = 0.38
 
 # 状态物理缓存
 var is_sliding: bool = false
@@ -30,9 +29,11 @@ var max_hp: float = 100.0
 var wall_contact_timer: float = 0.0
 var cached_wall_normal: Vector3 = Vector3.ZERO
 
+# 磁性索敌吸附前突 (挥刀前摇窗口内的定向位移)
+var attack_lunge_timer: float = 0.0
+var attack_lunge_velocity: Vector3 = Vector3.ZERO
+
 # 视觉表现与动效
-var original_blade_transform: Transform3D
-var blade_material: StandardMaterial3D
 var attack_tween: Tween = null
 
 signal hp_changed(current: float, max: float)
@@ -42,20 +43,9 @@ func _ready() -> void:
 	if not combat_data:
 		combat_data = CombatData.new()
 	combat_fsm.init(self, combat_data)
-	blade_hitbox.monitoring = false
-	original_blade_transform = blade_visual.transform
-	
-	# 初始化独立佩刀材质 (支持运行时动态变光与阶数变色)
-	blade_material = StandardMaterial3D.new()
-	blade_material.albedo_color = Color(0.85, 0.95, 1.0)
-	blade_material.emission_enabled = true
-	blade_material.emission = Color(0.3, 0.7, 1.0)
-	blade_material.emission_energy_multiplier = 2.0
-	blade_visual.set_surface_override_material(0, blade_material)
-	
-	# 连接第一人称与蓄力阶数信号
+
+	# 连接第一人称视角信号 (FPP 下隐藏真身防穿模)
 	camera_controller.view_mode_changed.connect(_on_view_mode_changed)
-	combat_fsm.charge_tier_changed.connect(_on_charge_tier_changed)
 
 func _unhandled_input(event: InputEvent) -> void:
 	combat_fsm.handle_input(event)
@@ -182,8 +172,17 @@ func apply_attack_physics(delta: float) -> void:
 		# 滑铲中横扫出刀：上下半身解耦，保持贴地滑铲物理与斜坡重力加速
 		apply_slide_physics(delta)
 	else:
-		velocity.x = move_toward(velocity.x, 0.0, combat_data.friction * delta)
-		velocity.z = move_toward(velocity.z, 0.0, combat_data.friction * delta)
+		# 磁性吸附前突窗口：匀速位移精准补偿 0.4m 距离，窗口结束即刻刹车防止惯性超程
+		if attack_lunge_timer > 0.0:
+			attack_lunge_timer -= delta
+			velocity.x = attack_lunge_velocity.x
+			velocity.z = attack_lunge_velocity.z
+			if attack_lunge_timer <= 0.0:
+				velocity.x = 0.0
+				velocity.z = 0.0
+		else:
+			velocity.x = move_toward(velocity.x, 0.0, combat_data.friction * delta)
+			velocity.z = move_toward(velocity.z, 0.0, combat_data.friction * delta)
 		if not is_on_floor():
 			velocity.y -= combat_data.base_gravity * delta
 
@@ -226,9 +225,9 @@ func start_slide() -> void:
 	set_capsule_height(combat_data.slide_height)
 	floor_snap_length = 0.5
 	
-	# 视觉根节点贴地俯冲姿态 (更强推背感)
+	# 视觉根节点贴地俯冲姿态 (真身模型只做轻微下潜+前倾，避免腿部入地)
 	var tween: Tween = create_tween()
-	tween.tween_property(visual_root, "position:y", -0.45, 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(visual_root, "position:y", -0.12, 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(visual_root, "rotation:x", deg_to_rad(-12.0), 0.08)
 
 func end_slide() -> void:
@@ -290,87 +289,62 @@ func start_dash() -> void:
 	slide_direction = input_direction if input_direction.length_squared() > 0.01 else -visual_root.global_transform.basis.z
 
 func start_guard_stance() -> void:
-	# 纳刀架刀低姿态
+	# 居合蓄力：握刀手沉腰架刀姿态（纯骨骼代码姿态，无特效）
 	if attack_tween and attack_tween.is_valid():
 		attack_tween.kill()
-	attack_tween = create_tween()
-	attack_tween.tween_property(blade_visual, "position", Vector3(-0.25, 0.75, 0.1), 0.12)
-	attack_tween.parallel().tween_property(blade_visual, "rotation_degrees", Vector3(-20, 80, -75), 0.12)
+	aster_rig.play_guard_pose()
 
-func _on_charge_tier_changed(tier: int) -> void:
-	if not blade_material:
-		return
-	match tier:
-		0:
-			blade_material.emission = Color(0.3, 0.7, 1.0)
-			blade_material.emission_energy_multiplier = 2.0
-		1: # 1阶：苍蓝微光
-			blade_material.emission = Color(0.2, 0.6, 1.0)
-			blade_material.emission_energy_multiplier = 4.0
-		2: # 2阶：星霜光环
-			blade_material.emission = Color(0.1, 0.95, 1.0)
-			blade_material.emission_energy_multiplier = 6.5
-		3: # 3阶：金芒次元裂隙
-			blade_material.emission = Color(1.0, 0.85, 0.15)
-			blade_material.emission_energy_multiplier = 10.0
+func update_blade_stance(drawn: bool) -> void:
+	## 拔刀/纳刀插槽切换：由战斗状态机在状态迁移时驱动
+	if drawn:
+		aster_rig.draw_sword()
+	else:
+		aster_rig.sheathe_sword()
+
+func begin_attack_lunge(lunge_dir: Vector3, distance: float, windup: float) -> void:
+	## 磁性索敌吸附：前摇窗口内向目标匀速前突指定距离
+	attack_lunge_timer = windup
+	attack_lunge_velocity = lunge_dir * (distance / maxf(windup, 0.01))
 
 func execute_attack_step(stage: int, soft_target: Node3D) -> void:
-	var lunge_pwr: float = combat_data.combo_lunge_speed[stage]
-	var lunge_dir: Vector3 = -visual_root.global_transform.basis.z
+	# 出刀瞬间：刀身切换至右手掌心插槽
+	update_blade_stance(true)
 
-	# 软锁定吸附微滑步 (Soft-lock)
+	# 磁性索敌吸附 (Soft-lock)：目标位于角色前方扇形内时，前摇窗口平滑前突补偿距离
+	var lunge_dir: Vector3 = -visual_root.global_transform.basis.z
+	var has_magnetic_target: bool = false
+	var cone_dot: float = -1.0
+	var pull: float = 0.0
 	if soft_target and is_instance_valid(soft_target):
 		var to_target: Vector3 = soft_target.global_position - global_position
 		to_target.y = 0.0
-		lunge_dir = to_target.normalized()
-		lunge_pwr = minf(lunge_pwr + combat_data.soft_lock_pull_speed, to_target.length() * 8.0)
+		var dist: float = to_target.length()
+		if dist > 0.01:
+			var target_dir: Vector3 = to_target.normalized()
+			var facing: Vector3 = -visual_root.global_transform.basis.z
+			cone_dot = facing.normalized().dot(target_dir)
+			if cone_dot >= cos(deg_to_rad(combat_data.magnetic_lunge_cone_deg)):
+				lunge_dir = target_dir
+				has_magnetic_target = true
 
-	# 滑铲横扫出刀时保留滑铲动量与顺坡加速，站立普攻才施加微突进位移
-	if not (is_sliding_attack and is_sliding):
-		velocity.x = lunge_dir.x * lunge_pwr
-		velocity.z = lunge_dir.z * lunge_pwr
+	# 滑铲横扫出刀时保留滑铲动量与顺坡加速，站立普攻才施加吸附前突位移
+	if has_magnetic_target and not (is_sliding_attack and is_sliding):
+		var pull_to_target: Vector3 = soft_target.global_position - global_position
+		pull_to_target.y = 0.0
+		pull = minf(combat_data.magnetic_lunge_distance,
+				maxf(pull_to_target.length() - combat_data.magnetic_lunge_stop_margin, 0.0))
+		if pull > 0.01:
+			begin_attack_lunge(lunge_dir, pull, combat_data.magnetic_lunge_windup)
 
-	# 程序化刀光动效 (Procedural Blade Animation)
-	if attack_tween and attack_tween.is_valid():
-		attack_tween.kill()
-	attack_tween = create_tween()
+	# 4段回旋：周身回旋气刃斩保留整周旋转位移
+	if stage == 3:
+		if attack_tween and attack_tween.is_valid():
+			attack_tween.kill()
+		attack_tween = create_tween()
+		attack_tween.tween_property(visual_root, "rotation:y", visual_root.rotation.y + TAU, 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
-	match stage:
-		0: # 1段挑击：自右下斜向上挑斩
-			blade_visual.position = Vector3(0.5, 0.4, -0.1)
-			blade_visual.rotation_degrees = Vector3(40, -30, -50)
-			blade_material.emission = Color(0.4, 0.85, 1.0)
-			blade_material.emission_energy_multiplier = 4.0
-			attack_tween.tween_property(blade_visual, "position", Vector3(-0.2, 1.2, -0.6), 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-			attack_tween.parallel().tween_property(blade_visual, "rotation_degrees", Vector3(-60, 45, 50), 0.12)
-			attack_tween.tween_property(blade_visual, "transform", original_blade_transform, 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			attack_tween.parallel().tween_property(blade_material, "emission_energy_multiplier", 2.0, 0.18)
-		1: # 2段反削：自左向右高速平削
-			blade_visual.position = Vector3(-0.35, 1.0, -0.4)
-			blade_visual.rotation_degrees = Vector3(-10, 60, 40)
-			blade_material.emission = Color(0.3, 0.9, 1.0)
-			blade_material.emission_energy_multiplier = 4.5
-			attack_tween.tween_property(blade_visual, "position", Vector3(0.55, 0.8, -0.5), 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-			attack_tween.parallel().tween_property(blade_visual, "rotation_degrees", Vector3(10, -70, -40), 0.12)
-			attack_tween.tween_property(blade_visual, "transform", original_blade_transform, 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			attack_tween.parallel().tween_property(blade_material, "emission_energy_multiplier", 2.0, 0.18)
-		2: # 3段双连刺：疾风双连刺
-			blade_material.emission = Color(0.6, 0.8, 1.0)
-			blade_material.emission_energy_multiplier = 5.0
-			attack_tween.tween_property(blade_visual, "position", Vector3(0.2, 0.9, -0.95), 0.07).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
-			attack_tween.parallel().tween_property(blade_visual, "rotation_degrees", Vector3(0, 0, 90), 0.07)
-			attack_tween.tween_property(blade_visual, "position", Vector3(0.2, 0.9, -0.3), 0.05)
-			attack_tween.tween_property(blade_visual, "position", Vector3(0.1, 0.9, -1.05), 0.07).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
-			attack_tween.tween_property(blade_visual, "transform", original_blade_transform, 0.15)
-			attack_tween.parallel().tween_property(blade_material, "emission_energy_multiplier", 2.0, 0.15)
-		3: # 4段回旋气刃：360度周身回旋气刃斩
-			blade_material.emission = Color(1.0, 0.8, 0.3)
-			blade_material.emission_energy_multiplier = 7.0
-			blade_visual.position = Vector3(0.6, 0.85, -0.3)
-			blade_visual.rotation_degrees = Vector3(0, -90, 0)
-			attack_tween.tween_property(visual_root, "rotation:y", visual_root.rotation.y + TAU, 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-			attack_tween.tween_property(blade_visual, "transform", original_blade_transform, 0.15)
-			attack_tween.parallel().tween_property(blade_material, "emission_energy_multiplier", 2.0, 0.15)
+	# 程序化握点挥刀（纯骨骼姿态，无特效）
+	aster_rig.play_swing(stage)
 
 	# 产生刀光弧刃与 Hitbox 判定
 	spawn_slash_arc(stage)
@@ -386,18 +360,12 @@ func execute_iaijutsu(tier: int) -> void:
 
 	# 极速瞬步穿透
 	velocity = fwd * (dash_dist / 0.22)
-	
-	# 居合拔刀横斩
-	if attack_tween and attack_tween.is_valid():
-		attack_tween.kill()
-	attack_tween = create_tween()
-	blade_visual.position = Vector3(-0.4, 0.85, 0.1)
-	blade_visual.rotation_degrees = Vector3(0, 90, 0)
-	attack_tween.tween_property(blade_visual, "position", Vector3(0.6, 0.85, -0.6), 0.15).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
-	attack_tween.parallel().tween_property(blade_visual, "rotation_degrees", Vector3(0, -90, 0), 0.15)
-	attack_tween.tween_property(blade_visual, "transform", original_blade_transform, 0.12)
 
-	# 判定路径上全部敌人并释放居合光芒
+	# 居合拔刀横斩（出刀瞬间切换右手插槽）
+	update_blade_stance(true)
+	aster_rig.play_iaijutsu_swing()
+
+	# 判定路径上全部敌人
 	spawn_slash_arc(3)
 	check_blade_hits(dmg, true)
 
@@ -426,13 +394,7 @@ func check_blade_hits(damage: float, is_heavy: bool) -> void:
 
 func play_parry_fx() -> void:
 	camera_controller.trigger_hit_impact(true)
-	spawn_hit_spark(blade_visual.global_position, true)
-	if blade_material:
-		blade_material.emission = Color(1.0, 0.9, 0.2)
-		blade_material.emission_energy_multiplier = 10.0
-		var mat_tween: Tween = create_tween()
-		mat_tween.tween_property(blade_material, "emission_energy_multiplier", 2.0, 0.35)
-		mat_tween.parallel().tween_property(blade_material, "emission", Color(0.3, 0.7, 1.0), 0.35)
+	spawn_hit_spark(aster_rig.get_katana_position(), true)
 	# 振刀火花与后仰震退反馈
 	velocity = visual_root.global_transform.basis.z * 4.0
 	var recoil_tween: Tween = create_tween()
@@ -558,7 +520,5 @@ func set_capsule_height(h: float) -> void:
 		collision_shape.position.y = h * 0.5
 
 func _on_view_mode_changed(is_first_person: bool) -> void:
-	# 第一人称下隐藏自身头部以防穿模
-	var head_node: Node3D = visual_root.get_node_or_null("HeadPlaceholder")
-	if head_node:
-		head_node.visible = not is_first_person
+	# 第一人称下隐藏整个真身模型以防穿模
+	aster_rig.visible = not is_first_person

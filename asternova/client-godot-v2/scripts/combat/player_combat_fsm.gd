@@ -324,12 +324,16 @@ func change_state(new_state: State) -> void:
 	current_state = new_state
 	state_time = 0.0
 	can_cancel_recovery = false
-	
+
 	# 离开旧状态回调
 	exit_state(old_state)
 	# 进入新状态回调
 	enter_state(new_state)
-	
+
+	# 拔刀/纳刀插槽联动：攻击/居合蓄力/居合穿透/弹刀硬直为拔刀态，其余自动纳刀回鞘
+	var is_drawn_state: bool = new_state in [State.ATTACK, State.GUARD_CHARGE, State.IAIJUTSU_DASH, State.PARRY_STUN]
+	player.update_blade_stance(is_drawn_state)
+
 	state_changed.emit(old_state, new_state)
 
 func enter_state(state: State) -> void:
@@ -368,6 +372,7 @@ func exit_state(state: State) -> void:
 			if player.is_sliding_attack:
 				player.is_sliding_attack = false
 				player.end_slide()
+			player.attack_lunge_timer = 0.0
 		State.DASH:
 			is_invulnerable = false
 
