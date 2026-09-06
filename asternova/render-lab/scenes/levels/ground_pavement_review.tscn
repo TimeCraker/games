@@ -1,0 +1,55 @@
+[gd_scene load_steps=7 format=3 uid="uid://ground_pave_review"]
+
+[ext_resource type="PackedScene" uid="uid://p7p6ww5uril8" path="res://models/environment/modern_japan_neighborhood.glb" id="1_env_mesh"]
+[ext_resource type="Script" path="res://scripts/environment/ground_npr_setup.gd" id="2_ground_npr"]
+[ext_resource type="PackedScene" path="res://scenes/character_aster.tscn" id="3_aster"]
+[ext_resource type="Script" path="res://scripts/environment/ground_review_capture.gd" id="4_capture"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
+sky_top_color = Color(0.36, 0.55, 0.80, 1)
+sky_horizon_color = Color(0.80, 0.84, 0.90, 1)
+ground_bottom_color = Color(0.30, 0.32, 0.36, 1)
+ground_horizon_color = Color(0.80, 0.84, 0.90, 1)
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 2
+sky = SubResource("SkyMat")
+ambient_light_source = 2
+ambient_light_color = Color(0.74, 0.80, 0.92, 1)
+ambient_light_energy = 0.5
+tonemap_mode = 3
+tonemap_exposure = 0.8
+ssao_enabled = true
+ssao_radius = 1.6
+ssao_intensity = 0.9
+ssao_power = 1.5
+glow_enabled = true
+glow_intensity = 0.2
+glow_hdr_threshold = 1.6
+
+[node name="GroundPavementReview" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env")
+
+[node name="SunLight" type="DirectionalLight3D" parent="."]
+light_color = Color(1, 0.97, 0.92, 1)
+light_energy = 1.4
+shadow_enabled = true
+directional_shadow_mode = 2
+directional_shadow_max_distance = 60.0
+shadow_blur = 1.4
+
+[node name="NeighborhoodMesh" parent="." instance=ExtResource("1_env_mesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="GroundNPRSetup" type="Node" parent="."]
+script = ExtResource("2_ground_npr")
+
+[node name="CharacterAster" parent="." instance=ExtResource("3_aster")]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0.8, 0.1, 17.5)
+
+[node name="ReviewCamera" type="Camera3D" parent="."]
+
+[node name="Capture" type="Node" parent="."]
+script = ExtResource("4_capture")

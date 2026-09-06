@@ -1,10 +1,11 @@
-[gd_scene load_steps=18 format=3 uid="uid://bmodern_japan_sandbox"]
+[gd_scene load_steps=19 format=3 uid="uid://bmodern_japan_sandbox"]
 
 [ext_resource type="PackedScene" uid="uid://bplayer_v2_core" path="res://scenes/entities/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://bdummy_v2_core" path="res://scenes/entities/training_dummy.tscn" id="2_dummy"]
 [ext_resource type="PackedScene" uid="uid://bdrone_v2_core" path="res://scenes/entities/training_drone.tscn" id="3_drone"]
 [ext_resource type="PackedScene" uid="uid://bhud_v2_core" path="res://scenes/ui/hud.tscn" id="4_hud"]
 [ext_resource type="PackedScene" uid="uid://p7p6ww5uril8" path="res://models/environment/modern_japan_neighborhood.glb" id="5_env_mesh"]
+[ext_resource type="Script" path="res://scripts/environment/ground_npr_setup.gd" id="6_ground_npr"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1430"]
 sky_top_color = Color(0.35, 0.6, 0.95, 1)
@@ -34,9 +35,9 @@ ssao_power = 1.5
 ssil_enabled = true
 ssil_radius = 2.0
 glow_enabled = true
-glow_intensity = 0.35
+glow_intensity = 0.2
 glow_bloom = 0.08
-glow_hdr_threshold = 1.15
+glow_hdr_threshold = 1.6
 
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_slope_ramp"]
@@ -91,6 +92,9 @@ size = Vector3(7.6, 7.0, 9.8)
 size = Vector3(0.4, 2.2, 5.0)
 
 [node name="ModernResidentialSandbox" type="Node3D"]
+
+[node name="GroundNPRSetup" type="Node" parent="."]
+script = ExtResource("6_ground_npr")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_1430")
