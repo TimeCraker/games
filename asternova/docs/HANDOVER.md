@@ -66,13 +66,13 @@
   - `endfield_studio_environment.tres`：Forward+、AgX 模式 4、全分辨率 SSAO、SSR、弱冷体积雾（密度 0.012，石板蓝雾色）。
 
 ### 2. 正在并行的外部 Agent 任务状态
-- 🔄 **战斗与角色驱动 Agent**：
-  - 用户已派发新任务书：正在为 Aster 装配工业级 **43 骨 Humanoid 骨架**，接入 Godot 4.7 原生 `BoneMap` + `SkeletonProfileHumanoid` + `AnimationTree`（BlendSpace1D 0~7m/s 移动融合 + ACT 状态机 + 局部卡肉 Hitstop）。
-- 🔄 **地面与道路（Tier 1）建模 Agent**：
-  - 之前陷入双边模糊导致沥青变成纯灰块面、Toon Shader 滥用 EMISSION 导致发光蓝塑料路的误区；
-  - 已下发纠偏指令：要求恢复沥青骨料颗粒、移除自发光 Hack、实装斑马线与盲道。
-- 🔄 **自动贩卖机（Tier 3）Agent**：
-  - 正在按独立单体 Prefab 进行规范建模。
+- ✅ **环境与场景总装 Agent（已交付封板）**：
+  - commit `a453424` 已落地：在 `render-lab/scenes/levels/m1_endfield_street.tscn` 纯实例化官方标准母版 `endfield_lighting_studio.tscn`，清除遮挡天空方块，完成 Tier 2 折角便利店、Tier 3 双联贩卖机、二次元法线球化樱花树与真实 PBR 沥青斑马线装配；
+  - 产出三张 2K 评审图入库，经主脑与制作人评审达 75~80 分质量底线，正式作为 M1 场景基线封板；
+  - 存在差距的 3 个短板（生活道具密度、墙体分缝与水渍贴花、角色动态）已记录在 `m1-render-vertical-slice.md` 与 `CONTENT_BACKLOG.md` 作为后期精修储备。
+- ⏳ **战斗与角色驱动 Agent（进行中，主脑等待其完工）**：
+  - 用户已派发工业级 Humanoid 任务书：正在为 Aster 执行 Blender 蒙皮手术（彻底切断两鞋粘连与长发贴腰权重污染），接入主脑已下载配置好的全套 Mixamo 动作库（`MeleeLib.res` 121 个近战动作 + `ShooterLib.res` 180 个身法动作 + `Mixamo_BoneMap.tres`）；
+  - 主脑保持静默监控，等待该 Agent 交付标准带动画的模型与 `AnimationTree` 后，再进行 M2 战斗核心集成。
 
 ---
 
