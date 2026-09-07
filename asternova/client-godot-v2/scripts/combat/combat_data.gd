@@ -4,8 +4,8 @@ extends Resource
 ## M2 战斗与高机动身法核心参数表（基于 /grill-me 严格对齐成果）
 
 @export_group("基础移动 (Locomotion)")
-@export var walk_speed: float = 4.5
-@export var sprint_speed: float = 7.0
+@export var walk_speed: float = 2.8 ## 动捕 walk 剪辑标定移速（优雅快步）
+@export var sprint_speed: float = 7.0 ## 动捕 run 剪辑标定移速（疾跑）
 @export var acceleration: float = 24.0
 @export var friction: float = 20.0
 @export var air_control: float = 0.65
@@ -45,6 +45,8 @@ extends Resource
 @export var soft_lock_pull_speed: float = 8.0 ## 软吸附微滑步推力
 @export var combo_damage: Array[float] = [25.0, 30.0, 45.0, 75.0]
 @export var combo_lunge_speed: Array[float] = [3.5, 3.0, 6.0, 8.5] ## 每段出刀前冲推力
+## 四段连招对应的动捕剪辑真实时长（Slash1/Slash2/Slash3/SlashUppercut，来自 aster_animlib）
+@export var combo_anim_lengths: Array[float] = [1.167, 1.167, 1.792, 1.375]
 
 @export_group("近身索敌吸附 (Magnetic Lunge)")
 @export var magnetic_lunge_distance: float = 0.4 ## 挥刀时自动向目标平滑前突距离(米)
@@ -59,6 +61,8 @@ extends Resource
 @export var charge_tier_3_time: float = 1.50 ## 3阶金芒次元穿透斩耗时
 @export var charge_dash_distances: Array[float] = [3.0, 6.0, 10.0] ## 各阶居合突进距离
 @export var charge_damages: Array[float] = [50.0, 110.0, 220.0]
+@export var iai_release_length: float = 1.333 ## 拔刀释放动捕剪辑时长（SlashRelease）
+@export var parry_length: float = 0.5 ## 完美弹刀动捕剪辑时长（GuardParry）
 
 @export_group("运镜与打击感 (Camera & Feedback)")
 @export var camera_tpp_distance: float = 2.8 ## 第三人称基准臂长

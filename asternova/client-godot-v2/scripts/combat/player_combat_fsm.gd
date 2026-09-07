@@ -111,7 +111,7 @@ func _physics_process(delta: float) -> void:
 		State.IAIJUTSU_DASH:
 			process_iaijutsu(delta)
 		State.PARRY_STUN:
-			if state_time >= 0.35:
+			if state_time >= player.combat_data.parry_length:
 				change_state(State.IDLE)
 
 func check_locomotion_transitions() -> void:
@@ -281,8 +281,8 @@ func process_attack(delta: float) -> void:
 		start_attack_combo()
 		return
 
-	# 整段攻击收刀结束
-	var current_attack_anim_len: float = 0.40 if combo_index < 3 else 0.55
+	# 整段攻击收刀结束（时长 = 当前段动捕剪辑真实时长）
+	var current_attack_anim_len: float = player.combat_data.combo_anim_lengths[combo_index]
 	if state_time >= current_attack_anim_len:
 		player.is_sliding_attack = false
 		combo_reset_timer = combat_data.combo_timeout
@@ -313,8 +313,8 @@ func process_guard_charge(delta: float) -> void:
 			change_state(State.IDLE)
 
 func process_iaijutsu(delta: float) -> void:
-	# 居合穿透冲刺
-	if state_time >= 0.28:
+	# 居合穿透冲刺（收势时长 = SlashRelease 动捕剪辑时长）
+	if state_time >= player.combat_data.iai_release_length:
 		current_charge_tier = 0
 		charge_tier_changed.emit(0)
 		change_state(State.IDLE)

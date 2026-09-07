@@ -1,15 +1,18 @@
 class_name AsterRig
 extends Node3D
 
-## Aster 真身视觉骨架：NPR 着色实装 + 双插槽拔刀/纳刀 + 程序化握点挥刀
-## （纯节点与代码层控制，不产生任何粒子特效）
+## Aster 真身视觉骨架：NPR 着色实装 + 双插槽拔刀/纳刀 + AnimationTree 动捕驱动。
+## 骨骼动作 100% 来自重定向动捕库（aster_animlib.res / aster_anim_tree.tres），
+## 代码层零手搓骨骼姿态（红线：严禁 sin/cos、Tween 摆骨等程序化假动作）。
 
 const SHADER_TOON := preload("res://shaders/toon_character.gdshader")
 const SHADER_OUTLINE := preload("res://shaders/outline.gdshader")
 
 # STYLE.md M1 定稿的二次元柔和冷紫阶梯调色
-const OUTLINE_COLOR := Color(0.24, 0.26, 0.36, 1.0)
-const OUTLINE_THICKNESS := 0.0022
+# 描边规范（任务书 Phase 4.3）：深灰青蓝 #3D435C，严禁纯黑；身体 0.0026 / 佩刀 0.0009
+const OUTLINE_COLOR := Color8(0x3D, 0x43, 0x5C)
+const OUTLINE_THICKNESS_BODY := 0.0026
+const OUTLINE_THICKNESS_KATANA := 0.0009
 const SHADOW_TINT := Color(0.82, 0.84, 0.92, 1.0)
 const RAMP_THRESHOLD := 0.48
 const RAMP_SMOOTHNESS := 0.04
@@ -29,6 +32,8 @@ signal blade_drawn_changed(is_drawn: bool)
 @onready var hand_socket: BoneAttachment3D = $Aster_Armature/Skeleton3D/Hand_R_Weapon_Socket
 @onready var scabbard_socket: BoneAttachment3D = $Aster_Armature/Skeleton3D/Pelvis_L_Scabbard_Socket
 
+var anim_player: AnimationPlayer = null
+var anim_tree: AnimationTree = null
 var katana_blade: MeshInstance3D = null
 var hand_drawn_transform: Transform3D = Transform3D.IDENTITY
 var is_drawn: bool = false
@@ -36,62 +41,80 @@ var blade_base_marker: Marker3D = null
 var blade_tip_marker: Marker3D = null
 var blade_trail: BladeRibbonTrail = null
 
-# 程序化挥刀：以右手腕握点为轴心的骨骼姿态偏移（欧拉角，度）
-const SOCKET_BONE := "Hand_R_Weapon_Socket"
-const UPPERARM_BONE := "R_Upperarm"
-const SWING_REST := Vector3.ZERO
-
-# 各段挥击的关键帧姿态：windup(前举起手) -> strike(挥出) -> 回位
-const SWING_POSES := {
-	0: [Vector3(35, 0, -55), Vector3(-55, 0, 65)],    # 1段挑击：右下斜撩而上
-	1: [Vector3(-20, -75, -25), Vector3(-30, 80, 25)], # 2段反削：左进右出平削
-	2: [Vector3(-10, 0, 10), Vector3(95, 0, 0)],      # 3段双连刺：刀尖指前突刺
-	3: [Vector3(95, -30, 0), Vector3(95, 40, 0)],     # 4段回旋：刀身横展周身回旋
-}
-const IAI_POSE := [Vector3(20, 100, 0), Vector3(-15, -115, 0)] # 居合拔刀横斩
-const GUARD_POSE := Vector3(15, 40, 45)                        # 纳刀架刀：刀贴腰际
-
-# 手臂挥动关键帧：肩→手期望方向（骨架空间，-Z 前方 / +X 右侧 / +Y 上）
-const SWING_ARM_DIRS := {
-	0: [Vector3(0.7, -0.5, 0.3), Vector3(0.15, 0.55, -0.82)],  # 1段挑击：右手低后位撩至前上
-	1: [Vector3(0.6, 0.0, -0.8), Vector3(0.65, 0.1, -0.75)], # 2段反削：手臂稳持前举，身体横扫出弧
-	2: [Vector3(0.5, -0.25, 0.2), Vector3(0.05, 0.05, -1.0)],  # 3段双连刺：收手回拉直刺前方
-	3: [Vector3(0.95, -0.1, -0.2), Vector3(0.95, 0.15, -0.35)], # 4段回旋：手臂平展右侧随体旋转
-}
-const IAI_ARM_DIRS := [Vector3(-0.45, -0.35, 0.0), Vector3(0.7, 0.0, -0.6)] # 居合：左手收刀位横斩至右前
-const GUARD_ARM_DIR := Vector3(-0.35, -0.45, -0.15)                         # 架刀：手探左腰握柄
-
-var _socket_rest_quat: Quaternion = Quaternion.IDENTITY
-var _socket_bone_idx: int = -1
-var _upperarm_idx: int = -1
-var _upperarm_parent_idx: int = -1
-var _upperarm_rest_quat: Quaternion = Quaternion.IDENTITY
-var _rest_arm_dir: Vector3 = Vector3(0.79, -0.62, 0.0)
-var _swing_tween: Tween = null
-var _freeze_tween: Tween = null
-var _body_sweep_tween: Tween = null
-
-## 单体局部卡肉：命中瞬间冻结骨骼位姿（暂停挥刀姿态动画），倒计时后恢复
-func freeze_pose(duration: float) -> void:
-	if _swing_tween and _swing_tween.is_valid():
-		_swing_tween.pause()
-	if _freeze_tween and _freeze_tween.is_valid():
-		_freeze_tween.kill()
-	_freeze_tween = create_tween()
-	_freeze_tween.tween_interval(duration)
-	_freeze_tween.tween_callback(_unfreeze_pose)
-
-func _unfreeze_pose() -> void:
-	if _swing_tween and _swing_tween.is_valid():
-		_swing_tween.play()
+# 单体局部卡肉序列号：连续冻结（如 3 段双刺两次卡肉）只由最后一次计时恢复
+var _freeze_seq: int = 0
 
 func _ready() -> void:
 	_apply_npr(self)
 	_locate_katana()
 	_setup_blade_markers_and_trail()
-	_capture_socket_rest()
+	_setup_animation_system()
 	# 玩家日常为纳刀态：入场即回鞘
 	sheathe_sword(false)
+
+# ==================== AnimationTree 动捕驱动 ====================
+
+func _setup_animation_system() -> void:
+	anim_player = AnimationPlayer.new()
+	anim_player.name = "AnimationPlayer"
+	anim_player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_PHYSICS
+	$Aster_Armature.add_child(anim_player)  # root_node 默认 ".." → 轨道 "Skeleton3D:骨名" 直接解析
+	anim_player.add_animation_library("", load("res://art/animations/aster_animlib.res"))
+
+	# 先配置后入树：AnimationTree 的参数表在 READY 时按 tree_root 构建，
+	# 入树后再设 tree_root 会错过构建（parameters/* 全部不存在）
+	anim_tree = AnimationTree.new()
+	anim_tree.name = "AnimationTree"
+	anim_tree.anim_player = NodePath("../Aster_Armature/AnimationPlayer")
+	anim_tree.tree_root = load("res://art/animations/aster_anim_tree.tres")
+	anim_tree.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_PHYSICS
+	add_child(anim_tree)
+	anim_tree.active = true
+	# 状态机从 Start 节点不会自动进状态，需显式 start；deferred 保证 playback 参数已就绪
+	call_deferred("_start_at", "Locomotion")
+
+func _playback() -> AnimationNodeStateMachinePlayback:
+	# SM 嵌在 BlendTree 根下，playback 路径 = parameters/SM/playback
+	return anim_tree.get("parameters/SM/playback") as AnimationNodeStateMachinePlayback if anim_tree else null
+
+func _start_at(state: String) -> void:
+	var pb := _playback()
+	if pb:
+		pb.start(state)
+
+func travel(state: String) -> void:
+	var pb := _playback()
+	if pb == null or pb.get_current_node() == StringName(state):
+		return
+	pb.travel(state)
+
+func get_current_state_node() -> String:
+	var pb := _playback()
+	return String(pb.get_current_node()) if pb else ""
+
+func set_locomotion_blend(speed: float) -> void:
+	if anim_tree:
+		anim_tree.set("parameters/SM/Locomotion/blend_position", speed)
+
+## 单体局部卡肉：仅冻结自身 AnimationTree 播放速度（TimeScale=0），
+## Engine.time_scale 恒为 1.0，UI/摄像机/环境满帧运转。
+func freeze_pose(duration: float) -> void:
+	if anim_tree == null:
+		return
+	_freeze_seq += 1
+	var seq := _freeze_seq
+	anim_tree.set("parameters/HitstopScale/scale", 0.0)
+	get_tree().create_timer(duration).timeout.connect(func() -> void:
+		if _freeze_seq == seq and anim_tree:
+			anim_tree.set("parameters/HitstopScale/scale", 1.0)
+	)
+
+func get_clip_length(clip: String) -> float:
+	if anim_player and anim_player.has_animation(clip):
+		return anim_player.get_animation(clip).length
+	return 0.4
+
+# ==================== 刀光条带采样点 ====================
 
 func _setup_blade_markers_and_trail() -> void:
 	if katana_blade == null:
@@ -122,24 +145,6 @@ func get_blade_base_position() -> Vector3:
 
 func get_blade_tip_position() -> Vector3:
 	return blade_tip_marker.global_position if blade_tip_marker else get_katana_position()
-
-func _locate_katana() -> void:
-	katana_blade = hand_socket.get_node_or_null("Katana_Blade") as MeshInstance3D
-	if katana_blade:
-		hand_drawn_transform = katana_blade.transform
-		# GLB 作者状态为右手握刀：初始记为拔刀态，交由 _ready 统一回鞘
-		is_drawn = true
-
-func _capture_socket_rest() -> void:
-	_socket_bone_idx = skeleton.find_bone(SOCKET_BONE)
-	if _socket_bone_idx >= 0:
-		_socket_rest_quat = skeleton.get_bone_rest(_socket_bone_idx).basis.get_rotation_quaternion()
-	_upperarm_idx = skeleton.find_bone(UPPERARM_BONE)
-	if _upperarm_idx >= 0:
-		_upperarm_parent_idx = skeleton.get_bone_parent(_upperarm_idx)
-		_upperarm_rest_quat = skeleton.get_bone_rest(_upperarm_idx).basis.get_rotation_quaternion()
-		var cur_global := skeleton.get_bone_global_pose(_upperarm_idx).basis.get_rotation_quaternion()
-		_rest_arm_dir = (cur_global * Vector3.UP).normalized() # 骨骼 +Y 指向肘部
 
 # ==================== NPR 着色实装 ====================
 
@@ -183,10 +188,18 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 		outline.render_priority = 1
 		outline.shader = SHADER_OUTLINE
 		outline.set_shader_parameter("outline_color", OUTLINE_COLOR)
-		outline.set_shader_parameter("outline_thickness", OUTLINE_THICKNESS)
+		outline.set_shader_parameter("outline_thickness",
+				OUTLINE_THICKNESS_KATANA if mi.name.begins_with("Katana") else OUTLINE_THICKNESS_BODY)
 		outline.set_shader_parameter("distance_scaling", true)
 		mat.next_pass = outline
 		mi.set_surface_override_material(i, mat)
+
+func _locate_katana() -> void:
+	katana_blade = hand_socket.get_node_or_null("Katana_Blade") as MeshInstance3D
+	if katana_blade:
+		hand_drawn_transform = katana_blade.transform
+		# GLB 作者状态为右手握刀：初始记为拔刀态，交由 _ready 统一回鞘
+		is_drawn = true
 
 # ==================== 拔刀 / 纳刀 插槽切换 ====================
 
@@ -202,7 +215,7 @@ func sheathe_sword(instant: bool = true) -> void:
 		return
 	is_drawn = false
 	_mount_blade(scabbard_socket, sheathe_transform)
-	_reset_swing_pose()
+	clear_trail()
 	blade_drawn_changed.emit(false)
 
 func _mount_blade(new_parent: Node3D, local_transform: Transform3D) -> void:
@@ -213,91 +226,3 @@ func _mount_blade(new_parent: Node3D, local_transform: Transform3D) -> void:
 
 func get_katana_position() -> Vector3:
 	return katana_blade.global_position if katana_blade else global_position + Vector3.UP
-
-# ==================== 程序化挥刀姿态（纯骨骼代码动画） ====================
-
-func play_swing(stage: int) -> void:
-	if _socket_bone_idx < 0:
-		return
-	var keyframes: Array = SWING_POSES.get(stage, SWING_POSES[0])
-	var arm_dirs: Array = SWING_ARM_DIRS.get(stage, SWING_ARM_DIRS[0])
-	_start_swing_timeline(keyframes[0], keyframes[1], arm_dirs[0], arm_dirs[1])
-	# 2段反削：身体刚体横扫（左转蓄势右转挥出），刀尖划出宽阔水平弧线
-	if stage == 1:
-		_start_body_sweep(-28.0, 42.0)
-
-func _start_body_sweep(from_deg: float, to_deg: float) -> void:
-	_kill_body_sweep_tween()
-	_body_sweep_tween = create_tween()
-	_body_sweep_tween.tween_property(self, "rotation:y", deg_to_rad(from_deg), 0.05)
-	_body_sweep_tween.tween_property(self, "rotation:y", deg_to_rad(to_deg), 0.12)
-	_body_sweep_tween.tween_property(self, "rotation:y", 0.0, 0.18)
-
-func _kill_body_sweep_tween() -> void:
-	if _body_sweep_tween and _body_sweep_tween.is_valid():
-		_body_sweep_tween.kill()
-		_body_sweep_tween = null
-	rotation.y = 0.0
-
-func play_iaijutsu_swing() -> void:
-	if _socket_bone_idx < 0:
-		return
-	_start_swing_timeline(IAI_POSE[0], IAI_POSE[1], IAI_ARM_DIRS[0], IAI_ARM_DIRS[1])
-
-func play_guard_pose() -> void:
-	if _socket_bone_idx < 0:
-		return
-	_kill_swing_tween()
-	_swing_tween = create_tween()
-	_swing_tween.tween_method(_apply_swing_euler, SWING_REST, GUARD_POSE, 0.12)
-	_swing_tween.parallel().tween_method(_apply_arm_dir, _rest_arm_dir, GUARD_ARM_DIR, 0.12)
-
-func _start_swing_timeline(windup_pose: Vector3, strike_pose: Vector3, windup_dir: Vector3, strike_dir: Vector3) -> void:
-	_kill_swing_tween()
-	set_trail_active(true)
-	_swing_tween = create_tween()
-	# 前举蓄势 0.05s -> 挥出 0.12s -> 平滑回位 0.18s
-	_swing_tween.tween_method(_apply_swing_euler, SWING_REST, windup_pose, 0.05)
-	_swing_tween.parallel().tween_method(_apply_arm_dir, _rest_arm_dir, windup_dir, 0.05)
-	_swing_tween.tween_method(_apply_swing_euler, windup_pose, strike_pose, 0.12)
-	_swing_tween.parallel().tween_method(_apply_arm_dir, windup_dir, strike_dir, 0.12)
-	_swing_tween.tween_method(_apply_swing_euler, strike_pose, SWING_REST, 0.18)
-	_swing_tween.parallel().tween_method(_apply_arm_dir, strike_dir, _rest_arm_dir, 0.18)
-	# 挥刀结束停止采样，尾迹随后自然淡出
-	_swing_tween.tween_callback(set_trail_active.bind(false))
-
-func _reset_swing_pose() -> void:
-	_kill_swing_tween()
-	_kill_body_sweep_tween()
-	_apply_swing_euler(SWING_REST)
-	if _upperarm_idx >= 0:
-		skeleton.set_bone_pose_rotation(_upperarm_idx, _upperarm_rest_quat)
-	set_trail_active(false)
-	clear_trail()
-
-func _kill_swing_tween() -> void:
-	if _swing_tween and _swing_tween.is_valid():
-		_swing_tween.kill()
-		_swing_tween = null
-
-func _apply_swing_euler(euler_deg: Vector3) -> void:
-	if _socket_bone_idx < 0:
-		return
-	var offset_quat := Quaternion.from_euler(Vector3(deg_to_rad(euler_deg.x), deg_to_rad(euler_deg.y), deg_to_rad(euler_deg.z)))
-	skeleton.set_bone_pose_rotation(_socket_bone_idx, _socket_rest_quat * offset_quat)
-
-func _apply_arm_dir(dir: Vector3) -> void:
-	## 将肩→手方向平滑转向 dir：对 R_Upperarm 骨骼全局姿态施加最短弧旋转
-	## （直接在全局空间求旋转，避免依赖骨骼局部轴向标定）
-	if _upperarm_idx < 0 or dir.length_squared() < 0.001:
-		return
-	var target := dir.normalized()
-	var cur_global := skeleton.get_bone_global_pose(_upperarm_idx).basis.get_rotation_quaternion()
-	var cur_dir := cur_global * Vector3.UP
-	var axis := cur_dir.cross(target)
-	if axis.length_squared() < 1e-8:
-		return
-	var delta := Quaternion(axis.normalized(), cur_dir.angle_to(target))
-	var target_global := delta * cur_global
-	var parent_global := skeleton.get_bone_global_pose(_upperarm_parent_idx).basis.get_rotation_quaternion()
-	skeleton.set_bone_pose_rotation(_upperarm_idx, parent_global.inverse() * target_global)

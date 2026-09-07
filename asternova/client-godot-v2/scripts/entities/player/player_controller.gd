@@ -36,9 +36,6 @@ var attack_lunge_velocity: Vector3 = Vector3.ZERO
 # 单体局部卡肉：命中瞬间冻结自身位姿与位移，倒计时后恢复（全局 time_scale 恒为 1.0）
 var hitstop_timer: float = 0.0
 
-# 视觉表现与动效
-var attack_tween: Tween = null
-
 signal hp_changed(current: float, max: float)
 signal attack_hit_target(target: Node3D, damage: float, is_heavy: bool)
 
@@ -46,6 +43,12 @@ func _ready() -> void:
 	if not combat_data:
 		combat_data = CombatData.new()
 	combat_fsm.init(self, combat_data)
+
+	# AnimationTree 桥接驱动器：FSM 状态 → 动捕状态树 travel + Locomotion 混合参数
+	var anim_driver := AsterAnimDriver.new()
+	anim_driver.name = "AsterAnimDriver"
+	add_child(anim_driver)
+	anim_driver.init(combat_fsm, aster_rig, self)
 
 	# 连接第一人称视角信号 (FPP 下隐藏真身防穿模)
 	camera_controller.view_mode_changed.connect(_on_view_mode_changed)
@@ -299,10 +302,8 @@ func start_dash() -> void:
 	slide_direction = input_direction if input_direction.length_squared() > 0.01 else -visual_root.global_transform.basis.z
 
 func start_guard_stance() -> void:
-	# 居合蓄力：握刀手沉腰架刀姿态（纯骨骼代码姿态，无特效）
-	if attack_tween and attack_tween.is_valid():
-		attack_tween.kill()
-	aster_rig.play_guard_pose()
+	# 居合蓄力姿态由动捕状态树 IaiCharge（Guarding 循环剪辑）驱动，无需代码摆姿势
+	pass
 
 func update_blade_stance(drawn: bool) -> void:
 	## 拔刀/纳刀插槽切换：由战斗状态机在状态迁移时驱动
@@ -317,16 +318,9 @@ func begin_attack_lunge(lunge_dir: Vector3, distance: float, windup: float) -> v
 	attack_lunge_velocity = lunge_dir * (distance / maxf(windup, 0.01))
 
 func freeze_pose(duration: float) -> void:
-	## 单体局部卡肉：冻结自身位移与骨骼位姿，同时暂停挥刀姿态与回旋位移动画
+	## 单体局部卡肉：仅冻结自身 AnimationTree 播放与位移，Engine.time_scale 恒 1.0
 	hitstop_timer = maxf(hitstop_timer, duration)
 	aster_rig.freeze_pose(duration)
-	if attack_tween and attack_tween.is_valid():
-		attack_tween.pause()
-	get_tree().create_timer(duration).timeout.connect(_unfreeze_attack_motion)
-
-func _unfreeze_attack_motion() -> void:
-	if attack_tween and attack_tween.is_valid():
-		attack_tween.play()
 
 func _trigger_screen_flash(duration: float) -> void:
 	## 全屏闪白（居合穿透斩）：交由 HUD 层执行
@@ -364,18 +358,11 @@ func execute_attack_step(stage: int, soft_target: Node3D) -> void:
 		if pull > 0.01:
 			begin_attack_lunge(lunge_dir, pull, combat_data.magnetic_lunge_windup)
 
-	# 4段回旋：周身回旋气刃斩保留整周旋转位移
-	if stage == 3:
-		if attack_tween and attack_tween.is_valid():
-			attack_tween.kill()
-		attack_tween = create_tween()
-		attack_tween.tween_property(visual_root, "rotation:y", visual_root.rotation.y + TAU, 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-
-	# 程序化握点挥刀（月华刀光条带由 rig 内 BladeRibbonTrail 生成）
-	aster_rig.play_swing(stage)
-
-	# Hitbox 判定与分级单体卡肉响应
-	check_blade_hits(stage)
+	# Hitbox 判定对齐动捕节拍：挥砍中段（剪辑 35% 处）落刀判定
+	var clip_len: float = maxf(combat_data.combo_anim_lengths[stage], 0.3)
+	get_tree().create_timer(clip_len * 0.35).timeout.connect(func() -> void:
+		check_blade_hits(stage)
+	)
 
 func execute_iaijutsu(tier: int) -> void:
 	if tier < 1:
@@ -388,13 +375,14 @@ func execute_iaijutsu(tier: int) -> void:
 	# 极速瞬步穿透
 	velocity = fwd * (dash_dist / 0.22)
 
-	# 居合拔刀横斩（出刀瞬间切换右手插槽 + 全屏闪白）
+	# 居合拔刀横斩（出刀瞬间切换右手插槽 + 全屏闪白；判定对齐动捕节拍）
 	update_blade_stance(true)
-	aster_rig.play_iaijutsu_swing()
 	_trigger_screen_flash(combat_data.iai_flash_duration)
 
-	# 判定路径上全部敌人（居合重卡肉 0.15s）
-	check_blade_hits_iai()
+	var release_len: float = maxf(combat_data.iai_release_length, 0.3)
+	get_tree().create_timer(release_len * 0.30).timeout.connect(func() -> void:
+		check_blade_hits_iai()
+	)
 
 func check_blade_hits(stage: int) -> void:
 	## 沿刀刃挥击范围做球形重叠检测，并按段位施加分级单体卡肉与震屏
