@@ -127,9 +127,16 @@
 > **2026-09-06 制作人拍板定案：正式确立以《明日方舟：终末地》为最高视觉标杆，全面升级为「Forward+ (Vulkan Clustered) + AgX 色彩科学 + PBR 场景 vs NPR 角色双管线」工业级底座。**
 >
 > - **双管线分工（Dual-Pipeline）**：
->   - **场景硬表面（PBR Pipeline）**：道路、混凝土、金属扶手、玻璃幕墙全部遵循真实微表面物理光照（Roughness / Metallic / Normal / Baked AO），结合盒投影反射探针与 SSR，打造《终末地》与《鸣潮》标志性的扎实工业质感与雨后湿润沥青光泽；
->   - **二次元角色（NPR Pipeline）**：Aster 采用受光控幅赛璐璐色阶（Toon Ramp）+ 面部 SDF 阴影 + Inverted Hull 描边，保持日漫纯净通透。
-> - **色彩科学升级：全面拥抱 AgX 色调映射（ToneMap AgX, mode 4）**：
+  - **场景硬表面（PBR Pipeline）**：道路、混凝土、金属扶手、玻璃幕墙全部遵循真实微表面物理光照（Roughness / Metallic / Normal / Baked AO），结合盒投影反射探针与 SSR，打造《终末地》与《鸣潮》标志性的扎实工业质感与雨后湿润沥青光泽；
+  - **二次元角色（NPR Pipeline）**：Aster 采用受光控幅赛璐璐色阶（Toon Ramp）+ 面部 SDF 阴影 + Inverted Hull 描边，保持日漫纯净通透。
+- **混合光照体系（Hybrid Lighting System · 对标《终末地》工业级光照分工）**：
+  - **实时直接光（Real-time Direct，保交互与手感）**：45° 侧逆主阳光（SunLight）与角色动态阴影（PSSM 4 分割深度阴影）、专属佩刀挥砍流光、自动贩卖机橱窗点光源 **100% 实时计算**，确保角色奔跑、滑铲、挥刀时脚下阴影紧密贴地、高光瞬时响应，支撑 120+ FPS 竞技级手感；
+  - **预计算/烘焙间接光（Pre-baked Indirect GI & Probes，保画质与帧率）**：
+    - **盒投影反射探针（Baked ReflectionProbe）**：预计算烘焙街道与便利店室内 360° 环境 Cubemap，为铝合金窗框、双层钢化玻璃与路面积水提供极低 GPU 开销的真实环境物理倒影；
+    - **光照探针网格（Light Probes / LightmapGI）**：将静态建筑外墙、坡道与小巷深处的双半球清冷天光二次反弹（Indirect Bounce）提前离线算好并存入探针，彻底根除暗部死黑，以接近零的运行时片元算力达成《终末地》电影级通透感；
+    - **微表面贴图 AO 烘焙（Baked Texture Ambient Occlusion）**：建筑屋檐挑角、台阶接缝、门框阴影在贴图制作阶段直接烘焙入 2K PBR 贴图的 AO 通道，强化结构阴影深邃咬合感；
+    - **跨平台分工准则**：PC 旗舰档采用 Forward+ Clustered 实时直接光 + 盒投影反射探针 + SSAO 动态微光；后期 M4 移植低配/轻薄本/移动端时，通过 Godot `LightmapGI` 将静态场景一键打包为全烘焙光照贴图，保证千元机满帧运行。
+- **色彩科学升级：全面拥抱 AgX 色调映射（ToneMap AgX, mode 4）**：
 >   - **淘汰 ACES 的深层原因**：ACES 存在严重的色相偏移（Abney 效应）与高光饱和度过载——高能量冷天光会偏向洋红紫，暖日光高光会变成焦黄芥末色，且容易将二次元浅色衣服炸成死白；
 >   - **AgX 核心优势**：模拟现代电影胶片全通道感光曲线（Inset Gamut Mapping），高光区域自然平滑地向白场滚降收敛（Highlight Roll-off），完美保全 Aster 珍珠白长发、象牙白衣物与淡水蓝细节的柔和层次。
 
