@@ -35,8 +35,10 @@ extends Resource
 @export var dash_cooldown: float = 0.55 ## 闪避冷却
 @export var dash_iframe_duration: float = 0.16 ## 瞬时无敌帧时间
 @export var perfect_dodge_window: float = 0.12 ## 受击判定前完美极闪窗口
-@export var time_dilation_factor: float = 0.25 ## 极闪周围时停减速倍率
-@export var time_dilation_duration: float = 0.50 ## 时停减速持续时长(秒)
+@export var time_dilation_factor: float = 0.20 ## 星闪时空断裂：周围敌方实体局部减速倍率(全局 time_scale 恒 1.0)
+@export var time_dilation_duration: float = 0.50 ## 星闪局部减速持续时长(秒)
+@export var bullet_time_fov_pulse: float = 4.0 ## 星闪运镜 FOV 瞬冲收窄度数(负向)
+@export var bullet_time_fov_recover: float = 0.30 ## 星闪运镜 FOV 平滑回弹时长(秒)
 
 @export_group("四段流光刀术 (Combo Attack)")
 @export var input_buffer_time: float = 0.18 ## 输入缓冲缓存时长(不吞键)
@@ -78,7 +80,12 @@ extends Resource
 @export var hitstop_iaijutsu: float = 0.15 ## 居合穿透斩重卡肉时长(秒)
 @export var hit_trauma_stage: Array[float] = [0.15, 0.15, 0.15, 0.65] ## 各段命中镜头震动量(4段终结大震屏)
 @export var hit_trauma_iaijutsu: float = 0.5 ## 居合穿透斩镜头震动量
-@export var finisher_knock_distance: float = 0.45 ## 4段终结木桩击退后仰距离(米)
-@export var hit_flash_duration: float = 0.06 ## 受击漫反射闪白时长(秒)
+@export var finisher_knock_distance: float = 1.00 ## 4段终结拔刀强力推移距离(米,重击 0.8~1.2 档)
+@export var hit_flash_duration: float = 0.05 ## 受击漫反射闪白时长(秒,街机利落白闪)
+
+@export_group("顺切线受击推力 (Directional Knockback)")
+@export var knockback_light_distance: float = 0.35 ## 平砍轻击推移距离(米)
+@export var knockback_heavy_distance: float = 0.80 ## 居合拔刀默认重击推移距离(米)
+@export var knockback_tangent_factor: float = 0.15 ## 受击方向微弱刀锋切向分量系数
 @export var iai_flash_duration: float = 0.06 ## 居合全屏闪白时长(秒)
 @export var trauma_decay: float = 2.2 ## 震屏能量衰减速度

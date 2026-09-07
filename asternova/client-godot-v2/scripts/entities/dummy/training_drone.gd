@@ -25,6 +25,9 @@ var total_damage_taken: float = 0.0
 var has_hit_player: bool = false
 var eye_mat: StandardMaterial3D = null
 
+# 星闪时空断裂：局部减速倍率（仅作用于傀儡自身状态计时、动画与位移，全局 time_scale 恒 1.0）
+var local_time_scale: float = 1.0
+
 # 单体局部卡肉与漫反射闪白
 var freeze_timer: float = 0.0
 var _pending_knock: Vector3 = Vector3.ZERO
@@ -61,8 +64,14 @@ func set_eye_visual(col: Color, energy: float) -> void:
 		eye_mat.emission = col
 		eye_mat.emission_energy_multiplier = energy
 
+func set_local_time_scale(scale: float) -> void:
+	## 星闪时空断裂：外部广播局部减速倍率（1.0 = 满速）
+	local_time_scale = clampf(scale, 0.05, 1.0)
+
 func _physics_process(delta: float) -> void:
-	state_timer += delta
+	# 星闪时空断裂：状态计时、动画与位移全部按局部倍率推进
+	var scaled_delta: float = delta * local_time_scale
+	state_timer += scaled_delta
 
 	# 单体局部卡肉：仅冻结自身位移与受击后仰，状态计时照常
 	if freeze_timer > 0.0:
@@ -81,28 +90,28 @@ func _physics_process(delta: float) -> void:
 
 	match current_state:
 		DroneState.IDLE:
-			velocity = velocity.move_toward(Vector3.ZERO, 12.0 * delta)
+			velocity = velocity.move_toward(Vector3.ZERO, 12.0 * scaled_delta)
 			set_eye_visual(Color(0.2, 0.7, 1.0), 2.5)
 			if arm_blade:
-				arm_blade.position = arm_blade.position.lerp(Vector3(0.45, 1.0, -0.6), delta * 8.0)
+				arm_blade.position = arm_blade.position.lerp(Vector3(0.45, 1.0, -0.6), scaled_delta * 8.0)
 			if state_timer >= attack_cooldown and target_player:
 				var dist: float = global_position.distance_to(target_player.global_position)
 				if dist <= 14.0:
 					start_telegraph()
 		DroneState.TELEGRAPH:
-			velocity = velocity.move_toward(Vector3.ZERO, 12.0 * delta)
+			velocity = velocity.move_toward(Vector3.ZERO, 12.0 * scaled_delta)
 			# 朝向玩家，红光高频闪烁警示 (0.75s 抬手，刀臂微后蓄)
-			look_at_player(delta)
+			look_at_player(scaled_delta)
 			var flash: float = sin(state_timer * 25.0) * 0.5 + 0.5
 			var alert_col: Color = Color(1.0, flash * 0.15, flash * 0.15)
 			set_eye_visual(alert_col, 3.5 + flash * 5.0)
 			if arm_blade:
-				arm_blade.position = arm_blade.position.lerp(Vector3(0.55, 1.1, -0.2), delta * 12.0)
+				arm_blade.position = arm_blade.position.lerp(Vector3(0.55, 1.1, -0.2), scaled_delta * 12.0)
 			if state_timer >= 0.75:
 				execute_strike()
 		DroneState.STRIKE:
 			if arm_blade:
-				arm_blade.position = arm_blade.position.lerp(Vector3(0.45, 1.0, -1.3), delta * 25.0)
+				arm_blade.position = arm_blade.position.lerp(Vector3(0.45, 1.0, -1.3), scaled_delta * 25.0)
 			if not has_hit_player and target_player:
 				var dist: float = global_position.distance_to(target_player.global_position)
 				if dist <= 3.2:
@@ -118,23 +127,29 @@ func _physics_process(delta: float) -> void:
 				state_timer = 0.0
 				update_state_label("收招回退...")
 		DroneState.RECOVERY:
-			velocity = velocity.move_toward(Vector3.ZERO, 15.0 * delta)
+			velocity = velocity.move_toward(Vector3.ZERO, 15.0 * scaled_delta)
 			set_eye_visual(Color(0.5, 0.5, 0.5), 1.0)
 			if arm_blade:
-				arm_blade.position = arm_blade.position.lerp(Vector3(0.45, 1.0, -0.6), delta * 6.0)
+				arm_blade.position = arm_blade.position.lerp(Vector3(0.45, 1.0, -0.6), scaled_delta * 6.0)
 			if state_timer >= 0.8:
 				current_state = DroneState.IDLE
 				state_timer = 0.0
 				update_state_label("待机中...")
 		DroneState.PARRIED:
-			velocity = velocity.move_toward(Vector3.ZERO, 10.0 * delta)
+			velocity = velocity.move_toward(Vector3.ZERO, 10.0 * scaled_delta)
 			set_eye_visual(Color(1.0, 0.85, 0.1), 5.0) # 刺眼金光破绽
 			if state_timer >= 1.5:
 				current_state = DroneState.IDLE
 				state_timer = 0.0
 				update_state_label("待机中...")
 
-	move_and_slide()
+	# 位移减速：局部时停期间按倍率缩放实际位移量，速度语义保留待恢复
+	if local_time_scale < 1.0:
+		velocity *= local_time_scale
+		move_and_slide()
+		velocity /= local_time_scale
+	else:
+		move_and_slide()
 
 func start_telegraph() -> void:
 	current_state = DroneState.TELEGRAPH
@@ -159,7 +174,7 @@ func on_parried() -> void:
 	velocity = -transform.basis.z * 7.0 # 被震飞后仰
 	update_state_label("⚡ PARRIED! 弹刀大破绽！受到伤害翻倍！")
 
-func take_hit(damage: float, hit_dir: Vector3, is_heavy: bool, freeze_time: float = 0.0, _knock_dist: float = -1.0, flash_time: float = 0.06) -> void:
+func take_hit(damage: float, hit_dir: Vector3, is_heavy: bool, freeze_time: float = 0.0, _knock_dist: float = -1.0, flash_time: float = 0.05) -> void:
 	var final_damage: float = damage
 	if current_state == DroneState.PARRIED:
 		final_damage *= 2.0 # 破绽状态下双倍暴击伤害！
@@ -189,6 +204,7 @@ func flash_albedo(duration: float) -> void:
 		return
 	if _flash_tween and _flash_tween.is_valid():
 		_flash_tween.kill()
+	_set_albedo_flash(1.0) # 受击当帧立即全亮
 	_flash_tween = create_tween()
 	_flash_tween.tween_method(_set_albedo_flash, 1.0, 0.0, maxf(duration, 0.01))
 

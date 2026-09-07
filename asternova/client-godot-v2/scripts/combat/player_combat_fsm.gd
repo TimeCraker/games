@@ -25,6 +25,7 @@ signal combo_stage_changed(stage: int)
 signal charge_tier_changed(tier: int)
 signal perfect_dodge_triggered()
 signal perfect_parry_triggered()
+signal bullet_time_triggered()
 
 @export var combat_data: CombatData
 
@@ -47,6 +48,11 @@ var input_buffer_timer: float = 0.0
 var is_invulnerable: bool = false
 var can_cancel_recovery: bool = false
 var soft_lock_target: Node3D = null
+
+# 星闪·时空断裂（Bullet Time）：局部时停标志，严禁触碰全局 Engine.time_scale
+var is_bullet_time_active: bool = false
+var _perfect_dodge_fired: bool = false ## 星闪已触发：折跃期间允许零前摇拔刀取消
+var _dilation_timer: float = 0.0 ## 局部时停剩余时长（物理帧倒计时，与门禁同钟）
 
 func init(parent_player: CharacterBody3D, data: CombatData) -> void:
 	player = parent_player
@@ -71,7 +77,13 @@ func buffer_input(action: String) -> void:
 
 func _physics_process(delta: float) -> void:
 	state_time += delta
-	
+
+	# 星闪局部时停物理帧倒计时（SceneTreeTimer 在 headless -s 主循环下推进不可靠，弃用）
+	if _dilation_timer > 0.0:
+		_dilation_timer -= delta
+		if _dilation_timer <= 0.0:
+			_end_time_dilation()
+
 	# 维护输入缓冲倒计时
 	if input_buffer_timer > 0.0:
 		input_buffer_timer -= delta
@@ -235,7 +247,14 @@ func process_plunge(delta: float) -> void:
 func process_dash(delta: float) -> void:
 	# 维护无敌帧
 	is_invulnerable = state_time < combat_data.dash_iframe_duration
-	
+
+	# 星闪·时空断裂已触发：折跃期间任意时刻可被普攻立即取消（零前摇拔刀衔接）
+	if _perfect_dodge_fired and consume_buffer("attack"):
+		is_invulnerable = false
+		dash_cooldown_timer = combat_data.dash_cooldown
+		start_attack_combo()
+		return
+
 	# 闪避期间允许预输入连招或滑铲
 	if state_time >= combat_data.dash_duration:
 		is_invulnerable = false
@@ -352,6 +371,7 @@ func enter_state(state: State) -> void:
 		State.PLUNGE:
 			player.start_plunge()
 		State.DASH:
+			_perfect_dodge_fired = false
 			player.start_dash()
 		State.GUARD_CHARGE:
 			charge_timer = 0.0
@@ -388,6 +408,7 @@ func check_incoming_attack(attack_dir: Vector3, damage: float) -> bool:
 	# 1. 检测极闪时停 (受击判定前 0.12s 处于闪避初段)
 	if current_state == State.DASH and state_time <= combat_data.perfect_dodge_window:
 		perfect_dodge_triggered.emit()
+		_perfect_dodge_fired = true
 		trigger_time_dilation()
 		return false # 完全免伤
 		
@@ -412,10 +433,22 @@ func check_incoming_attack(attack_dir: Vector3, damage: float) -> bool:
 	return true
 
 func trigger_time_dilation() -> void:
-	Engine.time_scale = combat_data.time_dilation_factor
-	get_tree().create_timer(combat_data.time_dilation_duration, true, false, true).timeout.connect(
-		func(): Engine.time_scale = 1.0
-	)
+	## 星闪·时空断裂：局部时停——仅周围敌方实体减速至 time_dilation_factor，
+	## 主角自身、运镜与 UI 保持 1.0x 满速（严禁全局 Engine.time_scale 卡死）
+	is_bullet_time_active = true
+	_dilation_timer = combat_data.time_dilation_duration
+	bullet_time_triggered.emit()
+	player.camera_controller.trigger_bullet_time_lens()
+	for enemy in get_tree().get_nodes_in_group("target_dummy"):
+		if enemy.has_method("set_local_time_scale"):
+			enemy.set_local_time_scale(combat_data.time_dilation_factor)
+
+func _end_time_dilation() -> void:
+	is_bullet_time_active = false
+	_dilation_timer = 0.0
+	for enemy in get_tree().get_nodes_in_group("target_dummy"):
+		if enemy.has_method("set_local_time_scale"):
+			enemy.set_local_time_scale(1.0)
 
 func find_soft_lock_target() -> void:
 	soft_lock_target = null

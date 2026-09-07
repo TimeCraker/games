@@ -299,7 +299,19 @@ func trigger_plunge_impact() -> void:
 			collider.take_hit(80.0, knock_dir.normalized(), true)
 
 func start_dash() -> void:
-	slide_direction = input_direction if input_direction.length_squared() > 0.01 else -visual_root.global_transform.basis.z
+	# 星闪折跃方向优先级：鼠标准星水平朝向 > 移动输入 > 视觉前向（0.25s 高速破空推进 5.0m）
+	var aim_dir: Vector3 = -camera_controller.camera.global_transform.basis.z
+	aim_dir.y = 0.0
+	if aim_dir.length_squared() > 0.01:
+		slide_direction = aim_dir.normalized()
+	elif input_direction.length_squared() > 0.01:
+		slide_direction = input_direction
+	else:
+		slide_direction = -visual_root.global_transform.basis.z
+	# 折跃前倾破空姿态（高速滑步的倾斜推进感）
+	var lean_tween: Tween = create_tween()
+	lean_tween.tween_property(visual_root, "rotation:x", deg_to_rad(-10.0), 0.06).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	lean_tween.tween_property(visual_root, "rotation:x", 0.0, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func start_guard_stance() -> void:
 	# 居合蓄力姿态由动捕状态树 IaiCharge（Guarding 循环剪辑）驱动，无需代码摆姿势
@@ -389,7 +401,8 @@ func check_blade_hits(stage: int) -> void:
 	var damage: float = combat_data.combo_damage[stage]
 	var freeze: float = combat_data.hitstop_stage_freeze[stage]
 	var trauma: float = combat_data.hit_trauma_stage[stage]
-	var knock: float = combat_data.finisher_knock_distance if stage == 3 else -1.0
+	# 阶梯推力：前 3 段轻击 0.35m，4 段终结拔刀强力推力 0.8~1.2m
+	var knock: float = combat_data.finisher_knock_distance if stage == 3 else combat_data.knockback_light_distance
 	var hit_colliders: Array = _query_blade_hits(damage, -visual_root.global_transform.basis.z, stage == 3, freeze, knock)
 
 	if not hit_colliders.is_empty():
@@ -406,9 +419,9 @@ func check_blade_hits(stage: int) -> void:
 			)
 
 func check_blade_hits_iai() -> void:
-	## 居合穿透斩：路径上全部敌人，重卡肉 0.15s
+	## 居合穿透斩：路径上全部敌人，重卡肉 0.15s + 重击档强力推力
 	var dmg: float = combat_data.charge_damages[combat_data.charge_damages.size() - 1]
-	var hit_colliders: Array = _query_blade_hits(dmg, -visual_root.global_transform.basis.z, true, combat_data.hitstop_iaijutsu, -1.0)
+	var hit_colliders: Array = _query_blade_hits(dmg, -visual_root.global_transform.basis.z, true, combat_data.hitstop_iaijutsu, combat_data.knockback_heavy_distance)
 	if not hit_colliders.is_empty():
 		camera_controller.add_trauma(combat_data.hit_trauma_iaijutsu)
 		freeze_pose(combat_data.hitstop_iaijutsu)
@@ -427,7 +440,12 @@ func _query_blade_hits(damage: float, hit_dir: Vector3, is_heavy: bool, freeze: 
 	for hit in hits:
 		var collider: Object = hit.collider
 		if collider.has_method("take_hit") and collider != self:
-			collider.take_hit(damage, hit_dir, is_heavy, freeze, knock)
+			# 顺切线受击推力：径向 = 攻击者→受击者（受击方再叠加微弱刀锋切向分量）
+			var radial: Vector3 = collider.global_position - global_position
+			radial.y = 0.0
+			if radial.length_squared() < 0.01:
+				radial = hit_dir
+			collider.take_hit(damage, radial.normalized(), is_heavy, freeze, knock)
 			attack_hit_target.emit(collider, damage, is_heavy)
 			spawn_hit_spark(collider.global_position + Vector3(0, 1.2, 0), is_heavy)
 			hit_colliders.append(collider)

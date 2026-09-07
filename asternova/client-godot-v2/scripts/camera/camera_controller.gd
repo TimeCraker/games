@@ -32,6 +32,11 @@ var target_arm_length: float = 2.8
 var target_arm_offset: Vector3 = Vector3(0.45, 1.35, 0.0)
 var current_arm_offset: Vector3 = Vector3(0.45, 1.35, 0.0)
 
+# 星闪时空断裂运镜：动态 FOV 与脉冲偏移解耦（脉冲叠加在速度 FOV 之上）
+var fov_pulse: float = 0.0 ## 星闪 FOV 脉冲偏移（负值=瞬冲收窄）
+var _fov_current: float = 75.0 ## 速度感驱动的动态 FOV
+var _fov_pulse_tween: Tween = null
+
 signal view_mode_changed(is_first_person: bool)
 
 func _ready() -> void:
@@ -43,6 +48,7 @@ func _ready() -> void:
 	current_arm_offset = target_arm_offset
 	spring_arm.spring_length = target_arm_length
 	spring_arm.position = current_arm_offset
+	_fov_current = combat_data.fov_base
 	if get_parent() is CollisionObject3D:
 		spring_arm.add_excluded_object((get_parent() as CollisionObject3D).get_rid())
 
@@ -87,6 +93,9 @@ func _process(delta: float) -> void:
 	current_arm_offset = current_arm_offset.lerp(target_arm_offset, delta * 12.0)
 	spring_arm.position = current_arm_offset
 
+	# 2. 合成 FOV：速度感动态值 + 星闪时空断裂脉冲偏移
+	camera.fov = _fov_current + fov_pulse
+
 	# 2. 震屏结算 (Trauma Shake 平方衰减)
 	if trauma > 0.0:
 		trauma = maxf(0.0, trauma - delta * combat_data.trauma_decay)
@@ -105,10 +114,10 @@ func _process(delta: float) -> void:
 
 ## 由角色控制器在 _physics_process 中通知当前速度与状态，用于动态拉伸 FOV 与贴地俯冲
 func update_speed_feel(speed: float, is_sliding: bool, delta: float) -> void:
-	# 动态广角 FOV
+	# 动态广角 FOV（只驱动内部动态值，星闪脉冲偏移在 _process 中叠加）
 	var speed_ratio: float = clampf((speed - combat_data.walk_speed) / (combat_data.slide_initial_speed - combat_data.walk_speed), 0.0, 1.0)
 	var target_fov: float = lerpf(combat_data.fov_base, combat_data.fov_max, speed_ratio)
-	camera.fov = lerpf(camera.fov, target_fov, delta * 8.0)
+	_fov_current = lerpf(_fov_current, target_fov, delta * 8.0)
 
 	# 滑铲贴地俯冲感
 	if current_mode == CameraMode.TPP:
@@ -120,6 +129,19 @@ func update_speed_feel(speed: float, is_sliding: bool, delta: float) -> void:
 ## 触发打击震屏（单体局部卡肉系统已接管顿帧，摄像机与世界时间恒定 1.0 满帧）
 func trigger_hit_impact(is_heavy: bool = false) -> void:
 	add_trauma(0.75 if is_heavy else 0.35)
+
+## 星闪·时空断裂运镜：FOV 微收瞬冲（-4°）后 0.3s 平滑回弹，增强时空张力
+func trigger_bullet_time_lens() -> void:
+	if _fov_pulse_tween and _fov_pulse_tween.is_valid():
+		_fov_pulse_tween.kill()
+	fov_pulse = -combat_data.bullet_time_fov_pulse
+	var recover_time: float = maxf(combat_data.bullet_time_fov_recover, 0.05)
+	var pulse_degrees: float = combat_data.bullet_time_fov_pulse
+	_fov_pulse_tween = create_tween()
+	_fov_pulse_tween.tween_method(
+		func(k: float) -> void: fov_pulse = -pulse_degrees * (1.0 - k),
+		0.0, 1.0, recover_time
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func add_trauma(amount: float) -> void:
 	trauma = clampf(trauma + amount, 0.0, 1.0)
