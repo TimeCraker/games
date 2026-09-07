@@ -19,7 +19,16 @@ const RAMP_SMOOTHNESS := 0.04
 const RIM_COLOR := Color(0.85, 0.92, 1.0, 1.0)
 const KATANA_ATLAS_FALLBACK := "res://models/aster/katana_basecolor.png"
 
-## 纳刀位姿（刀身相对左腰鞘插槽的局部变换，工程标定用）
+# ==================== §3 零偏置可拔刀架构常量 ====================
+# weapon-modeling-pipeline.md §3：刀身/刀鞘建模原点锁定刀鞘口 Koiguchi (0,0,0)，
+# 刀刃沿建模 -Z 延伸 0.70m，刀柄延伸至 +0.25m，握心（右手扣合点）在建模 +Z 0.13m。
+# GLB Y-up 导出轴向映射：Blender +Z → Godot +Y（握心 = 网格空间 +Y 0.13），
+# Blender +Z 0.13 握心补偿 → Godot 插槽空间 (0, -0.13, 0)。
+const GRIP_CENTER_LOCAL := Vector3(0.0, 0.13, 0.0)          # 握心（刀身网格空间）
+const DRAW_GRIP_COMPENSATION := Vector3(0.0, -0.13, 0.0)    # 拔刀握心回拉（插槽骨空间）
+
+## 纳刀位姿（刀身相对左腰鞘插槽的局部变换；_ready 时以刀鞘 authored 变换标定，
+## 即两分件网格空间完全重合的严丝合缝态）
 @export var sheathe_transform: Transform3D = Transform3D.IDENTITY
 
 ## 刀身采样标记偏移（Katana_Blade 网格空间：原点≈护手，-Y 为实际刀尖延伸端）
@@ -214,9 +223,27 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 func _locate_katana() -> void:
 	katana_blade = hand_socket.get_node_or_null("Katana_Blade") as MeshInstance3D
 	if katana_blade:
-		hand_drawn_transform = katana_blade.transform
-		# GLB 作者状态为右手握刀：初始记为拔刀态，交由 _ready 统一回鞘
+		# §3 拔刀挂载 = authored 握持滚转基（掌心对齐）+ 握心回拉补偿：
+		# 使刀柄握心（网格 +Y 0.13）精确落点右手掌心（插槽骨原点），绝不脱手悬空
+		hand_drawn_transform = Transform3D(katana_blade.basis, DRAW_GRIP_COMPENSATION)
 		is_drawn = true
+	# 纳刀标定：刀鞘分件的 authored 变换 = 两分件网格空间重合（Koiguchi 对齐入鞘）
+	var scab := scabbard_socket.get_node_or_null("Katana_Scabbard") as MeshInstance3D
+	if scab:
+		sheathe_transform = scab.transform
+
+## 刀柄握心世界坐标（拔刀态 = 右手掌心；物理抓握断言用）
+func get_grip_center_world() -> Vector3:
+	if katana_blade == null:
+		return global_position + Vector3.UP
+	return katana_blade.global_transform * GRIP_CENTER_LOCAL
+
+## 右手掌心世界坐标（R_Hand 骨原点沿骨轴前移半掌；Socket 骨即标定于半掌处）
+func get_palm_center_world() -> Vector3:
+	var skel := skeleton
+	var idx := skel.find_bone("R_Hand")
+	var pose := skel.global_transform * skel.get_bone_global_pose(idx)
+	return pose * Vector3(0.0, 0.0812, 0.0)
 
 # ==================== 拔刀 / 纳刀 插槽切换 ====================
 

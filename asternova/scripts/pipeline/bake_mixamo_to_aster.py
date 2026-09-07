@@ -461,16 +461,21 @@ def qc_render(tag, clip_name, t):
     arm.animation_data.action = act
     bpy.context.scene.frame_set(t)
     bpy.context.view_layer.update()
+    # 相机每帧追踪网格包围盒中心（战斗剪辑带 0.5m 级髋部位移，固定机位会跑出画）
+    dg = bpy.context.evaluated_depsgraph_get()
+    ob_eval = body.evaluated_get(dg)
+    corners = [ob_eval.matrix_world @ Vector(c) for c in ob_eval.bound_box]
+    center = sum(corners, Vector((0, 0, 0))) / 8.0
     cam_data = bpy.data.cameras.new("QCCam")
-    cam_data.lens = 55
+    cam_data.lens = 50
     cam = bpy.data.objects.new("QCCam_" + tag, cam_data)
     scene.collection.objects.link(cam)
-    cam.location = Vector((2.2, -0.6, 0.95))
-    cam.rotation_euler = (Vector((0, 0, 0.9)) - cam.location).to_track_quat("-Z", "Y").to_euler()
+    cam.location = center + Vector((1.9, -1.1, 0.15))
+    cam.rotation_euler = (center - cam.location).to_track_quat("-Z", "Y").to_euler()
     scene.camera = cam
     scene.render.filepath = os.path.join(QC_DIR, "qc_%s_%s.png" % (clip_name, tag))
     bpy.ops.render.render(write_still=True)
-    log("QC 渲染: %s @%s t=%.2f" % (clip_name, tag, t))
+    log("QC 渲染: %s @%s t=%.2f center=%s" % (clip_name, tag, t, tuple(round(v, 2) for v in center)))
 
 
 import os as _os

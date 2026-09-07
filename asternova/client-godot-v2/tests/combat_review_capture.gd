@@ -20,6 +20,12 @@ var images: Dictionary = {}  # name -> Image（内存攒帧，退出统一写盘
 var treadmill_on: bool = false
 var force_speed := 0.0  # >0 时每物理帧强制该水平速度（扫描混合步态用）
 
+# 动态追踪机位：Look-At 每物理帧平滑追踪角色 Spine01（胸口）世界坐标，消灭构图漂移
+var tracking_on: bool = false
+var _look_target := Vector3.ZERO
+var run_dir_flip: bool = false  # 疾跑反身朝 +Z（正面受光 + 露脸）
+const TRACK_SMOOTH := 0.0001  # 帧间插值系数底数（越小跟得越紧）
+
 func _initialize() -> void:
 	root.size = Vector2i(2048, 1152)  # SceneTree 脚本无 get_window()，root 即 Window
 	var scene_res: PackedScene = load("res://scenes/levels/combat_playground.tscn")
@@ -72,17 +78,27 @@ func _treadmill(delta: float) -> void:
 func _physics_process(delta: float) -> bool:
 	_treadmill(delta)
 	if force_speed > 0.0 and player:
-		player.velocity = Vector3(0, 0, -force_speed)
+		player.velocity = Vector3(0, 0, force_speed if run_dir_flip else -force_speed)
+	if tracking_on and review_cam != null and rig != null:
+		# 每物理帧动态平滑追踪胸口（Spine01）世界坐标
+		var chest_w := _chest_world()
+		_look_target = _look_target.lerp(chest_w, 1.0 - pow(TRACK_SMOOTH, delta))
+		review_cam.look_at(_look_target)
 	return false
+
+func _chest_world() -> Vector3:
+	var idx := rig.skeleton.find_bone("Spine01")
+	if idx < 0:
+		idx = rig.skeleton.find_bone("Hip")
+	return rig.skeleton.global_transform * rig.skeleton.get_bone_global_pose(idx).origin
 
 func ticks(n: int) -> void:
 	for i in n:
 		await physics_frame
 
 func snap(name: String) -> void:
-	# 相机跟随玩家重摆（锁位与节点物理存在次序差，逐帧跟随消除构图漂移）
+	# 相机位置按玩家重摆（Look-At 已由 _physics_process 每帧平滑追踪胸口）
 	review_cam.global_position = player.global_position + cam_offset
-	review_cam.look_at(player.global_position + Vector3(0, cam_look_h, 0))
 	# 诊断：状态/树节点/混合值/髋部世界高
 	var hip_w: Vector3 = rig.skeleton.global_transform * rig.skeleton.get_bone_global_pose(rig.skeleton.find_bone("Hip")).origin
 	print("[snap %s] fsm=%d tree=%s blend=%.2f hipY=%.2f pos=%s drawn=%s" % [
@@ -102,9 +118,11 @@ func _place_review_cam(offset: Vector3, look_height: float, fov: float) -> void:
 		review_cam.name = "ReviewCamera"
 		root.add_child(review_cam)
 	review_cam.global_position = player.global_position + offset
-	review_cam.look_at(player.global_position + Vector3(0, look_height, 0))
+	_look_target = player.global_position + Vector3(0, look_height, 0)
+	review_cam.look_at(_look_target)
 	review_cam.fov = fov
 	review_cam.make_current()
+	tracking_on = true
 
 func _capture_flow() -> void:
 	# ---------- 阶段 0：三态对照诊断（idle/walk/sprint 同机位） ----------
@@ -122,21 +140,25 @@ func _capture_flow() -> void:
 	await ticks(50)
 	await snap("diag_blend70")
 
-	# ---------- 阶段 1：疾跑侧面 ----------
+	# ---------- 阶段 1：疾跑侧 3/4（受光面 + 前倾剪影） ----------
+	# 深前倾疾跑唯有侧面剪影能正确传达速度感（正面透视会误读成后仰）。
+	# 角色朝 -Z 奔跑，相机在其受光右侧（+X）带微前侧（-Z 分量）露脸。
 	await ticks(10)
 	player.global_position = Vector3(0.0, 0.001, 6.0)
 	player.rotation = Vector3.ZERO
 	player.visual_root.rotation = Vector3.ZERO
-	# 全身机位：包含头部与完整步幅
-	_place_review_cam(Vector3(2.7, 1.35, 0.40), 1.05, 40.0)
+	run_dir_flip = false
+	_place_review_cam(Vector3(2.7, 1.30, -0.2), 1.05, 42.0)
 	# 纯 Sprint 扫描：blend=7.0 直取 LightRunning 原剪辑，30 帧覆盖整周期细相位
 	for sweep in [[7.0, "sprint"], [5.0, "run"]]:
 		force_speed = sweep[0]
+		run_dir_flip = true
 		await ticks(60)  # 收敛进稳定循环
 		for i in 30:
 			await snap("%s_cand_%02d" % [sweep[1], i])
 			await ticks(2)
 	force_speed = 0.0
+	run_dir_flip = false
 	Input.action_release("sprint")
 	Input.action_release("move_forward")
 	treadmill_on = false

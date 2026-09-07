@@ -1,18 +1,20 @@
-# Aster 网格治理与干净重绑 v2（无头 Blender）：
+# Aster 网格治理与解剖重绑 v4（无头 Blender）：
 #   blender.exe -b --factory-startup art/models/aster_assembled.blend \
 #     -P scripts/pipeline/rebind_aster_clean.py -- [blend_out] [temp_dir]
 #
-# 根除断肢与拉丝的工业化管线：
-#   1) 网格净化：顶点极微距离焊合(0.001) + 删孤立点/线 + 删零面积退化面
-#   2) 权重科学重绑：AI 碎片壳非流形拓扑会毒死 Blender 热权重求解器（实测
-#      24k/56k 顶点全军覆没），故走「流形捐赠者」中转——
-#        复制网格 → Make Manifold 修成流形（仅作权重捐赠者，不动本体）
-#        → 捐赠者上跑原生自动权重(ARMATURE_AUTO，真·Bone Heat)
-#        → Data Transfer 最近面插值把权重转回本体
-#      捐赠者热权重仍失败则降级：包络权重 + 连通平滑
-#   3) 定向防污染：长发簇 100% Head（杜绝粘腰）；左右侧锁（鞋/腿跨骨权重归零）
-#   4) 零权重顶点就近骨兜底 + 全量归一化，另存 aster_assembled_clean.blend
-# 输出：净化后 blend + 三视角预览图 + JSON 报告（人眼复核用）。
+# v5.3 任务书四铁律工业化落地：
+#   1) 【长发锁头】焊合前以「颅部种子 + 颈环圆柱墙」泛洪剥离头部系统并打 Hair_Group 标签；
+#      焊合走双通道（头部类 / 身体类各自内部焊合），严禁发簇与衣领身体顶点缝合；
+#      求解后 Hair_Group 顶点 100% 锁 Head，并写入 Hair_Mask 顶点色（红），
+#      随 GLB COLOR_0 导出供引擎侧门禁复核（Twist/长发/插槽/零权重四断言）。
+#   2) 【Twist 拍平】16 根肢体扭转骨 + NeckTwist02 全部移出形变骨集合
+#      （Mixamo 无扭转骨，扭骨恒 rest 即刚性锚点，会把手臂大腿拧成麻花）；
+#      形变由主骨（Thigh/Calf/Upperarm/Forearm 等 23 骨）独占。
+#   3) 【非形变骨零权重】Root 与全部 *Socket 骨不建顶点组（插槽纯挂载锚点）。
+#   4) 【裙摆硬隔离】伞状外层布料 100% 锁 Hip，腰封带按高度线性羽化（杜绝硬边缠绕）。
+#   5) 【归一化底线】全网格权重和强制 = 1.0，孤立点就近骨兜底，
+#      硬断言：Unweighted Vertices == 0、Socket 权重 == 0、Twist 权重 == 0。
+# 输出：净化后 blend（rest 姿态保存）+ 三视角预览图 + JSON 报告。
 import bpy
 import bmesh
 import json
@@ -26,37 +28,54 @@ BLEND_OUT = os.path.abspath(argv[0]) if len(argv) > 0 else os.path.join(REPO, "a
 TMP = os.path.abspath(argv[1]) if len(argv) > 1 else os.path.join(os.path.dirname(BLEND_OUT), "_rebind_preview")
 os.makedirs(TMP, exist_ok=True)
 
-MERGE_DIST = 0.001          # 任务书规定：极微距离焊合阈值
-LONG_EDGE = 0.25            # rest 长度超 25cm 的边 = 碎片焊盘/跨鞋桥（真实布片边 <5cm）
-SIDE_ISLAND_THRESH = 0.06   # 岛质心离中线超过 6cm 视作单侧岛（鞋/腿/臂）
-SIDE_BONE_THRESH = 0.02     # 骨头离中线超过 2cm 才参与侧锁（脊柱/骨盆保持中立）
-HAIR_SKULL_RADIUS = 0.22    # 岛上任一顶点距颅心 <22cm 判定连着头（发簇）
-HAIR_MAX_ISLAND = 512       # 且岛尺寸 ≤512（把主体岛的面部/颈部皮肤排除在外）
-COHERENCE_DIST = 0.45       # 岛内权重骨距支配骨段中心 >45cm = 跨区污染，清除
+MERGE_DIST = 0.001          # 焊合阈值（双通道：仅同类顶点互焊）
+LONG_EDGE = 0.25            # rest 长度超 25cm 的边 = 碎片焊盘/跨鞋桥
+HAIR_SEED_RADIUS = 0.12     # 颅部种子半径（Head 骨标定点）
+HAIR_WALL_RADIUS = 0.085    # 颈环圆柱墙半径（头发连颅不穿颈，面部止于下颌墙）
+HAIR_FACE_KEEP = 0.14       # 距颅 14cm 内=面部/颅顶皮肤，保持求解器权重
+HAIR_MAX_REACH = 0.78       # 头部系统泄漏熔断线（实测发梢垂距 0.565m）
+SKIRT_DZ_LO = 0.45          # 裙摆带下界：Hip rest 头下方 45cm（过膝）
+SKIRT_FADE = 0.14           # 腰封羽化带：腰带处随脊柱 → 向下 14cm 线性过渡 → 100% 锁髋
+SKIRT_R_MIN = 0.16          # 离髋轴水平半径 >16cm = 伞状外层布料
 
 body = bpy.data.objects["Aster_Body"]
 arm = bpy.data.objects["Aster_Armature"]
-report = {"merge": {}, "donor": {}, "hair": {}, "sidelock": {}, "fallback": {}}
+report = {"merge": {}, "solver": {}, "skirt": {}, "hair": {}, "gate": {}}
 
 
 def log(msg):
     print("[rebind] " + msg, flush=True)
 
 
-def bucket_hist(sizes):
-    edges = [(1, 1), (4, "2-4"), (16, "5-16"), (64, "17-64"), (256, "65-256"), (1024, "257-1024")]
-    out = {}
-    for s in sizes:
-        k = ">1024"
-        for cap, name in edges:
-            if s <= cap:
-                k = name
-                break
-        out[k] = out.get(k, 0) + 1
-    return out
+def fatal(msg):
+    print("[rebind] FATAL: " + msg, flush=True)
+    sys.exit(1)
 
 
-# ---------------- 0) 环境体检 ----------------
+def _seg_dist_local(p, seg):
+    h, t = seg
+    d = t - h
+    dd = d.dot(d)
+    u = 0.0 if dd < 1e-12 else max(0.0, min(1.0, (p - h).dot(d) / dd))
+    return (p - (h + d * u)).length
+
+
+def bone_seg(name):
+    pb = arm.pose.bones[name]
+    h = wm @ pb.matrix.translation
+    t = wm @ (pb.matrix @ Vector((0.0, pb.length, 0.0)))
+    return h, t
+
+
+# ---------------- 0) 环境体检 + 强制回 Rest ----------------
+bpy.context.view_layer.objects.active = arm
+bpy.ops.object.mode_set(mode="POSE")
+bpy.ops.pose.select_all(action="SELECT")
+bpy.ops.pose.transforms_clear()
+bpy.ops.object.mode_set(mode="OBJECT")
+bpy.context.view_layer.update()
+log("已强制回 Rest 姿态")
+
 log("armature matrix_world identity=%s" % (arm.matrix_world == __import__("mathutils").Matrix.Identity(4)))
 for name in ("Katana_Blade", "Katana_Scabbard"):
     o = bpy.data.objects.get(name)
@@ -66,16 +85,61 @@ for m in list(body.modifiers):
         body.modifiers.remove(m)
         log("移除旧 ARMATURE 修改器（防双重变形）")
 
-# ---------------- 1) 网格净化与碎片焊合 ----------------
+wm = body.matrix_world
+verts = body.data.vertices
+
+# ---------------- 0.5) 头部系统预分类（焊合前拓扑泛洪 + Hair_Group 标签） ----------------
+# 长发与躯干只在颈环处连通；颅部种子泛洪 + 颈环墙 = 干净剥出「颅面 + 全部头发」。
+skull_c = wm @ arm.pose.bones["Head"].matrix.translation
+neck_seg = bone_seg("NeckTwist01")
+adj = {v.index: [] for v in verts}
+for e in body.data.edges:
+    a, b = e.vertices
+    adj[a].append(b)
+    adj[b].append(a)
+_cls_attr = body.data.attributes.new("rebind_class", "INT", "POINT")
+_cls = _cls_attr.data
+for i in range(len(verts)):
+    _cls[i].value = 1  # 默认身体类
+walls = set()
+for v in verts:
+    if _seg_dist_local(wm @ v.co, neck_seg) < HAIR_WALL_RADIUS:
+        _cls[v.index].value = 1  # 墙顶点归身体类（颈环焊合不跨类）
+        walls.add(v.index)
+_seen = set(walls)
+_stack = [v.index for v in verts if (wm @ v.co - skull_c).length < HAIR_SEED_RADIUS and v.index not in walls]
+_head_comp = []
+while _stack:
+    vv = _stack.pop()
+    if vv in _seen:
+        continue
+    _seen.add(vv)
+    _head_comp.append(vv)
+    _stack.extend(adj[vv])
+for vi in _head_comp:
+    _cls[vi].value = 0  # 头部系统类
+n_below = sum(1 for vi in _head_comp if (wm @ verts[vi].co).z < skull_c.z - 0.35)
+log("头部系统泛洪: %d 顶点（墙 %d / 垂肩线下 %.1f%%）" % (len(_head_comp), len(walls), 100.0 * n_below / max(1, len(_head_comp))))
+if len(_head_comp) < 3000 or len(_head_comp) > 9000 or n_below > 0.3 * len(_head_comp):
+    fatal("头部系统泛洪规模异常（%d 顶点 / 垂肩 %.1f%%），拒绝继续" % (len(_head_comp), 100.0 * n_below / max(1, len(_head_comp))))
+report["hair"]["head_component_verts"] = len(_head_comp)
+
+# ---------------- 1) 网格净化：双通道焊合（头发绝不与身体缝合） ----------------
 bpy.context.view_layer.objects.active = body
 bpy.ops.object.mode_set(mode="EDIT")
 bm = bmesh.from_edit_mesh(body.data)
+bm.verts.ensure_lookup_table()
+_cls_layer = bm.verts.layers.int.get("rebind_class") or bm.verts.layers.int.new("rebind_class")
+head_bmv = [v for v in bm.verts if v[_cls_layer] == 0]
+body_bmv = [v for v in bm.verts if v[_cls_layer] == 1]
 n_v0, n_f0 = len(bm.verts), len(bm.faces)
-
-bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=MERGE_DIST)
+bmesh.ops.remove_doubles(bm, verts=head_bmv, dist=MERGE_DIST)   # 通道 A：头部系统内部焊合
+bm.verts.ensure_lookup_table()
+body_bmv = [v for v in bm.verts if v[_cls_layer] == 1]
+bmesh.ops.remove_doubles(bm, verts=body_bmv, dist=MERGE_DIST)   # 通道 B：身体内部焊合
+log("双通道焊合完成：头部类 %d / 身体类 %d（跨类缝合被禁止）" % (len(head_bmv), len(body_bmv)))
 
 # 长桥接面清除：AI 生成的跨鞋/跨区焊盘桥在迈步时被撕成米级拉丝
-# （实测：左右鞋之间存在 1.26m 的拉丝边与并行焊盘条）
 bad_edges = [e for e in bm.edges if e.calc_length() > LONG_EDGE]
 bad_faces = set()
 for e in bad_edges:
@@ -84,7 +148,6 @@ if bad_faces:
     bmesh.ops.delete(bm, geom=list(bad_faces), context="FACES")
 report["merge"]["long_bridge_edges"] = len(bad_edges)
 report["merge"]["long_bridge_faces"] = len(bad_faces)
-log("长桥清除: %d 条长边 / %d 张桥接面" % (len(bad_edges), len(bad_faces)))
 
 degenerate = [f for f in bm.faces if f.calc_area() < 1e-10]
 if degenerate:
@@ -96,95 +159,55 @@ loose_verts = [v for v in bm.verts if v.is_valid and not v.link_faces]
 if loose_verts:
     bmesh.ops.delete(bm, geom=loose_verts, context="VERTS")
 
-island_sizes = []
-_seen = set()
-for f in bm.faces:
-    if f.index in _seen:
-        continue
-    stack, comp = [f], 0
-    while stack:
-        cur = stack.pop()
-        if cur.index in _seen:
-            continue
-        _seen.add(cur.index)
-        comp += 1
-        for e in cur.edges:
-            for nf in e.link_faces:
-                if nf.index not in _seen:
-                    stack.append(nf)
-    island_sizes.append(comp)
-
-bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+# 【红线】严禁盲目 recalc_face_normals：源资产法线朝向本就正确（旧定稿渲染受光正常），
+# 焊合后拓扑改变会让重算把整片裙壳朝向翻转（NdotL 倒置=受光面渲染成暗蓝）。
 bmesh.update_edit_mesh(body.data)
 bpy.ops.object.mode_set(mode="OBJECT")
-report["merge"] = {
-    "verts": [n_v0, len(body.data.vertices)],
-    "faces": [n_f0, len(body.data.polygons)],
-    "degenerate_faces": len(degenerate),
-    "loose_verts": len(loose_verts),
-    "loose_edges": len(loose_edges),
-    "island_count": len(island_sizes),
-    "island_hist_buckets": bucket_hist(island_sizes),
-}
-log("焊合净化: verts %d->%d, faces %d->%d, islands=%d" % (
-    n_v0, len(body.data.vertices), n_f0, len(body.data.polygons), len(island_sizes)))
+report["merge"]["verts"] = [n_v0, len(body.data.vertices)]
+report["merge"]["faces"] = [n_f0, len(body.data.polygons)]
+log("焊合净化: verts %d->%d, faces %d->%d, 长桥 %d 条/%d 面" % (
+    n_v0, len(body.data.vertices), n_f0, len(body.data.polygons), len(bad_edges), len(bad_faces)))
+verts = body.data.vertices
 
-# ---------------- 2) 权重科学重绑（流形捐赠者中转） ----------------
+# ---------------- 2) 确定性几何权重求解器（23 形变骨） ----------------
+bone_names = [b.name for b in arm.pose.bones]
+SOCKET_BONES = [n for n in bone_names if n.endswith("Socket")]
+# 【Twist 拍平】Mixamo 无扭转骨：16 根肢体扭骨 + NeckTwist02 恒 rest = 刚性锚点，
+# 主骨转它不转会把肢体拧成麻花。全部移出形变集合，形变由主骨独占。
+TWIST_FLATTEN = [n for n in bone_names if "Twist" in n and n != "NeckTwist01"]
+DEFORM_EXCLUDE = set(["Root"] + SOCKET_BONES + TWIST_FLATTEN)
+_deform_bones = [n for n in bone_names if n not in DEFORM_EXCLUDE]
+
 for vg in list(body.vertex_groups):
     body.vertex_groups.remove(vg)
-log("已清除全部脏权重顶点组")
-
-bone_names = [b.name for b in arm.pose.bones]
-for n in bone_names:  # 预建 43 个空组（与捐赠者同名，供 Data Transfer 对位）
+for n in _deform_bones:
     body.vertex_groups.new(name=n)
-
-# ---------------- 2) 确定性几何权重求解器 ----------------
-# 不用热权重/代理/转移（AI 双壳网格会毒死热方程，转移链路启发式互相打架）。
-# 每顶点：43 骨段距离排序 → 侧别/Root 过滤 → 最近两骨反距离混合；
-# 深区域（第二近远 10cm 以上）单骨刚性。规则天然满足：无跨侧、无 Root、≤2 骨。
-def _seg_dist_local(p, seg):
-    h, t = seg
-    d = t - h
-    dd = d.dot(d)
-    u = 0.0 if dd < 1e-12 else max(0.0, min(1.0, (p - h).dot(d) / dd))
-    return (p - (h + d * u)).length
+log("形变骨 %d 个（排除 Root + %d Socket + %d 扭骨: %s）" % (
+    len(_deform_bones), len(SOCKET_BONES), len(TWIST_FLATTEN), TWIST_FLATTEN))
 
 
-wm = body.matrix_world
-verts = body.data.vertices
+def side_axis_setup():
+    l_h, _ = bone_seg("L_Thigh")
+    r_h, _ = bone_seg("R_Thigh")
+    axis = (l_h - r_h).normalized()
+    mid = (l_h + r_h) * 0.5
+    side = {}
+    for n in bone_names:
+        h, _ = bone_seg(n)
+        s = (h - mid).dot(axis)
+        side[n] = s if abs(s) > 0.02 else 0.0
+    for n in bone_names:
+        if "Twist" in n and side[n] == 0.0 and arm.pose.bones[n].parent:
+            side[n] = side.get(arm.pose.bones[n].parent.name, 0.0)
+    return axis, mid, side
 
 
-def bone_seg(name):
-    pb = arm.pose.bones[name]
-    h = wm @ pb.matrix.translation
-    t = wm @ (pb.matrix @ Vector((0.0, pb.length, 0.0)))
-    return h, t
-
-
-L_H, _ = bone_seg("L_Thigh")
-R_H, _ = bone_seg("R_Thigh")
-side_axis = (L_H - R_H).normalized()
-mid = (L_H + R_H) * 0.5
-bone_side = {}
-for n in bone_names:
-    h, _ = bone_seg(n)
-    s = (h - mid).dot(side_axis)
-    bone_side[n] = s if abs(s) > 0.02 else 0.0
-# 扭骨几乎长在肢体轴线上（位置近矢状面），侧别必须继承父主骨，
-# 否则小腿扭骨会被当作「中央骨」分给对侧顶点（实测 L_Calf 混入右腿顶点）
-for n in bone_names:
-    if "Twist" in n and bone_side[n] == 0.0 and arm.pose.bones[n].parent:
-        bone_side[n] = bone_side.get(arm.pose.bones[n].parent.name, 0.0)
+side_axis, mid, bone_side = side_axis_setup()
 seg_cache = {n: bone_seg(n) for n in bone_names}
-_deform_bones = [n for n in bone_names if n != "Root"]
 
-wm = body.matrix_world
-verts = body.data.vertices
-
-n_mixed_cross = 0
 n_single = 0
 n_blend = 0
-for vi, v in enumerate(verts):
+for v in verts:
     p = wm @ v.co
     v_side = (p - mid).dot(side_axis)
     vert_side = 1 if v_side > 0.02 else (-1 if v_side < -0.02 else 0)
@@ -192,13 +215,14 @@ for vi, v in enumerate(verts):
     for n in _deform_bones:
         bs = bone_side[n]
         if vert_side != 0 and bs != 0.0 and (bs > 0) != vert_side:
-            continue  # 位置在右侧的顶点绝不绑左侧骨（反之亦然）
+            continue  # 右侧顶点绝不绑左侧骨（反之亦然）
         if vert_side == 0 and bs != 0.0:
-            continue  # 矢状面带（裙摆/裆部）只允许中央骨：分给左右腿必被步幅撕开
+            continue  # 矢状面带（裙摆/裆部）只允许中央骨
         cand.append((_seg_dist_local(p, seg_cache[n]), n))
     cand.sort(key=lambda x: x[0])
     d1, n1 = cand[0]
     d2, n2 = cand[1]
+    vi = v.index
     if d2 > d1 + 0.10:
         body.vertex_groups[n1].add([vi], 1.0, "REPLACE")
         n_single += 1
@@ -209,64 +233,130 @@ for vi, v in enumerate(verts):
         body.vertex_groups[n1].add([vi], w1 / s, "ADD")
         body.vertex_groups[n2].add([vi], w2 / s, "ADD")
         n_blend += 1
-report["solver"] = {"single": n_single, "blend": n_blend}
+report["solver"] = {"single": n_single, "blend": n_blend, "deform_bones": len(_deform_bones)}
 log("确定性求解: 单骨 %d / 双骨混合 %d" % (n_single, n_blend))
 
-# 归一化（ADD 累加后兜底）
+# ---------------- 2.5) 【裙摆硬隔离】伞状布料 100% 锁 Hip（腰带羽化） ----------------
+hip_head_w = wm @ arm.pose.bones["Hip"].matrix.translation
+skirt_locked = 0
+skirt_feathered = 0
+for v in verts:
+    p = wm @ v.co
+    dz = hip_head_w.z - p.z
+    if not (0.0 < dz <= SKIRT_DZ_LO):
+        continue
+    r = ((p.x - hip_head_w.x) ** 2 + (p.y - hip_head_w.y) ** 2) ** 0.5
+    if r <= SKIRT_R_MIN:
+        continue
+    vi = v.index
+    if dz >= SKIRT_FADE:
+        for g in list(v.groups):
+            body.vertex_groups[g.group].remove([vi])
+        body.vertex_groups["Hip"].add([vi], 1.0, "REPLACE")
+        skirt_locked += 1
+    else:
+        w_hip = dz / SKIRT_FADE
+        for g in v.groups:
+            g.weight *= (1.0 - w_hip)
+        body.vertex_groups["Hip"].add([vi], w_hip, "ADD")
+        skirt_feathered += 1
+report["skirt"] = {"verts_locked_to_hip": skirt_locked, "verts_feathered": skirt_feathered,
+                   "band_dz": [SKIRT_DZ_LO, SKIRT_FADE], "r_min": SKIRT_R_MIN}
+log("裙摆硬隔离: %d 顶点 → 100%% Hip, 腰封羽化 %d 顶点" % (skirt_locked, skirt_feathered))
+
+# ---------------- 3) 【长发锁头】Hair_Group 顶点 100% 锁 Head + 顶点色标记 ----------------
+_cls_attr = body.data.attributes["rebind_class"]
+_cls = _cls_attr.data
+hair_vids = []
+for v in verts:
+    if _cls[v.index].value != 0:
+        continue  # 非头部系统类
+    if (wm @ v.co - skull_c).length <= HAIR_FACE_KEEP:
+        continue  # 面部/颅顶皮肤保持求解器权重
+    hair_vids.append(v.index)
+for vi in hair_vids:
+    for g in list(verts[vi].groups):
+        body.vertex_groups[g.group].remove([vi])
+    body.vertex_groups["Head"].add([vi], 1.0, "REPLACE")
+# Hair_Group 顶点组（Blender 侧可读标签；不对应骨骼，GLB 导出时自动忽略）
+vg_hair = body.vertex_groups.new(name="Hair_Group")
+body.vertex_groups["Hair_Group"].add(hair_vids, 1.0, "REPLACE")
+# Hair_UV 第二 UV 层（发丝=(0.5,0.5) 其余=(0,0)）：随 glTF TEXCOORD_1 →
+# Godot ARRAY_TEX_UV2 导出（实测 COLOR_0/1 通道会被引擎丢弃合成白色，UV2 通道可靠）
+_hair_set = set(hair_vids)
+_uv_main = body.data.uv_layers[0]
+_uv_hair = body.data.uv_layers.new(name="Hair_UV")
+_uv_vals = []
+for poly in body.data.polygons:
+    for li in poly.loop_indices:
+        vi = body.data.loops[li].vertex_index
+        if vi in _hair_set:
+            _uv_vals += [0.5, 0.5]
+        else:
+            _uv_vals += [0.0, 0.0]
+_uv_hair.data.foreach_set("uv", _uv_vals)
+body.data.uv_layers.active = _uv_main  # 主 UV 保持 TEXCOORD_0
+report["hair"]["verts_locked_head"] = len(hair_vids)
+log("长发锁头: %d 顶点 → 100%% Head（Hair_Group + Hair_Mask 标记完成）" % len(hair_vids))
+
+# ---------------- 3.5) 【归一化底线】+ 四铁律硬断言 ----------------
 for v in verts:
     total = sum(g.weight for g in v.groups)
     if total <= 1e-9:
         p = wm @ v.co
         best = min(_deform_bones, key=lambda n: _seg_dist_local(p, seg_cache[n]))
         body.vertex_groups[best].add([v.index], 1.0, "REPLACE")
-        report["solver"]["empty_fallback"] = report["solver"].get("empty_fallback", 0) + 1
+        report["gate"]["empty_fallback"] = report["gate"].get("empty_fallback", 0) + 1
         continue
     inv = 1.0 / total
     for g in v.groups:
         g.weight = min(1.0, g.weight * inv)
 
-# ---------------- 3) 长发防粘腰：连着头的小岛 → 100% Head ----------------
-seen_islands = set()
-adj = {v.index: [] for v in verts}
-for e in body.data.edges:
-    a, b = e.vertices
-    adj[a].append(b)
-    adj[b].append(a)
-islands = []
-_seen = set()
-for v0 in range(len(verts)):
-    if v0 in seen_islands:
+n_unweighted = sum(1 for v in verts if sum(g.weight for g in v.groups) <= 1e-6)
+n_socket_weighted = 0
+for sn in SOCKET_BONES:
+    gi = body.vertex_groups[sn].index if any(vg.name == sn for vg in body.vertex_groups) else -1
+    if gi < 0:
         continue
-    comp = []
-    stack = [v0]
-    while stack:
-        vv = stack.pop()
-        if vv in seen_islands:
-            continue
-        seen_islands.add(vv)
-        comp.append(vv)
-        stack.extend(adj[vv])
-    islands.append(comp)
-skull_c = wm @ arm.pose.bones["Head"].matrix.translation
-hair_islands = 0
-hair_touched = 0
-for comp in islands:
-    near_skull = any((wm @ verts[vi].co - skull_c).length < 0.22 for vi in comp)
-    if not (near_skull and len(comp) <= 512):
+    for v in verts:
+        if any(g.group == gi and g.weight > 1e-6 for g in v.groups):
+            n_socket_weighted += 1
+n_twist_weighted = 0
+for tn in TWIST_FLATTEN:
+    gi = body.vertex_groups[tn].index if any(vg.name == tn for vg in body.vertex_groups) else -1
+    if gi < 0:
         continue
-    for vi in comp:
-        non_head = {body.vertex_groups[g.group].name for g in verts[vi].groups
-                    if body.vertex_groups[g.group].name != "Head"}
-        for name in non_head:
-            body.vertex_groups[name].remove([vi])
-        body.vertex_groups["Head"].add([vi], 1.0, "REPLACE")
-    hair_touched += len(comp)
-    hair_islands += 1
-report["hair"] = {"islands": hair_islands, "verts_forced_head": hair_touched}
-log("长发防粘腰: %d 个发簇岛 / %d 顶点 → 100%% Head" % (hair_islands, hair_touched))
+    for v in verts:
+        if any(g.group == gi and g.weight > 1e-6 for g in v.groups):
+            n_twist_weighted += 1
+# 发丝锁头校验：Hair_Group 顶点必须恰好单骨 Head@1.0
+n_hair_bad = 0
+hair_gi = body.vertex_groups["Hair_Group"].index
+for v in verts:
+    is_hair = any(g.group == hair_gi and g.weight > 0.5 for g in v.groups)
+    if not is_hair:
+        continue
+    gs = [(body.vertex_groups[g.group].name, g.weight) for g in v.groups if g.weight > 1e-6]
+    if len(gs) != 1 or gs[0][0] != "Head" or abs(gs[0][1] - 1.0) > 1e-4:
+        n_hair_bad += 1
+report["gate"].update({
+    "unweighted_verts": n_unweighted,
+    "socket_weighted_verts": n_socket_weighted,
+    "twist_weighted_verts": n_twist_weighted,
+    "hair_bad_verts": n_hair_bad,
+})
+log("门禁: unweighted=%d socket=%d twist=%d hair_bad=%d" % (
+    n_unweighted, n_socket_weighted, n_twist_weighted, n_hair_bad))
+if n_unweighted != 0:
+    fatal("铁律失守：仍有 %d 个零权重顶点" % n_unweighted)
+if n_socket_weighted != 0:
+    fatal("铁律失守：Socket 骨带权顶点 %d 个" % n_socket_weighted)
+if n_twist_weighted != 0:
+    fatal("铁律失守：Twist 骨带权顶点 %d 个" % n_twist_weighted)
+if n_hair_bad != 0:
+    fatal("铁律失守：%d 个发丝顶点未严格锁 Head@1.0" % n_hair_bad)
 
 # ---------------- 4) 跨侧桥接面终清（安全网） ----------------
-# 用「坐标键控」的顶点侧别查表（mesh API 读数与 Godot 一致；bmesh 形变层读数不可靠）
 _pos_side = {}
 for v in verts:
     best, bw = None, 0.0
@@ -299,12 +389,9 @@ report["bridge_faces_removed"] = bridge_faces
 log("跨侧桥接面终清: %d 张" % bridge_faces)
 verts = body.data.vertices  # 索引位移，重新捕获
 
-
 # ---------------- 5) 保存 + 预览 ----------------
 body.parent = arm
 body.parent_type = "ARMATURE"
-# 只保留 ARMATURE 修改器：GN「Smooth by Angle」等残留修改器会在带动画导出时
-# 触发 depsgraph 重评估，把跨脚重叠顶点焊接错位、权重改写（实测 521 条跨侧边）
 for m in list(body.modifiers):
     if m.type != "ARMATURE":
         log("删除残留修改器: %s (%s)" % (m.name, m.type))

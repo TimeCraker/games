@@ -79,6 +79,9 @@ func _physics_process(_delta: float) -> bool:
 		"bullet_time":
 			phase_bullet_time()
 			return _maybe_quit()
+		"weapon_mount":
+			phase_weapon_mount()
+			return _maybe_quit()
 	return false
 
 func _maybe_quit() -> bool:
@@ -410,4 +413,99 @@ func phase_bullet_time() -> void:
 		check(bt_drone.local_time_scale == 1.0, "0.5s 局部减速结束后傀儡未恢复满速")
 		check(not fsm.is_bullet_time_active, "星闪标志位 0.5s 后未自动复位")
 		print("✔ 星闪 0.50s 局部时停自动恢复检验通过")
-		phase = "done"
+		phase = "weapon_mount"
+		tick = 0
+
+## ================= 阶段 H：武器挂载物理门禁（v5.2 三铁律） =================
+func phase_weapon_mount() -> void:
+	if tick != 1:
+		return
+	print("--- 武器挂载物理门禁（刀鞘口零偏置架构）---")
+	# 复位纳刀态
+	rig.sheathe_sword()
+	check(rig.katana_blade.get_parent() == rig.scabbard_socket, "纳刀态刀身应挂左腰鞘插槽")
+	# 断言1：物理抓握——拔刀态握心与掌心世界坐标物理距离 < 0.03m
+	rig.draw_sword()
+	var grip: Vector3 = rig.get_grip_center_world()
+	var palm: Vector3 = rig.get_palm_center_world()
+	var grip_dist := grip.distance_to(palm)
+	check(grip_dist < 0.03, "刀柄握心与右手掌心物理距离应 < 0.03m（实测 %.4fm）" % grip_dist)
+	check(rig.katana_blade.transform.origin.distance_to(AsterRig.DRAW_GRIP_COMPENSATION) < 0.001,
+		"拔刀挂载位置应为 §3 握心补偿 (0,-0.13,0)（实测 %s）" % rig.katana_blade.transform.origin)
+	print("  ✔ 物理抓握: 握心=%s 掌心=%s 距离=%.4fm" % [grip.snappedf(0.001), palm.snappedf(0.001), grip_dist])
+	rig.sheathe_sword()
+	# 断言2/3/4/5：插槽纯洁性 + Twist 洁净 + 长发锁头 + 零权重顶点（GLB 蒙皮数据真值）
+	var res := _audit_skin_weights()
+	check(res.socket_counts["Pelvis_L_Scabbard_Socket"] == 0,
+		"Pelvis_L_Scabbard_Socket 顶点权重计数应恒为 0（实测 %d）" % res.socket_counts["Pelvis_L_Scabbard_Socket"])
+	check(res.socket_counts["Hand_R_Weapon_Socket"] == 0,
+		"Hand_R_Weapon_Socket 顶点权重计数应恒为 0（实测 %d）" % res.socket_counts["Hand_R_Weapon_Socket"])
+	check(res.twist_weighted_verts == 0,
+		"肢体 Twist 扭骨加权顶点数应恒为 0（实测 %d）" % res.twist_weighted_verts)
+	check(res.hair_verts >= 500, "Hair_Mask 发丝标记顶点数应 ≥500（实测 %d）" % res.hair_verts)
+	check(res.hair_bad_verts == 0,
+		"发丝顶点在 Spine/Waist/Hip/腿骨上的权重应恒为 0（违例 %d 个）" % res.hair_bad_verts)
+	check(res.zero_weight_verts == 0, "全网格零权重顶点数应为 0（实测 %d）" % res.zero_weight_verts)
+	print("  ✔ 蒙皮审计: 加权顶点=%d Socket带权=%d/%d Twist带权=%d 发丝=%d(违例%d) 零权重=%d" % [
+		res.weighted_verts, res.socket_counts["Pelvis_L_Scabbard_Socket"],
+		res.socket_counts["Hand_R_Weapon_Socket"], res.twist_weighted_verts,
+		res.hair_verts, res.hair_bad_verts, res.zero_weight_verts])
+	phase = "done"
+
+
+## 蒙皮权重审计：扫描 Aster_Body 全部表面权重数组 + Hair_Mask 顶点色
+func _audit_skin_weights() -> Dictionary:
+	var out := {
+		"socket_counts": {"Pelvis_L_Scabbard_Socket": 0, "Hand_R_Weapon_Socket": 0},
+		"zero_weight_verts": 0,
+		"weighted_verts": 0,
+		"twist_weighted_verts": 0,
+		"hair_verts": 0,
+		"hair_bad_verts": 0,
+	}
+	var mi := rig.skeleton.get_node_or_null("Aster_Body") as MeshInstance3D
+	if mi == null or mi.mesh == null:
+		_failures.append("Aster_Body 蒙皮网格缺失")
+		return out
+	# 扭骨集合（NeckTwist01 除外——它是保留形变的颈主骨）
+	var twist_bones := {}
+	for b in rig.skeleton.get_bone_count():
+		var bn := rig.skeleton.get_bone_name(b)
+		if bn.contains("Twist") and bn != "NeckTwist01":
+			twist_bones[bn] = 0
+	# 发丝锁头黑名单骨（发丝顶点在这些骨上的权重必须恒 0）
+	var hair_forbidden := {"Spine01": 0, "Spine02": 0, "Waist": 0, "Hip": 0,
+		"Pelvis": 0, "L_Thigh": 0, "R_Thigh": 0, "L_Calf": 0, "R_Calf": 0}
+	var n_bones := rig.skeleton.get_bone_count()
+	for s in mi.mesh.get_surface_count():
+		var arrays := mi.mesh.surface_get_arrays(s)
+		var bones := arrays[Mesh.ARRAY_BONES] as PackedInt32Array
+		var weights := arrays[Mesh.ARRAY_WEIGHTS] as PackedFloat32Array
+		if bones.is_empty() or weights.is_empty():
+			continue
+		# 发丝标记：Hair_UV 第二 UV 通道（发丝=(0.5,0.5)）→ glTF TEXCOORD_1
+		var uv2: Variant = arrays[Mesh.ARRAY_TEX_UV2]
+		var has_uv2: bool = uv2 is PackedVector2Array and uv2.size() >= weights.size() / 4
+		var n := weights.size() / 4
+		for i in n:
+			var wsum := weights[i * 4] + weights[i * 4 + 1] + weights[i * 4 + 2] + weights[i * 4 + 3]
+			if wsum < 0.0001:
+				out.zero_weight_verts += 1
+				continue
+			out.weighted_verts += 1
+			var is_hair: bool = has_uv2 and uv2[i].x > 0.25
+			if is_hair:
+				out.hair_verts += 1
+			for k in 4:
+				var bi := bones[i * 4 + k]
+				var w := weights[i * 4 + k]
+				if w <= 0.0001 or bi >= n_bones:
+					continue
+				var bn := rig.skeleton.get_bone_name(bi)
+				if out.socket_counts.has(bn):
+					out.socket_counts[bn] += 1
+				if twist_bones.has(bn):
+					out.twist_weighted_verts += 1
+				if is_hair and hair_forbidden.has(bn):
+					out.hair_bad_verts += 1
+	return out
