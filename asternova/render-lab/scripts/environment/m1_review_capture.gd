@@ -34,6 +34,11 @@ func _ready() -> void:
 			if aster is Node3D:
 				aster.position = Vector3(-15.45, 0.2, 20.35)
 				aster.rotation.y = deg_to_rad(30.0)   # 面向西货架: 暖 LED 打亮右侧脸
+		"corner":
+			# 街角生活道具特写: 东南上空望西北, HouseA/B 檐下空调外机群 +
+			# 东西挡墙贴花 + 电线杆与跨街电缆一并入画
+			cam.look_at_from_position(Vector3(7.5, 3.2, 21.0), Vector3(-7.5, 5.2, -2.0))
+			cam.fov = 50.0
 		"overview":
 			# 标定俯瞰: 东北空地上空 34m, 看全街区装配落位与残伪影排查
 			cam.look_at_from_position(Vector3(10.0, 34.0, 14.0), Vector3(-3.0, 0.0, -20.0))
@@ -120,10 +125,16 @@ func _process(_delta: float) -> void:
 		_:
 			# 等待 60 帧: 反射探针烘焙/体积雾重投影/花瓣 preprocess 完全收敛
 			if frame == 60:
-				var out_name := "m1_endfield_street_high_2k.png" if shot == "street" \
-						else "m1_convenience_store_warmth_closeup_2k.png"
-				if shot == "overview" or shot == "topdown":
-					out_name = "m1_qa_%s.png" % shot
+				var out_name := ""
+				match shot:
+					"street":
+						out_name = "m1_endfield_street_high_2k.png"
+					"store":
+						out_name = "m1_convenience_store_warmth_closeup_2k.png"
+					"corner":
+						out_name = "m1_street_corner_props_2k.png"
+					_:
+						out_name = "m1_qa_%s.png" % shot
 				_capture(out_name, QA_DIR if out_name.begins_with("m1_qa_") else OUT_DIR)
 			elif frame >= 300:
 				push_error("[m1_capture] capture timed out")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://m1_endfield_street"]
+[gd_scene load_steps=14 format=3 uid="uid://m1_endfield_street"]
 
 [ext_resource type="PackedScene" uid="uid://ast_endfield_lighting_studio" path="res://scenes/lighting/endfield_lighting_studio.tscn" id="1_light"]
 [ext_resource type="PackedScene" uid="uid://p7p6ww5uril8" path="res://models/environment/modern_japan_neighborhood.glb" id="2_env_mesh"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://char_aster_01" path="res://scenes/character_aster.tscn" id="9_aster"]
 [ext_resource type="Script" path="res://scripts/quality_manager.gd" id="10_quality"]
 [ext_resource type="Script" path="res://scripts/environment/m1_review_capture.gd" id="11_capture"]
+[ext_resource type="Script" path="res://scripts/environment/m1_street_dressing.gd" id="12_dressing"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud"]
 bg_color = Color(0.08, 0.1, 0.16, 0.75)
@@ -32,6 +33,9 @@ agx_light_master = true
 
 [node name="M1StreetSetup" type="Node" parent="."]
 script = ExtResource("4_m1_purge")
+
+[node name="StreetDressing" type="Node" parent="."]
+script = ExtResource("12_dressing")
 
 [node name="ConvenienceStore" parent="." instance=ExtResource("5_store")]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -16.05, 0, 20)
