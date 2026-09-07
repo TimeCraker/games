@@ -54,18 +54,35 @@ func _ready() -> void:
 
 # ==================== AnimationTree 动捕驱动 ====================
 
+## 循环剪辑表（glTF 不携带循环标记，导入后逐剪辑打 LOOP_LINEAR）
+const LOOP_CLIPS := ["idle", "LightIdle", "LightWalking", "LightRunning", "Sprint",
+	"crouch-run", "fall", "fall-landing", "wall-slide-front", "Guarding"]
+
 func _setup_animation_system() -> void:
-	anim_player = AnimationPlayer.new()
-	anim_player.name = "AnimationPlayer"
-	anim_player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_PHYSICS
-	$Aster_Armature.add_child(anim_player)  # root_node 默认 ".." → 轨道 "Skeleton3D:骨名" 直接解析
-	anim_player.add_animation_library("", load("res://art/animations/aster_animlib.res"))
+	# 首选 GLB 内嵌烘焙动画库（Blender 离线烘焙产物，场景根下自带 AnimationPlayer）
+	anim_player = get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if anim_player != null:
+		anim_player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_PHYSICS
+		var lib := anim_player.get_animation_library("")
+		for clip in LOOP_CLIPS:
+			if lib.has_animation(clip):
+				lib.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
+	else:
+		# 兜底：旧 Godot 重定向库（aster_animlib.res）
+		anim_player = AnimationPlayer.new()
+		anim_player.name = "AnimationPlayer"
+		anim_player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_PHYSICS
+		$Aster_Armature.add_child(anim_player)  # root_node 默认 ".." → 轨道 "Skeleton3D:骨名" 直接解析
+		anim_player.add_animation_library("", load("res://art/animations/aster_animlib.res"))
 
 	# 先配置后入树：AnimationTree 的参数表在 READY 时按 tree_root 构建，
 	# 入树后再设 tree_root 会错过构建（parameters/* 全部不存在）
 	anim_tree = AnimationTree.new()
 	anim_tree.name = "AnimationTree"
-	anim_tree.anim_player = NodePath("../Aster_Armature/AnimationPlayer")
+	# 内嵌播放器在本节点直下（"../AnimationPlayer"）；兜底播放器在臂架下（"../Aster_Armature/AnimationPlayer"）
+	var player_siblings_root := anim_player.get_parent() == self
+	anim_tree.anim_player = NodePath("../AnimationPlayer") if player_siblings_root \
+			else NodePath("../Aster_Armature/AnimationPlayer")
 	anim_tree.tree_root = load("res://art/animations/aster_anim_tree.tres")
 	anim_tree.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_PHYSICS
 	add_child(anim_tree)

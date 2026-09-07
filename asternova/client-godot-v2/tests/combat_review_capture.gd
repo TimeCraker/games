@@ -6,7 +6,8 @@ extends SceneTree
 ## ② aster_combat_combo_slash_review.png：太刀大展开挥砍 + 月华带状刀光
 ## 布光铁律：卸下 playground 内联环境，换装 endfield_lighting_studio + endfield_studio_environment。
 
-const OUT_DIR := "res://../art/render_previews/combat"
+## 候选帧全部落临时目录，人眼挑选后仅两张终审图入 art/render_previews/combat/
+const OUT_DIR := "C:/Users/TimeCraker/AppData/Local/Temp/aster_pipeline/captures"
 
 var player: PlayerController = null
 var rig: AsterRig = null
@@ -64,7 +65,9 @@ func _treadmill(delta: float) -> void:
 	if not treadmill_on or player == null:
 		return
 	# 跑步机锁位：贴地 y=0.001（悬空会误入 FALL 滞空）
+	# 每物理帧传送必须复位物理插值，否则 GPU 蒙皮与节点变换时序错位会把网格撕成碎片
 	player.global_position = Vector3(0.0, 0.001, 6.0)
+	player.reset_physics_interpolation()
 
 func _physics_process(delta: float) -> bool:
 	_treadmill(delta)
@@ -124,8 +127,8 @@ func _capture_flow() -> void:
 	player.global_position = Vector3(0.0, 0.001, 6.0)
 	player.rotation = Vector3.ZERO
 	player.visual_root.rotation = Vector3.ZERO
-	# 推近机位：让步幅/抬膝在 2K 画幅里更可读
-	_place_review_cam(Vector3(2.25, 1.05, 0.30), 0.90, 38.0)
+	# 全身机位：包含头部与完整步幅
+	_place_review_cam(Vector3(2.7, 1.35, 0.40), 1.05, 40.0)
 	# 纯 Sprint 扫描：blend=7.0 直取 LightRunning 原剪辑，30 帧覆盖整周期细相位
 	for sweep in [[7.0, "sprint"], [5.0, "run"]]:
 		force_speed = sweep[0]
