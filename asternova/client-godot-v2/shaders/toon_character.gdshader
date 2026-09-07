@@ -36,6 +36,20 @@ uniform vec4 specular_color : source_color = vec4(0.92, 0.95, 1.0, 1.0);
 uniform float specular_size : hint_range(0.01, 1.0, 0.01) = 0.06;
 uniform float specular_smoothness : hint_range(0.001, 0.2, 0.005) = 0.01;
 
+// --- 面部 SDF 仰角解耦（头部前向区域生效，杜绝正午阳光鼻梁/眼眶碎影）---
+group_uniforms FacePitchClamp;
+uniform bool enable_face_pitch_clamp = true;
+uniform float face_pitch_clamp : hint_range(0.0, 1.0, 0.05) = 0.15; // 主光垂直俯仰角钳制 ±15°
+uniform float face_forward_mix : hint_range(0.0, 1.0, 0.05) = 0.70; // 面部法线向前向平滑（抹平多边形折痕）
+uniform float head_min_y : hint_range(0.0, 2.0, 0.01) = 1.30; // 模型空间头部区域下缘（Aster 1.65m）
+
+// --- 发丝各向异性天使光环 (Kajiya-Kay) ---
+group_uniforms HairKajiyaKay;
+uniform bool enable_hair_specular = true;
+uniform vec4 hair_spec_color : source_color = vec4(0.78, 0.88, 1.0, 1.0); // 冷蓝月华
+uniform float hair_spec_strength : hint_range(0.0, 1.0, 0.01) = 0.30;
+uniform float hair_shininess : hint_range(4.0, 128.0, 1.0) = 40.0;
+
 void fragment() {
 	vec4 tex_color = texture(albedo_texture, UV);
 	vec3 desat = mix(tex_color.rgb, vec3(dot(tex_color.rgb, vec3(0.299, 0.587, 0.114))), desaturation);
@@ -53,11 +67,38 @@ void fragment() {
 	SPECULAR = 0.0;
 }
 
+varying float v_head_mask;      // 模型空间头部区域掩码
+varying float v_front_mask;     // 头部前向（面部）掩码
+varying vec3 v_world_up_view;   // 视空间下的世界竖直轴（俯仰钳制基准）
+varying vec3 v_face_fwd_view;   // 视空间下的面部前向（模型 rest -Z）
+varying vec3 v_strand_dir;      // 视空间发流方向（Kajiya-Kay 切线代理）
+
+void vertex() {
+	v_head_mask = step(head_min_y, VERTEX.y);
+	v_front_mask = smoothstep(0.05, 0.45, -NORMAL.z); // 面部朝 -Z
+	mat3 model_rot = mat3(MODEL_MATRIX);
+	v_world_up_view = normalize((MODELVIEW_MATRIX * vec4(transpose(model_rot) * vec3(0.0, 1.0, 0.0), 0.0)).xyz);
+	v_face_fwd_view = normalize((MODELVIEW_MATRIX * vec4(0.0, 0.0, -1.0, 0.0)).xyz);
+	// 发簇沿 +Y 生长：以模型上方向作为 Kajiya-Kay 切线代理（网格无 TANGENT 属性）
+	v_strand_dir = normalize((MODELVIEW_MATRIX * vec4(0.0, 1.0, 0.0, 0.0)).xyz);
+}
+
 void light() {
 	// 1. 半兰伯特光照 (Half-Lambert) 计算，将 [-1, 1] 映射到 [0, 1]
 	float NdotL = dot(NORMAL, LIGHT);
 	float half_lambert = clamp(NdotL * 0.5 + 0.5, 0.0, 1.0);
 	float light_term = half_lambert * ATTENUATION;
+
+	// 1.5 面部 SDF 仰角解耦：头部前向区域改用「俯仰钳制光向量 × 前向平滑法线」重算明暗项
+	//     光向量沿真实世界竖直轴分解后钳制俯仰角（±15°），与相机姿态无关
+	if (enable_face_pitch_clamp && v_head_mask > 0.001 && v_front_mask > 0.001) {
+		vec3 up_v = normalize(v_world_up_view);
+		float L_vert = dot(LIGHT, up_v);
+		vec3 L_clamped = normalize(LIGHT - up_v * L_vert + up_v * (L_vert * face_pitch_clamp));
+		vec3 N_face = normalize(mix(NORMAL, normalize(v_face_fwd_view), face_forward_mix));
+		float face_term = clamp(dot(N_face, L_clamped) * 0.5 + 0.5, 0.0, 1.0) * ATTENUATION;
+		light_term = mix(light_term, face_term, v_head_mask * v_front_mask);
+	}
 
 	// 2. 赛璐璐两阶光照阶梯
 	float w = ramp_smoothness * 0.5;
@@ -83,7 +124,16 @@ void light() {
 	float spec_intensity = smoothstep(1.0 - specular_size - 0.01, 1.0 - specular_size + 0.01, NdotH);
 	vec3 specular_contribution = spec_intensity * specular_color.rgb * LIGHT_COLOR * 0.45 * lit_mask;
 
+	// 4.5 发丝 Kajiya-Kay 各向异性天使光环：垂直于发流的镜面角形成弧形高光带
+	vec3 strand_contribution = vec3(0.0);
+	if (enable_hair_specular && v_head_mask > 0.5) {
+		float TdotH = dot(normalize(v_strand_dir), half_vector);
+		float sinTH = sqrt(max(0.0, 1.0 - TdotH * TdotH));
+		float strand = pow(sinTH, hair_shininess) * hair_spec_strength * lit_mask;
+		strand_contribution = strand * hair_spec_color.rgb * LIGHT_COLOR;
+	}
+
 	// 5. 漫反射贡献累加（乘以 0.90 控光系数，配合环境光维持最高亮度在 0.88~0.92，细腻保留高光与布纹细节）
 	DIFFUSE_LIGHT += ALBEDO * LIGHT_COLOR * light_mult * ATTENUATION * 0.90;
-	SPECULAR_LIGHT += specular_contribution + rim_contribution;
+	SPECULAR_LIGHT += specular_contribution + rim_contribution + strand_contribution;
 }
