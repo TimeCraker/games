@@ -137,27 +137,32 @@
 
 ### ① MCP 协议连接规范（Model Context Protocol）
 
-- **全局配置文件**：`~/.gemini/config/mcp_config.json`
+- **配置随客户端各自维护**（2026-09-10 修正：不存在全局单一配置文件）：Claude Code 在 `~/.claude.json` / 项目 `.mcp.json`；Gemini CLI 在 `~/.gemini/config/mcp_config.json`。
 - **Godot 游戏引擎 MCP (`@coding-solo/godot-mcp`)**：
   - 启动方式：`npx -y @coding-solo/godot-mcp`
   - 环境变量：`GODOT_PATH = "C:\\Users\\TimeCraker\\tools\\godot\\Godot_v4.7.2-stable_win64.exe"`
   - 核心职责：前台拉起 Godot 编辑器、运行指定工程/场景、实时捕获控制台日志与崩溃堆栈、动态创建场景、增删节点、管理资源 UID。
+  - 状态：**尚未接入 Claude Code**（此前仅 Gemini 侧配置）；接入前 Godot 自动化走 CLI。
 - **Blender 3D 建模 MCP (`blender-mcp`)**：
   - 服务端：`uvx blender-mcp`（配置 `DISABLE_TELEMETRY=true`）
   - 视口端插件：安装于 `AppData/Roaming/Blender Foundation/Blender/5.2/scripts/addons/blender_mcp.py`
-  - 核心职责：当用户在前台打开 Blender GUI 时，在右侧 N 面板点击启动 MCP Server，Agent 可通过 JSON-RPC 实时读取视口对象、自然语言修改材质与灯光、调用 `execute_blender_code` 产生即时交互。
+  - 核心职责：Agent 通过 JSON-RPC 实时读取视口对象、执行代码、抓取视口截图、自然语言修改材质与灯光；并内置 **Hunyuan3D / Hyper3D Rodin 图生 3D 直连导入**与 PolyHaven / PolyPizza 素材检索。
+  - 状态：✅ **2026-09-10 在 Claude Code 会话验证可用**。
 
 ### ② 本地底层脚本与 CLI 规范（无头工业生产）
 
 - **Blender 无头 Python 脚本 (`bpy`)**：
   - 运行命令：`& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b <工程.blend> -P <脚本.py>`
-  - 核心职责：处理大规模顶点几何运算（如数万面顶点切除、倒 V 型刘海空气雕刻、法线球面化 Data Transfer、贴图像素清洗），零网络开销、秒级完成。
+  - 核心职责（**仅限非审美确定性批处理**，见 §9 ③）：格式导出（GLB/KTX2）、LOD 减面、贴图通道搬运、像素级清洗、CI/CD 自动化跑分。
 - **Godot 自动化命令行执行**：
   - 运行命令：`godot --path <工程路径> <场景.tscn>`
   - 核心职责：无头执行自动化渲染、多相机 Viewport 截图与三档画质自动化跑分。
 
-### ③ 双模协同决策原则
+### ③ 双模协同决策原则（2026-09-10 修订：视觉闭环优先）
 
-- **何时用 CLI/bpy**：执行复杂模型拓扑修改、资产格式转换（GLB/KTX2）、批量贴图处理、CI/CD 自动化跑分时。
-- **何时用 MCP**：用户在前台打开图形界面、需要“所见即所得”实时伴随式调参、排查当前场景层级、或需要让 Agent 操作编辑器时。
+- **何时用 MCP**：一切**审美相关**的建模操作（造型、比例、材质、灯光、几何手术）。MCP 会话内每完成一处修改立即截图自查。
+- **何时用 CLI/bpy**：仅限**非审美**的确定性批处理——格式导出、LOD 减面、贴图通道搬运、自动化出图、CI 跑分。**严禁用无头脚本做「不看效果就无法确认好坏」的修改**；无头脚本执行完毕后同样必须出图并由 Agent 查看确认。
+- **视觉闭环铁律（对所有建模 Agent 强制）**：任何几何 / 材质 / 光照修改之后，必须立即产出渲染截图（MCP 视口截图或无头渲染均可），并由具备多模态能力的 Agent **亲自看图**、与参考图比对，确认无误后才准执行下一步；**严禁连续多步盲改后才看结果，严禁未经看图就声称通过**。
+- **参考图同框验收**：按参考图生产的资产交「参考图 vs 成品」同框对比看板，由制作人拍板；严禁 Agent 自报数值化相似度。
+- **并行纪律**：一个资产一个 Agent，严禁多 Agent 同改一个 `.blend`（无法合并编辑，必然互相覆盖）。
 

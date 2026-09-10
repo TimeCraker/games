@@ -10,12 +10,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 历史背景：`asternova/` 各子目录由 6 个原仓库经 `git subtree add`（不 squash）合并而来，完整历史在 `git log` 可追溯。不要在子目录里 `git init` 或期望独立 remote。
 
-## 当前状态（M0：蓝图定稿与仓库整理）
+## 当前状态（M1 渲染切片 + M2 战斗骨架并行推进中）
 
 - [x] 技术栈定案、client-unity 归档、client-godot 冻结、README/CLAUDE.md 重写
 - [x] **backend 迁移 PostgreSQL**（弃 GORM/MySQL → sqlc + golang-migrate，本地开发数据直接弃，module 改名 `github.com/TimeCraker/asternova-backend`）
-- [ ] STYLE.md 从骨架填充为可执行约束（随 M1 切片）
-- 下一里程碑：**M1 渲染垂直切片**（Aster + 黄昏樱花商店街 + 二次元渲染四件套 + 三档画质，出验证件给用户过目后才批量生产；场景定案见 STYLE.md §4）与 **M2 战斗骨架**（client-godot-v2 + GDScript 模拟核心单机可玩）并行
+- [x] STYLE.md 随 M1 大部分定稿（面数策略 2026-09-10 修订：AI 生成资产**生成阶段不设上限**、取 Tripo 最高档、LOD 后置）
+- [x] **文档收敛手术（2026-09-10）**：废黜 HANDOVER.md 与旧角色计划书（git 历史可恢复）；全仓统一面数 / 材质 / M1 验收口径；**建模视觉闭环铁律**入 AGENTS.md 与 architecture §9（审美操作走 Blender MCP + 每步截图多模态自查；无头脚本仅限非审美批处理；一个资产一个 Agent）
+- 当前主线：**M1**（场景基线已出但制作人尚未终审「过」，按参考图驱动闭环逐资产攻坚）与 **M2**（真身 rig + 连击/卡肉/极闪/动捕动画树已落地；Transport 与联机未启动）
 
 ## 整体架构（big picture）
 
@@ -85,6 +86,8 @@ go run main.go          # 监听 :8081，启动时自动 migrate up（内嵌 gol
 - **完成一个独立、可验证单元后即提交**；Conventional Commits + 中英对照，如 `feat(arena): 接入 WASM 战斗 / wire WASM combat engine`。
 - **最小改动**：只动需求所需，不顺手重构；换技术栈/加抽象先报备。
 - **技术卡点与方案校准（死磕红线）**：当发现一个技术方案或修复手段尝试很久都达不到预期效果时，严禁在错误基模/劣质路径上死磕打补丁；**必须果断停下，跳出局部死循环，深度调研工业界成熟标杆（如原神/鸣潮/米哈游等工业级管线）的最佳实践与技术选型**，校准方向、与用户对齐后再执行。
-- **红线**（完整版见 architecture.md §8）：性能优化以实测数据为准（tick 16.6ms / GC / RTT P95），不凭感觉换语言；破坏性操作先确认；渲染与资产先出验证件再批量生产；玩法方向导致的架构调整先改 BLUEPRINT 再动代码。
+- **红线**（完整版见 architecture.md §8 与 character-modeling-pipeline.md §1.1）：
+  - 性能优化以实测数据为准（tick 16.6ms / GC / RTT P95），不凭感觉换语言；破坏性操作先确认；渲染与资产先出验证件再批量生产；玩法方向导致的架构调整先改 BLUEPRINT 再动代码。
+  - **严禁无头 Python 脚本手搓角色绑定与动画重定向**：严禁用 Python 数学代码在 Blender 无头模式（-b）下手算四元数重定向与网格蒙皮权重，禁止盲人摸象式自嗨测试；有机角色必须使用行业标准 Humanoid 自动骨骼（AccuRIG / Mixamo）与 Godot 原生 BoneMap。
 - 验证界面改动必须看真实页面与关键 API，HTTP 200 或模型声称 PASS ≠ 验收通过。
 - 安全：密钥一律环境变量永不入库；不输出完整环境变量清单，只查指定变量报 SET/UNSET。

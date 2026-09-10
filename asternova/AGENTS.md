@@ -11,13 +11,17 @@
 | 模式 | 工具 / 服务 | 本地绝对路径 / 配置源 | 状态与版本 | 核心使用场景与规范 |
 | :--- | :--- | :--- | :--- | :--- |
 | **CLI 模式**<br>(底层无头批处理) | **Godot 4.7** | `C:\Users\TimeCraker\tools\godot\Godot_v4.7.2-stable_win64.exe` | **v4.7.2 stable** | 全局 `godot` 命令行可用；用于无头执行测试脚本、三视图截屏与场景跑分。 |
-| **CLI 模式**<br>(底层无头批处理) | **Blender 5.2** | `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe` | **5.2.1 LTS** | 内置 Python 3.11 + `mmd_tools v4.5.14`；`blender.exe -b ... -P script.py` 秒级处理几万面顶点拓扑、UV 变换与贴图像素清洗。 |
-| **MCP 模式**<br>(前台可视化交互) | **Godot MCP** | `~/.gemini/config/mcp_config.json` (`@coding-solo/godot-mcp`) | ✅ 已连通本地引擎 | 供 Agent 通过 MCP 协议前台唤起 Godot 编辑器、运行调试、动态增删节点与实时抓取控制台报错。 |
-| **MCP 模式**<br>(前台可视化交互) | **Blender MCP** | `~/.gemini/config/mcp_config.json` (`blender-mcp`) | ✅ 插件已装入 5.2 | 插件位于 `Blender/5.2/scripts/addons/blender_mcp.py`；用户前台打开 Blender 界面时，Agent 可通过 MCP 协议与视口实时双向通信。 |
+| **CLI 模式**<br>(底层无头批处理) | **Blender 5.2** | `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe` | **5.2.1 LTS** | 内置 Python 3.11 + `mmd_tools v4.5.14`；仅限非审美批处理（导出 / LOD / 贴图通道搬运 / 自动化出图），见下方调用准则。 |
+| **MCP 模式**<br>(前台可视化交互) | **Blender MCP**（`blender-mcp`，视口插件已装入 5.2） | Claude Code 会话可直接调用（配置随客户端各自维护：Claude Code 在 `~/.claude.json` / 项目 `.mcp.json`；Gemini CLI 在 `~/.gemini/`） | ✅ 2026-09-10 验证可用 | **一切审美相关建模操作的首选通道**：视口截图、代码执行、Hunyuan3D / Hyper3D Rodin 图生 3D 直连导入、PolyHaven / PolyPizza 素材库检索。 |
+| **MCP 模式**<br>(前台可视化交互) | **Godot MCP**（`@coding-solo/godot-mcp`） | 同上（按客户端配置） | ⬜ **尚未接入 Claude Code**（此前仅 Gemini 侧配置） | 前台唤起 Godot 编辑器、运行调试、动态增删节点与实时抓取控制台报错；接入前 Godot 侧自动化一律走 CLI。 |
 
-> **调用准则**：
-> 1. **复杂拓扑算法 / 贴图重绘 / 自动化出图**：优先使用 **CLI + Python 脚本**（无头运行、零通信损耗、秒级完成）；
-> 2. **前台人工协同 / 场景属性审查 / 编辑器操作**：优先使用 **MCP 协议工具**（所见即所得、直观联动）。
+> **调用准则（2026-09-10 修订：视觉闭环铁律，所有建模 Agent 强制遵守）**：
+> 1. **审美类操作（造型 / 比例 / 材质 / 光照 / 几何手术）一律优先在 MCP 会话内完成**；
+> 2. **CLI + Python 无头脚本仅限非审美的确定性批处理**：格式导出、LOD 减面、贴图通道搬运、自动化出图与 CI 跑分——**严禁用无头脚本做「不看效果就无法确认好坏」的修改**（有机角色绑定与重定向的禁令见 character-modeling-pipeline §1.1 红线 5）；
+> 3. **视觉闭环铁律**：任何几何 / 材质 / 光照修改之后，必须**立即截图**（MCP 视口截图或无头渲染均可），由 Agent 多模态能力**亲自看图**并与参考图比对，确认无误才准执行下一步；**严禁连续多步盲改后才看结果，严禁未看图就声称通过**；
+> 4. **参考图同框验收**：按参考图生产的资产必须交付「参考图 vs 成品」同框对比看板（同透视、同光照），由制作人拍板；**严禁自报数值化相似度**（详细流程见 modular SOP §2.6）；
+> 5. **并行纪律**：**一个资产一个 Agent**；`.blend` 无法合并编辑，严禁多 Agent 同改一个文件 / 一个资产目录；需要并行时按资产拆分任务；
+> 6. **面数策略**：AI 生成资产（角色 / 建筑 / 道具）一律取 Tripo 最高面数档，**生成阶段不设上限**，LOD 后置兜底（详见 modular SOP §1.3）。
 
 
 ---

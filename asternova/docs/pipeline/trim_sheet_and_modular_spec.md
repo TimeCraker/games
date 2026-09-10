@@ -1,9 +1,11 @@
 # AsterNova 日系近未来建筑 Trim Sheet 贴图与模块化构件技术规范
 
-> **文档版本**：v1.0  
+> **文档版本**：v1.1（2026-09-10 适用范围收缩）  
 > **制定者**：Master Architect (主脑)  
 > **适用模块**：M1 街区视觉工业化重塑（对标 31 张权威参考图白皮书）  
 > **对应着色器**：`res://shaders/toon_trim_pbr.gdshader`
+>
+> ⚠️ **适用范围收缩定案（2026-09-10 制作人拍板）**：本规范现仅适用于 **Tier 1 地面与道路基础设施**（第二节贴图条带 Band 0~7 与地面材质参考）。第三节「六大模块化建筑构件」**整节废弃**——建筑一律走 [modular_art_and_asset_production_sop.md](modular_art_and_asset_production_sop.md) 的「Tripo 底模 + 几何手术」管线，严禁再按本清单程序化拼装建筑立面。第四节着色器参数中的 toon 色阶（ramp_threshold / shadow_tint 等）**不适用于建筑硬表面**（场景纯 PBR 定案，见 STYLE.md §3），仅作地面材质存档参考。
 
 ---
 
