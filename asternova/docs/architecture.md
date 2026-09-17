@@ -151,11 +151,13 @@
 
 ### ② 本地底层脚本与 CLI 规范（无头工业生产）
 
-- **Blender 无头 Python 脚本 (`bpy`)**：
-  - 运行命令：`& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b <工程.blend> -P <脚本.py>`
-  - 核心职责（**仅限非审美确定性批处理**，见 §9 ③）：格式导出（GLB/KTX2）、LOD 减面、贴图通道搬运、像素级清洗、CI/CD 自动化跑分。
-- **Godot 自动化命令行执行**：
-  - 运行命令：`godot --path <工程路径> <场景.tscn>`
+- **Blender 实际安装路径**：
+  - 本地实体路径：`C:\Users\TimeCraker\tools\blender\blender-5.2.1-windows-x64\blender.exe`（已配置进用户环境变量 PATH）
+  - 运行命令：`& "C:\Users\TimeCraker\tools\blender\blender-5.2.1-windows-x64\blender.exe" -b <工程.blend> -P <脚本.py>`
+  - 核心职责（**仅限非审美确定性批处理**，见 §9 ③）：格式导出（GLB/KTX2）、LOD 减面、PBR 贴图烘焙（Bake）、贴图通道搬运、像素级清洗、CI/CD 自动化跑分。
+- **Godot 实际安装路径与自动化命令行执行**：
+  - 本地实体路径：`C:\Users\TimeCraker\tools\godot\Godot_v4.7.2-stable_win64.exe`（控制台可执行文件为 `Godot_v4.7.2-stable_win64_console.exe`）
+  - 运行命令：`& "C:\Users\TimeCraker\tools\godot\Godot_v4.7.2-stable_win64_console.exe" --path <工程路径> <场景.tscn>`
   - 核心职责：无头执行自动化渲染、多相机 Viewport 截图与三档画质自动化跑分。
 
 ### ③ 双模协同决策原则（2026-09-10 修订：视觉闭环优先）
