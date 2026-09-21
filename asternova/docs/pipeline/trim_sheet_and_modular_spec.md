@@ -41,9 +41,14 @@
 
 ---
 
-## 三、 六大模块化建筑构件尺寸与倒角定义 (Modular Kit)
+## 三、 [DEPRECATED / 已废弃] 六大模块化建筑构件尺寸与倒角定义 (Modular Kit)
 
-构件遵循严格的网格对齐标准（Grid Snapping: 1.0m / 0.5m / 0.1m），必须由 Blender bpy 脚本程序化生成：
+> [!CAUTION]
+> **本节已全量废弃（2026-09-10 制作人定案）**：
+> 建筑与特色单体一律严禁使用代码程序化拼积木，必须严格走 [modular_art_and_asset_production_sop.md](modular_art_and_asset_production_sop.md) 确立的**「Tripo AI 原生高精底模 + Blender 自动化几何手术（Surgery）」**工业管线。
+> 以下构件清单与参数仅作为历史工程数据归档备查，**严禁 Agent 继续开发或引用下述建筑构件**！
+
+（以下内容仅作归档留存，不再维护）：
 
 ### 1. `facade_wall_4x4_panel.glb`（标准立面预制分缝墙板）
 - **尺寸**：宽 4.0m × 高 4.0m × 厚 0.3m
