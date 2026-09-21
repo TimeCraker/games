@@ -3,3 +3,8 @@
 *.translation
 export_presets.cfg
 .import/
+
+# Runtime logs & test outputs
+*.log
+debug_output.txt
+error_log.txt

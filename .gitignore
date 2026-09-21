@@ -12,6 +12,7 @@ Desktop.ini
 *.orig
 *.swp
 *~
+*.log
 
 # 工具自动生成
 __pycache__/

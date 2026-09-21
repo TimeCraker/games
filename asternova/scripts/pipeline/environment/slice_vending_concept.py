@@ -11,7 +11,8 @@ import shutil
 
 from PIL import Image, ImageDraw
 
-BASE = os.path.dirname(os.path.abspath(__file__))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE = os.path.abspath(os.path.join(SCRIPT_DIR, "../../.."))
 src_path = os.path.join(BASE, "art/references/vending_machine/vending_machine_concept_sheet.png")
 out_dir = os.path.join(BASE, "art/references/vending_machine")
 os.makedirs(out_dir, exist_ok=True)

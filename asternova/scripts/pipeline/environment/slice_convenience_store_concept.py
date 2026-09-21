@@ -12,7 +12,8 @@ import shutil
 import numpy as np
 from PIL import Image
 
-BASE = os.path.dirname(os.path.abspath(__file__))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE = os.path.abspath(os.path.join(SCRIPT_DIR, "../../.."))
 src_path = os.path.join(BASE, "art/references/convenience_store/convenience_store_concept_sheet.png")
 out_dir = os.path.join(BASE, "art/references/convenience_store")
 os.makedirs(out_dir, exist_ok=True)
