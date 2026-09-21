@@ -51,3 +51,4 @@ flowchart TD
 3. **角色绑定**：**严禁无头 Python 脚本手搓角色绑定与动画重定向**；有机角色必须使用工业标准 Humanoid 自动骨骼（AccuRIG / Mixamo / Tripo Auto-Rig）并交由 Godot 原生 BoneMap 引擎层对齐。
 4. **建模审美闭环**：一切审美操作必须在 Blender MCP / 前台交互视口下完成，每修改一步必须截图自查；严禁用 Python 代码拼凑立体几何生物（严禁圆柱体猫/面团球灌木）。
 5. **验收标准**：**唯一合法终验是 Godot 4.7 Forward+ 引擎 60FPS 实机窗口可交互画面**；DCC 视口截图不能代替实机验收。
+6. **单体卡肉与软吸附**：**严禁在联机战斗中调用全局时间缩放（如 `Engine.time_scale = 0`）**，卡肉顿帧必须使用单体级冻结（Per-Entity Hitstop，仅冻结攻守双方 4~8 帧并配合视口震屏）；出刀软吸附采用 $\text{Score} = \text{Distance} \times 0.4 + \text{Angle} \times 0.6$ 锥形加权，杜绝近战砍空气与抢锁。
