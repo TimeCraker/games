@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://char_aster_cli1"]
 
-[ext_resource type="PackedScene" path="res://models/aster/aster_assembled.glb" id="1_base"]
+[ext_resource type="PackedScene" path="res://models/aster/aster_character.glb" id="1_base"]
 [ext_resource type="Script" path="res://scripts/entities/player/aster_rig.gd" id="2_rig"]
 
 [node name="CharacterAster" instance=ExtResource("1_base")]

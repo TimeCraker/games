@@ -106,11 +106,11 @@ func phase_integrity() -> void:
 
 	rig = player.visual_root.get_node_or_null("CharacterAster") as AsterRig
 	check(rig != null, "Aster 真身 rig 不存在")
-	check(rig.skeleton != null and rig.skeleton.get_bone_count() == 43, "Aster 骨骼数量异常")
+	check(rig.skeleton != null and (rig.skeleton.get_bone_count() == 43 or rig.skeleton.get_bone_count() == 55), "Aster 骨骼数量异常")
 	check(rig.hand_socket != null and rig.hand_socket is BoneAttachment3D, "Hand_R_Weapon_Socket 插槽缺失")
 	check(rig.scabbard_socket != null and rig.scabbard_socket is BoneAttachment3D, "Pelvis_L_Scabbard_Socket 插槽缺失")
 	check(rig.katana_blade != null, "Katana_Blade 刀身网格缺失")
-	print("✔ Aster 真身 rig 就绪: 43 骨骼 / 双插槽 / 刀身网格齐备")
+	print("✔ Aster 真身 rig 就绪: %d 骨骼 / 双插槽 / 刀身网格齐备" % rig.skeleton.get_bone_count())
 
 	check(not rig.is_drawn, "入场默认应为纳刀态")
 	check(rig.katana_blade.get_parent() == rig.scabbard_socket, "纳刀态刀身未挂在左腰鞘插槽")
@@ -181,6 +181,7 @@ func phase_integrity() -> void:
 ## ================= 阶段 B：动捕动画系统 =================
 func _anim_capture_before() -> void:
 	var idx := rig.skeleton.find_bone("R_Upperarm")
+	if idx == -1: idx = rig.skeleton.find_bone("DEF-upper_arm.R")
 	_bone_pose_before = rig.skeleton.get_bone_global_pose(idx).basis.get_rotation_quaternion()
 	phase = "anim_ready"
 
@@ -208,10 +209,11 @@ func phase_mocap_driving() -> void:
 	# 0.25s（15 tick）后 Slash1 已越过 CrossFade 进入蓄力段
 	if tick >= 15:
 		var idx := rig.skeleton.find_bone("R_Upperarm")
+		if idx == -1: idx = rig.skeleton.find_bone("DEF-upper_arm.R")
 		var now := rig.skeleton.get_bone_global_pose(idx).basis.get_rotation_quaternion()
 		var ang := rad_to_deg(now.angle_to(_bone_pose_before))
-		check(ang > 6.0, "骨骼姿态未被动捕数据驱动（R_Upperarm 变化仅 %.2f°）" % ang)
-		print("✔ 动捕数据驱动验证: R_Upperarm 姿态变化 %.1f°（Slash1 蓄力段）" % ang)
+		check(ang > 6.0, "骨骼姿态未被动捕数据驱动（上臂变化仅 %.2f°）" % ang)
+		print("✔ 动捕数据驱动验证: 上臂姿态变化 %.1f°（挥砍蓄力段）" % ang)
 		rig.travel("Locomotion")
 		phase = "locomotion_blend"
 		tick = 0

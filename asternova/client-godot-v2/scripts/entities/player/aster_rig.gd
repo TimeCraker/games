@@ -37,9 +37,9 @@ const DRAW_GRIP_COMPENSATION := Vector3(0.0, -0.13, 0.0)    # 拔刀握心回拉
 
 signal blade_drawn_changed(is_drawn: bool)
 
-@onready var skeleton: Skeleton3D = $Aster_Armature/Skeleton3D
-@onready var hand_socket: BoneAttachment3D = $Aster_Armature/Skeleton3D/Hand_R_Weapon_Socket
-@onready var scabbard_socket: BoneAttachment3D = $Aster_Armature/Skeleton3D/Pelvis_L_Scabbard_Socket
+@onready var skeleton: Skeleton3D = (get_node_or_null("Aster_Armature/Skeleton3D") as Skeleton3D) if has_node("Aster_Armature/Skeleton3D") else ((get_node_or_null("Rig/Skeleton3D") as Skeleton3D) if has_node("Rig/Skeleton3D") else find_child("Skeleton3D", true, false) as Skeleton3D)
+@onready var hand_socket: BoneAttachment3D = skeleton.get_node_or_null("Hand_R_Weapon_Socket") as BoneAttachment3D if skeleton else null
+@onready var scabbard_socket: BoneAttachment3D = skeleton.get_node_or_null("Pelvis_L_Scabbard_Socket") as BoneAttachment3D if skeleton else null
 
 var anim_player: AnimationPlayer = null
 var anim_tree: AnimationTree = null
@@ -70,9 +70,29 @@ const LOOP_CLIPS := ["idle", "LightIdle", "LightWalking", "LightRunning", "Sprin
 func _setup_animation_system() -> void:
 	# 首选 GLB 内嵌烘焙动画库（Blender 离线烘焙产物，场景根下自带 AnimationPlayer）
 	anim_player = get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if anim_player == null:
+		anim_player = find_child("AnimationPlayer", true, false) as AnimationPlayer
 	if anim_player != null:
 		anim_player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_PHYSICS
 		var lib := anim_player.get_animation_library("")
+		
+		# 桥接别名映射表：将 Rigify 原生动捕剪辑映射给 FSM / AnimationTree
+		var aliases := {
+			"idle": "Idle", "LightIdle": "Idle", "LightWalking": "Walk",
+			"LightRunning": "Jog_Fwd", "jump": "Jump", "fall": "Jump",
+			"fall-landing": "Jump_Land", "Slash1": "Sword_Attack",
+			"Slash2": "Sword_Attack", "Slash3": "Sword_Attack",
+			"SlashUppercut": "Sword_Attack", "SlashCharge": "Sword_Idle",
+			"SlashRelease": "Sword_Attack", "Guarding": "Sword_Idle",
+			"GuardParry": "Sword_Idle", "wall-slide-front": "Jump",
+			"HeavyJumpAttack": "Sword_Attack", "Hurt1": "Hit_Chest",
+			"crouch-run": "Crouch_Fwd"
+		}
+		for alias_name in aliases:
+			var src: String = aliases[alias_name]
+			if lib.has_animation(src) and not lib.has_animation(alias_name):
+				lib.add_animation(alias_name, lib.get_animation(src))
+				
 		for clip in LOOP_CLIPS:
 			if lib.has_animation(clip):
 				lib.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
@@ -81,7 +101,11 @@ func _setup_animation_system() -> void:
 		anim_player = AnimationPlayer.new()
 		anim_player.name = "AnimationPlayer"
 		anim_player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_PHYSICS
-		$Aster_Armature.add_child(anim_player)  # root_node 默认 ".." → 轨道 "Skeleton3D:骨名" 直接解析
+		var arm: Node = get_node_or_null("Aster_Armature") if has_node("Aster_Armature") else get_node_or_null("Rig")
+		if arm:
+			arm.add_child(anim_player)
+		else:
+			add_child(anim_player)
 		anim_player.add_animation_library("", load("res://art/animations/aster_animlib.res"))
 
 	# 先配置后入树：AnimationTree 的参数表在 READY 时按 tree_root 构建，
@@ -225,7 +249,7 @@ func _locate_katana() -> void:
 	if katana_blade:
 		# §3 拔刀挂载 = authored 握持滚转基（掌心对齐）+ 握心回拉补偿：
 		# 使刀柄握心（网格 +Y 0.13）精确落点右手掌心（插槽骨原点），绝不脱手悬空
-		hand_drawn_transform = Transform3D(katana_blade.basis, DRAW_GRIP_COMPENSATION)
+		hand_drawn_transform = Transform3D(Basis.IDENTITY, DRAW_GRIP_COMPENSATION)
 		is_drawn = true
 	# 纳刀标定：刀鞘分件的 authored 变换 = 两分件网格空间重合（Koiguchi 对齐入鞘）
 	var scab := scabbard_socket.get_node_or_null("Katana_Scabbard") as MeshInstance3D
@@ -238,10 +262,18 @@ func get_grip_center_world() -> Vector3:
 		return global_position + Vector3.UP
 	return katana_blade.global_transform * GRIP_CENTER_LOCAL
 
-## 右手掌心世界坐标（R_Hand 骨原点沿骨轴前移半掌；Socket 骨即标定于半掌处）
+## 右手掌心世界坐标（Socket 骨即标定于掌心处；与拔刀握心精确重合）
 func get_palm_center_world() -> Vector3:
+	if hand_socket:
+		return hand_socket.global_position
 	var skel := skeleton
+	if skel == null:
+		return global_position + Vector3.UP
 	var idx := skel.find_bone("R_Hand")
+	if idx == -1:
+		idx = skel.find_bone("DEF-hand.R")
+	if idx == -1:
+		return global_position + Vector3.UP
 	var pose := skel.global_transform * skel.get_bone_global_pose(idx)
 	return pose * Vector3(0.0, 0.0812, 0.0)
 
