@@ -234,14 +234,16 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 		mat.set_shader_parameter("specular_color", Color(0.95, 0.97, 1.0, 1.0))
 		mat.set_shader_parameter("specular_size", 0.05)
 		mat.set_shader_parameter("specular_smoothness", 0.015)
-		var outline := ShaderMaterial.new()
-		outline.render_priority = 1
-		outline.shader = SHADER_OUTLINE
-		outline.set_shader_parameter("outline_color", OUTLINE_COLOR)
-		outline.set_shader_parameter("outline_thickness",
-				OUTLINE_THICKNESS_KATANA if mi.name.begins_with("Katana") else OUTLINE_THICKNESS_BODY)
-		outline.set_shader_parameter("distance_scaling", true)
-		mat.next_pass = outline
+		# 工业级二次元管线：硬表面佩刀实装 Inverted Hull 描边；
+		# 角色真身由 Toon Shader 自带的 Rim Light + 边缘阶梯着色，杜绝复杂服饰发丝薄片因反相外壳产生破面与鬼影
+		if mi.name.begins_with("Katana"):
+			var outline := ShaderMaterial.new()
+			outline.render_priority = 1
+			outline.shader = SHADER_OUTLINE
+			outline.set_shader_parameter("outline_color", OUTLINE_COLOR)
+			outline.set_shader_parameter("outline_thickness", OUTLINE_THICKNESS_KATANA)
+			outline.set_shader_parameter("distance_scaling", true)
+			mat.next_pass = outline
 		mi.set_surface_override_material(i, mat)
 
 func _locate_katana() -> void:

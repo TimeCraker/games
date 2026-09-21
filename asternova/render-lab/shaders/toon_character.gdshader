@@ -36,6 +36,24 @@ uniform vec4 specular_color : source_color = vec4(0.92, 0.95, 1.0, 1.0);
 uniform float specular_size : hint_range(0.01, 1.0, 0.01) = 0.06;
 uniform float specular_smoothness : hint_range(0.001, 0.2, 0.005) = 0.01;
 
+// --- 发丝各向异性天使光环 (Kajiya-Kay Specular) ---
+group_uniforms HairAnisotropy;
+uniform bool enable_hair_anisotropy = false;
+uniform vec4 hair_spec_color : source_color = vec4(0.85, 0.92, 1.0, 1.0);
+uniform float hair_spec_exponent : hint_range(10.0, 200.0, 5.0) = 80.0;
+uniform float hair_spec_shift : hint_range(-1.0, 1.0, 0.05) = 0.0;
+uniform float hair_spec_intensity : hint_range(0.0, 2.0, 0.05) = 0.35;
+
+// --- 直接漫反射光强 ---
+group_uniforms DirectLight;
+uniform float diffuse_energy : hint_range(0.1, 2.0, 0.05) = 0.85;
+
+varying vec3 v_tangent;
+
+void vertex() {
+	v_tangent = TANGENT;
+}
+
 void fragment() {
 	vec4 tex_color = texture(albedo_texture, UV);
 	vec3 desat = mix(tex_color.rgb, vec3(dot(tex_color.rgb, vec3(0.299, 0.587, 0.114))), desaturation);
@@ -77,28 +95,22 @@ void light() {
 		rim_contribution = rim_intensity * rim_color.rgb * LIGHT_COLOR * 0.07 * lit_mask;
 	}
 
-	// 4. 二次元高光 (Specular)
+	// 4. 二次元高光 (Specular) 与发丝各向异性天使光环 (Kajiya-Kay)
 	vec3 half_vector = normalize(VIEW + LIGHT);
 	float NdotH = dot(NORMAL, half_vector);
 	float spec_intensity = smoothstep(1.0 - specular_size - 0.01, 1.0 - specular_size + 0.01, NdotH);
-	vec3 specular_contribution = spec_intensity * specular_color.rgb * LIGHT_COLOR * 0.07 * lit_mask;
+	vec3 specular_contribution = spec_intensity * specular_color.rgb * LIGHT_COLOR * 0.12 * lit_mask;
 
-	// 5. HDR 余量控制（实测标定）：本机 gl_compatibility 合成管线对 light() 直接光
-	//    叠加约 2.88x 增益（天空背景与环境光不受影响），白色材质受光面会被截断成
-	//    255 死白。漫反射系数按标定下调，高光/边缘光按剩余亮度余量衰减，
-	//    保证受光面合成亮度 <= 0.84 线性（sRGB ~244），杜绝死白。
-	float diffuse_scale = 0.20;
-	float light_gain = 2.88;
-	float luma_ceiling = 0.80;
-	float ambient_luma = 0.23; // 场景 Environment ambient_light 的等效亮度估计
-	float albedo_lum = dot(ALBEDO, vec3(0.299, 0.587, 0.114));
-	float light_lum = dot(LIGHT_COLOR, vec3(0.299, 0.587, 0.114));
-	float mult_lum = dot(light_mult, vec3(0.299, 0.587, 0.114));
-	float used_luma = albedo_lum * (light_gain * light_lum * mult_lum * diffuse_scale + ambient_luma);
-	float headroom = clamp((luma_ceiling - used_luma) / max(light_gain * light_lum, 1e-4), 0.0, 1.0);
-	specular_contribution *= headroom;
-	rim_contribution *= headroom;
+	if (enable_hair_anisotropy) {
+		// Kajiya-Kay 切线高光: sin(T, H) = sqrt(max(0.0, 1.0 - (T.H)^2))
+		vec3 t = normalize(v_tangent + NORMAL * hair_spec_shift);
+		float TdotH = dot(t, half_vector);
+		float sinTH = sqrt(max(0.0, 1.0 - TdotH * TdotH));
+		float hair_spec = pow(sinTH, hair_spec_exponent);
+		specular_contribution += hair_spec * hair_spec_color.rgb * LIGHT_COLOR * hair_spec_intensity * lit_mask;
+	}
 
-	DIFFUSE_LIGHT += ALBEDO * LIGHT_COLOR * light_mult * ATTENUATION * diffuse_scale;
+	// 5. Forward+ 与 AgX 模式下直接光合成 (由 AgX 自动负责高光平滑滚降, 无需 gl_compatibility 时代的 2.88x 截断 hack)
+	DIFFUSE_LIGHT += ALBEDO * LIGHT_COLOR * light_mult * ATTENUATION * diffuse_energy;
 	SPECULAR_LIGHT += specular_contribution + rim_contribution;
 }
