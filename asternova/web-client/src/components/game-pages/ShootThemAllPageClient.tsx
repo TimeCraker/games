@@ -14,6 +14,7 @@ const StaRoot = dynamic(() => import("@/src/components/shoot-them-all/StaRoot").
 export function ShootThemAllPageClient() {
   return (
     <>
+      <h1 className="sr-only">射击大战</h1>
       <GlobalRuntimeErrorProbe />
       <GameRuntimeErrorBoundary>
         <StaRoot />

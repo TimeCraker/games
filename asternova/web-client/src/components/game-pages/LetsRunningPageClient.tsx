@@ -12,9 +12,12 @@ const StarDashGame = dynamic(() => import("@/src/components/star-dash/StarDashGa
 
 export function LetsRunningPageClient() {
   return (
-    <GameRuntimeErrorBoundary>
+    <>
+      <h1 className="sr-only">星际酷跑</h1>
+      <GameRuntimeErrorBoundary>
       <StarDashGame />
     </GameRuntimeErrorBoundary>
+    </>
   )
 }
 

@@ -15,9 +15,12 @@ const NebulaSurvivorGame = dynamic(
 
 export function NebulaSurvivorPageClient() {
   return (
+    <>
+      <h1 className="sr-only">星云求生</h1>
     <GameRuntimeErrorBoundary>
       <NebulaSurvivorGame />
     </GameRuntimeErrorBoundary>
+    </>
   )
 }
 

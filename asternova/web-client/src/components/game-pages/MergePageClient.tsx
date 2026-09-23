@@ -12,9 +12,12 @@ const MergeGame = dynamic(() => import("@/src/components/merge/MergeGame").then(
 
 export function MergePageClient() {
   return (
-    <GameRuntimeErrorBoundary>
+    <>
+      <h1 className="sr-only">AsterNova Merge</h1>
+      <GameRuntimeErrorBoundary>
       <MergeGame />
     </GameRuntimeErrorBoundary>
+    </>
   )
 }
 
