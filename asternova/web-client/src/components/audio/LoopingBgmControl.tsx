@@ -126,7 +126,7 @@ export function LoopingBgmControl({ src, basePath, storageKey, className = "" }:
           <button
             type="button"
             onClick={onPrimaryClick}
-            className="relative flex h-8 w-8 items-center justify-center rounded-full border border-white/16 bg-white/10 text-white/90 transition hover:bg-white/15"
+            className="relative flex h-8 w-8 items-center justify-center rounded-full border border-white/16 bg-white/10 text-white/90 transition hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             title="背景音乐"
             aria-label="背景音乐"
           >
@@ -150,9 +150,10 @@ export function LoopingBgmControl({ src, basePath, storageKey, className = "" }:
             <div className="flex items-center gap-2 pr-1">
               <button
                 type="button"
-                className="text-white/80"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-white/80 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60"
                 onClick={() => setVolume((v) => (v > 0.001 ? 0 : Math.max(0.2, lastNonZeroRef.current)))}
                 title={volume > 0.001 ? "静音" : "恢复音量"}
+                aria-label={volume > 0.001 ? "静音" : "恢复音量"}
               >
                 {volume > 0.001 ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
               </button>
