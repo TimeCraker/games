@@ -444,3 +444,13 @@ body {
 .liquid-success {
   animation: pulseSuccess 1.2s ease-in-out infinite;
 }
+/* ===== 键盘焦点统一样式 · 2026-09-22 =====
+   游戏壳 HUD 大量按钮无焦点样式；此处兜底全站（鼠标点击不显示环） */
+:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.7);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+:focus:not(:focus-visible) {
+  outline: 2px solid transparent;
+}
