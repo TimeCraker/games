@@ -50,10 +50,10 @@ export function GameLoadingScreen({
         </div>
 
         {hasProgress && (
-          <p className="mt-2 font-mono-data text-[11px] tracking-[0.12em] text-white/45">{Math.round(pct)}%</p>
+          <p className="mt-2 font-mono-data text-[11px] tracking-[0.12em] text-white/50">{Math.round(pct)}%</p>
         )}
         {hint && (
-          <p className="mt-5 font-mono-data text-[11px] leading-relaxed tracking-[0.08em] text-white/40">{hint}</p>
+          <p className="mt-5 font-mono-data text-[11px] leading-relaxed tracking-[0.08em] text-white/50">{hint}</p>
         )}
       </div>
     </div>

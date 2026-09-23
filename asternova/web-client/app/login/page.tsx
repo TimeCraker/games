@@ -24,9 +24,9 @@ const CinematicBlackHole = dynamic(
 )
 
 const fieldClass =
-  "h-11 rounded-xl border-white/[0.11] bg-black/45 text-[15px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-[border-color,box-shadow] placeholder:text-white/32 focus-visible:border-white/22 focus-visible:ring-2 focus-visible:ring-violet-400/25"
+  "h-11 rounded-xl border-white/[0.11] bg-black/45 text-[15px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-[border-color,box-shadow] placeholder:text-white/50 focus-visible:border-white/22 focus-visible:ring-2 focus-visible:ring-violet-400/25"
 
-const labelClass = "text-[11px] font-semibold uppercase tracking-[0.2em] text-white/42"
+const labelClass = "text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -325,7 +325,7 @@ export default function LoginPage() {
                     AsterNova Studio
                   </span>
                 </Link>
-                <span className="font-mono-data rounded-full border border-white/[0.1] bg-white/[0.05] px-2.5 py-1 text-[10px] tracking-[0.12em] text-white/45">
+                <span className="font-mono-data rounded-full border border-white/[0.1] bg-white/[0.05] px-2.5 py-1 text-[10px] tracking-[0.12em] text-white/50">
                   OBS · 23h 17m
                 </span>
               </div>
@@ -357,7 +357,7 @@ export default function LoginPage() {
             >
               <div className="flex items-center gap-3 rounded-[0.95rem] bg-black/32 px-3.5 py-2.5 sm:gap-4 sm:px-4 sm:py-3">
                 <Mail className="hidden h-4 w-4 shrink-0 text-violet-300/75 sm:block" strokeWidth={2} aria-hidden />
-                <p className="min-w-0 flex-1 text-[12px] leading-snug text-white/48 sm:text-[12.5px]">
+                <p className="min-w-0 flex-1 text-[12px] leading-snug text-white/50 sm:text-[12.5px]">
                   <span className="font-medium text-white/78">新用户</span>
                   用邮箱验证码即可；未注册时会引导设置账号。
                 </p>
@@ -389,7 +389,7 @@ export default function LoginPage() {
                 <Input
                   value={guestInviteCode}
                   onChange={(e) => setGuestInviteCode(e.target.value)}
-                  className="h-9 border-white/[0.08] bg-black/35 text-[13px] text-white/90 placeholder:text-white/32 focus-visible:border-white/20 focus-visible:ring-1 focus-visible:ring-violet-400/20"
+                  className="h-9 border-white/[0.08] bg-black/35 text-[13px] text-white/90 placeholder:text-white/50 focus-visible:border-white/20 focus-visible:ring-1 focus-visible:ring-violet-400/20"
                   placeholder="输入邀请码"
                 />
                 <Button
@@ -412,7 +412,7 @@ export default function LoginPage() {
                 <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-2xl border border-white/[0.07] bg-black/40 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
                   <TabsTrigger
                     value="password_login"
-                    className="group/tab relative h-10 rounded-xl border border-transparent text-[13px] font-medium text-white/45 transition data-[state=active]:border-white/[0.12] data-[state=active]:bg-white/[0.12] data-[state=active]:text-white data-[state=active]:shadow-[0_0_20px_rgba(255,255,255,0.06)]"
+                    className="group/tab relative h-10 rounded-xl border border-transparent text-[13px] font-medium text-white/50 transition data-[state=active]:border-white/[0.12] data-[state=active]:bg-white/[0.12] data-[state=active]:text-white data-[state=active]:shadow-[0_0_20px_rgba(255,255,255,0.06)]"
                   >
                     <KeyRound
                       className="mr-1.5 h-3.5 w-3.5 opacity-55 transition group-data-[state=active]/tab:opacity-100"
@@ -422,7 +422,7 @@ export default function LoginPage() {
                   </TabsTrigger>
                   <TabsTrigger
                     value="email_login"
-                    className="group/tab relative h-10 rounded-xl border border-transparent text-[13px] font-medium text-white/45 transition data-[state=active]:border-white/[0.12] data-[state=active]:bg-white/[0.12] data-[state=active]:text-white data-[state=active]:shadow-[0_0_20px_rgba(255,255,255,0.06)]"
+                    className="group/tab relative h-10 rounded-xl border border-transparent text-[13px] font-medium text-white/50 transition data-[state=active]:border-white/[0.12] data-[state=active]:bg-white/[0.12] data-[state=active]:text-white data-[state=active]:shadow-[0_0_20px_rgba(255,255,255,0.06)]"
                   >
                     <Mail
                       className="mr-1.5 h-3.5 w-3.5 opacity-55 transition group-data-[state=active]/tab:opacity-100"
@@ -660,7 +660,7 @@ export default function LoginPage() {
                     className={fieldClass}
                     placeholder="输入新密码"
                   />
-                  <p className="text-[11px] text-white/45">密码需 6-20 位，且包含字母和数字。</p>
+                  <p className="text-[11px] text-white/50">密码需 6-20 位，且包含字母和数字。</p>
                 </div>
 
                 <div className="space-y-2">

@@ -51,7 +51,7 @@ export function ShopUI() {
     <GlassPanel className="p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="font-mono-data text-[11px] uppercase tracking-[0.28em] text-white/45">Weapon Bay</p>
+          <p className="font-mono-data text-[11px] uppercase tracking-[0.28em] text-white/50">Weapon Bay</p>
           <h2 className="font-display mt-1 text-2xl font-semibold tracking-[-0.02em] text-white">武器舱</h2>
         </div>
         <Button
@@ -82,7 +82,7 @@ export function ShopUI() {
             <span key={item.label} className="inline-flex items-center gap-1.5">
               <span className={cn("h-2 w-2 rounded-full", item.colorClass)} />
               <span>{item.label}</span>
-              <span className="font-mono-data text-white/45">{item.weight}%</span>
+              <span className="font-mono-data text-white/50">{item.weight}%</span>
             </span>
           ))}
         </div>

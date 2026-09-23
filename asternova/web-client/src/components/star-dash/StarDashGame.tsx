@@ -936,7 +936,7 @@ export function StarDashGame() {
         <span className="justify-self-center font-display text-sm font-semibold tracking-tight text-white">
           AsterNova · Star Dash
         </span>
-        <span className="hidden max-w-[10rem] justify-self-end text-right text-[11px] leading-tight text-white/40 sm:block">
+        <span className="hidden max-w-[10rem] justify-self-end text-right text-[11px] leading-tight text-white/50 sm:block">
           Space 跳 · E 星爆 · ↓ 铲
         </span>
       </div>
@@ -955,7 +955,7 @@ export function StarDashGame() {
             >
               怎么玩
             </h2>
-            <p className="mt-1 text-center text-[13px] text-white/45">AsterNova · Star Dash · Let&apos;s Running</p>
+            <p className="mt-1 text-center text-[13px] text-white/50">AsterNova · Star Dash · Let&apos;s Running</p>
 
             <ul className="mt-5 space-y-4 text-[14px] leading-relaxed text-white/80">
               <li className="flex gap-3 rounded-2xl bg-white/[0.05] p-3">
@@ -1049,7 +1049,7 @@ export function StarDashGame() {
                 }}
                 className={cn(
                   "flex h-[3.25rem] min-w-[6rem] shrink-0 items-center gap-1.5 rounded-2xl border border-white/10 bg-glass-bg backdrop-blur-glass-md pl-1.5 pr-2 text-xs font-semibold leading-tight shadow-sm transition active:scale-95 sm:h-14 sm:min-w-[7rem] sm:gap-2 sm:pl-2 sm:pr-2.5 sm:text-sm",
-                  boostReadyUi ? "animate-pulse text-white" : "text-white/40",
+                  boostReadyUi ? "animate-pulse text-white" : "text-white/50",
                 )}
                 style={{ touchAction: "manipulation" }}
               >

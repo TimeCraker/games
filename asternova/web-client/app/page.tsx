@@ -42,10 +42,10 @@ export default function Home() {
         transition={{ duration: 0.6, ease: cinematicEase }}
         className="relative z-20 mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6 sm:py-7"
       >
-        <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-white/45">
+        <span className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-white/50">
           AsterNova · Observatory
         </span>
-        <span className="font-mono-data text-[11px] tracking-[0.14em] text-white/35">
+        <span className="font-mono-data text-[11px] tracking-[0.14em] text-white/50">
           23h 17m · +41°
         </span>
       </motion.header>
@@ -80,7 +80,7 @@ export default function Home() {
             <span>进入大厅</span>
             <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
           </motion.button>
-          <p className="font-mono-data mt-4 text-[10px] tracking-[0.12em] text-white/30">
+          <p className="font-mono-data mt-4 text-[10px] tracking-[0.12em] text-white/50">
             登录后进入游戏大厅
           </p>
         </motion.div>
@@ -93,7 +93,7 @@ export default function Home() {
         transition={{ duration: 1, delay: 1.4, ease: cinematicEase }}
         className="relative z-10 mx-auto w-full max-w-6xl px-6 py-6 sm:py-7"
       >
-        <p className="font-mono-data text-center text-[10px] tracking-[0.18em] text-white/25">
+        <p className="font-mono-data text-center text-[10px] tracking-[0.18em] text-white/50">
           © 2026 ASTERNOVA · DEEP SPACE OBSERVATORY
         </p>
       </motion.footer>

@@ -42,12 +42,12 @@ export class GameRuntimeErrorBoundary extends React.Component<{ children: React.
           <p className="mt-2 text-sm text-white/80">Application error: a client-side exception has occurred.</p>
 
           <div className="mt-4 rounded-xl border border-white/12 bg-black/45 p-3">
-            <p className="text-xs uppercase tracking-[0.16em] text-white/45">Error Message</p>
+            <p className="text-xs uppercase tracking-[0.16em] text-white/50">Error Message</p>
             <pre className="mt-2 whitespace-pre-wrap break-words text-sm text-rose-200">{this.state.message}</pre>
           </div>
 
           <div className="mt-3 rounded-xl border border-white/12 bg-black/45 p-3">
-            <p className="text-xs uppercase tracking-[0.16em] text-white/45">Stack Trace</p>
+            <p className="text-xs uppercase tracking-[0.16em] text-white/50">Stack Trace</p>
             <pre className="mt-2 max-h-[50dvh] overflow-auto whitespace-pre-wrap break-words text-xs text-white/80">
               {this.state.stack || "(no stack trace)"}
             </pre>

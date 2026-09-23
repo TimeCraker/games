@@ -100,7 +100,7 @@ export function ResultOverlay({
               {stats.map((s) => (
                 <div key={s.label} className="flex flex-col">
                   <span className="font-mono-data text-2xl font-bold text-white">{s.value}</span>
-                  <span className="font-mono-data mt-1 text-[10px] uppercase tracking-[0.18em] text-white/40">
+                  <span className="font-mono-data mt-1 text-[10px] uppercase tracking-[0.18em] text-white/50">
                     {s.label}
                   </span>
                 </div>
@@ -124,7 +124,7 @@ export function ResultOverlay({
             </Button>
           </div>
 
-          {slogan && <p className="mt-6 font-display text-[11px] tracking-[0.32em] text-white/30">{slogan}</p>}
+          {slogan && <p className="mt-6 font-display text-[11px] tracking-[0.32em] text-white/50">{slogan}</p>}
         </div>
       </motion.div>
     </motion.div>

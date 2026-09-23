@@ -89,7 +89,7 @@ function NextDropPanel({ tier }: { tier: StarTier }) {
       className="flex w-full flex-col items-center justify-center gap-2.5 rounded-[18px] border border-white/10 bg-white/[0.06] px-3 py-3.5 shadow-[0_1px_0_rgba(255,255,255,0.05)_inset,0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-[18px] sm:rounded-[20px] sm:py-4 md:min-h-[200px] md:w-[118px]"
       style={{ WebkitBackdropFilter: "blur(18px)" }}
     >
-      <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">下一颗</p>
+      <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/50">下一颗</p>
       <div
         className="relative flex h-[88px] w-[88px] items-center justify-center rounded-2xl border border-white/10 bg-black/25"
         style={{
@@ -108,7 +108,7 @@ function NextDropPanel({ tier }: { tier: StarTier }) {
         />
       </div>
       <div className="text-center">
-        <p className="text-[11px] font-semibold tabular-nums text-white/45">Lv.{tier.level}</p>
+        <p className="text-[11px] font-semibold tabular-nums text-white/50">Lv.{tier.level}</p>
         <p className="mt-0.5 text-[13px] font-medium tracking-tight text-white/90">{tier.name}</p>
       </div>
     </div>
@@ -580,11 +580,11 @@ export function MergeGame() {
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col items-center gap-2 text-center sm:gap-2.5"
         >
-          <p className="font-display text-[10px] font-medium uppercase tracking-[0.26em] text-white/40 min-[400px]:text-[11px] min-[400px]:tracking-[0.28em]">
+          <p className="font-display text-[10px] font-medium uppercase tracking-[0.26em] text-white/50 min-[400px]:text-[11px] min-[400px]:tracking-[0.28em]">
             AsterNova
           </p>
           <h1 className="font-display text-[clamp(1.25rem,4.5vw,1.65rem)] font-semibold tracking-tight text-white/95">Merge</h1>
-          <p className="max-w-md px-1 text-center text-[12px] font-normal leading-relaxed text-white/45 sm:text-[13px]">
+          <p className="max-w-md px-1 text-center text-[12px] font-normal leading-relaxed text-white/50 sm:text-[13px]">
             同级相撞合成升级 · 越红线 3 秒结束 · 点击 / E / 空格下落
           </p>
         </motion.header>
@@ -600,13 +600,13 @@ export function MergeGame() {
             style={{ WebkitBackdropFilter: "blur(22px) saturate(150%)" }}
           >
             <div className="mb-2 flex items-baseline justify-between gap-3 px-0.5 sm:mb-3">
-              <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/40 sm:text-[11px]">
+              <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/50 sm:text-[11px]">
                 得分
               </span>
               <span className="font-mono-data text-[13px] tabular-nums text-white/85 sm:text-[14px]">
                 <span className="text-white/90">{score}</span>
-                <span className="mx-1 text-white/30">/</span>
-                <span className="text-white/45">最高 {highScore}</span>
+                <span className="mx-1 text-white/50">/</span>
+                <span className="text-white/50">最高 {highScore}</span>
               </span>
             </div>
 
@@ -676,7 +676,7 @@ export function MergeGame() {
               </div>
             </div>
 
-            <p className="mt-2 px-1 text-center text-[10px] font-normal leading-relaxed text-white/38 sm:mt-3 sm:text-[11px]">
+            <p className="mt-2 px-1 text-center text-[10px] font-normal leading-relaxed text-white/50 sm:mt-3 sm:text-[11px]">
               移动准星 · 点击 / E / 空格下落 · 同级两球合成升级
             </p>
           </div>
@@ -716,7 +716,7 @@ export function MergeGame() {
             >
               怎么玩
             </h2>
-            <p className="mt-1 text-center text-[13px] text-white/45">AsterNova · Merge · 星球合成</p>
+            <p className="mt-1 text-center text-[13px] text-white/50">AsterNova · Merge · 星球合成</p>
 
             <ul className="mt-5 space-y-4 text-[14px] leading-relaxed text-white/80">
               <li className="flex gap-3 rounded-2xl bg-white/[0.05] p-3">
@@ -754,7 +754,7 @@ export function MergeGame() {
                   <div className="font-medium text-white/95">下一颗</div>
                   <div className="mt-0.5 text-[13px] text-white/55">
                     右侧卡片预览下一颗球的等级与配色；共 10 档，从星尘到星冕。
-                    <span className="mt-1 block text-[12px] text-white/45">
+                    <span className="mt-1 block text-[12px] text-white/50">
                       得分较高时，有小概率直接掉落 Lv4–7 大号赠送球。
                     </span>
                   </div>
@@ -806,11 +806,11 @@ export function MergeGame() {
               className="max-h-[min(88dvh,calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-1.5rem))] w-full max-w-sm overflow-y-auto overscroll-contain rounded-t-[1.5rem] border border-white/10 border-b-0 bg-white/[0.08] p-5 text-center shadow-[0_24px_80px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.05)_inset] backdrop-blur-[24px] sm:rounded-[26px] sm:border-b sm:p-7"
               style={{ WebkitBackdropFilter: "blur(24px)" }}
             >
-              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/40">Game Over</p>
+              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/50">Game Over</p>
               <h2 className="mt-2 text-xl font-semibold tracking-tight text-white">越界过久</h2>
               <p className="mt-2 text-[13px] text-white/50">堆叠越过红线并持续 3 秒</p>
               <p className="mt-4 text-3xl font-semibold tabular-nums text-white/95">{score}</p>
-              <p className="text-[12px] text-white/40">本局得分</p>
+              <p className="text-[12px] text-white/50">本局得分</p>
               <div className="mt-6 flex flex-col gap-2">
                 <button
                   type="button"

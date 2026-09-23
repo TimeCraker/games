@@ -219,7 +219,7 @@ function UpgradeCard({
       <div className="relative p-4 sm:p-5">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/40">Upgrade</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/50">Upgrade</p>
             <h3 className="mt-1.5 text-lg font-semibold tracking-tight text-white sm:text-xl">{offer.title}</h3>
           </div>
           <span className="shrink-0 rounded-full border-[0.5px] border-white/15 bg-black/30 px-2.5 py-1 text-[11px] font-medium tabular-nums text-white/55">
@@ -445,7 +445,7 @@ export function NebulaSurvivorGame() {
       <div className="relative z-10 flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.07] px-3 py-2.5 backdrop-blur-xl sm:px-5 sm:py-3">
         <GameBackButton variant="header" label="大厅" />
         <div className="text-center">
-          <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/35">AsterNova</div>
+          <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/50">AsterNova</div>
           <div className="font-display text-sm font-semibold text-white sm:text-base">
             Nebula Survivor
           </div>
@@ -483,7 +483,7 @@ export function NebulaSurvivorGame() {
 
       <div className="relative min-h-0 flex-1">
         <div className="pointer-events-none absolute left-3 top-2 z-10 flex w-52 flex-col gap-2.5 rounded-2xl border border-glass-border bg-glass-bg px-3 py-2.5 shadow-lg backdrop-blur-glass-md sm:left-5 sm:top-4 sm:w-56">
-          <div className="flex items-center justify-between font-mono-data text-[10px] uppercase tracking-[0.18em] text-white/45">
+          <div className="flex items-center justify-between font-mono-data text-[10px] uppercase tracking-[0.18em] text-white/50">
             <span>Wave {ui.worldTier}</span>
             <span>Lv {ui.level}</span>
           </div>
@@ -495,11 +495,11 @@ export function NebulaSurvivorGame() {
             <span className="w-4 shrink-0 text-right font-mono-data text-[10px] font-semibold text-emerald-200/60">XP</span>
             <LiquidBar value={ui.xp} max={ui.xpToNext} variant="xp" className="flex-1 rounded-full" />
           </div>
-          <div className="flex items-center justify-between font-mono-data text-[10px] tabular-nums text-white/45">
+          <div className="flex items-center justify-between font-mono-data text-[10px] tabular-nums text-white/50">
             <span>
               {Math.floor(ui.xp)}/{ui.xpToNext}
             </span>
-            <span className="text-white/30">每分钟升档</span>
+            <span className="text-white/50">每分钟升档</span>
           </div>
           <p className="text-[9px] leading-tight text-emerald-200/40">青绿光球+十字为急救包（稀有）</p>
         </div>
@@ -520,8 +520,8 @@ export function NebulaSurvivorGame() {
 
         <VirtualJoystick onMove={joyMove} disabled={blocked} />
 
-        <p className="pointer-events-none absolute bottom-[max(0.35rem,env(safe-area-inset-bottom))] right-2 z-10 max-w-[12rem] text-[9px] leading-snug text-white/35 sm:bottom-3 sm:right-5 sm:max-w-none sm:text-[10px]">
-          WASD / 方向键 · 指针滑移 · 左下摇杆 · <span className="text-white/45">P 暂停</span>（暂停时见规则）
+        <p className="pointer-events-none absolute bottom-[max(0.35rem,env(safe-area-inset-bottom))] right-2 z-10 max-w-[12rem] text-[9px] leading-snug text-white/50 sm:bottom-3 sm:right-5 sm:max-w-none sm:text-[10px]">
+          WASD / 方向键 · 指针滑移 · 左下摇杆 · <span className="text-white/50">P 暂停</span>（暂停时见规则）
         </p>
       </div>
 
@@ -539,7 +539,7 @@ export function NebulaSurvivorGame() {
           }}
         >
           <div className="max-h-[min(90dvh,720px)] w-full max-w-[440px] overflow-y-auto overscroll-contain rounded-t-[1.5rem] border border-glass-border border-b-0 bg-glass-bg p-4 shadow-lg backdrop-blur-glass-lg sm:rounded-[2rem] sm:border-b sm:p-6">
-            <p className="text-center text-[10px] font-semibold uppercase tracking-[0.26em] text-white/38">Briefing</p>
+            <p className="text-center text-[10px] font-semibold uppercase tracking-[0.26em] text-white/50">Briefing</p>
             {rulesModalKind === "pause" ? (
               <div className="mt-2 flex justify-center">
                 <span className="rounded-full border border-amber-200/25 bg-amber-400/15 px-3 py-1 text-[11px] font-semibold tracking-wide text-amber-100/95">
@@ -550,7 +550,7 @@ export function NebulaSurvivorGame() {
             <h2 id="nebula-rules-title" className="mt-1.5 text-center text-xl font-semibold tracking-tight text-white sm:text-2xl">
               Nebula Survivor
             </h2>
-            <p className="mt-1 text-center text-[12px] text-white/45">
+            <p className="mt-1 text-center text-[12px] text-white/50">
               {rulesModalKind === "briefing"
                 ? "读完后点击「开始任务」进入战场"
                 : rulesModalKind === "pause"
@@ -638,9 +638,9 @@ export function NebulaSurvivorGame() {
               className="max-h-[92dvh] w-full max-w-[920px] overflow-y-auto rounded-[1.75rem] border-[0.5px] border-white/[0.12] bg-white/[0.06] p-4 shadow-[0_32px_100px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.06)] sm:rounded-[2rem] sm:p-8"
               style={{ WebkitBackdropFilter: "blur(32px) saturate(170%)" }}
             >
-              <p className="text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-white/40">Time Stop</p>
+              <p className="text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-white/50">Time Stop</p>
               <h2 className="mt-2 text-center text-xl font-semibold tracking-tight text-white sm:text-2xl">选择一项升级</h2>
-              <p className="mx-auto mt-1 max-w-md text-center text-[13px] text-white/45">
+              <p className="mx-auto mt-1 max-w-md text-center text-[13px] text-white/50">
                 五条强化中随机三张 · 每级可免费<span className="text-white/60">刷新一次</span>换一批 · 必须选一项后继续
               </p>
               <div className="mt-4 flex flex-col items-center gap-2 sm:mt-5">

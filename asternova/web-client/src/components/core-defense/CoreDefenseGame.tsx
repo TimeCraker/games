@@ -93,7 +93,7 @@ function CoreDefenseScene() {
         <div className="pointer-events-auto flex items-center gap-2">
           {state.phase === "shop" ? (
             <div className="flex flex-col items-center gap-1.5">
-              <span className="font-mono-data text-[10px] uppercase tracking-[0.3em] text-white/45">Next Wave</span>
+              <span className="font-mono-data text-[10px] uppercase tracking-[0.3em] text-white/50">Next Wave</span>
               <Button
                 type="button"
                 variant="default"
@@ -108,7 +108,7 @@ function CoreDefenseScene() {
 
           {state.phase === "result" ? (
             <div className="flex flex-col items-center gap-1.5">
-              <span className="font-mono-data text-[10px] uppercase tracking-[0.3em] text-white/45">Next Round</span>
+              <span className="font-mono-data text-[10px] uppercase tracking-[0.3em] text-white/50">Next Round</span>
               <Button
                 type="button"
                 variant="default"
@@ -121,7 +121,7 @@ function CoreDefenseScene() {
 
           {state.phase === "gameover" ? (
             <div className="flex flex-col items-center gap-1.5">
-              <span className="font-mono-data text-[10px] uppercase tracking-[0.3em] text-white/45">Restart</span>
+              <span className="font-mono-data text-[10px] uppercase tracking-[0.3em] text-white/50">Restart</span>
               <Button
                 type="button"
                 variant="outline"

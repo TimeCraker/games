@@ -786,7 +786,7 @@ export function GameEngine() {
           {isDev ? (
             <>
               <p className="mt-3 whitespace-pre-wrap break-words text-sm text-white/70">{fatalRuntimeError.message}</p>
-              <p className="mt-2 whitespace-pre-wrap break-words text-xs text-white/40" style={{ opacity: 0.85 }}>
+              <p className="mt-2 whitespace-pre-wrap break-words text-xs text-white/50" style={{ opacity: 0.85 }}>
                 {fatalRuntimeError.stack || "(no stack trace)"}
               </p>
             </>
@@ -816,7 +816,7 @@ export function GameEngine() {
             <h2 id="sta-rules-title" className="text-center text-[1.15rem] font-semibold tracking-[-0.02em] text-white">
               规则速览
             </h2>
-            <p className="mt-1 text-center text-[0.78rem] text-white/45">Shoot Them All · 物理弹射清场</p>
+            <p className="mt-1 text-center text-[0.78rem] text-white/50">Shoot Them All · 物理弹射清场</p>
 
             <ul className="mt-4 flex list-none flex-col gap-2.5 p-0">
               <li className="flex items-start gap-2.5 rounded-[1rem] bg-white/[0.05] p-2.5">
@@ -872,7 +872,7 @@ export function GameEngine() {
       <div className="relative z-[5] mx-auto w-[min(1180px,calc(100%-2rem))] pt-3.5 shell-fill:w-[min(1180px,calc(100%-1rem))] shell-fill:pt-1.5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-col">
-            <span className="font-mono-data text-[10px] uppercase tracking-[0.22em] text-white/40">Physics · Arcade</span>
+            <span className="font-mono-data text-[10px] uppercase tracking-[0.22em] text-white/50">Physics · Arcade</span>
             <div className="font-display text-[clamp(1.4rem,2.4vw,2.05rem)] font-bold uppercase tracking-[0.1em] text-white">Shoot Them All</div>
           </div>
           <div className="flex flex-wrap items-center gap-2.5">

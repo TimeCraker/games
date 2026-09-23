@@ -228,7 +228,7 @@ export function LobbyAvatarPickerModal({
             <h2 id="lobby-avatar-picker-title" className="text-center text-[15px] font-semibold tracking-tight text-white">
               选一个头像
             </h2>
-            <p className="mt-1 text-center text-[12px] text-white/45">简约卡通 · 仅保存在本机</p>
+            <p className="mt-1 text-center text-[12px] text-white/50">简约卡通 · 仅保存在本机</p>
             <div className="mt-5 grid grid-cols-5 gap-2.5">
               {LOBBY_AVATAR_IDS.map((id) => {
                 const active = id === currentId

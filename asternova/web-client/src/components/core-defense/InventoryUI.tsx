@@ -59,7 +59,7 @@ function WeaponSlot({
     return (
       <div className="relative h-24 w-24 rounded-2xl border border-dashed border-white/20 bg-black/45 shadow-[inset_0_0_18px_rgba(0,0,0,0.55)]">
         <div className="absolute inset-0 flex items-center justify-center">
-          <Lock className="h-4 w-4 text-white/30" />
+          <Lock className="h-4 w-4 text-white/50" />
         </div>
       </div>
     )
@@ -129,7 +129,7 @@ export function InventoryUI() {
     <GlassPanel className="p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="font-mono-data text-[11px] uppercase tracking-[0.28em] text-white/45">Loadout</p>
+          <p className="font-mono-data text-[11px] uppercase tracking-[0.28em] text-white/50">Loadout</p>
           <h3 className="font-display mt-1 text-xl font-semibold tracking-[-0.02em] text-white">装备与背包</h3>
         </div>
         <div className="flex items-center gap-2 text-xs text-white/65">
@@ -176,7 +176,7 @@ export function InventoryUI() {
               {weaponDisplayName(weapon.classType, weapon.level)}
             </span>
           ))}
-          {!state.equipped.length ? <span className="text-white/45">尚未装备武器</span> : null}
+          {!state.equipped.length ? <span className="text-white/50">尚未装备武器</span> : null}
         </div>
       </div>
     </GlassPanel>

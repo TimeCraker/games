@@ -316,7 +316,7 @@ export default function LobbyPage() {
               <Sparkles className="relative z-[1] h-[1.15rem] w-[1.15rem] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.48)]" strokeWidth={1.7} />
             </motion.div>
             <div className="leading-[1.15]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/40 transition-colors group-hover:text-white/65">AsterNova</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/50 transition-colors group-hover:text-white/65">AsterNova</p>
               <p className="mt-0.5 text-[15px] font-semibold tracking-[-0.02em] text-white/96">大厅</p>
             </div>
           </motion.button>
@@ -360,11 +360,11 @@ export default function LobbyPage() {
                 <Gamepad2 className="h-[1.35rem] w-[1.35rem] text-white/82" strokeWidth={1.6} />
               </motion.div>
               <div className="min-w-0 pt-0.5">
-                <p className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-white/45">Arcade · 本地即玩</p>
+                <p className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-white/50">Arcade · 本地即玩</p>
                 <h2 className="mt-2 text-[1.65rem] font-semibold leading-[1.15] tracking-[-0.03em] text-white sm:text-[1.85rem]">
                   休闲小游戏
                 </h2>
-                <p className="mt-2 max-w-[26rem] text-[14px] leading-[1.55] text-white/44">
+                <p className="mt-2 max-w-[26rem] text-[14px] leading-[1.55] text-white/50">
                   无需匹配，本地即玩。与下方联机战场互不干扰。
                 </p>
               </div>
@@ -404,12 +404,12 @@ export default function LobbyPage() {
                       strokeWidth={1.7}
                     />
                   </motion.div>
-                  <span className="rounded-full border border-white/[0.08] bg-black/25 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-white/38">
+                  <span className="rounded-full border border-white/[0.08] bg-black/25 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-white/50">
                     {game.category}
                   </span>
                 </div>
                 <p className="relative mt-4 text-[15px] font-semibold leading-snug tracking-[-0.02em] text-white">{game.title}</p>
-                <p className="relative mt-1.5 text-[13px] leading-[1.45] text-white/46">{game.blurb}</p>
+                <p className="relative mt-1.5 text-[13px] leading-[1.45] text-white/50">{game.blurb}</p>
                 <div className="relative mt-auto pt-5">
                   <span className="lobby-arcade-enter-pill relative inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/[0.2] px-4 py-2.5 text-[13px] font-semibold text-white tabular-nums">
                     <span
@@ -450,11 +450,11 @@ export default function LobbyPage() {
               <Swords className="h-[1.35rem] w-[1.35rem] text-white/76" strokeWidth={1.6} />
             </motion.div>
             <div className="min-w-0 pt-0.5">
-              <p className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-white/45">Battle · 联机竞技</p>
+              <p className="font-mono-data text-[11px] uppercase tracking-[0.22em] text-white/50">Battle · 联机竞技</p>
               <h2 className="mt-2 text-[1.65rem] font-semibold leading-[1.15] tracking-[-0.03em] text-white sm:text-[1.85rem]">
                 联机战场
               </h2>
-              <p className="mt-2 max-w-[26rem] text-[14px] leading-[1.55] text-white/44">
+              <p className="mt-2 max-w-[26rem] text-[14px] leading-[1.55] text-white/50">
                 选择职业后匹配进入竞技场。右侧列表可滚动切换。
               </p>
             </div>
@@ -479,9 +479,9 @@ export default function LobbyPage() {
                       <RoleIcon className="h-7 w-7 text-white/88" strokeWidth={1.45} />
                     </motion.div>
                     <div>
-                      <p className="text-[12px] font-medium text-white/38">当前职业</p>
+                      <p className="text-[12px] font-medium text-white/50">当前职业</p>
                       <p className="mt-1 text-[1.35rem] font-semibold leading-tight tracking-[-0.03em]">{selectedRole.name}</p>
-                      <p className="mt-1.5 text-[14px] leading-snug text-white/48">{selectedRole.tagline}</p>
+                      <p className="mt-1.5 text-[14px] leading-snug text-white/50">{selectedRole.tagline}</p>
                     </div>
                   </motion.div>
                 </AnimatePresence>
@@ -492,9 +492,9 @@ export default function LobbyPage() {
                   whileHover={{ borderColor: "rgba(255,255,255,0.1)", backgroundColor: "rgba(0,0,0,0.32)" }}
                   className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-black/[0.22] px-3.5 py-3 transition-colors duration-200"
                 >
-                  <IdCard className="h-4 w-4 shrink-0 text-white/32" strokeWidth={1.75} />
+                  <IdCard className="h-4 w-4 shrink-0 text-white/50" strokeWidth={1.75} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/32">User ID</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/50">User ID</p>
                     <p className="mt-0.5 truncate font-mono-data text-[12px] text-white/74">{userId || "—"}</p>
                   </div>
                 </motion.div>
@@ -502,9 +502,9 @@ export default function LobbyPage() {
                   whileHover={{ borderColor: "rgba(255,255,255,0.1)", backgroundColor: "rgba(0,0,0,0.32)" }}
                   className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-black/[0.22] px-3.5 py-3 transition-colors duration-200"
                 >
-                  <Cpu className="h-4 w-4 shrink-0 text-white/32" strokeWidth={1.75} />
+                  <Cpu className="h-4 w-4 shrink-0 text-white/50" strokeWidth={1.75} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/32">Role key</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/50">Role key</p>
                     <p className="mt-0.5 truncate font-mono-data text-[11px] text-white/62">{selectedRole.id}</p>
                   </div>
                 </motion.div>
@@ -541,11 +541,11 @@ export default function LobbyPage() {
                       transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                       className="relative rounded-2xl border border-white/[0.08] bg-white/[0.04] p-3.5"
                     >
-                      <RoleIcon className="h-8 w-8 text-white/28" strokeWidth={1.2} />
+                      <RoleIcon className="h-8 w-8 text-white/50" strokeWidth={1.2} />
                     </motion.div>
                   </div>
-                  <p className="font-mono-data text-[10px] uppercase tracking-[0.3em] text-white/28">Preview</p>
-                  <p className="font-mono-data max-w-[16rem] text-center text-[12px] leading-relaxed text-white/38">
+                  <p className="font-mono-data text-[10px] uppercase tracking-[0.3em] text-white/50">Preview</p>
+                  <p className="font-mono-data max-w-[16rem] text-center text-[12px] leading-relaxed text-white/50">
                     立绘接入中 · 占位观测
                   </p>
                 </div>
@@ -555,7 +555,7 @@ export default function LobbyPage() {
             <GlassPanel className="flex flex-col overflow-hidden">
               <div className="border-b border-white/[0.06] px-5 py-4 sm:px-7 sm:py-5">
                 <p className="text-[15px] font-semibold tracking-[-0.02em]">职业</p>
-                <p className="mt-1 text-[13px] text-white/40">轻点切换 · 弹簧反馈</p>
+                <p className="mt-1 text-[13px] text-white/50">轻点切换 · 弹簧反馈</p>
               </div>
               <LayoutGroup id="roles">
                 <div className="max-h-[min(58vh,520px)] space-y-1 overflow-y-auto p-2.5 sm:p-3.5 [scrollbar-width:thin]">
@@ -606,7 +606,7 @@ export default function LobbyPage() {
                         </motion.div>
                         <div className="relative z-[1] min-w-0 flex-1">
                           <p className="text-[15px] font-medium leading-tight tracking-[-0.02em]">{role.name}</p>
-                          <p className="mt-0.5 truncate text-[12px] text-white/42">{role.tagline}</p>
+                          <p className="mt-0.5 truncate text-[12px] text-white/50">{role.tagline}</p>
                         </div>
                         <span className="relative z-[1] shrink-0">
                           {active ? (
@@ -614,7 +614,7 @@ export default function LobbyPage() {
                               已选
                             </span>
                           ) : (
-                            <ChevronRight className="h-4 w-4 text-white/22" strokeWidth={2} />
+                            <ChevronRight className="h-4 w-4 text-white/50" strokeWidth={2} />
                           )}
                         </span>
                       </motion.button>

@@ -95,7 +95,7 @@ export function StaRoot() {
       />
 
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between p-3">
-        <span className="font-mono-data text-[10px] uppercase tracking-[0.22em] text-white/40">
+        <span className="font-mono-data text-[10px] uppercase tracking-[0.22em] text-white/50">
           Shoot Them All · v2
         </span>
         <div className="pointer-events-auto">
