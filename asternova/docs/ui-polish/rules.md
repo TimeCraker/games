@@ -25,6 +25,7 @@
 - 一律接 `useDialogA11y`（`src/hooks/useDialogA11y.ts`）：Esc 关闭 + Tab 焦点循环 + 打开移焦/关闭还焦；`closeOnEsc: false` 仅用于「必须显式确认」的弹层（如开局 briefing、Game Over）。
 - 结构必备：`role="dialog"` + `aria-modal="true"` + `aria-labelledby`（标题加 id）。
 - Radix 组件（ui/dialog 等）自带上述行为，优先用 Radix。
+- **容器配方（三游戏规则弹层统一）**：移动端底部抽屉 `rounded-t-[1.75rem] border-b-0`，桌面 `sm:rounded-[2rem] sm:border-b`；宽度 `max-w-[420px]`；内距 `p-4 sm:p-6`；玻璃 `bg-glass-bg backdrop-blur-glass-lg`；高度 `max-h-[min(88dvh,calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-1.5rem))] overscroll-contain`。居中式弹层（如 star-dash）可保留 `rounded-[2rem] p-6` 全圆角变体，但玻璃/边框/投影 token 不得离队。
 
 ## 5. 语义与键盘
 

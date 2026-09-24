@@ -6,6 +6,46 @@
 
 ---
 
+## R2（2026-09-24）· 隔轮评审 + 深扫 + 工艺轮
+
+### 隔轮评审（R1 改动，截图证据）
+
+| 对象 | 证据 | 结论 |
+| --- | --- | --- |
+| login main 包裹/命中区 | 几何验证：卡片中心 (720,480)=视口正中，表单可交互 | ✅ 无回归 |
+| shoot floating 返回钮 | `r2-review-shoot.png`：左上真实尺寸 41px，品牌字右上完好 | ✅ |
+| merge/nebula/star-dash 规则弹层 | `r2-review-merge.png` / `r2-review-nebula.png` / `r2-review-running.png`：弹层渲染完好、glass/排版未变 | ✅ |
+| 主题锁定 | 全部截图均为深空黑 | ✅ |
+| login 视觉取证 | framer 冻结致卡片不可见，强制解锁尝试无效 → 以几何验证替代（见 R1 踩坑 3） | ⚠️ 环境限制，登记 |
+
+**结论：R1 全部改动通过隔轮评审，无 revert 项。**
+
+### 修复清单
+
+| 级 | 方向 | 位置 | 前值 → 后值 | 验证 |
+| --- | --- | --- | --- | --- |
+| P1 | 弹层 | `src/components/ui/ResultOverlay.tsx`（5 处结算共用） | 无 role/无陷阱 → 接 useDialogA11y（`closeOnEsc:false`，结算无关闭语义）+ role/aria-labelledby（useId） | lint 0 errors；调用方 nebula/nova-ball/arena 行为不变 |
+| P2 | 深扫 | 8 路由 × 320/700、812×375 横屏、2560×1440 | 横向溢出全部 0px（脚本矩阵） | 脚本 ✓ |
+| P2 | 工艺·一致性 | `src/components/nebula-survivor/NebulaSurvivorGame.tsx:552` | 弹层容器 1.5rem/440px/90dvh → 对齐统一配方 1.75rem/420px/88dvh-safe-area（merge 同款） | before/after 截图：`r2-review-nebula.png` → `r3-review-nebula.png`（下轮隔轮评审） |
+
+### 保留 + 原因
+
+- star-dash 规则弹层保留居中全圆角变体（`rounded-[2rem] p-6`）：其布局模式本就非底部抽屉，改响应式行为超出 token 统一范畴；玻璃/边框 token 已一致。已将两变体配方写入 rules.md §4。
+
+### 验证汇总
+
+- `npm run lint` 0 errors 1 warning（R1 保留项）· build OK。
+- 极端视口（320×700 / 812×375 / 2560×1440）× 8 路由：横向溢出 0、document.title 唯一性不变。
+
+### 剩余队列（R3+ 候选）
+
+- [P1] login 重置弹层 / nebula、star-dash Esc 语义的端到端复验（真实浏览器环境，本环境 rAF 冻结限制）。
+- [P2] iframe 壳内部页面 a11y（xiaoxiaole/arena 内嵌游戏本体）。
+- [P2] 工艺：GameLoadingScreen / lobby（待后端可登录后）逐项节奏审查。
+- [P3] 弱网 / 超长内容 / emoji 昵称边界深扫。
+
+---
+
 ## R1（2026-09-24）· 全量基线轮
 
 **范围**：9 路由 × 双视口（1440×900 / 375×812）脚本审计 + 人工截图复核。
@@ -80,7 +120,7 @@
 4. `fix(web): 自绘弹层键盘可达性 hook 与四处接线 / dialog a11y hook with Esc and focus trap`
 5. `fix(web): 关键路径触控 44px 与壳页语义 / 44px key-path hit areas and shell heading semantics`
 6. `docs(ui-polish): 首轮审计台账与设计规则 / first-round audit ledger and UI rules`
-- push 结果：见下轮回填（重试 ≤3 次）。
+- push 结果：✅ 一次成功（6672356..1c1fcaf → github.com/TimeCraker/games main，含用户此前本地提交 bd59af7）。
 
 ### 剩余队列（R2+ 候选）
 
