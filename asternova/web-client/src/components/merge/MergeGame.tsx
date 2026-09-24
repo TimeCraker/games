@@ -10,6 +10,7 @@ import { Bodies, Body, Composite, Engine, Events, Render, Runner, World } from "
 import { AnimatePresence, motion } from "framer-motion"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
+import { useDialogA11y } from "@/src/hooks/useDialogA11y"
 
 const MERGE_STORAGE_SKIP_RULES = "merge-skip-rules"
 
@@ -249,6 +250,10 @@ export function MergeGame() {
     }
     setRulesModalOpen(false)
   }, [dontShowRulesAgain])
+
+  // 弹层键盘可达性：Esc 关闭规则弹层；Game Over 无「关闭」语义仅做焦点陷阱
+  const rulesDialogRef = useDialogA11y<HTMLDivElement>({ open: rulesModalOpen, onClose: confirmMergeRules })
+  const gameOverDialogRef = useDialogA11y<HTMLDivElement>({ open: !playing, onClose: () => {}, closeOnEsc: false })
 
   React.useEffect(() => {
     scoreRef.current = score
@@ -583,7 +588,7 @@ export function MergeGame() {
           <p className="font-display text-[10px] font-medium uppercase tracking-[0.26em] text-white/50 min-[400px]:text-[11px] min-[400px]:tracking-[0.28em]">
             AsterNova
           </p>
-          <h1 className="font-display text-[clamp(1.25rem,4.5vw,1.65rem)] font-semibold tracking-tight text-white/95">Merge</h1>
+          <h2 className="font-display text-[clamp(1.25rem,4.5vw,1.65rem)] font-semibold tracking-tight text-white/95">Merge</h2>
           <p className="max-w-md px-1 text-center text-[12px] font-normal leading-relaxed text-white/50 sm:text-[13px]">
             同级相撞合成升级 · 越红线 3 秒结束 · 点击 / E / 空格下落
           </p>
@@ -696,6 +701,7 @@ export function MergeGame() {
 
       {rulesModalOpen ? (
         <div
+          ref={rulesDialogRef}
           className="fixed inset-0 z-[55] flex items-end justify-center bg-black/55 backdrop-blur-md sm:items-center sm:p-4"
           role="dialog"
           aria-modal="true"
@@ -799,6 +805,10 @@ export function MergeGame() {
             }}
           >
             <motion.div
+              ref={gameOverDialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="merge-gameover-title"
               initial={{ opacity: 0, scale: 0.94, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96 }}
@@ -807,7 +817,7 @@ export function MergeGame() {
               style={{ WebkitBackdropFilter: "blur(24px)" }}
             >
               <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/50">Game Over</p>
-              <h2 className="mt-2 text-xl font-semibold tracking-tight text-white">越界过久</h2>
+              <h2 id="merge-gameover-title" className="mt-2 text-xl font-semibold tracking-tight text-white">越界过久</h2>
               <p className="mt-2 text-[13px] text-white/50">堆叠越过红线并持续 3 秒</p>
               <p className="mt-4 text-3xl font-semibold tabular-nums text-white/95">{score}</p>
               <p className="text-[12px] text-white/50">本局得分</p>

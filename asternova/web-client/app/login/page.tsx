@@ -16,6 +16,7 @@ import { getApiErrorMessage, guestLogin, login, loginWithEmail, register, resetP
 import { extractUserIdFromToken } from "@/src/api/jwt"
 import { useGameStore } from "@/src/store/useGameStore"
 import { cinematicEase } from "@/src/lib/motion"
+import { useDialogA11y } from "@/src/hooks/useDialogA11y"
 import dynamic from "next/dynamic"
 
 const CinematicBlackHole = dynamic(
@@ -57,6 +58,13 @@ export default function LoginPage() {
   const [resetSubmitting, setResetSubmitting] = React.useState(false)
   const [guestInviteCode, setGuestInviteCode] = React.useState("")
   const [guestSubmitting, setGuestSubmitting] = React.useState(false)
+
+  const resetEmailRef = React.useRef<HTMLInputElement>(null)
+  const resetDialogRef = useDialogA11y<HTMLDivElement>({
+    open: resetOpen,
+    onClose: () => setResetOpen(false),
+    initialFocusRef: resetEmailRef,
+  })
 
   function goToEmailRegister() {
     setActiveTab("email_login")
@@ -295,12 +303,12 @@ export default function LoginPage() {
 
       <div className="star-chart-grid pointer-events-none absolute inset-0 z-[1] opacity-60" />
 
-      <motion.div
-        className="relative z-10 w-full max-w-[420px] px-5 sm:px-6"
-        initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        transition={{ duration: 0.7, delay: 0.5, ease: cinematicEase }}
-      >
+      <main id="main-content" tabIndex={-1} className="relative z-10 w-full max-w-[420px] px-5 sm:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.7, delay: 0.5, ease: cinematicEase }}
+        >
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -318,7 +326,7 @@ export default function LoginPage() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <Link
                   href="/"
-                  className="group/brand inline-flex items-center rounded-md outline-none ring-offset-2 ring-offset-surface-2 focus-visible:ring-2 focus-visible:ring-white/35"
+                  className="group/brand relative inline-flex items-center rounded-md outline-none ring-offset-2 ring-offset-surface-2 focus-visible:ring-2 focus-visible:ring-white/35 before:absolute before:-inset-x-1.5 before:-inset-y-3.5 before:content-['']"
                   aria-label="返回首页"
                 >
                   <span className="font-mono-data text-[0.65rem] font-medium uppercase tracking-[0.2em] text-white/55 transition-opacity group-hover/brand:opacity-85 sm:text-[11px]">
@@ -391,6 +399,7 @@ export default function LoginPage() {
                   onChange={(e) => setGuestInviteCode(e.target.value)}
                   className="h-9 border-white/[0.08] bg-black/35 text-[13px] text-white/90 placeholder:text-white/50 focus-visible:border-white/20 focus-visible:ring-1 focus-visible:ring-violet-400/20"
                   placeholder="输入邀请码"
+                  aria-label="游客邀请码"
                 />
                 <Button
                   type="submit"
@@ -455,7 +464,7 @@ export default function LoginPage() {
                           setResetEmail(identifier.includes("@") ? identifier : "")
                           setResetOpen(true)
                         }}
-                        className="text-[12px] font-medium text-cyan-200/85 transition hover:text-cyan-100"
+                        className="relative text-[12px] font-medium text-cyan-200/85 transition hover:text-cyan-100 before:absolute before:-inset-x-2 before:-inset-y-3.5 before:content-['']"
                       >
                         忘记密码？
                       </button>
@@ -582,7 +591,8 @@ export default function LoginPage() {
             </motion.div>
           </div>
         </motion.div>
-      </motion.div>
+        </motion.div>
+      </main>
 
       <AnimatePresence>
         {resetOpen ? (
@@ -594,6 +604,10 @@ export default function LoginPage() {
             onClick={() => setResetOpen(false)}
           >
             <motion.div
+              ref={resetDialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="reset-password-title"
               initial={{ opacity: 0, y: 18, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
@@ -601,7 +615,7 @@ export default function LoginPage() {
               onClick={(e) => e.stopPropagation()}
               className="w-full max-w-[430px] rounded-2xl border border-glass-border bg-surface-2/90 p-5 shadow-lg backdrop-blur-2xl sm:p-6"
             >
-              <h3 className="text-[1.15rem] font-semibold tracking-tight text-white">忘记密码</h3>
+              <h3 id="reset-password-title" className="text-[1.15rem] font-semibold tracking-tight text-white">忘记密码</h3>
               <p className="mt-1 text-[12px] text-white/52">邮箱验证通过后即可重置密码</p>
 
               <form className="mt-5 space-y-4" onSubmit={onSubmitResetPassword}>
@@ -611,6 +625,7 @@ export default function LoginPage() {
                   </Label>
                   <Input
                     id="reset-email"
+                    ref={resetEmailRef}
                     type="email"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}

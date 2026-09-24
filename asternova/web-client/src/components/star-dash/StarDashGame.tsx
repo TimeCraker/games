@@ -9,6 +9,7 @@
 import * as React from "react"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
+import { useDialogA11y } from "@/src/hooks/useDialogA11y"
 import { cn } from "@/lib/utils"
 
 // —— 可调参数 ——
@@ -344,6 +345,9 @@ export function StarDashGame() {
     }
     setRulesModalOpen(false)
   }, [dontShowRulesAgain])
+
+  // 规则弹层键盘可达性：Esc = 确认并关闭，焦点锁定弹层内
+  const rulesDialogRef = useDialogA11y<HTMLDivElement>({ open: rulesModalOpen, onClose: confirmRules })
 
   React.useLayoutEffect(() => {
     try {
@@ -943,6 +947,7 @@ export function StarDashGame() {
 
       {rulesModalOpen ? (
         <div
+          ref={rulesDialogRef}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-md"
           role="dialog"
           aria-modal="true"

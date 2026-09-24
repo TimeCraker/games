@@ -11,6 +11,7 @@ import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { LiquidBar } from "@/src/components/ui/LiquidBar"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
 import { ResultOverlay } from "@/src/components/ui/ResultOverlay"
+import { useDialogA11y } from "@/src/hooks/useDialogA11y"
 
 const NEBULA_STORAGE_SKIP_RULES = "nebula-survivor-skip-rules"
 
@@ -263,6 +264,15 @@ export function NebulaSurvivorGame() {
 
   const rulesOpenRef = React.useRef(rulesModalOpen)
   const rulesKindRef = React.useRef(rulesModalKind)
+
+  // 弹层焦点陷阱 + Esc（briefing 须显式确认，Esc 不关闭，与既有 Esc/P 语义一致）
+  const rulesDialogRef = useDialogA11y<HTMLDivElement>({
+    open: rulesModalOpen,
+    onClose: () => {
+      const k = rulesKindRef.current
+      if (k === "pause" || k === "reference") setRulesModalOpen(false)
+    },
+  })
 
   React.useLayoutEffect(() => {
     rulesOpenRef.current = rulesModalOpen
@@ -527,6 +537,7 @@ export function NebulaSurvivorGame() {
 
       {rulesModalOpen ? (
         <div
+          ref={rulesDialogRef}
           className="fixed inset-0 z-40 flex items-end justify-center bg-black/58 backdrop-blur-md sm:items-center sm:p-5"
           role="dialog"
           aria-modal="true"
