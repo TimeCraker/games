@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { springSnappy } from "@/src/lib/motion"
+import { useDialogA11y } from "@/src/hooks/useDialogA11y"
 import { cn } from "@/lib/utils"
 
 /**
@@ -46,6 +47,9 @@ export function ResultOverlay({
   const router = useRouter()
   const handleSecondary = onSecondary ?? (() => router.push("/lobby"))
   const heading = title ?? (victory ? "VICTORY" : "信号丢失")
+  const headingId = React.useId()
+  // 结算弹层无「关闭」语义：仅焦点陷阱（Esc 不关闭），与规则弹层的 Esc 行为区分
+  const dialogRef = useDialogA11y<HTMLDivElement>({ open: true, onClose: handleSecondary, closeOnEsc: false })
 
   return (
     <motion.div
@@ -64,6 +68,10 @@ export function ResultOverlay({
         />
       )}
       <motion.div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
         initial={{ opacity: 0, scale: 0.94, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96 }}
@@ -83,6 +91,7 @@ export function ResultOverlay({
         />
         <div className="relative z-10">
           <h2
+            id={headingId}
             className={cn(
               "font-display text-[clamp(3rem,9vw,6.6rem)] font-black italic leading-none tracking-widest",
               victory

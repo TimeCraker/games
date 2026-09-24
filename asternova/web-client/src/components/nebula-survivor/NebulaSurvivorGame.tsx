@@ -549,7 +549,7 @@ export function NebulaSurvivorGame() {
             paddingTop: "max(0.5rem, env(safe-area-inset-top, 0px))",
           }}
         >
-          <div className="max-h-[min(90dvh,720px)] w-full max-w-[440px] overflow-y-auto overscroll-contain rounded-t-[1.5rem] border border-glass-border border-b-0 bg-glass-bg p-4 shadow-lg backdrop-blur-glass-lg sm:rounded-[2rem] sm:border-b sm:p-6">
+          <div className="max-h-[min(88dvh,calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-1.5rem))] w-full max-w-[420px] overflow-y-auto overscroll-contain rounded-t-[1.75rem] border border-glass-border border-b-0 bg-glass-bg p-4 shadow-lg backdrop-blur-glass-lg sm:rounded-[2rem] sm:border-b sm:p-6">
             <p className="text-center text-[10px] font-semibold uppercase tracking-[0.26em] text-white/50">Briefing</p>
             {rulesModalKind === "pause" ? (
               <div className="mt-2 flex justify-center">
