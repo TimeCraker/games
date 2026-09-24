@@ -86,6 +86,31 @@
 
 ---
 
+## R5（2026-09-24）· 工艺轮：CTA 图形语言统一
+
+### 隔轮评审（R4）
+
+R4 无代码改动，无需评审。
+
+### 修复清单
+
+| 级 | 方向 | 位置 | 前值 → 后值 | 验证 |
+| --- | --- | --- | --- | --- |
+| P3 | 工艺·图标 | `app/not-found.tsx` CTA | 文本箭头「→」→ lucide `ChevronRight`（与首页「进入大厅」CTA 同图形语言），`aria-hidden` 保留 | 脚本：hasChevronSvg ✓ arrowTextGone ✓ 链接高 44px ✓；after 截图 `r5-after-404.png`（before：`r3-after-404.png`） |
+
+### 验证汇总
+
+- lint 0 errors（1 保留 warning）· build OK。
+
+### 剩余队列（R6+ 候选）
+
+- [P1] login 重置弹层 / nebula、star-dash Esc 语义端到端复验（真实浏览器）。
+- [P2] lobby 登录后全量审计（待凭据/后端）。
+- [P2] iframe 壳内部 a11y。
+- [P3] 工艺候选：GameLoadingScreen 品牌一致性与节奏（可截图对象）。
+
+---
+
 ## R4（2026-09-24）· 平板盲区扫描 + 隔轮评审
 
 ### 隔轮评审（R3 改动）

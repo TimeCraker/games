@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { ChevronRight } from "lucide-react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -35,7 +36,7 @@ export default function NotFoundPage() {
           className="mt-9 inline-flex min-h-11 items-center gap-2 rounded-full border border-glass-border bg-glass-bg px-6 py-2.5 text-sm font-medium text-white/90 backdrop-blur-glass-md transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-space-black"
         >
           返回游戏大厅
-          <span aria-hidden="true">→</span>
+          <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
         </Link>
       </div>
     </main>
