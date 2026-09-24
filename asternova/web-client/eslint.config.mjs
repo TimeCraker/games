@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Godot 导出产物与静态游戏文件，非手写源码
+    "public/**",
   ]),
 ]);
 
