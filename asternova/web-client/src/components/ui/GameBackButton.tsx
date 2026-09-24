@@ -25,11 +25,11 @@ export function GameBackButton({
 }) {
   const router = useRouter()
   const base =
-    "group inline-flex min-h-6 items-center gap-1.5 rounded-full border border-glass-border bg-glass-bg px-3.5 py-2.5 text-[13px] font-medium text-white/90 backdrop-blur-glass-md shadow-sm transition-colors duration-fast hover:bg-white/10 hover:text-white active:scale-[0.98]"
+    "group relative inline-flex min-h-6 items-center gap-1.5 rounded-full border border-glass-border bg-glass-bg px-3.5 py-2.5 text-[13px] font-medium text-white/90 backdrop-blur-glass-md shadow-sm transition-colors duration-fast hover:bg-white/10 hover:text-white active:scale-[0.98] before:absolute before:-inset-x-2 before:-inset-y-3 before:content-['']"
   const pos =
     variant === "floating"
       ? "fixed left-[max(0.75rem,env(safe-area-inset-left))] top-[max(0.75rem,env(safe-area-inset-top))] z-50"
-      : "relative"
+      : ""
   return (
     <button
       type="button"
