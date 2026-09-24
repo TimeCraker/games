@@ -1,0 +1,45 @@
+# UI Polish 设计规则（写改前先读，改令牌先改这里）
+
+> 依据：`web-client/app/globals.css`（Stage A 深空黑体系）· 本文件是「审美有依据」的挂靠点。
+> 任何工艺改动必须引用此处规则或先补录规则，禁止拍脑袋。
+
+## 1. 主题
+
+- 站点为**深空黑单主题**（Stage A 决策）。`ThemeProvider` 锁 `forcedTheme="dark"`，浅色 token（`:root` 段）仅为 shadcn 默认残留，**不得**在组件里依赖 `bg-background`/`text-foreground` 走浅色分支，也不新增浅色适配。
+- 自定义表面一律用 `bg-space-black` / `bg-surface-1/2/3` / `bg-glass-bg`，不用裸 `bg-white`/`bg-black` 拼贴。
+
+## 2. 文字与对比度（实测口径：含元素 opacity 与 alpha 合成后的有效对比度）
+
+- 文字透明度地板 `text-white/50`（≈4.8:1 on surface-2）。**22%~48% 一律违规**；装饰性 `aria-hidden` 文字可用 /35 下限。
+- 正文 ≥ 4.5:1；≥24px 或 ≥18.66px 粗体大字 ≥ 3:1。
+- 品牌色不做正文文字色（`--brand-violet` 等只用于实底/描边/光晕）。
+
+## 3. 触控目标
+
+- 一切可点目标**视觉盒 ≥ 24px**；关键路径（主 CTA / 返回 / 关闭 / 删除）**有效命中区 ≥ 44px**。
+- 视觉不变扩命中区统一用伪元素法：`relative before:absolute before:-inset-x-2 before:-inset-y-3 before:content-['']`（±12px ≈ +24px 命中）。参考 `GameBackButton`、login 返回首页/忘记密码。
+- **禁止把交互控件放进 `transform: scale()` 缩放容器**（shoot-them-all 教训：HUD 随画布缩到 21px）；用 floating 变体固定在安全区。
+
+## 4. 弹层（自绘 overlay）
+
+- 一律接 `useDialogA11y`（`src/hooks/useDialogA11y.ts`）：Esc 关闭 + Tab 焦点循环 + 打开移焦/关闭还焦；`closeOnEsc: false` 仅用于「必须显式确认」的弹层（如开局 briefing、Game Over）。
+- 结构必备：`role="dialog"` + `aria-modal="true"` + `aria-labelledby`（标题加 id）。
+- Radix 组件（ui/dialog 等）自带上述行为，优先用 Radix。
+
+## 5. 语义与键盘
+
+- 每路由唯一 `document.title`（`metadata` + `%s · AsterNova` 模板）；正文有且仅有一个 `<h1>`，游戏壳用 `sr-only` h1。
+- `<main id="main-content" tabIndex={-1}>` 为 skip link 落点；skip link 挂 `app/layout.tsx`（fixed + translate 出入屏，禁用 sr-only/not-sr-only 组合——二者 position 冲突）。
+- 全站焦点环 `:focus-visible` 紫环（globals.css 兜底）；图标按钮必须 `aria-label`。
+- 表单控件可见 label（Label htmlFor）；仅 placeholder 的输入必须补 `aria-label`。
+
+## 6. 动效与排版
+
+- 时长 token：`--duration-fast: 200ms`（hover/微交互 150–300ms 区间）；缓动 `--ease-cinematic`。
+- 字体：正文 Geist Sans；数据/坐标 `font-mono-data`（JetBrains Mono + tnum）；品牌大字 Orbitron（`.aster-title`）。
+- 间距/圆角走 token：`--radius` 阶梯、`max-w-aster`（1180px）容器。
+
+## 7. 工具链
+
+- `public/**` 已加入 eslint 忽略（Godot 导出产物与静态游戏，非手写源码）。
+- `typescript.ignoreBuildErrors: true` → build 通过 ≠ 类型正确，改动后跑 `npx tsc --noEmit` 或依赖 IDE。
