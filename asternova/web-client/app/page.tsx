@@ -51,7 +51,7 @@ export default function Home() {
       </motion.header>
 
       {/* 居中品牌 hero(高级排版:大字 + 留白 + 层次) */}
-      <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 text-center">
+      <main id="main-content" tabIndex={-1} className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: 18, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}

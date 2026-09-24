@@ -52,7 +52,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        {/* skip link：首个 Tab 落点，跳到页面主内容（各页 main#main-content，tabIndex -1 可聚焦） */}
+        <a
+          href="#main-content"
+          className="fixed left-4 top-4 z-[200] -translate-y-24 rounded-full border border-white/20 bg-space-black px-5 py-2.5 text-sm font-medium text-white shadow-lg outline-none transition-transform duration-fast focus:translate-y-0 focus-visible:ring-2 focus-visible:ring-violet-400/70"
+        >
+          跳到主内容
+        </a>
+        {/* 站点为深空黑单主题设计（Stage A）；enableSystem 关闭，避免浅色系统用户
+            落入从未设计的浅色 token 拼盘（白底 + 硬编码白字不可读） */}
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark">
           <AnalyticsProvider>
           {children}
           </AnalyticsProvider>

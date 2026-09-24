@@ -13,7 +13,7 @@ export const metadata: Metadata = {
  */
 export default function NotFoundPage() {
   return (
-    <main className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-space-black px-6 text-center text-white">
+    <main id="main-content" tabIndex={-1} className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-space-black px-6 text-center text-white">
       {/* 星图网格 */}
       <div className="star-chart-grid pointer-events-none absolute inset-0 z-0" aria-hidden="true" />
       {/* 紫色星云光晕 */}
