@@ -46,6 +46,47 @@
 
 ---
 
+## R3（2026-09-24）· 登录交互深扫 + 隔轮评审 + 工艺轮
+
+### 隔轮评审（R2 改动）
+
+- nebula 弹层容器统一（1.75rem/420px/88dvh-safe-area）：`r3-review-nebula.png` 渲染干净、无截断、按钮完好 → **通过**。
+- R1/R2 其余改动维持上轮评审结论。
+
+### 深扫（登录页 = 唯一可完整交互的可达页面）
+
+| 项 | 结果 |
+| --- | --- |
+| 空表单提交 | toast「请输入用户名/邮箱和密码」——原因明确 + 表单本身即出路 ✅ |
+| 后端错误路径 | 生产 API（api.asterforge.top）真实 401 → toast「用户名或密码错误」error 态，表单有「忘记密码？」出路 ✅ |
+| 超长输入（209 字符） | 无横向溢出、输入框不破卡 ✅ |
+| Tab 顺序 | skip link 首位 → identifier → 忘记密码？→ password（与视觉序一致）✅ |
+| 环境事实 | dev 的 `.env.local` 指向生产 API（既有配置，非本任务范围，不改） |
+
+### 修复清单
+
+| 级 | 方向 | 位置 | 前值 → 后值 | 验证 |
+| --- | --- | --- | --- | --- |
+| P3 | 工艺·字体 | `app/not-found.tsx:26` | 「SIGNAL LOST」用 `font-mono`（Geist Mono）→ `font-mono-data`（JetBrains Mono，全站数据 mono 约定） | 脚本 computed font ✓；before/after 截图 `r3-before-404.png` / `r3-after-404.png` |
+
+### 保留 + 原因
+
+- 404 页正文其余字体（标题 Orbitron、按钮 Geist Sans）与全站一致，无需改。
+
+### 验证汇总
+
+- lint 0 errors（1 保留 warning）· build OK · 8 路由 console/axe/溢出维持全绿。
+
+### 剩余队列（R4+ 候选）
+
+- [P1] login 重置弹层 / nebula、star-dash Esc 语义端到端复验（真实浏览器）。
+- [P2] lobby 登录后全量审计（待 backend 可启动或提供测试凭据）。
+- [P2] iframe 壳内部 a11y。
+- [P3] GameLoadingScreen / nova-ball（无路由，藏于 lobby）。
+
+---
+
+
 ## R1（2026-09-24）· 全量基线轮
 
 **范围**：9 路由 × 双视口（1440×900 / 375×812）脚本审计 + 人工截图复核。

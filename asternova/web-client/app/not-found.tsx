@@ -23,7 +23,7 @@ export default function NotFoundPage() {
         style={{ background: "radial-gradient(circle at 50% 50%, rgba(139,92,246,0.55), transparent 70%)" }}
       />
       <div className="relative z-10">
-        <p className="font-mono text-[12px] uppercase tracking-[0.4em] text-white/50">SIGNAL LOST</p>
+        <p className="font-mono-data text-[12px] uppercase tracking-[0.4em] text-white/50">SIGNAL LOST</p>
         <h1 className="mt-5 font-orbitron text-6xl font-black tracking-[0.06em] text-white sm:text-7xl">
           4<span className="text-violet-400">0</span>4
         </h1>
