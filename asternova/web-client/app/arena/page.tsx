@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { toast } from "sonner"
 import dynamic from "next/dynamic"
 import { PlayerHud, UltimateButton } from "@/src/components/arena/ArenaHud"
@@ -198,9 +199,9 @@ export default function ArenaPage() {
           setCountdown("FIGHT!")
           // 呼叫 Godot 解除玩家冻结
           try {
-            const cw = iframeRef.current?.contentWindow as any
+            const cw = iframeRef.current?.contentWindow as { startFight?: () => void } | null
             cw?.startFight?.()
-          } catch (e) {}
+          } catch {}
         } else {
           setCountdown(null)
           clearInterval(interval)
@@ -230,11 +231,35 @@ export default function ArenaPage() {
   }, [canEnterArena])
 
   if (!canEnterArena) {
-    return null
+    // 空态出口（R1 ui-polish）：原先 return null 渲染成纯黑屏，用户无从脱身
+    return (
+      <main id="main-content" tabIndex={-1} className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-space-black px-6 text-center text-white">
+        <p className="font-mono-data text-[12px] uppercase tracking-[0.3em] text-white/50">Arena Locked</p>
+        <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-white">战斗舱未解锁</h1>
+        <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/50">
+          你还没有进入一场对战。请先登录，在大厅开启或加入一局战斗后再回到这里。
+        </p>
+        <div className="mt-8 flex items-center gap-3">
+          <Link
+            href="/login"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/16 bg-white/[0.08] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-white/[0.14] focus-visible:ring-2 focus-visible:ring-violet-400/70"
+          >
+            前往登录
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex min-h-11 items-center rounded-full border border-glass-border bg-glass-bg px-6 py-2.5 text-sm font-medium text-white/90 backdrop-blur-glass-md transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-violet-400/70"
+          >
+            返回首页
+          </Link>
+        </div>
+      </main>
+    )
   }
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-space-black text-white">
+      <h1 className="sr-only">竞技场对战</h1>
       {shouldShowLandscapeHint && (
         <div
           className="absolute inset-0 z-[200] flex flex-col items-center justify-center gap-6 bg-black/92 px-8 text-center backdrop-blur-md"
