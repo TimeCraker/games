@@ -125,12 +125,13 @@ class Cdp {
       this.ws.send(JSON.stringify({ id, method, params }));
     });
   }
-  close() { try { this.ws.close(); } catch {} }
+  async close() { try { if (this.targetId) await this.send("Target.closeTarget", { targetId: this.targetId }); } catch {} try { this.ws.close(); } catch {} }
 }
 
 async function newTab(route) {
   const t = await (await fetch(CDP_HTTP + "/json/new?about:blank", { method: "PUT" })).json();
   const cdp = new Cdp(t.webSocketDebuggerUrl);
+  cdp.targetId = t.id;
   await cdp.open();
   return cdp;
 }

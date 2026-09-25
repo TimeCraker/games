@@ -23,12 +23,13 @@ class Cdp {
     const id = ++this.id;
     return new Promise((res, rej) => { this.p.set(id, { res, rej }); this.ws.send(JSON.stringify({ id, method, params })); });
   }
-  close() { try { this.ws.close(); } catch {} }
+  async close() { try { if (this.targetId) await this.send("Target.closeTarget", { targetId: this.targetId }); } catch {} try { this.ws.close(); } catch {} }
 }
 
 async function newTab() {
   const t = await (await fetch(CDP_HTTP + "/json/new?about:blank", { method: "PUT" })).json();
   const c = new Cdp(t.webSocketDebuggerUrl);
+  c.targetId = t.id;
   await c.open();
   return c;
 }
@@ -84,12 +85,16 @@ async function tabRingInDialog(c, scenarioName, tabs = 12) {
 
 async function pressEscAndCheck(c, name, expectClosed) {
   await pressKey(c, "Escape", "Escape", 27);
-  // AnimatePresence exit 动画保留 DOM 200~400ms：轮询至多 2s 判定
+  // AnimatePresence exit 动画保留 DOM 200~400ms：轮询至多 2.4s；未生效再补一次 Esc（双击幂等）
   let open = true;
-  for (let i = 0; i < 8; i++) {
-    await sleep(300);
-    open = await evalJson(c, "!!document.querySelector('[role=dialog]')");
+  for (let round = 0; round < 2; round++) {
+    for (let i = 0; i < 8; i++) {
+      await sleep(300);
+      open = await evalJson(c, "!!document.querySelector('[role=dialog]')");
+      if (open === !expectClosed) break;
+    }
     if (open === !expectClosed) break;
+    await pressKey(c, "Escape", "Escape", 27);
   }
   const pass = open === !expectClosed;
   report(name, pass, "弹层仍打开=" + open + "（期望关闭=" + expectClosed + "）");
@@ -160,6 +165,41 @@ try {
     const summary = await evalJson(c, "(function(){var els=[...document.querySelectorAll('a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex=\"-1\"])')]; var bad=els.filter(function(e){var r=e.getBoundingClientRect(); var s=getComputedStyle(e); return r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none'&&(e.tagName==='BUTTON'&&!(e.textContent||'').trim()&&!e.getAttribute('aria-label')&&!e.getAttribute('title')&&!e.getAttribute('aria-labelledby'));}); return {focusables:els.length, unnamedVisibleButtons:bad.length};})()");
     report("tab-ring-login·页内无名可见按钮=0", summary.unnamedVisibleButtons === 0, JSON.stringify(summary));
     await c.close();
+  }
+  // G. 全路由 Tab 环轮转：跳过链接首落点 + 环内落点全部可见 + 无无名按钮
+  {
+    const pages = [
+      { name: "home", route: "/" },
+      { name: "login", route: "/login" },
+      { name: "lobby", route: "/lobby", seed: true },
+      { name: "xiaoxiaole", route: "/xiaoxiaole" },
+      { name: "notfound", route: "/this-route-does-not-exist" },
+    ];
+    for (const pg of pages) {
+      const c = await runScenario("tab-ring-" + pg.name, pg.route, { seed: !!pg.seed });
+      await evalJson(c, "(document.activeElement && document.activeElement.blur && document.activeElement.blur(), true)");
+      const stops = [];
+      let firstOk = false, allVisible = true;
+      const invis = [];
+      const maxTabs = 40;
+      for (let i = 0; i < maxTabs; i++) {
+        await pressKey(c, "Tab", "Tab", 9);
+        await sleep(280); // skip link 的 translate 入场 200ms：等落点就位再测可见性
+        const f = await evalJson(c, focusInfo);
+        if (f.tag === "BODY") break; // 环耗尽落回 body：终点而非违规
+        stops.push(f);
+        const visible = (f.w ?? 0) > 0 && (f.h ?? 0) > 0 && (f.top ?? -999) > -60;
+        if (!visible) { allVisible = false; if (invis.length < 4) invis.push({ tag: f.tag, txt: (f.txt || "").slice(0, 12), top: f.top, w: f.w }); }
+        if (i === 0) firstOk = (f.txt || "").indexOf("跳到主内容") >= 0;
+        // 回到首落点 = 完整闭环（容差：同 tag/txt/aria/坐标）
+        if (i > 0 && stops[0].tag === f.tag && stops[0].txt === f.txt && stops[0].aria === f.aria && Math.abs((stops[0].top ?? 0) - (f.top ?? 0)) < 3 && Math.abs((stops[0].left ?? 0) - (f.left ?? 0)) < 3) break;
+      }
+      const unnamed = await evalJson(c, "(function(){var bad=[].slice.call(document.querySelectorAll('button:not([disabled])')).filter(function(e){var r=e.getBoundingClientRect();var s=getComputedStyle(e);return r.width>0&&r.height>0&&s.visibility!=='hidden'&&!(e.textContent||'').trim()&&!e.getAttribute('aria-label')&&!e.getAttribute('title')&&!e.getAttribute('aria-labelledby');});return bad.length;})()");
+      report("tab-ring-" + pg.name + "·首选=skip链接", firstOk, JSON.stringify(stops[0]));
+      report("tab-ring-" + pg.name + "·环内落点全部可见", allVisible && stops.length >= 2, "stops=" + stops.length + (invis.length ? " 不可见=" + JSON.stringify(invis) : ""));
+      report("tab-ring-" + pg.name + "·页内无名可见按钮=0", unnamed === 0, "unnamed=" + unnamed);
+      await c.close();
+    }
   }
   fs.mkdirSync(OUT_DIR, { recursive: true });
   fs.writeFileSync(path.join(OUT_DIR, "interact-summary.json"), JSON.stringify({ at: new Date().toISOString(), results }, null, 2));
