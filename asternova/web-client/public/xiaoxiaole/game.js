@@ -10,9 +10,9 @@ const ROWS = 8, COLS = 8, TYPES = 4;
 const SWAP_DUR = 260, REMOVE_DUR = 420, FALL_DUR = 320, GAP = 8, PAD = 10, SWIPE_THRESH = 0.22;
 const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./assets/faces/face2.jpg','./assets/faces/face3.jpg'];
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
-const SPECIAL = { NONE:0, BOMB:1, RAINBOW:2 };
+const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.25';
+const CACHE_VER = '2.26';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -48,6 +48,8 @@ const SVG = {
   zoomIn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6M11 8v6"/></svg>',
   zoomOut:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6"/></svg>',
   fit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V5a2 2 0 012-2h4M15 3h4a2 2 0 012 2v4M21 15v4a2 2 0 01-2 2h-4M9 21H5a2 2 0 01-2-2v-4"/></svg>',
+  rocketH:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M15 8l4 4-4 4M9 8l-4 4 4 4"/></svg>',
+  rocketV:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8 15l4 4 4-4M8 9l4-4 4 4"/></svg>',
 };
 function ic(name, cls=''){ return `<span class="ic ${cls}">${SVG[name]||''}</span>`; }
 
@@ -64,11 +66,11 @@ const LEVELS = [
   { id:2,  name:'渐入佳境',   target:3000, moves:0,  goals:[{t:'score',v:3000}] },
   { id:3,  name:'连击初体验', target:3500, moves:0,  goals:[{t:'score',v:3500},{t:'combo',v:3}] },
   { id:4,  name:'步数挑战',   target:3000, moves:30, goals:[{t:'score',v:3000}] },
-  { id:5,  name:'炸弹实验室', target:4000, moves:28, goals:[{t:'score',v:4000},{t:'bomb',v:2}] },
+  { id:5,  name:'炸弹实验室', target:3500, moves:26, goals:[{t:'score',v:3500},{t:'bomb',v:1}] },
   { id:6,  name:'彩虹时刻',   target:4500, moves:26, goals:[{t:'score',v:4500},{t:'rainbow',v:1}] },
   { id:7,  name:'连击大师',   target:5000, moves:25, goals:[{t:'score',v:5000},{t:'combo',v:4}] },
   { id:8,  name:'极速通关',   target:4000, moves:20, goals:[{t:'score',v:4000}] },
-  { id:9,  name:'双重目标',   target:5500, moves:24, goals:[{t:'score',v:5500},{t:'bomb',v:3}] },
+  { id:9,  name:'双重目标',   target:5000, moves:24, goals:[{t:'score',v:5000},{t:'bomb',v:2}] },
   { id:10, name:'彩虹盛宴',   target:6000, moves:22, goals:[{t:'score',v:6000},{t:'rainbow',v:2}] },
   { id:11, name:'极限连击',   target:7000, moves:20, goals:[{t:'score',v:7000},{t:'combo',v:5}] },
   { id:12, name:'桓睿大师',   target:8000, moves:18, goals:[{t:'score',v:8000},{t:'combo',v:5},{t:'rainbow',v:2}] },
@@ -207,6 +209,8 @@ const posOf=(r,c)=>({x:c*cellUnit,y:r*cellUnit});
 function makeTile(r,c,type,special=SPECIAL.NONE){
   const el=document.createElement('div');
   el.className=`tile t${type}`;
+  if(special===SPECIAL.ROCKET_H) el.classList.add('special-rocket-h');
+  if(special===SPECIAL.ROCKET_V) el.classList.add('special-rocket-v');
   if(special===SPECIAL.BOMB) el.classList.add('special-bomb');
   if(special===SPECIAL.RAINBOW) el.classList.add('special-rainbow');
   el.dataset.r=r; el.dataset.c=c; el.dataset.type=type;
@@ -217,7 +221,7 @@ function makeTile(r,c,type,special=SPECIAL.NONE){
   const ring=document.createElement('div'); ring.className='ring';
   const corner=document.createElement('div'); corner.className='corner'; corner.textContent=type+1;
   el.appendChild(face); el.appendChild(ring); el.appendChild(corner);
-  if(special!==SPECIAL.NONE){ const badge=document.createElement('span'); badge.className='badge'; badge.innerHTML=ic(special===SPECIAL.BOMB?'bomb':'rainbow'); el.appendChild(badge); }
+  if(special!==SPECIAL.NONE){ const badge=document.createElement('span'); badge.className='badge'; badge.innerHTML=ic(({[SPECIAL.BOMB]:'bomb',[SPECIAL.RAINBOW]:'rainbow',[SPECIAL.ROCKET_H]:'rocketH',[SPECIAL.ROCKET_V]:'rocketV'})[special]||'star'); el.appendChild(badge); }
   const {x,y}=posOf(r,c);
   el.style.setProperty('--tx',x+'px'); el.style.setProperty('--ty',y+'px');
   el.style.transform=`translate3d(${x}px,${y}px,${Z_TILE}px)`;
@@ -285,11 +289,23 @@ async function trySwap(r1,c1,r2,c2){
     swapData(r1,c1,r2,c2);
     await Promise.all([placeTile(a,r2,c2),placeTile(b,r1,c1)]); sfx.swap();
     const rainbow=a.special===SPECIAL.RAINBOW?a:b;
-    const otherType=(a.special===SPECIAL.RAINBOW?b:a).type;
-    const targets=[];
-    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(board[r][c]&&(board[r][c].type===otherType||board[r][c]===rainbow)) targets.push({r,c});
-    if(targets.some(t=>board[t.r][t.c]?.special===SPECIAL.BOMB)) sfx.bomb();
-    await removeCells(targets,{rainbow:true});
+    const other=a.special===SPECIAL.RAINBOW?b:a;
+    const rPos=a.special===SPECIAL.RAINBOW?{r:r2,c:c2}:{r:r1,c:c1};
+    const oPos=a.special===SPECIAL.RAINBOW?{r:r1,c:c1}:{r:r2,c:c2};
+    const set=new Set();
+    set.add(rPos.r+','+rPos.c); set.add(oPos.r+','+oPos.c);
+    const add=(r,c)=>{ if(inBounds(r,c)) set.add(r+','+c); };
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+      const t=board[r][c]; if(!t||t.type!==other.type) continue;
+      if(other.special===SPECIAL.BOMB){ for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++) add(r+dr,c+dc); }
+      else if(other.special===SPECIAL.ROCKET_H){ for(let nc=0;nc<COLS;nc++) add(r,nc); }
+      else if(other.special===SPECIAL.ROCKET_V){ for(let nr=0;nr<ROWS;nr++) add(nr,c); }
+      else { add(r,c); }
+    }
+    const targets=Array.from(set).map(parseKey);
+    if(other.special===SPECIAL.BOMB) sfx.bomb();
+    if(other.special===SPECIAL.ROCKET_H||other.special===SPECIAL.ROCKET_V) sfx.special(SPECIAL.ROCKET_H);
+    await removeCells(targets,{rainbow:other.special===SPECIAL.RAINBOW});
     combo=0; await cascade(); afterMove(); return;
   }
   busy=true; clearSelection();
@@ -359,10 +375,40 @@ async function cascade(){
 }
 function scoreFor(n,c){ return Math.round(n*30*(1+(c-1)*0.5)); }
 function planSpecials(runs){
-  const out=[];
+  const out=[]; const planned=new Set();
+  const key=(r,c)=>r+','+c;
+  // 1) 直线 5+ → 彩虹
   for(const run of runs){
-    if(run.len>=5){ const mid=run.cells[Math.floor(run.cells.length/2)]; out.push({r:mid.r,c:mid.c,type:run.type,special:SPECIAL.RAINBOW}); stats.rainbows++; goalProgress.rainbow=(goalProgress.rainbow||0)+1; unlockAchievement('make_rainbow'); }
-    else if(run.len>=4){ const mid=run.cells[Math.floor(run.cells.length/2)]; out.push({r:mid.r,c:mid.c,type:run.type,special:SPECIAL.BOMB}); stats.bombs++; goalProgress.bomb=(goalProgress.bomb||0)+1; unlockAchievement('make_bomb'); }
+    if(run.len>=5){
+      const mid=run.cells[Math.floor(run.cells.length/2)];
+      if(!planned.has(key(mid.r,mid.c))){
+        planned.add(key(mid.r,mid.c));
+        out.push({r:mid.r,c:mid.c,type:run.type,special:SPECIAL.RAINBOW});
+        stats.rainbows++; goalProgress.rainbow=(goalProgress.rainbow||0)+1; unlockAchievement('make_rainbow');
+      }
+    }
+  }
+  // 2) 横竖交叉（T/L/十字）→ 炸弹（交叉点）
+  const hs=runs.filter(x=>x.dir==='h'&&x.len>=3), vs=runs.filter(x=>x.dir==='v'&&x.len>=3);
+  for(const h of hs){
+    for(const v of vs){
+      let hit=null;
+      for(const hc of h.cells){ if(v.cells.some(vc=>vc.r===hc.r&&vc.c===hc.c)){ hit=hc; break; } }
+      if(hit&&!planned.has(key(hit.r,hit.c))){
+        planned.add(key(hit.r,hit.c));
+        out.push({r:hit.r,c:hit.c,type:h.type,special:SPECIAL.BOMB});
+        stats.bombs++; goalProgress.bomb=(goalProgress.bomb||0)+1; unlockAchievement('make_bomb');
+      }
+    }
+  }
+  // 3) 直线 4 → 条纹火箭（方向=连线走向）
+  for(const run of runs){
+    if(run.len!==4) continue;
+    const mid=run.cells[Math.floor(run.cells.length/2)];
+    if(planned.has(key(mid.r,mid.c))) continue;
+    planned.add(key(mid.r,mid.c));
+    out.push({r:mid.r,c:mid.c,type:run.type,special:run.dir==='h'?SPECIAL.ROCKET_H:SPECIAL.ROCKET_V});
+    stats.rockets++;
   }
   if(combo>=2) goalProgress.combo=Math.max(goalProgress.combo||0,combo);
   return out;
@@ -370,8 +416,11 @@ function planSpecials(runs){
 function collectSpecialTriggers(set){ const extra=new Set(); for(const k of set){ const{r,c}=parseKey(k); const t=board[r][c]; if(t&&t.special!==SPECIAL.NONE) extra.add(k);} return extra; }
 function expandSpecials(set){
   const result=new Set(set); const queue=Array.from(set); const seen=new Set(set);
+  const add=(nr,nc)=>{ if(!inBounds(nr,nc)) return; const k=nr+','+nc; if(!seen.has(k)){seen.add(k);result.add(k);queue.push(k);} };
   while(queue.length){ const key=queue.shift(); const{r,c}=parseKey(key); const t=board[r]&&board[r][c]; if(!t) continue;
-    if(t.special===SPECIAL.BOMB){ for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){ const nr=r+dr,nc=c+dc; if(!inBounds(nr,nc)) continue; const k=`${nr},${nc}`; if(!seen.has(k)){seen.add(k);result.add(k);queue.push(k);} } }
+    if(t.special===SPECIAL.BOMB){ for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++) add(r+dr,c+dc); }
+    else if(t.special===SPECIAL.ROCKET_H){ for(let nc=0;nc<COLS;nc++) add(r,nc); }
+    else if(t.special===SPECIAL.ROCKET_V){ for(let nr=0;nr<ROWS;nr++) add(nr,c); }
   }
   return result;
 }
@@ -428,7 +477,7 @@ function spawnParticles(r,c,type,rainbow){
 function shockwave(r,c,sp){
   if(!settings.motion||Q.shockwaves<=0) return;
   const {x,y}=posOf(r,c); const cx=(x+tileSize/2+PAD)*dpr, cy=(y+tileSize/2+PAD)*dpr;
-  const col = sp===SPECIAL.RAINBOW?'#a78bfa':'#ff6b6b';
+  const col = sp===SPECIAL.RAINBOW?'#a78bfa':sp===SPECIAL.BOMB?'#ff6b6b':sp===SPECIAL.ROCKET_V?'#ffaa3c':'#4ecdc4';
   for(let k=0;k<Q.shockwaves;k++){ if(particles.length>=MAX_PARTICLES) break; const p=newParticle(); Object.assign(p,{ring:true,x:cx,y:cy,r:6*dpr,life:1,decay:.04,color:col}); particles.push(p); }
   ensureParticleLoop();
 }
@@ -624,7 +673,7 @@ const sfx=(()=>{
     invalid:()=>tone(180,0.18,'sawtooth',0.18,0.6),
     clear:(combo)=>{ const base=523+(combo-1)*70; tone(base,0.12,'triangle',0.22,1.5); setTimeout(()=>tone(base*1.5,0.1,'sine',0.16),60); },
     bomb:()=>{ noise(0.3,0.5); tone(120,0.3,'sawtooth',0.3,0.4); },
-    special:(sp)=>{ if(sp===SPECIAL.RAINBOW){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,0.15,'triangle',0.2),i*50)); } else { tone(80,0.2,'sawtooth',0.3,2); noise(0.15,0.3); } },
+    special:(sp)=>{ if(sp===SPECIAL.RAINBOW){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,0.15,'triangle',0.2),i*50)); } else if(sp===SPECIAL.ROCKET_H||sp===SPECIAL.ROCKET_V){ tone(620,0.1,'square',0.18,2.6); setTimeout(()=>{ noise(0.18,0.28); tone(180,0.3,'sawtooth',0.2,0.3); },70); } else { tone(80,0.2,'sawtooth',0.3,2); noise(0.15,0.3); } },
     win:()=>{ [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,0.3,'triangle',0.3),i*120)); },
     lose:()=>{ [400,330,260].forEach((f,i)=>setTimeout(()=>tone(f,0.35,'sawtooth',0.25),i*150)); },
     achieve:()=>{ [659,784,988,1319].forEach((f,i)=>setTimeout(()=>tone(f,0.25,'triangle',0.25),i*90)); },
@@ -743,7 +792,7 @@ function renderLevelsGrid(){
 async function startLevel(idx){
   levelIdx=idx; currentLevel=LEVELS[idx];
   score=0; moves=currentLevel.moves; usedMoves=0; combo=0; busy=false;
-  stats={clears:0,maxCombo:0,bombs:0,rainbows:0}; goalProgress={};
+  stats={clears:0,maxCombo:0,bombs:0,rainbows:0,rockets:0}; goalProgress={};
   state='intro'; showScreen('screenIntro');
   $('introNum').textContent=currentLevel.id; $('introName').textContent=currentLevel.name;
   $('introGoals').innerHTML=currentLevel.goals.map(g=>{const m=GOAL_META[g.t];return `<div>${ic(m.icon,'sm')} ${m.label} <b>${g.v}</b></div>`;}).join('') + (currentLevel.moves===0?'':'<div>'+ic('target','sm')+' '+currentLevel.moves+' 步内完成</div>');
@@ -773,7 +822,7 @@ function winLevel(){
   if(levelIdx+1>=LEVELS.length) unlockAchievement('beat12');
   $('winScore').textContent=score;
   $('winStars').innerHTML=[0,1,2].map(i=>i<stars?ic('star','lg full'):ic('starO','lg empty')).join('');
-  $('winStats').innerHTML=`消除方块 <b>${stats.clears}</b> · 最高连击 <b>×${stats.maxCombo}</b><br>生成炸弹 <b>${stats.bombs}</b> · 生成彩虹 <b>${stats.rainbows}</b>`;
+  $('winStats').innerHTML=`消除方块 <b>${stats.clears}</b> · 最高连击 <b>×${stats.maxCombo}</b><br>生成炸弹 <b>${stats.bombs}</b> · 彩虹 <b>${stats.rainbows}</b> · 火箭 <b>${stats.rockets}</b>`;
   $('nextLevelBtn').style.display=(levelIdx+1<LEVELS.length)?'':'none';
   showModal('modalWin');
 }

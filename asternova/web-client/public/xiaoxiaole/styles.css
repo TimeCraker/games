@@ -290,18 +290,20 @@ body {
   60%{ transform:translate3d(var(--tx),var(--ty),12px) scale(1.12); opacity:1; }
   100%{transform:translate3d(var(--tx),var(--ty),8px) scale(1); opacity:1; }
 }
-.tile.special-bomb .badge, .tile.special-rainbow .badge {
+.tile.special-bomb .badge, .tile.special-rainbow .badge, .tile.special-rocket-h .badge, .tile.special-rocket-v .badge {
   position:absolute; inset:0; display:grid; place-items:center;
   width:46%; height:46%; margin:auto; color:#fff; z-index:3; transform:translateZ(12px);
   filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));
 }
 .tile.special-bomb .badge { background:rgba(255,90,90,.92); border-radius:50%; animation:bombBeat 1s ease-in-out infinite; padding:8%; }
+.tile.special-rocket-h .badge { background:rgba(78,205,196,.92); border-radius:12px; padding:8%; }
+.tile.special-rocket-v .badge { background:rgba(255,170,60,.94); border-radius:12px; padding:8%; }
 .tile.special-bomb { /* 静态光晕，不动画 filter */ }
 .tile.special-bomb::after { content:""; position:absolute; inset:-4px; border-radius:14px; background:radial-gradient(circle,rgba(255,90,90,.5),transparent 70%); opacity:.7; z-index:-1; animation:bombGlow 1s ease-in-out infinite; }
 .tile.special-rainbow .badge { animation: spin 4s linear infinite; padding:6%; }
 .tile.special-rainbow { /* 不再持续 hue-rotate */ }
 .tile.special-rainbow::after { content:""; position:absolute; inset:-4px; border-radius:14px; background:conic-gradient(from 0deg,#ff6b6b,#ffd93d,#4ecdc4,#a78bfa,#ff6b6b); opacity:.55; z-index:-1; animation: spin 4s linear infinite; }
-.tile.special-bomb .badge svg, .tile.special-rainbow .badge svg { width:100%; height:100%; display:block; }
+.tile.special-bomb .badge svg, .tile.special-rainbow .badge svg, .tile.special-rocket-h .badge svg, .tile.special-rocket-v .badge svg { width:100%; height:100%; display:block; }
 @keyframes bombBeat { 0%,100%{transform:translateZ(12px) scale(1)} 50%{transform:translateZ(16px) scale(1.15)} }
 @keyframes bombGlow { 0%,100%{opacity:.4; transform:scale(.9)} 50%{opacity:.7; transform:scale(1.05)} }
 @keyframes spin { to{transform:translateZ(12px) rotate(360deg)} }
@@ -495,6 +497,7 @@ svg { max-width:100%; }
 .legend-badge { width:28px; height:28px; border-radius:9px; display:grid; place-items:center; flex-shrink:0; background:var(--surface-2); }
 .legend-badge.bomb { color:#ff5a5a; }
 .legend-badge.rainbow { color:#a78bfa; }
+.legend-badge.rocket { color:#4ecdc4; }
 .legend-badge .ic { width:17px; height:17px; }
 
 /* 关卡卡片补充 */
@@ -614,7 +617,7 @@ svg { max-width:100%; }
   .tile .face { transform:none; }
   .tile .ring { transform:none; }
   .tile .corner { transform:none; }
-  .tile.special-bomb .badge, .tile.special-rainbow .badge { transform:none; }
+  .tile.special-bomb .badge, .tile.special-rainbow .badge, .tile.special-rocket-h .badge, .tile.special-rocket-v .badge { transform:none; }
   .tile.special-bomb::after, .tile.special-rainbow::after { transform:none; }
   .fx-layer { transform:none; }
   .float-layer { transform:none; }
@@ -632,6 +635,7 @@ svg { max-width:100%; }
   .tile.pre-clear .face { animation:none; transform:scale(1.1); }
   .tile.special-bomb .badge { animation:none; }
   .tile.special-rainbow .badge { animation:none; }
+  .tile.special-rocket-h .badge, .tile.special-rocket-v .badge { transform:none; }
   .tile.special-bomb::after, .tile.special-rainbow::after { animation:none; opacity:.4; }
   .tile .face { box-shadow: var(--tile-shadow); }
   .tile .corner { box-shadow:none; }
