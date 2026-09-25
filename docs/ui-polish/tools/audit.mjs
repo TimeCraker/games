@@ -109,8 +109,20 @@ const AUDIT_FN = `() => {
     if (r.top < -900 || r.left < -900) continue; // 离屏定位节点（如 Pixi 注入的 1×1 accessibility 占位按钮，top/left=-1000）
     const s = getComputedStyle(el);
     if (s.visibility === "hidden" || s.display === "none") continue;
+    // 累计祖先 transform 缩放（ScaleFitGameStage 等比缩放舞台）：<0.9 视为「缩放壳内」
+    let sc = 1; let nd = el.parentElement;
+    while (nd && nd.nodeType === 1) {
+      const t = getComputedStyle(nd).transform;
+      if (t && t !== "none") {
+        if (t.startsWith("matrix(")) { const p = t.slice(7, -1).split(",").map(Number); sc *= Math.hypot(p[0], p[1]); }
+        else if (t.startsWith("matrix3d(")) { const p = t.slice(9, -1).split(",").map(Number); sc *= Math.hypot(p[0], p[1], p[2]); }
+      }
+      nd = nd.parentElement;
+    }
+    sc = Math.round(sc * 1000) / 1000;
     const pseudoHit = (() => { const b = getComputedStyle(el, "::before"); return !!b && b.content !== "none" && /^(absolute|fixed)$/.test(b.position) && b.inset !== "auto"; })();
-    if ((r.width < 24 || r.height < 24) && !pseudoHit) small.push({ tag: el.tagName, d: desc(el), w: Math.round(r.width), h: Math.round(r.height), name: (el.getAttribute("aria-label") || el.getAttribute("title") || (el.textContent || "").trim().slice(0, 20) || ""), html: el.outerHTML.slice(0, 220) });
+    // 伪元素扩区仅在未缩放的上下文里作数；缩放壳内无论伪元素都按视觉盒判定（关键路径必须出壳）
+    if ((r.width < 24 || r.height < 24) && (!pseudoHit || sc < 0.9)) small.push({ tag: el.tagName, d: desc(el), w: Math.round(r.width), h: Math.round(r.height), name: (el.getAttribute("aria-label") || el.getAttribute("title") || (el.textContent || "").trim().slice(0, 20) || ""), scale: sc, html: el.outerHTML.slice(0, 220) });
     if (el.tagName === "BUTTON" && !(el.textContent || "").trim() && !el.getAttribute("aria-label") && !el.getAttribute("title") && !el.getAttribute("aria-labelledby")) unnamed.push(desc(el));
     clickables.push({ el, r: visRect(el) });
   }
