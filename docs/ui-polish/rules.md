@@ -38,7 +38,7 @@
 
 ## 6. 动效与排版
 
-- 时长 token：`--duration-fast: 200ms`（hover/微交互 150–300ms 区间）；缓动 `--ease-cinematic`；节奏呼吸类动效（lobby 光晕 2.6s 等）在 R6+ 工艺轮统一。
+- 时长 token：`--duration-fast: 200ms`（hover/微交互 150–300ms 区间）；缓动 `--ease-cinematic`；氛围呼吸类循环动效统一 `--duration-ambient: 2600ms`（R7 起，lobby 光晕已挂接）；低于秒级的重复闪烁禁用。
 - 字体：正文 Geist Sans；数据/坐标 `font-mono-data`（JetBrains Mono + tnum）；品牌大字 Orbitron（`.aster-title`）。
 - 间距/圆角走 token：`--radius` 阶梯、`max-w-aster`（1180px）容器。
 - 按钮动词统一：登录 / 进入大厅 / 返回大厅 / 重新开始 / 确认修改 / 取消（既有文案为准）。
