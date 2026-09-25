@@ -347,7 +347,7 @@ body {
 }
 
 .group:hover .lobby-arcade-enter-pill .lobby-arcade-sheen {
-  animation: lobby-enter-sheen 0.88s ease-out forwards;
+  animation: lobby-enter-sheen var(--duration-slow) ease-out forwards;
 }
 
 /* ===== 星象观测台:星图坐标网格 + 赤道仪刻度 + 引力扫描(committed 视觉决策) ===== */
