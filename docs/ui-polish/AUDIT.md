@@ -8,6 +8,34 @@
 
 ---
 
+## R12（收尾轮）· 用户手动叫停 → 暂停打磨
+
+### 隔轮评审（R11 改动）
+
+- 死样式删除（gravity/pulse-scan）：全仓 grep 0 残留 + 本轮终态复扫通过 → **通过**。
+- BGM 外环 ambient 令牌：计算样式 1.8s/2.6s 前后一致 → **通过，无 revert。**
+
+### 未实施（因用户叫停，留作召回首项）
+
+- `app/lobby/page.tsx:312-313` logo hover 旋摆 `duration: 0.5` 超 150–300ms 带 → 拟归 0.3s（WAAPI 取证脚本已备，临时目录）；规则依据 rules §6。
+- 队列余项：sonner toast 时长语料、slow3G 首帧占位截图、xiaoxiaole SW 离线取证、弱网截图隔轮评审。
+
+### 终态验证（本次收尾取证）
+
+- 全量扫描 10 路由 × 双视口 = 20 组合：语义/布局/a11y/console **0 问题**（保留项不变：16×16 label checkbox、404 自身资源日志、merge 渐变按钮已裁定达标）。
+- 最近全套记录：interact 33/33（R8）、edge 22/22（R9）、矩阵 tablet/wide/tiny 27 组合全绿（R9）。
+- build/lint：基线 0 errors（1 条 R1 定案保留 warning）。
+
+### Commits 累计
+
+- 19 个 Conventional Commit（R5–R11）+ 本收尾台账提交，**全部已推送 origin/main 同步**。
+- 站点与验证脚本、台账、规则文档全部入库；截图/扫描 JSON 存 `.ui-polish/artifacts`（不进仓库）。
+
+### 结论
+
+- 目标按用户指令暂停（永不停止条款的「手动叫停」出口）。环境（:4105 站点、CDP 浏览器、看护脚本）保持可用，随时可恢复继续 R12+。
+
+---
 ## R11（本轮）· 轨 2 数据轮：死样式清理 + 恒等令牌化 + 深扫语料
 
 ### 隔轮评审（R10 改动）
