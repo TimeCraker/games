@@ -157,7 +157,18 @@ body {
   background:var(--panel-bg); border:1px solid var(--panel-border);
   padding:6px 16px; border-radius:20px; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
 }
-.actions { display:flex; gap:8px; }
+.actions { display:flex; gap:8px; align-items:center; }
+.back-menu-btn {
+  display:inline-flex; align-items:center; gap:6px; height:38px; padding:0 13px; cursor:pointer;
+  border:1px solid var(--line); border-radius:12px; background:var(--panel-bg); color:var(--text-soft);
+  font-size:12px; font-weight:700; font-family:inherit;
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  transition:transform .15s var(--ease-out), box-shadow .2s, color .2s, background .2s;
+}
+.back-menu-btn:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(var(--sc),.16); color:var(--text); }
+.back-menu-btn:active { transform:scale(.94); }
+.back-menu-btn .ic { width:15px; height:15px; }
+.back-menu-btn .bm-label { letter-spacing:.4px; }
 .icon-btn {
   width:38px; height:38px; border-radius:12px; border:1px solid var(--line);
   background:var(--panel-bg); color:var(--text-soft); font-size:16px;
@@ -167,7 +178,7 @@ body {
 .icon-btn:hover { transform:translateY(-1px); box-shadow:0 4px 10px rgba(var(--sc),.14); }
 .icon-btn:active { transform:scale(.92); }
 .icon-btn.off { opacity:.4; }
-.icon-btn:focus-visible, .menu-cta:focus-visible, .menu-levels-btn:focus-visible, .menu-utilities button:focus-visible { outline:3px solid #ffbd59; outline-offset:3px; }
+.icon-btn:focus-visible, .menu-cta:focus-visible, .menu-levels-btn:focus-visible, .mode-chip:focus-visible, .feat-card:focus-visible, .util-btn:focus-visible, .back-menu-btn:focus-visible { outline:3px solid #ffbd59; outline-offset:3px; }
 
 .game-body {
   flex:1; display:grid; grid-template-columns: 230px 1fr 230px;
@@ -389,10 +400,42 @@ body {
 }
 .menu-levels-btn:hover { transform:translateY(-2px); background:rgba(12,18,28,.52); }
 .menu-levels-btn small { font-size:10px; font-weight:700; color:rgba(255,255,255,.56); letter-spacing:1.2px; }
-.menu-utilities { display:flex; align-items:center; gap:9px; margin-top:16px; }
-.menu-utilities button { min-height:44px; padding:0 4px; border:0; background:none; color:rgba(255,255,255,.66); font-size:12px; font-weight:650; cursor:pointer; }
-.menu-utilities button:hover { color:#fff; }
-.menu-utilities > span { width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,.4); }
+/* 主菜单功能宫格（方块皮肤 / 排行榜 / 数据统计） */
+.menu-features { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px; }
+.feat-card {
+  position:relative; overflow:hidden; display:flex; align-items:center; gap:10px;
+  padding:11px 13px; text-align:left; cursor:pointer; color:#fff;
+  border:1px solid rgba(255,255,255,.2); border-radius:16px; background:rgba(12,18,28,.4);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  transition:transform .2s var(--ease-out), background .2s, border-color .2s;
+}
+.feat-card:hover { transform:translateY(-3px); background:rgba(12,18,28,.58); border-color:rgba(255,255,255,.4); }
+.feat-card:active { transform:scale(.98); }
+.feat-ic {
+  width:34px; height:34px; flex-shrink:0; border-radius:11px; display:grid; place-items:center; color:#fff;
+  background:linear-gradient(135deg,var(--c),var(--p)); box-shadow:0 6px 16px rgba(78,205,196,.3);
+  transition:transform .25s var(--ease-bounce);
+}
+.feat-card:hover .feat-ic { transform:scale(1.08) rotate(-4deg); }
+.feat-card:nth-child(2) .feat-ic { background:linear-gradient(135deg,var(--y),var(--r)); box-shadow:0 6px 16px rgba(255,217,61,.26); }
+.feat-card:nth-child(3) .feat-ic { background:linear-gradient(135deg,var(--p),#7c9dff); box-shadow:0 6px 16px rgba(167,139,250,.28); }
+.feat-ic .ic { width:18px; height:18px; }
+.feat-text { display:flex; flex-direction:column; gap:1px; min-width:0; }
+.feat-text b { font-size:13px; letter-spacing:.4px; }
+.feat-text small { font-size:10px; color:rgba(255,255,255,.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* 工具按钮（背景 / 音效 / 刷新） */
+.menu-utilities { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.util-btn {
+  display:inline-flex; align-items:center; gap:6px; min-height:36px; padding:0 12px; cursor:pointer;
+  border:1px solid rgba(255,255,255,.16); border-radius:12px; background:rgba(12,18,28,.32);
+  color:rgba(255,255,255,.8); font-size:12px; font-weight:650;
+  transition:transform .18s var(--ease-out), background .2s, color .2s, border-color .2s;
+}
+.util-btn:hover { transform:translateY(-2px); background:rgba(12,18,28,.54); color:#fff; border-color:rgba(255,255,255,.34); }
+.util-btn:active { transform:scale(.97); }
+.util-ic { width:15px; height:15px; display:inline-flex; justify-content:center; color:#ffbd59; }
+.util-ic .ic { width:15px; height:15px; }
 .menu-active .global-bar .icon-btn { color:#fff; background:rgba(10,16,26,.34); border-color:rgba(255,255,255,.24); box-shadow:0 8px 24px rgba(0,0,0,.12); }
 .menu-active .global-bar .icon-btn:hover { background:rgba(10,16,26,.52); }
 
@@ -749,7 +792,19 @@ svg { max-width:100%; }
   .menu-actions { gap:8px; margin-top:auto; }
   .menu-cta { min-width:0; flex:1; min-height:54px; padding:0 17px; }
   .menu-levels-btn { min-width:112px; min-height:54px; padding:0 14px; }
-  .menu-utilities { margin-top:9px; }
+  .menu-utilities { margin-top:9px; gap:6px; }
+  .menu-features { gap:7px; margin-top:9px; }
+  .feat-card { gap:7px; padding:9px 10px; border-radius:13px; }
+  .feat-ic { width:28px; height:28px; border-radius:9px; }
+  .feat-ic .ic { width:15px; height:15px; }
+  .feat-text b { font-size:12px; }
+  .feat-text small { display:none; }
+  .util-btn { min-height:34px; padding:0 10px; font-size:11px; gap:5px; }
+  .util-ic, .util-ic .ic { width:13px; height:13px; }
+  .back-menu-btn { height:44px; border-radius:14px; padding:0 12px; }
+  .back-menu-btn .bm-label { display:none; }
+  .back-menu-btn .ic { width:17px; height:17px; }
+  .menu-content { overflow-y:auto; }
   .panel-left .panel-card { min-width:140px; padding:10px 12px; }
   .goals { gap:6px; }
   .goal-item { font-size:12px; }

@@ -12,7 +12,7 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.30';
+const CACHE_VER = '2.31';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -53,6 +53,7 @@ const SVG = {
   infinity:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16C3.8 16 2.5 14.2 2.5 12S3.8 8 6 8c1.5 0 2.5 1 3.5 3 1 2 2 3 3.5 3 2.2 0 3.5-1.8 3.5-4s-1.3-4-3.5-4c-1.5 0-2.5 1-3.5 3-1 2-2 3-3.5 3z"/></svg>',
   clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   calendarDay:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/></svg>',
+  refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-2.64-6.36"/><path d="M21 3v6h-6"/></svg>',
 };
 function ic(name, cls=''){ return `<span class="ic ${cls}">${SVG[name]||''}</span>`; }
 
@@ -780,7 +781,8 @@ function setBg(key){
   bgIdx=BG_LIST.findIndex(b=>b.key===key);
   const cur=BG_LIST[bgIdx];
   $('bgBtn').innerHTML = ic(cur.icon);
-  const mb=$('menuBg'); if(mb) mb.textContent = `背景 · ${cur.name}`;
+  const mb=$('menuBgLabel'); if(mb) mb.textContent = `背景 · ${cur.name}`;
+  const mbi=$('menuBgIcon'); if(mbi) mbi.innerHTML = ic(cur.icon);
   localStorage.setItem('xxl-bg',key);
   syncBgStars();
 }
@@ -1268,6 +1270,7 @@ attachRipple(document.getElementById('menuDaily'));
 // ---------- 事件绑定 ----------
 $('brandBtn').onclick=()=>{ sfx.btn(); gotoMenu(); };
 $('bgBtn').onclick=()=>cycleBg();
+$('homeBtn').onclick=()=>{ sfx.btn(); gotoMenu(); };
 $('themeBtn').onclick=()=>{ setTheme(document.documentElement.dataset.theme==='light'?'dark':'light'); sfx.btn(); };
 $('soundBtn').onclick=()=>toggleSound();
 $('gameSoundBtn').onclick=()=>toggleSound();
@@ -1293,7 +1296,8 @@ function toggleSound(){
   settings.sfx=!settings.sfx; settings.music=settings.sfx; soundOn=settings.sfx; settings.save();
   // 同步所有静音按钮图标
   for(const id of ['soundBtn','gameSoundBtn','pauseMuteBtn']){ const el=$(id); if(el){ el.innerHTML=ic(soundOn?'sound':'mute'); el.classList.toggle('off',!soundOn); } }
-  const ms=$('menuSound'); if(ms) ms.textContent=`音效 · ${soundOn?'开':'关'}`;
+  const msl=$('menuSoundLabel'); if(msl) msl.textContent=`音效 · ${soundOn?'开':'关'}`;
+  const msi=$('menuSoundIcon'); if(msi) msi.innerHTML=ic(soundOn?'sound':'mute');
   if(!soundOn) stopBgMusic(); else if(state==='playing'&&settings.music) startBgMusic();
   syncSettingsUI();
   sfx.btn();
@@ -1647,7 +1651,10 @@ function start(){
   setTheme(themePref); setBg(bgPref);
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn); const gsb=$('gameSoundBtn'); if(gsb){ gsb.innerHTML=ic(soundOn?'sound':'mute'); gsb.classList.toggle('off',!soundOn); }
   $('pauseBtn').innerHTML=ic('pause'); $('levelsBack').innerHTML=ic('back');
-  $('menuSound').textContent=`音效 · ${soundOn?'开':'关'}`;
+  $('homeBtnIcon').innerHTML=ic('home');
+  $('menuSkinIcon').innerHTML=ic('image'); $('menuLbIcon').innerHTML=ic('trophy'); $('menuStatsIcon').innerHTML=ic('chart');
+  $('menuRefreshIcon').innerHTML=ic('refresh'); $('menuSoundIcon').innerHTML=ic(soundOn?'sound':'mute'); $('menuBgIcon').innerHTML=ic(BG_LIST[bgIdx]?BG_LIST[bgIdx].icon:'cloud');
+  $('menuSoundLabel').textContent=`音效 · ${soundOn?'开':'关'}`;
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
   syncBgStars();
   initBgStars(); syncBgStars();

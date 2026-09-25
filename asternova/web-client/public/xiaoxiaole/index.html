@@ -9,7 +9,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
-<link rel="stylesheet" href="./styles.css?v=2.30">
+<link rel="stylesheet" href="./styles.css?v=2.31">
 </head>
 <body>
 
@@ -37,6 +37,7 @@
     </div>
     <div class="level-pill" id="levelPill">Level 1</div>
     <div class="actions">
+      <button class="back-menu-btn" id="homeBtn" title="返回主菜单" aria-label="返回主菜单"><span class="ic" id="homeBtnIcon"></span><span class="bm-label">主菜单</span></button>
       <button class="icon-btn" id="gameSoundBtn" title="静音" aria-label="静音"></button>
       <button class="icon-btn" id="pauseBtn" title="暂停" aria-label="暂停"></button>
     </div>
@@ -134,13 +135,15 @@
         <button class="mode-chip" id="menuTimed"><span class="mode-ic"></span><b>限时模式</b><small>60秒冲刺</small></button>
         <button class="mode-chip" id="menuDaily"><span class="mode-ic"></span><b>每日挑战</b><small>每天同一题</small></button>
       </div>
+      <div class="menu-features">
+        <button class="feat-card" id="menuSkin"><span class="feat-ic" id="menuSkinIcon"></span><span class="feat-text"><b>方块皮肤</b><small>上传照片换方块</small></span></button>
+        <button class="feat-card" id="menuLeaderboard"><span class="feat-ic" id="menuLbIcon"></span><span class="feat-text"><b>排行榜</b><small>各模式 TOP 10</small></span></button>
+        <button class="feat-card" id="menuStats"><span class="feat-ic" id="menuStatsIcon"></span><span class="feat-text"><b>数据统计</b><small>战绩与成就墙</small></span></button>
+      </div>
       <div class="menu-utilities">
-        <button id="menuSkin">方块皮肤</button>
-        <button id="menuLeaderboard">排行榜</button>
-        <button id="menuStats">数据统计</button>
-        <button id="menuBg">游戏背景</button>
-        <button id="menuRefresh">刷新资源</button>
-        <button id="menuSound">音效</button>
+        <button class="util-btn" id="menuBg"><span class="util-ic" id="menuBgIcon"></span><span id="menuBgLabel">游戏背景</span></button>
+        <button class="util-btn" id="menuSound"><span class="util-ic" id="menuSoundIcon"></span><span id="menuSoundLabel">音效 · 开</span></button>
+        <button class="util-btn" id="menuRefresh"><span class="util-ic" id="menuRefreshIcon"></span><span>刷新资源</span></button>
       </div>
     </div>
   </div>
@@ -399,6 +402,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<script src="./game.js?v=2.30"></script>
+<script src="./game.js?v=2.31"></script>
 </body>
 </html>
