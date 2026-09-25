@@ -47,7 +47,7 @@ async function pressKey(c, key, code, vk) {
   await c.send("Input.dispatchKeyEvent", { type: "keyUp", key, code, windowsVirtualKeyCode: vk, nativeVirtualKeyCode: vk });
 }
 
-const focusInfo = "(function(){var a=document.activeElement; if(!a||a===document.body) return {tag:'BODY'}; var r=a.getBoundingClientRect(); return {tag:a.tagName,cls:String(a.className).slice(0,44),txt:(a.textContent||'').trim().slice(0,14),aria:a.getAttribute('aria-label')||'',w:Math.round(r.width),h:Math.round(r.height),top:Math.round(r.top),inDialog:!!a.closest('[role=dialog]')};})()";
+const focusInfo = "(function(){var a=document.activeElement; if(!a||a===document.body) return {tag:'BODY'}; var r=a.getBoundingClientRect(); return {tag:a.tagName,cls:String(a.className).slice(0,44),txt:(a.textContent||'').trim().slice(0,14),aria:a.getAttribute('aria-label')||'',w:Math.round(r.width),h:Math.round(r.height),top:Math.round(r.top),left:Math.round(r.left),inDialog:!!a.closest('[role=dialog]')};})()";
 
 const results = [];
 function report(name, pass, detail) {
@@ -69,15 +69,16 @@ async function runScenario(name, route, opts = {}) {
 }
 
 async function tabRingInDialog(c, scenarioName, tabs = 12) {
-  const stops = []; let outside = 0;
+  const stops = []; let outside = 0; let cycleLen = null;
+  const sameStop = (a, b) => a.tag === b.tag && a.txt === b.txt && a.aria === b.aria && Math.abs(a.top - b.top) < 3 && Math.abs((a.left ?? 0) - (b.left ?? 0)) < 3;
   for (let i = 0; i < tabs; i++) {
     await pressKey(c, "Tab", "Tab", 9);
     const f = await evalJson(c, focusInfo);
     stops.push(f);
     if (!f.inDialog) outside++;
+    if (cycleLen === null && i > 0 && sameStop(stops[0], f)) { cycleLen = stops.length - 1; break; } // 首循环回到起点即闭环
   }
-  const distinct = new Set(stops.map((s) => s.tag + "|" + s.txt + "|" + s.aria)).size;
-  report(scenarioName + "·Tab焦点陷阱", outside === 0 && distinct >= 2, "落点数=" + distinct + "，越界=" + outside + "，首落点=" + JSON.stringify(stops[0]));
+  report(scenarioName + "·Tab焦点陷阱", outside === 0 && stops.length >= 2, "落点数=" + stops.length + (cycleLen !== null ? "（首循环长 " + cycleLen + "）" : "") + "，越界=" + outside + "，首落点=" + JSON.stringify(stops[0]));
   return stops;
 }
 

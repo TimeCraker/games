@@ -9,6 +9,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { inflateSync } from "node:zlib";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CDP_HTTP = process.env.CDP_HTTP || "http://127.0.0.1:9333";
@@ -28,6 +29,84 @@ const VIEWPORTS = argVal("viewports", "desktop,mobile").split(",").filter(Boolea
 }));
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** 零依赖 PNG 解码（8bit、RGB/RGBA；Adam interlace 不支持，CDP 截图无 interlace） */
+function decodePng(buf) {
+  if (buf.readUInt32BE(0) !== 0x89504e47) throw new Error("not a png");
+  let pos = 8; let width = 0, height = 0, bitDepth = 0, colorType = 0;
+  const idat = [];
+  while (pos < buf.length) {
+    const len = buf.readUInt32BE(pos);
+    const type = buf.toString("ascii", pos + 4, pos + 8);
+    const data = buf.subarray(pos + 8, pos + 8 + len);
+    if (type === "IHDR") { width = data.readUInt32BE(0); height = data.readUInt32BE(4); bitDepth = data[8]; colorType = data[9]; }
+    else if (type === "IDAT") idat.push(data);
+    else if (type === "IEND") break;
+    pos += 12 + len;
+  }
+  if (bitDepth !== 8 || (colorType !== 6 && colorType !== 2)) throw new Error("unsupported png depth/type " + bitDepth + "/" + colorType);
+  const raw = inflateSync(Buffer.concat(idat));
+  const bpp = colorType === 6 ? 4 : 3;
+  const stride = width * bpp;
+  const out = Buffer.alloc(height * stride);
+  let p = 0;
+  for (let y = 0; y < height; y++) {
+    const filter = raw[p++];
+    const line = raw.subarray(p, p + stride); p += stride;
+    for (let x = 0; x < stride; x++) {
+      const a = x >= bpp ? out[y * stride + x - bpp] : 0;
+      const b = y > 0 ? out[(y - 1) * stride + x] : 0;
+      const c = x >= bpp && y > 0 ? out[(y - 1) * stride + x - bpp] : 0;
+      let v = line[x];
+      if (filter === 1) v = (v + a) & 255;
+      else if (filter === 2) v = (v + b) & 255;
+      else if (filter === 3) v = (v + ((a + b) >> 1)) & 255;
+      else if (filter === 4) {
+        const p0 = a + b - c;
+        const pa = Math.abs(p0 - a), pb = Math.abs(p0 - b), pc = Math.abs(p0 - c);
+        const pr = pa <= pb && pa <= pc ? a : pb <= pc ? b : c;
+        v = (v + pr) & 255;
+      }
+      out[y * stride + x] = v;
+    }
+  }
+  return { width, height, data: out, bpp };
+}
+
+function samplePng(png, x, y) {
+  const cx = Math.max(0, Math.min(png.width - 1, Math.round(x)));
+  const cy = Math.max(0, Math.min(png.height - 1, Math.round(y)));
+  const o = (cy * png.width + cx) * png.bpp;
+  return [png.data[o], png.data[o + 1], png.data[o + 2]];
+}
+
+/** 像素级对比度复核：screenshot 中取元素四角内缩点做真实底色，与 DOM 报告的
+ *  文字色计算 WCAG 比值——弥补「渐变底/复杂背景」时 DOM 层无法判定的盲区。 */
+function verifyPixels(base64, dpr, violations, dialogs = []) {
+  let png;
+  try { png = decodePng(Buffer.from(base64, "base64")); } catch (e) { return [{ error: String((e && e.message) || e) }]; }
+  const lumOf = (c) => { const f = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
+  const ratioOf = (a, b) => { const l1 = lumOf(a), l2 = lumOf(b); return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05); };
+  const visDialogs = (dialogs || []).filter((d) => d.visible && d.rect);
+  const inDialog = (x, y) => visDialogs.some((d) => { const [l, t, w, h] = d.rect; return x >= l && x <= l + w && y >= t && y <= t + h; });
+  const out = [];
+  for (const v of violations) {
+    if (!v.rect || !v.fg) continue;
+    const [left, top, w, h] = v.rect;
+    const raw = { r: v.fg[0], g: v.fg[1], b: v.fg[2], a: (v.fg[3] ?? 100) / 100 };
+    if (w < 8 || h < 8) continue;
+    const elInDialog = inDialog(left + w / 2, top + h / 2);
+    const ix = Math.max(4, w * 0.12), iy = Math.max(4, Math.min(8, h * 0.25));
+    const pts = [[left + ix, top + iy], [left + w - ix, top + iy], [left + ix, top + h - iy], [left + w - ix, top + h - iy]];
+    const obscuredSamples = pts.filter(([x, y]) => !elInDialog && inDialog(x, y)).length;
+    if (obscuredSamples === pts.length) { out.push({ x: v.x.slice(0, 24), need: v.need, domRatio: v.ratio, obscured: true, note: "元素被打开的弹层遮罩覆盖，采样无代表性（弹层关闭后复核）" }); continue; }
+    const samples = pts.map(([x, y]) => { const px = samplePng(png, (x + 0.5) * dpr, (y + 0.5) * dpr); return { r: px[0], g: px[1], b: px[2] }; });
+    const fg = raw.a < 1 ? { r: raw.r * raw.a + samples[0].r * (1 - raw.a), g: raw.g * raw.a + samples[0].g * (1 - raw.a), b: raw.b * raw.a + samples[0].b * (1 - raw.a) } : raw;
+    const ratios = samples.map((s) => Math.round(ratioOf(fg, s) * 10) / 10);
+    out.push({ x: v.x.slice(0, 24), need: v.need, domRatio: v.ratio, sampled: ratios, best: Math.max(...ratios), pass: Math.max(...ratios) >= v.need });
+  }
+  return out;
+}
 
 class Cdp {
   constructor(url) { this.ws = new WebSocket(url); this.id = 0; this.pending = new Map(); this.events = []; }
@@ -207,12 +286,12 @@ const AUDIT_FN = `() => {
     const need = large ? 3 : 4.5;
     if (rr < need) {
       const key = Math.round(rr * 100) + "|" + Math.floor(sizePx);
-      if (!seen[key]) { seen[key] = 1; bad.push({ x: txt.slice(0, 40), size: Math.round(sizePx), weight: s.fontWeight, ratio: Math.round(rr * 100) / 100, need, fg: [fg.r, fg.g, fg.b, Math.round(fg.a * 100)], bg: [Math.round(bg.r), Math.round(bg.g), Math.round(bg.b)] }); }
+      if (!seen[key]) { seen[key] = 1; bad.push({ x: txt.slice(0, 40), size: Math.round(sizePx), weight: s.fontWeight, ratio: Math.round(rr * 100) / 100, need, fg: [fg.r, fg.g, fg.b, Math.round(fg.a * 100)], bg: [Math.round(bg.r), Math.round(bg.g), Math.round(bg.b)], rect: [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)] }); }
     }
   }
   out.contrastViolations = bad;
 
-  out.dialogs = [...document.querySelectorAll("[role=dialog]")].map((d) => ({ labelledby: d.getAttribute("aria-labelledby") || "", modal: d.getAttribute("aria-modal") || "", visible: !!visRect(d) }));
+  out.dialogs = [...document.querySelectorAll("[role=dialog]")].map((d) => { const r = visRect(d); return { labelledby: d.getAttribute("aria-labelledby") || "", modal: d.getAttribute("aria-modal") || "", visible: !!r, rect: r ? [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)] : null }; });
   return out;
 }`;
 
@@ -263,7 +342,26 @@ async function auditRoute(route, vp, seedAuth) {
   const scr = await cdp.send("Page.captureScreenshot", { format: "png", fromSurface: true });
   const base = route.replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "") || "index";
   fs.writeFileSync(path.join(SHOTS_DIR, base + "-" + vp.name + ".png"), Buffer.from(scr.data, "base64"));
-  const payload = { route, viewport: vp.name, url: audit.url, audit, consoleErrors: errors.length, consoleErrorSamples: errors.slice(0, 12), screenshot: "artifacts/shots/" + base + "-" + vp.name + ".png" };
+  const contrastVerify = (audit.contrastViolations || []).length && scr.data ? verifyPixels(scr.data, vp.dpr, audit.contrastViolations, audit.dialogs) : [];
+  // 第二遍：若存在可见弹层（games 开局的 briefing/规则弹层），Esc 关闭后复核被遮罩覆盖的底层 UI
+  let postModal = null;
+  if ((audit.dialogs || []).some((d) => d.visible)) {
+    await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27, nativeVirtualKeyCode: 27 });
+    await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27, nativeVirtualKeyCode: 27 });
+    await sleep(1400);
+    const stillOpen = await evalJson(cdp, "!!document.querySelector('[role=dialog]')");
+    if (!stillOpen) {
+      const audit2 = await evalJson(cdp, "(" + AUDIT_FN + ")()");
+      const scr2 = await cdp.send("Page.captureScreenshot", { format: "png", fromSurface: true });
+      fs.writeFileSync(path.join(SHOTS_DIR, base + "-" + vp.name + "-postmodal.png"), Buffer.from(scr2.data, "base64"));
+      postModal = {
+        audit: audit2,
+        contrastVerify: (audit2.contrastViolations || []).length ? verifyPixels(scr2.data, vp.dpr, audit2.contrastViolations, audit2.dialogs) : [],
+        screenshot: "artifacts/shots/" + base + "-" + vp.name + "-postmodal.png",
+      };
+    }
+  }
+  const payload = { route, viewport: vp.name, url: audit.url, audit, consoleErrors: errors.length, consoleErrorSamples: errors.slice(0, 12), contrastVerify, postModal, screenshot: "artifacts/shots/" + base + "-" + vp.name + ".png" };
   fs.writeFileSync(path.join(OUT_DIR, "scan-" + base + "-" + vp.name + ".json"), JSON.stringify(payload, null, 2));
   await cdp.close();
   return payload;
