@@ -1,5 +1,5 @@
 // 消消乐 Service Worker v2.11 - 智能缓存 + 自动更新
-const CACHE = 'xxl-v2.25';
+const CACHE = 'xxl-v2.26';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -10,6 +10,15 @@ const CORE_ASSETS = [
   './assets/faces/face1.jpg',
   './assets/faces/face2.jpg',
   './assets/faces/face3.jpg',
+  './assets/faces/lib/01.jpg',
+  './assets/faces/lib/02.jpg',
+  './assets/faces/lib/03.jpg',
+  './assets/faces/lib/04.jpg',
+  './assets/faces/lib/05.jpg',
+  './assets/faces/lib/06.jpg',
+  './assets/faces/lib/07.jpg',
+  './assets/faces/lib/08.jpg',
+  './assets/faces/lib/09.jpg',
   './assets/backgrounds/bg-anime-1.webp',
   './assets/backgrounds/bg-anime-2.webp',
   './assets/music/bgm1.mp3?v=2.16',

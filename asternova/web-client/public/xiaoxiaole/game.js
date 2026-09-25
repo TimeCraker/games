@@ -9,10 +9,13 @@
 const ROWS = 8, COLS = 8, TYPES = 4;
 const SWAP_DUR = 260, REMOVE_DUR = 420, FALL_DUR = 320, GAP = 8, PAD = 10, SWIPE_THRESH = 0.22;
 const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./assets/faces/face2.jpg','./assets/faces/face3.jpg'];
+// 内置图库（玩家可自选 4 张）+ 默认套装对应的图库编号
+const LIB_FACES = ['./assets/faces/lib/01.jpg','./assets/faces/lib/02.jpg','./assets/faces/lib/03.jpg','./assets/faces/lib/04.jpg','./assets/faces/lib/05.jpg','./assets/faces/lib/06.jpg','./assets/faces/lib/07.jpg','./assets/faces/lib/08.jpg','./assets/faces/lib/09.jpg'];
+const DEFAULT_LIB = [1,2,0,3];   // 02剑姬 · 03星空 · 01Q版女仆 · 04龙娘
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.32';
+const CACHE_VER = '2.33';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -1424,6 +1427,8 @@ function applySkinToBoard(){
 // 皮肤草稿（未应用前仅内存）
 const cropDraft=[null,null,null,null];
 const pendingSrc=[null,null,null,null];
+const libSel=[-1,-1,-1,-1];        // 槽位对应的内置图库编号（-1 = 非图库来源）
+const slotFromFile=[false,false,false,false]; // 槽位是否来自上传图片
 
 async function decodeSource(file){
   let source=null;
@@ -1548,20 +1553,55 @@ function renderSkinGrid(){
     const slotEl=document.createElement('div'); slotEl.className='skin-slot';
     slotEl.style.setProperty('--ring-c',ACCENT[i]);
     const has=!!cropDraft[i];
+    const stateTxt = libSel[i]>=0 ? ('图库 '+(libSel[i]+1)) : (has?'已就绪':'待上传');
     slotEl.innerHTML = '<div class="skin-preview">' + (has ? '<img src="'+cropDraft[i]+'" alt="">' : '<span class="skin-ph">'+ic('image')+'</span>') + '</div>' +
-      '<div class="skin-row"><span class="skin-label">方块 '+(i+1)+'</span><span class="skin-state'+(has?' ok':'')+'">'+(has?'已就绪':'待上传')+'</span></div>' +
+      '<div class="skin-row"><span class="skin-label">方块 '+(i+1)+'</span><span class="skin-state'+(has?' ok':'')+'">'+stateTxt+'</span></div>' +
       '<div class="skin-actions">' +
         '<button class="mini-btn" data-act="pick" data-i="'+i+'">'+(has?'重传':'上传')+'</button>' +
         '<button class="mini-btn" data-act="crop" data-i="'+i+'"'+(pendingSrc[i]?'':' disabled')+'>裁剪</button>' +
+        '<button class="mini-btn" data-act="clear" data-i="'+i+'"'+(has?'':' disabled')+'>清除</button>' +
       '</div>';
     grid.appendChild(slotEl);
   }
   document.getElementById('skinApply').disabled = cropDraft.filter(Boolean).length<TYPES;
 }
+function renderLibGrid(){
+  const box=document.getElementById('libGrid'); if(!box) return;
+  box.innerHTML='';
+  LIB_FACES.forEach((src,k)=>{
+    const b=document.createElement('button');
+    b.type='button'; b.className='lib-thumb'; b.dataset.k=String(k);
+    const slot=libSel.indexOf(k);
+    if(slot>=0) b.classList.add('sel');
+    b.innerHTML='<img src="'+src+'" alt="">'+(slot>=0?'<span class="lib-badge">'+(slot+1)+'</span>':'');
+    box.appendChild(b);
+  });
+}
+function libPick(k){
+  const at=libSel.indexOf(k);
+  if(at>=0){ libSel[at]=-1; cropDraft[at]=null; slotFromFile[at]=false; }
+  else {
+    let free=-1;
+    for(let i=0;i<TYPES;i++){ if(libSel[i]<0&&!slotFromFile[i]&&!cropDraft[i]){ free=i; break; } }
+    if(free<0){ for(let i=0;i<TYPES;i++){ if(libSel[i]<0&&!slotFromFile[i]){ free=i; break; } } }
+    if(free<0){ showToast('已选满 4 张，先取消一张再选'); return; }
+    libSel[free]=k; slotFromFile[free]=false; cropDraft[free]=LIB_FACES[k];
+  }
+  renderSkinGrid(); renderLibGrid(); sfx.btn();
+}
+function clearSlot(i){
+  cropDraft[i]=null; pendingSrc[i]=null; libSel[i]=-1; slotFromFile[i]=false;
+  renderSkinGrid(); renderLibGrid(); sfx.btn();
+}
 function openSkinModal(){
-  const cur = skinCustom()? skinSet.imgs.slice() : [null,null,null,null];
-  for(let i=0;i<TYPES;i++){ cropDraft[i]=cur[i]; pendingSrc[i]=null; }
+  for(let i=0;i<TYPES;i++){ pendingSrc[i]=null; libSel[i]=-1; slotFromFile[i]=false; cropDraft[i]=null; }
+  if(skinCustom()){
+    for(let i=0;i<TYPES;i++){ cropDraft[i]=skinSet.imgs[i]||null; const k=LIB_FACES.indexOf(cropDraft[i]); if(k>=0) libSel[i]=k; }
+  } else {
+    DEFAULT_LIB.forEach((k,i)=>{ libSel[i]=k; cropDraft[i]=LIB_FACES[k]; });
+  }
   renderSkinGrid();
+  renderLibGrid();
   showModal('modalSkin');
   sfx.btn();
 }
@@ -1577,12 +1617,15 @@ function pickSkinFile(i){
     try{ src=await decodeSource(f); }
     catch(e){ showToast('图片加载失败，换一张试试'); return; }
     pendingSrc[i]=src;
+    libSel[i]=-1; slotFromFile[i]=true;
     crop.open(i);
   };
   inp.click();
 }
 function confirmCrop(){
-  cropDraft[crop.getSlot()]=crop.exportSquare();
+  const ci=crop.getSlot();
+  cropDraft[ci]=crop.exportSquare();
+  libSel[ci]=-1; slotFromFile[ci]=true;
   crop.close();
   hideAllModal();
   showModal('modalSkin');
@@ -1595,6 +1638,7 @@ function autoCropRemaining(){
     if(cropDraft[i]) continue;
     if(!pendingSrc[i]){ missing++; continue; }
     cropDraft[i]=crop.autoExport(pendingSrc[i]);
+    libSel[i]=-1; slotFromFile[i]=true;
     doneCount++;
   }
   renderSkinGrid();
@@ -1620,7 +1664,8 @@ function resetSkin(){
   localStorage.setItem('xxl-skin-active','default');
   applySkinToBoard();
   predecodeFaces();
-  renderSkinGrid();
+  for(let i=0;i<TYPES;i++){ pendingSrc[i]=null; slotFromFile[i]=false; libSel[i]=DEFAULT_LIB[i]; cropDraft[i]=LIB_FACES[DEFAULT_LIB[i]]; }
+  renderSkinGrid(); renderLibGrid();
   sfx.btn();
   showToast('已恢复默认头像');
 }
@@ -1639,6 +1684,11 @@ document.getElementById('skinGrid').addEventListener('click',e=>{
   if(act==='pick'){ sfx.btn(); pickSkinFile(i); }
   else if(act==='crop'&&pendingSrc[i]){ crop.open(i); }
   else if(act==='crop'){ showToast('先上传一张照片'); }
+  else if(act==='clear'){ clearSlot(i); }
+});
+document.getElementById('libGrid').addEventListener('click',e=>{
+  const b=e.target.closest('.lib-thumb'); if(!b) return;
+  libPick(+b.dataset.k);
 });
 document.getElementById('cropOut').innerHTML=ic('zoomOut');
 document.getElementById('cropIn').innerHTML=ic('zoomIn');
