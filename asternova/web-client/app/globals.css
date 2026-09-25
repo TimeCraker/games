@@ -146,6 +146,8 @@
   --duration-fast: 200ms;
   --duration-base: 500ms;
   --duration-slow: 900ms;
+  /* 氛围呼吸类循环动效（非微交互）：统一 2.6s，收口散落硬编码 */
+  --duration-ambient: 2600ms;
 
   /* 容器宽度 → max-w-aster */
   --container-aster: 1180px;
@@ -314,7 +316,7 @@ body {
 }
 
 .lobby-arcade-enter-pill {
-  animation: lobby-arcade-enter-glow 2.6s ease-in-out infinite;
+  animation: lobby-arcade-enter-glow var(--duration-ambient) ease-in-out infinite;
 }
 
 .group:hover .lobby-arcade-enter-pill {
