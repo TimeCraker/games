@@ -12,7 +12,7 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.29';
+const CACHE_VER = '2.30';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -1242,6 +1242,29 @@ const SynthMusic=(()=>{
   function setVol(v){ if(gain) gain.gain.value=v; }
   return { start:start, stop:stop, setVol:setVol };
 })();
+// ---------- UI 动效增强（无障碍友好：reduce-motion / 动效开关下自动禁用） ----------
+function attachRipple(el, color){
+  if(!el) return;
+  el.addEventListener('pointerdown',e=>{
+    if(!settings.motion) return;
+    const r=el.getBoundingClientRect();
+    const s=document.createElement('span'); s.className='ripple';
+    const d=Math.max(r.width,r.height)*1.8;
+    s.style.width=s.style.height=d+'px';
+    s.style.left=(e.clientX-r.left-d/2)+'px';
+    s.style.top=(e.clientY-r.top-d/2)+'px';
+    s.style.background=color||'rgba(255,255,255,.28)';
+    el.appendChild(s);
+    const anim=s.animate([{transform:'scale(0)',opacity:.45},{transform:'scale(1)',opacity:0}],{duration:520,easing:'cubic-bezier(.22,1,.36,1)'});
+    if(anim&&anim.onfinish!==undefined) anim.onfinish=()=>s.remove();
+    else setTimeout(()=>s.remove(),560);
+  });
+}
+attachRipple(document.getElementById('menuContinue'),'rgba(17,23,34,.16)');
+attachRipple(document.getElementById('menuLevels'));
+attachRipple(document.getElementById('menuEndless'));
+attachRipple(document.getElementById('menuTimed'));
+attachRipple(document.getElementById('menuDaily'));
 // ---------- 事件绑定 ----------
 $('brandBtn').onclick=()=>{ sfx.btn(); gotoMenu(); };
 $('bgBtn').onclick=()=>cycleBg();

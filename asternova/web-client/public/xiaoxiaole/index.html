@@ -9,7 +9,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
-<link rel="stylesheet" href="./styles.css?v=2.29">
+<link rel="stylesheet" href="./styles.css?v=2.30">
 </head>
 <body>
 
@@ -311,54 +311,63 @@
 
 <!-- 设置面板 -->
 <div class="modal" id="modalSettings">
-  <div class="modal-card">
+  <div class="modal-card settings-card">
     <h2 class="modal-title">设置</h2>
-    <div class="settings-list">
-      <div class="setting-row">
-        <span>音效</span>
-        <label class="switch"><input type="checkbox" id="setSfx"><span class="slider"></span></label>
-      </div>
-      <div class="setting-row">
-        <span>背景音乐</span>
-        <label class="switch"><input type="checkbox" id="setMusic"><span class="slider"></span></label>
-      </div>
-      <div class="setting-row music-row">
-        <span>曲目</span>
-        <div class="music-picker">
-          <button class="music-btn" id="musicPrev" aria-label="上一首">‹</button>
-          <span class="music-label" id="musicLabel">Puzzle Loop</span>
-          <button class="music-btn" id="musicNext" aria-label="下一首">›</button>
+    <div class="settings-sections">
+      <section class="set-section">
+        <div class="set-head">声音</div>
+        <div class="setting-row">
+          <span>音效</span>
+          <label class="switch"><input type="checkbox" id="setSfx"><span class="slider"></span></label>
         </div>
-      </div>
-      <div class="setting-row">
-        <label for="setVol">音量</label>
-        <input type="range" id="setVol" min="0" max="100" value="45" class="range">
-      </div>
-      <div class="setting-row">
-        <span>动效</span>
-        <label class="switch"><input type="checkbox" id="setMotion"><span class="slider"></span></label>
-      </div>
-      <div class="setting-row">
-        <span>触觉反馈</span>
-        <label class="switch"><input type="checkbox" id="setHaptic"><span class="slider"></span></label>
-      </div>
-      <div class="setting-row">
-        <span>方块皮肤</span>
-        <button class="mini-btn skin-settings-btn" id="settingsSkin">自定义图片</button>
-      </div>
-      <div class="setting-row">
-        <span>数据统计</span>
-        <button class="mini-btn skin-settings-btn" id="settingsStats">查看</button>
-      </div>
-      <div class="setting-row">
-        <label for="setQuality">特效质量</label>
-        <select id="setQuality" class="select">
-          <option value="auto">自动</option>
-          <option value="high">高</option>
-          <option value="medium">中</option>
-          <option value="low">低</option>
-        </select>
-      </div>
+        <div class="setting-row">
+          <span>背景音乐</span>
+          <label class="switch"><input type="checkbox" id="setMusic"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row music-row">
+          <span>曲目</span>
+          <div class="music-picker">
+            <button class="music-btn" id="musicPrev" aria-label="上一首">‹</button>
+            <span class="music-label" id="musicLabel">Puzzle Loop</span>
+            <button class="music-btn" id="musicNext" aria-label="下一首">›</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <label for="setVol">音量</label>
+          <input type="range" id="setVol" min="0" max="100" value="45" class="range">
+        </div>
+      </section>
+      <section class="set-section">
+        <div class="set-head">体验</div>
+        <div class="setting-row">
+          <span>动效</span>
+          <label class="switch"><input type="checkbox" id="setMotion"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <span>触觉反馈</span>
+          <label class="switch"><input type="checkbox" id="setHaptic"><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <label for="setQuality">特效质量</label>
+          <select id="setQuality" class="select">
+            <option value="auto">自动</option>
+            <option value="high">高</option>
+            <option value="medium">中</option>
+            <option value="low">低</option>
+          </select>
+        </div>
+      </section>
+      <section class="set-section">
+        <div class="set-head">个性化</div>
+        <div class="setting-row">
+          <span>方块皮肤</span>
+          <button class="mini-btn skin-settings-btn" id="settingsSkin">自定义图片</button>
+        </div>
+        <div class="setting-row">
+          <span>数据统计</span>
+          <button class="mini-btn skin-settings-btn" id="settingsStats">查看</button>
+        </div>
+      </section>
     </div>
     <div class="modal-actions">
       <button class="menu-btn primary" id="settingsClose">完成</button>
@@ -390,6 +399,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<script src="./game.js?v=2.29"></script>
+<script src="./game.js?v=2.30"></script>
 </body>
 </html>
