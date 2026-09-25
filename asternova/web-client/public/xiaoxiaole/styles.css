@@ -594,6 +594,41 @@ svg { max-width:100%; }
 .crop-stage::after { content:""; position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(255,255,255,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.16) 1px,transparent 1px); background-size:33.33% 33.33%; mix-blend-mode:overlay; }
 .crop-controls { display:flex; justify-content:center; gap:8px; margin-bottom:12px; }
 .crop-controls .music-btn { width:38px; height:38px; font-size:16px; display:grid; place-items:center; }
+/* ---------- 模式入口 ---------- */
+.menu-modes { display:flex; gap:10px; margin-top:12px; }
+.mode-chip { flex:1; max-width:190px; min-height:74px; padding:10px 14px; border:1px solid rgba(255,255,255,.22); border-radius:16px; background:rgba(12,18,28,.36); color:#fff; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:3px; text-align:left; cursor:pointer; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); transition:transform .18s var(--ease-out), background .2s, border-color .2s; }
+.mode-chip:hover { transform:translateY(-3px); background:rgba(12,18,28,.55); border-color:rgba(255,255,255,.4); }
+.mode-chip .mode-ic { width:19px; height:19px; color:#ffbd59; }
+.mode-chip b { font-size:15px; letter-spacing:.5px; }
+.mode-chip small { font-size:10px; color:rgba(255,255,255,.55); letter-spacing:.4px; }
+
+/* ---------- 排行榜 ---------- */
+.lb-card { max-width:430px; text-align:left; }
+.lb-sections { display:flex; flex-direction:column; gap:12px; margin:14px 0 6px; }
+.lb-section { border:1px solid var(--line); border-radius:14px; padding:10px 12px; background:var(--surface-2); }
+.lb-head { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--text-mute); margin-bottom:4px; letter-spacing:.5px; }
+.lb-row { display:flex; align-items:center; gap:9px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:13px; }
+.lb-row:last-child { border-bottom:0; }
+.lb-rank { width:24px; height:24px; border-radius:50%; background:var(--cell-bg); color:var(--text-soft); display:grid; place-items:center; font-weight:800; font-size:11px; flex-shrink:0; }
+.lb-row.top1 .lb-rank { background:linear-gradient(135deg,#ffd93d,#ffaa3c); color:#fff; }
+.lb-row.top2 .lb-rank { background:linear-gradient(135deg,#98a1b5,#6b7488); color:#fff; }
+.lb-row.top3 .lb-rank { background:linear-gradient(135deg,#d8a06a,#a1663a); color:#fff; }
+.lb-score { font-weight:900; font-variant-numeric:tabular-nums; min-width:58px; }
+.lb-meta { font-size:11px; color:var(--text-mute); margin-left:auto; }
+.lb-empty { text-align:center; color:var(--text-mute); font-size:12px; padding:8px 0; }
+
+/* ---------- 每日挑战 ---------- */
+.daily-strip { display:flex; gap:6px; justify-content:center; margin:12px 0 4px; }
+.daily-day { flex:1; max-width:52px; padding:6px 2px; border-radius:10px; background:var(--surface-2); border:1px solid var(--line); font-size:10px; color:var(--text-mute); text-align:center; }
+.daily-day b { display:block; font-weight:800; font-size:12px; margin-top:3px; color:var(--text-soft); }
+.daily-day.today { border-color:var(--c); }
+.daily-day.today b { color:var(--c); }
+
+/* ---------- 结算 ---------- */
+.mode-end-rank { display:inline-block; margin:2px auto 6px; padding:4px 14px; border-radius:20px; background:var(--surface-2); border:1px solid var(--line); font-size:12px; font-weight:700; color:var(--text-soft); }
+.float-text.time { color:#4ecdc4; }
+
+@media (max-width:480px){ .mode-chip { min-height:64px; padding:8px 10px; gap:2px; } .mode-chip b { font-size:13px; } }
 /* 减少动效（设置关闭时） */
 .reduce-motion * { animation-duration:.01ms !important; transition-duration:.08s !important; }
 .reduce-motion .bg-cloud::after, .reduce-motion .bg-neon::after { animation:none !important; }

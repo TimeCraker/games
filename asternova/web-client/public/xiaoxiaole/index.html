@@ -9,7 +9,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
-<link rel="stylesheet" href="./styles.css?v=2.26">
+<link rel="stylesheet" href="./styles.css?v=2.27">
 </head>
 <body>
 
@@ -66,7 +66,7 @@
     <section class="board-area">
       <div class="hud-strip">
         <div class="hud-stat">
-          <div class="hud-label">步数</div>
+          <div class="hud-label" id="movesLabel">步数</div>
           <div class="hud-value" id="movesLeft">∞</div>
         </div>
         <div class="hud-stat score-stat">
@@ -129,8 +129,14 @@
           <span>关卡选择</span><small id="menuProgress">01 / 12</small>
         </button>
       </div>
+      <div class="menu-modes">
+        <button class="mode-chip" id="menuEndless"><span class="mode-ic"></span><b>无尽模式</b><small>难度逐级爬升</small></button>
+        <button class="mode-chip" id="menuTimed"><span class="mode-ic"></span><b>限时模式</b><small>60秒冲刺</small></button>
+        <button class="mode-chip" id="menuDaily"><span class="mode-ic"></span><b>每日挑战</b><small>每天同一题</small></button>
+      </div>
       <div class="menu-utilities">
         <button id="menuSkin">方块皮肤</button>
+        <button id="menuLeaderboard">排行榜</button>
         <button id="menuBg">游戏背景</button>
         <button id="menuRefresh">刷新资源</button>
         <button id="menuSound">音效</button>
@@ -153,7 +159,7 @@
 <!-- 关卡入场 -->
 <div class="screen screen-intro" id="screenIntro">
   <div class="intro-inner">
-    <div class="intro-label">LEVEL</div>
+    <div class="intro-label" id="introLabel">LEVEL</div>
     <div class="intro-num" id="introNum">1</div>
     <div class="intro-name" id="introName">初见桓睿</div>
     <div class="intro-goals" id="introGoals"></div>
@@ -195,6 +201,48 @@
   </div>
 </div>
 
+<!-- 模式结算 -->
+<div class="modal" id="modalModeEnd">
+  <div class="modal-card">
+    <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v6a5 5 0 01-10 0z"/><path d="M7 6H4v1a4 4 0 003 4M17 6h3v1a4 4 0 01-3 4"/><path d="M12 15v3M8.5 21h7l-1-3h-5z"/></svg></div>
+    <h2 class="modal-title" id="modeEndTitle">结算</h2>
+    <div class="modal-score" id="modeEndScore">0</div>
+    <div class="mode-end-rank" id="modeEndRank"></div>
+    <div class="modal-stats" id="modeEndStats"></div>
+    <div class="modal-actions">
+      <button class="menu-btn primary" id="modeEndRetry">再来一局</button>
+      <button class="menu-btn ghost" id="modeEndMenu">回主菜单</button>
+    </div>
+  </div>
+</div>
+
+<!-- 每日挑战入口 -->
+<div class="modal" id="modalDaily">
+  <div class="modal-card">
+    <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/></svg></div>
+    <h2 class="modal-title">每日挑战</h2>
+    <div class="modal-sub" id="dailyDate">—</div>
+    <div class="daily-strip" id="dailyStrip"></div>
+    <div class="modal-sub" id="dailyBest">—</div>
+    <div class="modal-actions">
+      <button class="menu-btn primary" id="dailyGo">开始挑战</button>
+      <button class="menu-btn ghost" id="dailyClose">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 排行榜 -->
+<div class="modal" id="modalLeaderboard">
+  <div class="modal-card lb-card">
+    <h2 class="modal-title">排行榜</h2>
+    <p class="modal-sub">各模式 TOP 10 · 本地记录</p>
+    <div class="lb-sections" id="lbSections"></div>
+    <div class="modal-actions">
+      <button class="menu-btn ghost" id="lbClose">关闭</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="modalPause">
   <div class="modal-card">
     <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.5" height="14" rx="1.2"/><rect x="13.5" y="5" width="3.5" height="14" rx="1.2"/></svg></div>
@@ -207,6 +255,7 @@
       <button class="menu-btn primary" id="resumeBtn">继续游戏</button>
       <button class="menu-btn" id="restartBtn2">重新开始</button>
       <button class="menu-btn" id="pauseBgBtn">换背景</button>
+      <button class="menu-btn primary" id="pauseEndBtn" hidden>结算成绩</button>
       <button class="menu-btn" id="pauseSettingsBtn">设置</button>
       <button class="menu-btn ghost" id="pauseMenuBtn">回主菜单</button>
     </div>
@@ -320,6 +369,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<script src="./game.js?v=2.26"></script>
+<script src="./game.js?v=2.27"></script>
 </body>
 </html>
