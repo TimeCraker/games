@@ -12,7 +12,7 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.28';
+const CACHE_VER = '2.29';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -107,7 +107,7 @@ let bgIdx=0, soundOn=true;
 let state='menu';
 let mode='campaign';
 const M_CAMPAIGN='campaign', M_ENDLESS='endless', M_TIMED='timed', M_DAILY='daily';
-let dailyRng=null, timerInt=null, timeLeftMs=0, timeBonusTotal=0, timerExpired=false, lastTick=0;
+let dailyRng=null, timerInt=null, timeLeftMs=0, timeBonusTotal=0, timerExpired=false, lastTick=0, lastSecAnn=0;
 const TIME_TOTAL=60000, TIME_BONUS_CAP=10000;
 let audioCtx=null, masterGain=null, bgOsc=null, bgGain=null;
 // 背景音乐（MP3 列表播放）
@@ -116,6 +116,9 @@ const MUSIC_LIST = [
   { file:'bgm2.mp3', name:'Puzzle Bright' },
   { file:'bgm3.mp3', name:'8-Bit Game' },
   { file:'bgm4.mp3', name:'Retro Arcade' },
+  { name:'极光脉冲', synth:0 },
+  { name:'星港夜航', synth:1 },
+  { name:'冲刺棋手', synth:2 },
 ];
 let bgAudio=null, musicIdx=0;
 
@@ -369,9 +372,10 @@ async function cascade(){
     if(mode===M_TIMED&&combo>=2&&timeBonusTotal<TIME_BONUS_CAP){
       const add=2000; timeBonusTotal+=add; timeLeftMs+=add;
       floatText({...center,dy:-66},'+2秒','time');
+      sfx.timeBonus();
     }
     floatText(center,`+${gain}`,combo>=2?'combo':'');
-    if(combo>=2){ floatText({...center,dy:-34},`COMBO ×${combo}`,'combo big'); if(combo>=3) comboFlash(combo); }
+    if(combo>=2){ floatText({...center,dy:-34},`COMBO ×${combo}`,'combo big'); if(combo>=3) comboFlash(combo); if(combo>=5) sfx.cheer(); }
     sfx.clear(combo); haptic(combo>=3?40:20);
     // 成就检测
     unlockAchievement('first_clear');
@@ -680,7 +684,7 @@ function hasPossibleMove(){
   return false;
 }
 async function shuffleBoard(){
-  busy=true; const types=[];
+  busy=true; sfx.whoosh(); const types=[];
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) if(board[r][c]) types.push(board[r][c].type);
   let attempts=0;
   do{ for(let i=types.length-1;i>0;i--){const j=rnd(i+1);[types[i],types[j]]=[types[j],types[i]];}
@@ -708,25 +712,40 @@ const sfx=(()=>{
     win:()=>{ [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,0.3,'triangle',0.3),i*120)); },
     lose:()=>{ [400,330,260].forEach((f,i)=>setTimeout(()=>tone(f,0.35,'sawtooth',0.25),i*150)); },
     achieve:()=>{ [659,784,988,1319].forEach((f,i)=>setTimeout(()=>tone(f,0.25,'triangle',0.25),i*90)); },
+    tick:(urgent)=>tone(urgent?1240:880,0.05,'square',0.13),
+    timeBonus:()=>{ tone(660,0.09,'triangle',0.2,1.5); setTimeout(()=>tone(990,0.12,'triangle',0.2),70); },
+    cheer:()=>{ [523,659,784].forEach((f,i)=>setTimeout(()=>tone(f,0.09,'triangle',0.2),i*55)); },
+    photo:()=>{ noise(0.06,0.25); setTimeout(()=>tone(1500,0.05,'sine',0.15),40); },
+    whoosh:()=>{ tone(300,0.2,'sine',0.16,0.35); noise(0.2,0.12); },
     btn:()=>tone(660,0.06,'sine',0.12),
   };
 })();
 function startBgMusic(){
   if(!settings.music) return;
-  // 已在播放同一首则不重复启动
-  if(bgAudio && !bgAudio.paused && bgAudio.src.includes(MUSIC_LIST[musicIdx].file)) return;
+  const m=MUSIC_LIST[musicIdx];
   sfx.init(); // 确保 audioCtx 激活（解锁自动播放）
+  if(m.synth!==undefined){
+    if(bgAudio) bgAudio.pause();
+    SynthMusic.start(m.synth);
+    updateMusicLabel();
+    return;
+  }
+  SynthMusic.stop();
+  // 已在播放同一首则不重复启动
+  if(bgAudio && !bgAudio.paused && bgAudio.src.includes(m.file)) return;
   if(!bgAudio){ bgAudio=new Audio(); bgAudio.loop=true; bgAudio.preload='auto'; }
-  bgAudio.src=`./assets/music/${MUSIC_LIST[musicIdx].file}?v=${CACHE_VER}`;
+  bgAudio.src=`./assets/music/${m.file}?v=${CACHE_VER}`;
   bgAudio.volume = (settings.volume/100)*0.55;
   bgAudio.play().catch(()=>{});
   updateMusicLabel();
 }
-function stopBgMusic(){ if(bgAudio){ bgAudio.pause(); } }
+function stopBgMusic(){ if(bgAudio){ bgAudio.pause(); } SynthMusic.stop(); }
 function switchMusic(idx){
   musicIdx = (idx+MUSIC_LIST.length)%MUSIC_LIST.length;
   localStorage.setItem('xxl-music-idx',musicIdx);
-  if(bgAudio&&settings.music){ bgAudio.src=`./assets/music/${MUSIC_LIST[musicIdx].file}?v=${CACHE_VER}`; bgAudio.play().catch(()=>{}); }
+  if(bgAudio) bgAudio.pause();
+  SynthMusic.stop();
+  if(settings.music&&state==='playing') startBgMusic();
   updateMusicLabel();
 }
 function updateMusicLabel(){ const el=$('musicLabel'); if(el) el.textContent=MUSIC_LIST[musicIdx].name; }
@@ -920,6 +939,8 @@ function timerTick(){
     return;
   }
   renderTimeUI(timeLeftMs);
+  const s=Math.ceil(timeLeftMs/1000);
+  if(s<=5&&s>0&&s!==lastSecAnn){ lastSecAnn=s; sfx.tick(s<=3); haptic(15); }
 }
 function renderTimeUI(ms){
   const s=Math.ceil(ms/1000), m=Math.floor(s/60);
@@ -1166,6 +1187,61 @@ document.getElementById('settingsStats').onclick=()=>{ openStats(); };
 document.getElementById('statsClose').onclick=()=>{ hideAllModal(); };
 document.getElementById('winShareBtn').onclick=()=>{ shareScore(); };
 document.getElementById('modeEndShare').onclick=()=>{ shareScore(); };
+// ---------- 程序化 8-bit 背景音乐 ----------
+const SYNTH_TRACKS=[
+  { name:'极光脉冲', bpm:120, len:16,
+    bass:[45,0,45,0,45,0,45,0,52,0,47,0,43,0,43,0],
+    lead:[69,0,72,0,76,72,69,0,71,0,74,0,79,76,71,67],
+    kick:true },
+  { name:'星港夜航', bpm:96, len:16,
+    bass:[33,0,33,0,36,0,33,0,38,0,38,0,31,0,31,0],
+    lead:[0,64,0,67,0,71,67,64,0,62,0,66,0,69,66,62],
+    kick:true },
+  { name:'冲刺棋手', bpm:144, len:16,
+    bass:[45,45,52,45,45,45,52,45,43,43,50,43,41,41,48,41],
+    lead:[81,0,84,81,0,79,0,77,76,0,79,76,0,74,0,72],
+    kick:true },
+];
+const SynthMusic=(()=>{
+  let gain=null, timer=null, step=0, noiseBuf=null;
+  const N=n=>440*Math.pow(2,(n-69)/12);
+  function ensure(){
+    if(gain) return true;
+    sfx.init();
+    if(!audioCtx||!masterGain) return false;
+    gain=audioCtx.createGain(); gain.gain.value=(settings.volume/100)*0.5; gain.connect(masterGain);
+    const len=Math.floor(audioCtx.sampleRate*0.06), buf=audioCtx.createBuffer(1,len,audioCtx.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len);
+    noiseBuf=buf;
+    return true;
+  }
+  function tone(freq,t,dur,type,vol){
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.001,t+dur);
+    o.connect(g); g.connect(gain); o.start(t); o.stop(t+dur+.02);
+  }
+  function hat(t){ const s=audioCtx.createBufferSource(); s.buffer=noiseBuf; const f=audioCtx.createBiquadFilter(); f.type='highpass'; f.frequency.value=6000; s.connect(f); f.connect(gain); s.start(t); }
+  function kick(t){ tone(110,t,.12,'sine',.5); tone(55,t,.16,'sine',.45); }
+  function playStep(T,s){
+    const t=audioCtx.currentTime;
+    if(T.bass[s]) tone(N(T.bass[s]),t,.22,'triangle',.5);
+    if(T.lead[s]) tone(N(T.lead[s]),t,.15,'square',.2);
+    if(T.kick&&s%4===0) kick(t);
+    if(s%2===1) hat(t);
+  }
+  function start(i){
+    stop();
+    if(!ensure()) return;
+    const T=SYNTH_TRACKS[i]; if(!T) return;
+    step=0;
+    const dur=60/T.bpm/2;
+    timer=setInterval(()=>{ playStep(T,step%T.len); step++; }, dur*1000);
+  }
+  function stop(){ if(timer){ clearInterval(timer); timer=null; } }
+  function setVol(v){ if(gain) gain.gain.value=v; }
+  return { start:start, stop:stop, setVol:setVol };
+})();
 // ---------- 事件绑定 ----------
 $('brandBtn').onclick=()=>{ sfx.btn(); gotoMenu(); };
 $('bgBtn').onclick=()=>cycleBg();
@@ -1173,7 +1249,7 @@ $('themeBtn').onclick=()=>{ setTheme(document.documentElement.dataset.theme==='l
 $('soundBtn').onclick=()=>toggleSound();
 $('gameSoundBtn').onclick=()=>toggleSound();
 $('pauseMuteBtn').onclick=()=>toggleSound();
-$('pauseVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); if(masterGain) masterGain.gain.value=settings.volume/100; if(bgAudio) bgAudio.volume=(settings.volume/100)*0.55; };
+$('pauseVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); if(masterGain) masterGain.gain.value=settings.volume/100; if(bgAudio) bgAudio.volume=(settings.volume/100)*0.55; SynthMusic.setVol((settings.volume/100)*0.5); };
 $('pauseBtn').onclick=()=>pauseGame();
 $('menuContinue').onclick=()=>{ sfx.init(); sfx.btn(); startBgMusic(); startLevel(Math.min(SAVE.unlocked-1,LEVELS.length-1)); };
 $('menuLevels').onclick=()=>{ sfx.btn(); gotoLevels(); };
@@ -1211,6 +1287,7 @@ function applySettings(){
   if(masterGain) masterGain.gain.value=settings.volume/100;
   if(!settings.music) stopBgMusic(); else if(state==='playing'&&(!bgAudio||bgAudio.paused)) startBgMusic();
   if(bgAudio) bgAudio.volume=(settings.volume/100)*0.55;
+  SynthMusic.setVol((settings.volume/100)*0.5);
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
   Q = QUALITY_PRESETS[resolveQuality()];
   if(!$('gameShell').hidden){ resizeFx(); }
@@ -1224,7 +1301,7 @@ $('pauseBgBtn').onclick=()=>{ cycleBg(); };
 $('settingsClose').onclick=()=>{ hideAllModal(); sfx.btn(); if(state==='playing'){ scheduleHint(); } else if(state==='paused'){ showModal('modalPause'); } };
 $('setSfx').onchange=e=>{ settings.sfx=e.target.checked; settings.save(); soundOn=settings.sfx; applySettings(); sfx.btn(); };
 $('setMusic').onchange=e=>{ settings.music=e.target.checked; settings.save(); applySettings(); sfx.btn(); };
-$('setVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); if(masterGain) masterGain.gain.value=settings.volume/100; if(bgAudio) bgAudio.volume=(settings.volume/100)*0.55; };
+$('setVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); if(masterGain) masterGain.gain.value=settings.volume/100; if(bgAudio) bgAudio.volume=(settings.volume/100)*0.55; SynthMusic.setVol((settings.volume/100)*0.5); };
 $('setMotion').onchange=e=>{ settings.motion=e.target.checked; settings.save(); applySettings(); };
 $('setHaptic').onchange=e=>{ settings.haptic=e.target.checked; settings.save(); if(settings.haptic) haptic(30); };
 $('setQuality').onchange=e=>{ settings.quality=e.target.value; settings.save(); applySettings(); sfx.btn(); };
