@@ -9,7 +9,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
-<link rel="stylesheet" href="./styles.css?v=2.23">
+<link rel="stylesheet" href="./styles.css?v=2.25">
 </head>
 <body>
 
@@ -129,6 +129,7 @@
         </button>
       </div>
       <div class="menu-utilities">
+        <button id="menuSkin">方块皮肤</button>
         <button id="menuBg">游戏背景</button>
         <button id="menuRefresh">刷新资源</button>
         <button id="menuSound">音效</button>
@@ -159,6 +160,39 @@
 </div>
 
 <!-- ===== 弹窗 ===== -->
+
+<!-- 方块皮肤 -->
+<div class="modal" id="modalSkin">
+  <div class="modal-card skin-card">
+    <h2 class="modal-title">方块皮肤</h2>
+    <p class="modal-sub">上传 4 张照片分别替换 4 种方块 · 裁剪为 1:1</p>
+    <div class="skin-grid" id="skinGrid"></div>
+    <div class="modal-actions">
+      <button class="menu-btn primary" id="skinApply" disabled>应用皮肤</button>
+      <button class="menu-btn" id="skinAuto">自动裁剪剩余照片</button>
+      <button class="menu-btn" id="skinReset">恢复默认头像</button>
+      <button class="menu-btn ghost" id="skinClose">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 1:1 裁剪 -->
+<div class="modal" id="modalCrop">
+  <div class="modal-card crop-card">
+    <h2 class="modal-title">裁剪 1:1</h2>
+    <p class="modal-sub">拖动移动 · 滚轮 / 双指缩放</p>
+    <div class="crop-stage"><canvas id="cropCanvas" aria-label="裁剪画布"></canvas></div>
+    <div class="crop-controls">
+      <button class="music-btn" id="cropOut" title="缩小" aria-label="缩小"></button>
+      <button class="music-btn" id="cropIn" title="放大" aria-label="放大"></button>
+      <button class="music-btn" id="cropFit" title="自动居中" aria-label="自动居中"></button>
+    </div>
+    <div class="modal-actions">
+      <button class="menu-btn primary" id="cropOk">确认裁剪</button>
+      <button class="menu-btn ghost" id="cropCancel">取消</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="modalPause">
   <div class="modal-card">
@@ -242,6 +276,10 @@
         <label class="switch"><input type="checkbox" id="setHaptic"><span class="slider"></span></label>
       </div>
       <div class="setting-row">
+        <span>方块皮肤</span>
+        <button class="mini-btn skin-settings-btn" id="settingsSkin">自定义图片</button>
+      </div>
+      <div class="setting-row">
         <label for="setQuality">特效质量</label>
         <select id="setQuality" class="select">
           <option value="auto">自动</option>
@@ -265,10 +303,10 @@ if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
     // 清理所有旧的 Service Worker，注册新版
     navigator.serviceWorker.getRegistrations().then(regs => {
-      const old = regs.filter(r => r.active && r.active.scriptURL.indexOf('sw-v20.js') === -1);
+      const old = regs.filter(r => r.active && r.active.scriptURL.indexOf('sw-v21.js') === -1);
       return Promise.all(old.map(r => r.unregister()));
     }).then(() => {
-      return navigator.serviceWorker.register('./sw-v20.js');
+      return navigator.serviceWorker.register('./sw-v21.js');
     }).then(reg => {
       // 立即检查更新，新版接管后刷新一次
       const hadSW = !!navigator.serviceWorker.controller;
@@ -281,6 +319,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<script src="./game.js?v=2.23"></script>
+<script src="./game.js?v=2.25"></script>
 </body>
 </html>

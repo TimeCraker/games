@@ -12,7 +12,7 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, BOMB:1, RAINBOW:2 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.24';
+const CACHE_VER = '2.25';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -44,6 +44,10 @@ const SVG = {
   neon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21l4-8h6l4 8M9 13l3-9 3 9"/></svg>',
   photo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg>',
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>',
+  image:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5-10 10"/></svg>',
+  zoomIn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6M11 8v6"/></svg>',
+  zoomOut:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6"/></svg>',
+  fit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V5a2 2 0 012-2h4M15 3h4a2 2 0 012 2v4M21 15v4a2 2 0 01-2 2h-4M9 21H5a2 2 0 01-2-2v-4"/></svg>',
 };
 function ic(name, cls=''){ return `<span class="ic ${cls}">${SVG[name]||''}</span>`; }
 
@@ -207,7 +211,7 @@ function makeTile(r,c,type,special=SPECIAL.NONE){
   if(special===SPECIAL.RAINBOW) el.classList.add('special-rainbow');
   el.dataset.r=r; el.dataset.c=c; el.dataset.type=type;
   const face=document.createElement('div'); face.className='face';
-  const img=document.createElement('img'); img.src=FACE_IMG[type]; img.draggable=false; img.alt='';
+  const img=document.createElement('img'); img.src=faceSrcOf(type); img.draggable=false; img.alt='';
   img.onerror=()=>{ face.style.background=ACCENT[type]; };
   face.appendChild(img);
   const ring=document.createElement('div'); ring.className='ring';
@@ -601,7 +605,7 @@ async function shuffleBoard(){
   let attempts=0;
   do{ for(let i=types.length-1;i>0;i--){const j=rnd(i+1);[types[i],types[j]]=[types[j],types[i]];}
     let idx=0;
-    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ if(board[r][c]){ board[r][c].type=types[idx++]; board[r][c].el.dataset.type=board[r][c].type; board[r][c].el.className=`tile t${board[r][c].type}`; const img=board[r][c].el.querySelector('img'); if(img) img.src=FACE_IMG[board[r][c].type]; } }
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ if(board[r][c]){ board[r][c].type=types[idx++]; board[r][c].el.dataset.type=board[r][c].type; board[r][c].el.className=`tile t${board[r][c].type}`; const img=board[r][c].el.querySelector('img'); if(img) img.src=faceSrcOf(board[r][c].type); } }
     attempts++;
   } while((findAllMatches().matched.size>0||!hasPossibleMove())&&attempts<50);
   boardEl.querySelectorAll('.tile').forEach(e=>{e.classList.add('spawning');setTimeout(()=>e.classList.remove('spawning'),450);});
@@ -857,6 +861,308 @@ document.addEventListener('touchmove',e=>{ if(e.touches.length>1) e.preventDefau
 document.addEventListener('gesturestart',e=>e.preventDefault());
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&(state==='playing'||state==='paused')){ state==='playing'?pauseGame():resumeGame(); } });
 
+// ---------- 自定义皮肤（传图 + 1:1 裁剪 + IndexedDB 持久化） ----------
+const SkinDB = (() => {
+  const DB='xxl-skin-db', STORE='skins', KEY='custom', LS='xxl-skin';
+  let dbp=null;
+  function open(){
+    if(dbp) return dbp;
+    dbp=new Promise((res,rej)=>{
+      if(!('indexedDB' in window)){ rej(new Error('no-idb')); return; }
+      let req; try{ req=indexedDB.open(DB,1); }catch(e){ rej(e); return; }
+      req.onupgradeneeded=()=>{ const db=req.result; if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE); };
+      req.onsuccess=()=>res(req.result);
+      req.onerror=()=>rej(req.error||new Error('idb-open-fail'));
+      req.onblocked=()=>rej(new Error('idb-blocked'));
+    });
+    return dbp;
+  }
+  async function get(){
+    try{
+      const db=await open();
+      const v=await new Promise((res,rej)=>{
+        const tx=db.transaction(STORE,'readonly');
+        const rq=tx.objectStore(STORE).get(KEY);
+        rq.onsuccess=()=>res(rq.result||null);
+        rq.onerror=()=>rej(rq.error);
+      });
+      if(v&&v.imgs&&Array.isArray(v.imgs)) return v;
+      return lsGet();
+    }catch(e){ return lsGet(); }
+  }
+  async function set(v){
+    let ok=false;
+    try{
+      const db=await open();
+      await new Promise((res,rej)=>{
+        const tx=db.transaction(STORE,'readwrite');
+        tx.objectStore(STORE).put(v,KEY);
+        tx.oncomplete=()=>res(null);
+        tx.onerror=()=>rej(tx.error);
+      });
+      ok=true;
+    }catch(e){ ok=false; }
+    return lsSet(v)||ok;
+  }
+  async function clear(){
+    try{
+      const db=await open();
+      await new Promise((res)=>{
+        const tx=db.transaction(STORE,'readwrite');
+        tx.objectStore(STORE).delete(KEY);
+        tx.oncomplete=()=>res(null);
+        tx.onerror=()=>res(null);
+      });
+    }catch(e){}
+    try{ localStorage.removeItem(LS); }catch(e){}
+  }
+  function lsGet(){ try{ return JSON.parse(localStorage.getItem(LS)||'null'); }catch(e){ return null; } }
+  function lsSet(v){ try{ localStorage.setItem(LS,JSON.stringify(v)); return true; }catch(e){ return false; } }
+  return { get:get, set:set, clear:clear };
+})();
+
+let skinSet=null;
+const skinActiveFlag = ()=> localStorage.getItem('xxl-skin-active')==='custom';
+const skinCustom = ()=> !!(skinSet&&skinSet.imgs&&skinSet.imgs.filter(Boolean).length===TYPES);
+const skinActive = ()=> skinActiveFlag()&&skinCustom();
+function faceSrcOf(i){ return skinActive()? skinSet.imgs[i] : FACE_IMG[i]; }
+function predecodeFaces(){ for(let i=0;i<TYPES;i++){ const im=new Image(); im.src=faceSrcOf(i); if(im.decode) im.decode().catch(()=>{}); } }
+async function loadSkin(){
+  skinSet=await SkinDB.get();
+  predecodeFaces();
+}
+function applySkinToBoard(){
+  document.querySelectorAll('#board .tile img').forEach(img=>{
+    const tile=img.closest('.tile'); if(!tile) return;
+    img.src=faceSrcOf(tile.dataset.type|0);
+  });
+}
+
+// 皮肤草稿（未应用前仅内存）
+const cropDraft=[null,null,null,null];
+const pendingSrc=[null,null,null,null];
+
+async function decodeSource(file){
+  let source=null;
+  if('createImageBitmap' in window){
+    try{ source=await createImageBitmap(file,{imageOrientation:'from-image'}); }catch(e){ source=null; }
+  }
+  if(!source){
+    const url=URL.createObjectURL(file);
+    try{
+      const im=await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error('bad-image')); i.src=url; });
+      const cv=document.createElement('canvas'); cv.width=im.naturalWidth; cv.height=im.naturalHeight;
+      cv.getContext('2d').drawImage(im,0,0); source=cv;
+    }catch(e){ throw e; }
+    finally{ URL.revokeObjectURL(url); }
+  }
+  // 源图上限 2048px 控内存
+  const m=Math.max(source.width,source.height);
+  if(m>2048){
+    const k=2048/m;
+    const cv=document.createElement('canvas'); cv.width=Math.max(1,Math.round(source.width*k)); cv.height=Math.max(1,Math.round(source.height*k));
+    cv.getContext('2d').drawImage(source,0,0,cv.width,cv.height);
+    source=cv;
+  }
+  // 归一化为 canvas（统一 width/height 语义）
+  const out=document.createElement('canvas'); out.width=source.width; out.height=source.height;
+  out.getContext('2d').drawImage(source,0,0);
+  return out;
+}
+
+// ---------- 1:1 裁剪器 ----------
+const crop=(()=>{
+  const can=document.getElementById('cropCanvas'), ctx2=can.getContext('2d');
+  const SIZE=360; can.width=SIZE; can.height=SIZE;
+  let src=null, scale=1, ox=0, oy=0, slot=-1;
+  let drag=null, pinch=null;
+  const pts=new Map();
+  function cover(){ return Math.max(SIZE/src.width, SIZE/src.height); }
+  function clamp(){
+    if(!src) return;
+    const min=cover(); if(scale<min) scale=min;
+    const max=Math.max(min*8,8); if(scale>max) scale=max;
+    const w=src.width*scale, h=src.height*scale;
+    ox=Math.min(Math.max(ox,SIZE-w),0);
+    oy=Math.min(Math.max(oy,SIZE-h),0);
+  }
+  function draw(){
+    ctx2.clearRect(0,0,SIZE,SIZE);
+    ctx2.fillStyle='#10141f'; ctx2.fillRect(0,0,SIZE,SIZE);
+    if(src) ctx2.drawImage(src,ox,oy,src.width*scale,src.height*scale);
+  }
+  function fitCenter(){ if(!src) return; scale=cover(); ox=(SIZE-src.width*scale)/2; oy=(SIZE-src.height*scale)/2; draw(); }
+  function zoomAt(px,py,factor){
+    if(!src) return;
+    const old=scale; scale*=factor;
+    ox=px-(px-ox)*(scale/old); oy=py-(py-oy)*(scale/old);
+    clamp(); draw();
+  }
+  function open(i){ if(!pendingSrc[i]) return; slot=i; src=pendingSrc[i]; fitCenter(); showModal('modalCrop'); sfx.btn(); }
+  function close(){ src=null; slot=-1; pts.clear(); drag=pinch=null; ctx2.clearRect(0,0,SIZE,SIZE); }
+  function exportSquare(){
+    const out=document.createElement('canvas'); out.width=512; out.height=512;
+    const c=out.getContext('2d');
+    c.fillStyle='#10141f'; c.fillRect(0,0,512,512);
+    const k=512/SIZE;
+    c.drawImage(src,ox*k,oy*k,src.width*scale*k,src.height*scale*k);
+    return out.toDataURL('image/jpeg',.85);
+  }
+  function autoExport(sourceCanvas){
+    const saved=src; src=sourceCanvas; fitCenter();
+    const out=exportSquare(); src=saved;
+    return out;
+  }
+  can.addEventListener('pointerdown',e=>{
+    if(!src) return;
+    e.preventDefault();
+    try{ can.setPointerCapture(e.pointerId); }catch(_){}
+    pts.set(e.pointerId,{x:e.offsetX,y:e.offsetY});
+    can.classList.add('panning');
+    if(pts.size===1){ drag={x:e.offsetX,y:e.offsetY,ox:ox,oy:oy}; pinch=null; }
+    else{
+      const arr=[...pts.values()], a=arr[0], b=arr[1];
+      pinch={ d:Math.hypot(b.x-a.x,b.y-a.y), scale:scale, mid:{x:(a.x+b.x)/2,y:(a.y+b.y)/2}, ox:ox, oy:oy };
+      drag=null;
+    }
+  });
+  can.addEventListener('pointermove',e=>{
+    if(!src||!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId,{x:e.offsetX,y:e.offsetY});
+    if(pts.size===1&&drag){
+      ox=drag.ox+(e.offsetX-drag.x); oy=drag.oy+(e.offsetY-drag.y);
+      clamp(); draw();
+    }else if(pts.size>=2&&pinch){
+      const arr=[...pts.values()], a=arr[0], b=arr[1];
+      const d=Math.hypot(b.x-a.x,b.y-a.y);
+      const mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+      scale=pinch.scale*(d/Math.max(1,pinch.d));
+      const ix=(pinch.mid.x-pinch.ox)/pinch.scale, iy=(pinch.mid.y-pinch.oy)/pinch.scale;
+      ox=mid.x-ix*scale; oy=mid.y-iy*scale;
+      clamp(); draw();
+    }
+  });
+  function up(e){
+    if(!pts.has(e.pointerId)) return;
+    pts.delete(e.pointerId);
+    if(pts.size===1){ const p=[...pts.values()][0]; drag={x:p.x,y:p.y,ox:ox,oy:oy}; pinch=null; }
+    if(pts.size===0){ can.classList.remove('panning'); drag=pinch=null; }
+  }
+  can.addEventListener('pointerup',up);
+  can.addEventListener('pointercancel',up);
+  can.addEventListener('wheel',e=>{
+    if(!src) return;
+    e.preventDefault();
+    zoomAt(e.offsetX,e.offsetY, e.deltaY<0?1.12:0.9);
+  },{passive:false});
+  return { open:open, close:close, exportSquare:exportSquare, autoExport:autoExport, fitCenter:fitCenter, zoomAt:zoomAt, getSlot:()=>slot };
+})();
+
+// ---------- 皮肤弹窗 ----------
+function renderSkinGrid(){
+  const grid=document.getElementById('skinGrid'); grid.innerHTML='';
+  for(let i=0;i<TYPES;i++){
+    const slotEl=document.createElement('div'); slotEl.className='skin-slot';
+    slotEl.style.setProperty('--ring-c',ACCENT[i]);
+    const has=!!cropDraft[i];
+    slotEl.innerHTML = '<div class="skin-preview">' + (has ? '<img src="'+cropDraft[i]+'" alt="">' : '<span class="skin-ph">'+ic('image')+'</span>') + '</div>' +
+      '<div class="skin-row"><span class="skin-label">方块 '+(i+1)+'</span><span class="skin-state'+(has?' ok':'')+'">'+(has?'已就绪':'待上传')+'</span></div>' +
+      '<div class="skin-actions">' +
+        '<button class="mini-btn" data-act="pick" data-i="'+i+'">'+(has?'重传':'上传')+'</button>' +
+        '<button class="mini-btn" data-act="crop" data-i="'+i+'"'+(pendingSrc[i]?'':' disabled')+'>裁剪</button>' +
+      '</div>';
+    grid.appendChild(slotEl);
+  }
+  document.getElementById('skinApply').disabled = cropDraft.filter(Boolean).length<TYPES;
+}
+function openSkinModal(){
+  const cur = skinCustom()? skinSet.imgs.slice() : [null,null,null,null];
+  for(let i=0;i<TYPES;i++){ cropDraft[i]=cur[i]; pendingSrc[i]=null; }
+  renderSkinGrid();
+  showModal('modalSkin');
+  sfx.btn();
+}
+function pickSkinFile(i){
+  const inp=document.createElement('input');
+  inp.type='file'; inp.accept='image/*';
+  inp.onchange=async()=>{
+    const f=inp.files&&inp.files[0];
+    if(!f) return;
+    if(!f.type||f.type.indexOf('image/')!==0){ showToast('请选择图片文件'); return; }
+    if(f.size>10*1024*1024){ showToast('图片不能超过 10MB'); return; }
+    let src=null;
+    try{ src=await decodeSource(f); }
+    catch(e){ showToast('图片加载失败，换一张试试'); return; }
+    pendingSrc[i]=src;
+    crop.open(i);
+  };
+  inp.click();
+}
+function confirmCrop(){
+  cropDraft[crop.getSlot()]=crop.exportSquare();
+  crop.close();
+  hideAllModal();
+  showModal('modalSkin');
+  renderSkinGrid();
+  sfx.btn();
+}
+function autoCropRemaining(){
+  let missing=0, doneCount=0;
+  for(let i=0;i<TYPES;i++){
+    if(cropDraft[i]) continue;
+    if(!pendingSrc[i]){ missing++; continue; }
+    cropDraft[i]=crop.autoExport(pendingSrc[i]);
+    doneCount++;
+  }
+  renderSkinGrid();
+  if(doneCount>0) sfx.btn();
+  if(missing>0) showToast('还有 '+missing+' 个方块未上传照片');
+  else if(doneCount===0&&cropDraft.filter(Boolean).length===TYPES) showToast('照片都已就绪');
+  else if(doneCount===0) showToast('请先上传照片');
+  else showToast('已自动裁剪 '+doneCount+' 张');
+}
+async function applySkin(){
+  if(cropDraft.filter(Boolean).length<TYPES){ showToast('请先裁剪完 4 张照片'); return; }
+  skinSet={v:1, imgs:cropDraft.slice(), ts:Date.now()};
+  const ok=await SkinDB.set(skinSet);
+  if(!ok) showToast('存储空间不足，皮肤仅本次生效');
+  localStorage.setItem('xxl-skin-active','custom');
+  applySkinToBoard();
+  predecodeFaces();
+  renderSkinGrid();
+  sfx.btn();
+  showToast('自定义皮肤已应用！');
+}
+function resetSkin(){
+  localStorage.setItem('xxl-skin-active','default');
+  applySkinToBoard();
+  predecodeFaces();
+  renderSkinGrid();
+  sfx.btn();
+  showToast('已恢复默认头像');
+}
+
+document.getElementById('menuSkin').onclick=()=>{ openSkinModal(); };
+document.getElementById('settingsSkin').onclick=()=>{ openSkinModal(); };
+document.getElementById('skinApply').onclick=()=>{ applySkin(); };
+document.getElementById('skinAuto').onclick=()=>{ autoCropRemaining(); };
+document.getElementById('skinReset').onclick=()=>{ resetSkin(); };
+document.getElementById('skinClose').onclick=()=>{ hideAllModal(); };
+document.getElementById('cropOk').onclick=()=>{ confirmCrop(); };
+document.getElementById('cropCancel').onclick=()=>{ crop.close(); hideAllModal(); showModal('modalSkin'); renderSkinGrid(); };
+document.getElementById('skinGrid').addEventListener('click',e=>{
+  const btn=e.target.closest('button[data-act]'); if(!btn) return;
+  const i=+btn.dataset.i, act=btn.dataset.act;
+  if(act==='pick'){ sfx.btn(); pickSkinFile(i); }
+  else if(act==='crop'&&pendingSrc[i]){ crop.open(i); }
+  else if(act==='crop'){ showToast('先上传一张照片'); }
+});
+document.getElementById('cropOut').innerHTML=ic('zoomOut');
+document.getElementById('cropIn').innerHTML=ic('zoomIn');
+document.getElementById('cropFit').innerHTML=ic('fit');
+document.getElementById('cropOut').onclick=()=>crop.zoomAt(180,180,.8);
+document.getElementById('cropIn').onclick=()=>crop.zoomAt(180,180,1.25);
+document.getElementById('cropFit').onclick=()=>crop.fitCenter();
 // ---------- 启动 ----------
 function start(){
   setTheme(themePref); setBg(bgPref);
@@ -868,7 +1174,7 @@ function start(){
   initBgStars(); syncBgStars();
   musicIdx = Math.min(+localStorage.getItem('xxl-music-idx')||0, MUSIC_LIST.length-1);
   // 预解码方块图，避免首次交换/洗牌解码抖动
-  FACE_IMG.forEach(src=>{ const img=new Image(); img.src=src; img.decode&&img.decode().catch(()=>{}); });
+  predecodeFaces(); loadSkin();
   gotoMenu();
 }
 start();
