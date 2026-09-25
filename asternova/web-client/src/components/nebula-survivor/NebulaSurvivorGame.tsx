@@ -12,6 +12,8 @@ import { LiquidBar } from "@/src/components/ui/LiquidBar"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
 import { ResultOverlay } from "@/src/components/ui/ResultOverlay"
 import { useDialogA11y } from "@/src/hooks/useDialogA11y"
+import { StagePortal } from "@/src/components/game-shell/StagePortal"
+import { useMobileGameViewport } from "@/src/hooks/useMobileGameViewport"
 
 const NEBULA_STORAGE_SKIP_RULES = "nebula-survivor-skip-rules"
 
@@ -242,6 +244,7 @@ function UpgradeCard({
 }
 
 export function NebulaSurvivorGame() {
+  const { isMobile } = useMobileGameViewport()
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   const engineRef = React.useRef<NebulaEngine | null>(null)
   const rafRef = React.useRef<number>(0)
@@ -453,7 +456,7 @@ export function NebulaSurvivorGame() {
   return (
     <div className="relative flex h-full min-h-0 min-h-full flex-col overflow-hidden bg-space-black text-white">
       <div className="relative z-10 flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.07] px-3 py-2.5 backdrop-blur-xl sm:px-5 sm:py-3">
-        <GameBackButton variant="header" label="大厅" />
+        {isMobile ? <span aria-hidden="true" /> : <GameBackButton variant="header" label="大厅" />}
         <div className="text-center">
           <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/50">AsterNova</div>
           <div className="font-display text-sm font-semibold text-white sm:text-base">
@@ -461,35 +464,76 @@ export function NebulaSurvivorGame() {
           </div>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <button
-            type="button"
-            title="暂停（战斗中按 P 亦可）"
-            disabled={ui.gameOver || ui.pausedUpgrade || rulesModalOpen}
-            onClick={() => {
-              setRulesModalKind("pause")
-              setRulesModalOpen(true)
-            }}
-            className="rounded-full border-[0.5px] border-white/15 bg-white/[0.06] px-2 py-1 text-[11px] font-medium text-white/75 disabled:pointer-events-none disabled:opacity-35 sm:px-2.5 sm:text-xs"
-          >
-            暂停
-          </button>
-          <button
-            type="button"
-            disabled={rulesModalOpen}
-            onClick={() => {
-              setRulesModalKind("reference")
-              setRulesModalOpen(true)
-            }}
-            className="rounded-full border-[0.5px] border-white/15 bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-white/75 disabled:pointer-events-none disabled:opacity-35 sm:px-3 sm:text-xs"
-          >
-            规则
-          </button>
+          {!isMobile ? (
+            <>
+              <button
+                type="button"
+                title="暂停（战斗中按 P 亦可）"
+                disabled={ui.gameOver || ui.pausedUpgrade || rulesModalOpen}
+                onClick={() => {
+                  setRulesModalKind("pause")
+                  setRulesModalOpen(true)
+                }}
+                className="rounded-full border-[0.5px] border-white/15 bg-white/[0.06] px-2 py-1 text-[11px] font-medium text-white/75 disabled:pointer-events-none disabled:opacity-35 sm:px-2.5 sm:text-xs"
+              >
+                暂停
+              </button>
+              <button
+                type="button"
+                disabled={rulesModalOpen}
+                onClick={() => {
+                  setRulesModalKind("reference")
+                  setRulesModalOpen(true)
+                }}
+                className="rounded-full border-[0.5px] border-white/15 bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-white/75 disabled:pointer-events-none disabled:opacity-35 sm:px-3 sm:text-xs"
+              >
+                规则
+              </button>
+            </>
+          ) : null}
           <div className="text-right font-mono-data text-[11px] leading-tight text-white/55 sm:text-xs">
             <div className="text-white/50">击杀 {ui.kills}</div>
             <div className="text-white/80">分 {ui.score}</div>
           </div>
         </div>
       </div>
+
+      {isMobile && !rulesModalOpen && !ui.pausedUpgrade && !ui.gameOver ? (
+        <StagePortal>
+          <GameBackButton variant="floating" label="大厅" />
+          <div
+            className="fixed z-[70] flex flex-col gap-2"
+            style={{
+              top: "max(0.75rem, env(safe-area-inset-top, 0px))",
+              right: "max(0.75rem, env(safe-area-inset-right, 0px))",
+            }}
+          >
+            <button
+              type="button"
+              title="暂停（战斗中按 P 亦可）"
+              disabled={ui.gameOver || ui.pausedUpgrade || rulesModalOpen}
+              onClick={() => {
+                setRulesModalKind("pause")
+                setRulesModalOpen(true)
+              }}
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/15 bg-black/45 px-3.5 text-[12px] font-medium text-white/85 backdrop-blur-md disabled:pointer-events-none disabled:opacity-35 active:scale-[0.97]"
+            >
+              暂停
+            </button>
+            <button
+              type="button"
+              disabled={rulesModalOpen}
+              onClick={() => {
+                setRulesModalKind("reference")
+                setRulesModalOpen(true)
+              }}
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/15 bg-black/45 px-3.5 text-[12px] font-medium text-white/85 backdrop-blur-md disabled:pointer-events-none disabled:opacity-35 active:scale-[0.97]"
+            >
+              规则
+            </button>
+          </div>
+        </StagePortal>
+      ) : null}
 
       <div className="relative min-h-0 flex-1">
         <div className="pointer-events-none absolute left-3 top-2 z-10 flex w-52 flex-col gap-2.5 rounded-2xl border border-glass-border bg-glass-bg px-3 py-2.5 shadow-lg backdrop-blur-glass-md sm:left-5 sm:top-4 sm:w-56">
@@ -535,6 +579,7 @@ export function NebulaSurvivorGame() {
         </p>
       </div>
 
+      <StagePortal>
       {rulesModalOpen ? (
         <div
           ref={rulesDialogRef}
@@ -630,7 +675,9 @@ export function NebulaSurvivorGame() {
           </div>
         </div>
       ) : null}
+      </StagePortal>
 
+      <StagePortal>
       <AnimatePresence>
         {ui.pausedUpgrade && ui.choices.length > 0 ? (
           <motion.div
@@ -687,7 +734,9 @@ export function NebulaSurvivorGame() {
           </motion.div>
         ) : null}
       </AnimatePresence>
+      </StagePortal>
 
+      <StagePortal>
       <AnimatePresence>
         {ui.gameOver ? (
           <ResultOverlay
@@ -703,7 +752,8 @@ export function NebulaSurvivorGame() {
           />
         ) : null}
       </AnimatePresence>
-      <LoopingBgmControl src="/audio/games/nebula-survivor/Untitled.mp3" storageKey="bgm-volume:nebula-survivor" />
+      </StagePortal>
+      <LoopingBgmControl src="/audio/games/nebula-survivor/Untitled.mp3" storageKey="bgm-volume:nebula-survivor" hidden={rulesModalOpen || ui.pausedUpgrade || ui.gameOver} />
     </div>
   )
 }

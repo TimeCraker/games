@@ -10,6 +10,8 @@ import * as React from "react"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
 import { useDialogA11y } from "@/src/hooks/useDialogA11y"
+import { StagePortal } from "@/src/components/game-shell/StagePortal"
+import { useMobileGameViewport } from "@/src/hooks/useMobileGameViewport"
 import { cn } from "@/lib/utils"
 
 // —— 可调参数 ——
@@ -232,6 +234,7 @@ function DashIconStarBurst({ className, iconClass }: { className?: string; iconC
 }
 
 export function StarDashGame() {
+  const { isMobile } = useMobileGameViewport()
   const wrapRef = React.useRef<HTMLDivElement | null>(null)
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
   const rafRef = React.useRef<number | null>(null)
@@ -936,7 +939,7 @@ export function StarDashGame() {
   return (
     <div className="relative flex h-full min-h-0 min-h-full flex-col bg-space-black text-white">
       <div className="relative z-20 grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-white/[0.08] px-4 py-3 backdrop-blur-xl">
-        <GameBackButton variant="header" className="justify-self-start" />
+        {isMobile ? <span aria-hidden="true" /> : <GameBackButton variant="header" className="justify-self-start" />}
         <span className="justify-self-center font-display text-sm font-semibold tracking-tight text-white">
           AsterNova · Star Dash
         </span>
@@ -945,7 +948,9 @@ export function StarDashGame() {
         </span>
       </div>
 
-      {rulesModalOpen ? (
+      <StagePortal>
+        {isMobile && !rulesModalOpen ? <GameBackButton variant="floating" /> : null}
+        {rulesModalOpen ? (
         <div
           ref={rulesDialogRef}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-md"
@@ -1020,6 +1025,7 @@ export function StarDashGame() {
           </div>
         </div>
       ) : null}
+      </StagePortal>
 
       <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 min-[480px]:px-4">
         <div
@@ -1097,7 +1103,7 @@ export function StarDashGame() {
           </div>
         ) : null}
       </div>
-      <LoopingBgmControl src="/audio/games/lets-running/Digital_Frenzy lets running.mp3" storageKey="bgm-volume:lets-running" />
+      <LoopingBgmControl src="/audio/games/lets-running/Digital_Frenzy lets running.mp3" storageKey="bgm-volume:lets-running" hidden={rulesModalOpen} />
     </div>
   )
 }

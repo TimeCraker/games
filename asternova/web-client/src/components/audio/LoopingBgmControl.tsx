@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { Music2, Volume2, VolumeX } from "lucide-react"
+import { StagePortal } from "@/src/components/game-shell/StagePortal"
 
 type Props = {
   src?: string
@@ -13,6 +14,8 @@ type Props = {
    * 将控制条上移避免与关键 CTA 点击区重叠。
    */
   elevated?: boolean
+  /** 全屏弹层（规则/结算）打开时置 true：隐藏控制条，避免压在弹层按钮之上 */
+  hidden?: boolean
 }
 
 const FILE_CANDIDATES = [
@@ -36,7 +39,7 @@ function normalizePublicAudioPath(path: string): string {
     .join("/")
 }
 
-export function LoopingBgmControl({ src, basePath, storageKey, className = "", elevated = false }: Props) {
+export function LoopingBgmControl({ src, basePath, storageKey, className = "", elevated = false, hidden = false }: Props) {
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const lastNonZeroRef = React.useRef(0.6)
   const [open, setOpen] = React.useState(false)
@@ -107,7 +110,7 @@ export function LoopingBgmControl({ src, basePath, storageKey, className = "", e
     setAvailable(false)
   }, [idx, src])
 
-  if (!available) return null
+  if (!available || hidden) return null
   const audible = volume > 0.001
 
   const onPrimaryClick = () => {
@@ -120,8 +123,10 @@ export function LoopingBgmControl({ src, basePath, storageKey, className = "", e
     setOpen(false)
   }
 
+  // portal 到 document.body：游戏页内 BGM 位于 ScaleFitGameStage 缩放容器中，
+  // 不逃逸 transform 会随舞台缩到 <24px（rules §3）。
   return (
-    <>
+    <StagePortal>
       <audio ref={audioRef} src={resolvedSrc} loop preload="auto" onError={onAudioError} />
 
       <div
@@ -180,7 +185,7 @@ export function LoopingBgmControl({ src, basePath, storageKey, className = "", e
           ) : null}
         </div>
       </div>
-    </>
+    </StagePortal>
   )
 }
 

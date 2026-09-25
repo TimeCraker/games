@@ -11,6 +11,8 @@ import { AnimatePresence, motion } from "framer-motion"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
 import { useDialogA11y } from "@/src/hooks/useDialogA11y"
+import { StagePortal } from "@/src/components/game-shell/StagePortal"
+import { useMobileGameViewport } from "@/src/hooks/useMobileGameViewport"
 
 const MERGE_STORAGE_SKIP_RULES = "merge-skip-rules"
 
@@ -242,7 +244,9 @@ export function MergeGame() {
     }
   }, [])
 
-  const confirmMergeRules = React.useCallback(() => {
+    const { isMobile } = useMobileGameViewport()
+
+const confirmMergeRules = React.useCallback(() => {
     try {
       if (dontShowRulesAgain) localStorage.setItem(MERGE_STORAGE_SKIP_RULES, "1")
     } catch {
@@ -565,18 +569,35 @@ export function MergeGame() {
         }}
       />
 
-      <button
-        type="button"
-        onClick={() => setRulesModalOpen(true)}
-        className="absolute z-30 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5 text-[11px] font-medium text-white/80 shadow-[0_8px_28px_rgba(0,0,0,0.35)] backdrop-blur-md transition hover:bg-white/[0.11] active:scale-[0.98] min-[400px]:px-3.5 min-[400px]:text-[12px] sm:right-6 sm:top-6"
-        style={{
-          WebkitBackdropFilter: "blur(14px)",
-          top: "max(0.75rem, env(safe-area-inset-top, 0px))",
-          right: "max(0.75rem, env(safe-area-inset-right, 0px))",
-        }}
-      >
-        规则
-      </button>
+      {isMobile && !rulesModalOpen && playing ? (
+        <StagePortal>
+          <button
+            type="button"
+            onClick={() => setRulesModalOpen(true)}
+            className="fixed z-[70] flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/45 px-3.5 text-[13px] font-medium text-white/85 backdrop-blur-md transition hover:bg-white/[0.11] active:scale-[0.98]"
+            style={{
+              WebkitBackdropFilter: "blur(14px)",
+              top: "max(0.75rem, env(safe-area-inset-top, 0px))",
+              right: "max(0.75rem, env(safe-area-inset-right, 0px))",
+            }}
+          >
+            规则
+          </button>
+        </StagePortal>
+      ) : !isMobile ? (
+        <button
+          type="button"
+          onClick={() => setRulesModalOpen(true)}
+          className="absolute z-30 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5 text-[11px] font-medium text-white/80 shadow-[0_8px_28px_rgba(0,0,0,0.35)] backdrop-blur-md transition hover:bg-white/[0.11] active:scale-[0.98] min-[400px]:px-3.5 min-[400px]:text-[12px] sm:right-6 sm:top-6"
+          style={{
+            WebkitBackdropFilter: "blur(14px)",
+            top: "max(0.75rem, env(safe-area-inset-top, 0px))",
+            right: "max(0.75rem, env(safe-area-inset-right, 0px))",
+          }}
+        >
+          规则
+        </button>
+      ) : null}
 
       <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-[min(100%,42rem)] flex-1 flex-col gap-3 overflow-y-auto overscroll-y-contain px-[max(0.75rem,env(safe-area-inset-left))] pb-[max(0.75rem,env(safe-area-inset-bottom))] pr-[max(0.75rem,env(safe-area-inset-right))] pt-[max(0.35rem,env(safe-area-inset-top))] min-[400px]:gap-4 min-[400px]:px-4 min-[400px]:pb-6 min-[400px]:pt-4 sm:gap-4 sm:pb-6 sm:pt-4 lg:overflow-hidden">
         <motion.header
@@ -687,19 +708,38 @@ export function MergeGame() {
           </div>
         </motion.div>
 
-        <div className="flex flex-wrap items-center justify-center gap-2.5 pb-1 sm:gap-3 sm:pb-0">
-          <GameBackButton variant="header" />
-          <button
-            type="button"
-            onClick={restart}
-            className="min-h-[44px] min-w-[44px] rounded-full border border-white/10 bg-gradient-to-r from-rose-400/90 via-amber-400/88 to-teal-500/88 px-5 py-2.5 text-[12px] font-semibold text-gray-950 shadow-[0_12px_40px_rgba(45,212,191,0.22),0_0_0_1px_rgba(255,255,255,0.15)_inset] transition hover:brightness-105 active:scale-[0.98] sm:min-h-0 sm:px-6 sm:text-[13px]"
-          >
-            再来一局
-          </button>
-        </div>
+        {isMobile && !rulesModalOpen && playing ? (
+          <StagePortal>
+            <GameBackButton variant="floating" />
+            <div
+              className="fixed inset-x-3 z-[70] flex justify-center"
+              style={{ bottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))" }}
+            >
+              <button
+                type="button"
+                onClick={restart}
+                className="min-h-[44px] min-w-[44px] rounded-full border border-white/10 bg-gradient-to-r from-rose-400/90 via-amber-400/88 to-teal-500/88 px-6 py-2.5 text-[13px] font-semibold text-gray-950 shadow-[0_12px_40px_rgba(45,212,191,0.22),0_0_0_1px_rgba(255,255,255,0.15)_inset] transition hover:brightness-105 active:scale-[0.98]"
+              >
+                再来一局
+              </button>
+            </div>
+          </StagePortal>
+        ) : !isMobile ? (
+          <div className="flex flex-wrap items-center justify-center gap-2.5 pb-1 sm:gap-3 sm:pb-0">
+            <GameBackButton variant="header" />
+            <button
+              type="button"
+              onClick={restart}
+              className="min-h-[44px] min-w-[44px] rounded-full border border-white/10 bg-gradient-to-r from-rose-400/90 via-amber-400/88 to-teal-500/88 px-5 py-2.5 text-[12px] font-semibold text-gray-950 shadow-[0_12px_40px_rgba(45,212,191,0.22),0_0_0_1px_rgba(255,255,255,0.15)_inset] transition hover:brightness-105 active:scale-[0.98] sm:min-h-0 sm:px-6 sm:text-[13px]"
+            >
+              再来一局
+            </button>
+          </div>
+        ) : null}
       </div>
 
-      {rulesModalOpen ? (
+      <StagePortal>
+        {rulesModalOpen ? (
         <div
           ref={rulesDialogRef}
           className="fixed inset-0 z-[55] flex items-end justify-center bg-black/55 backdrop-blur-md sm:items-center sm:p-4"
@@ -787,9 +827,11 @@ export function MergeGame() {
             </button>
           </div>
         </div>
-      ) : null}
+        ) : null}
+      </StagePortal>
 
-      <AnimatePresence>
+      <StagePortal>
+        <AnimatePresence>
         {!playing ? (
           <motion.div
             className="fixed inset-0 z-[60] flex items-end justify-center bg-black/55 backdrop-blur-md sm:items-center sm:p-6"
@@ -841,8 +883,9 @@ export function MergeGame() {
             </motion.div>
           </motion.div>
         ) : null}
-      </AnimatePresence>
-      <LoopingBgmControl src="/audio/games/merge/Velvet_Resonance.mp3" storageKey="bgm-volume:merge" />
+        </AnimatePresence>
+      </StagePortal>
+      <LoopingBgmControl src="/audio/games/merge/Velvet_Resonance.mp3" storageKey="bgm-volume:merge" hidden={rulesModalOpen || !playing} />
     </div>
   )
 }
