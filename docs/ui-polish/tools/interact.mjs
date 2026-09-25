@@ -9,6 +9,26 @@ const CDP_HTTP = process.env.CDP_HTTP || "http://127.0.0.1:9333";
 const SITE = (process.env.SITE_URL || "http://127.0.0.1:4105").replace(/\/$/, "");
 const OUT_DIR = process.env.OUT_DIR || path.resolve(HERE, "..", "..", ".ui-polish", "artifacts");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const EDGE_EXE = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
+const CHROME_EXE = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+/** CDP 无响应时自动拉起浏览器（Crashpad 禁用 + 工作区 profile，R8 踩坑配方） */
+async function ensureBrowser() {
+  try { await (await fetch(CDP_HTTP + "/json/version")).text(); return true; } catch {}
+  if (typeof process === "undefined" || !process.getuid && !process.title) {}
+  try {
+    const { spawn } = await import("node:child_process");
+    const exe = (await import("node:fs")).existsSync(EDGE_EXE) ? EDGE_EXE : CHROME_EXE;
+    const flags = ["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--disable-features=Crashpad","--no-first-run","--window-size=1440,900","--remote-debugging-port=9333","--remote-allow-origins=*","--no-proxy-server","--user-data-dir=C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\.ui-polish\\edge-profile","about:blank"];
+    const child = spawn(exe, flags, { stdio: "ignore", detached: true });
+    child.unref();
+  } catch {}
+  for (let i = 0; i < 30; i++) {
+    await sleep(2000);
+    try { await (await fetch(CDP_HTTP + "/json/version")).text(); return true; } catch {}
+  }
+  return false;
+}
+
 
 class Cdp {
   constructor(u) { this.ws = new WebSocket(u); this.id = 0; this.p = new Map(); }
@@ -27,6 +47,7 @@ class Cdp {
 }
 
 async function newTab() {
+  await ensureBrowser();
   const t = await (await fetch(CDP_HTTP + "/json/new?about:blank", { method: "PUT" })).json();
   const c = new Cdp(t.webSocketDebuggerUrl);
   c.targetId = t.id;

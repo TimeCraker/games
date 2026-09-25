@@ -21,14 +21,39 @@ fs.mkdirSync(SHOTS_DIR, { recursive: true });
 const argv = process.argv.slice(2);
 const argVal = (name, def) => { const i = argv.indexOf("--" + name); return i >= 0 && argv[i + 1] ? argv[i + 1] : def; };
 const ROUTES = argVal("routes", "/,/login,/lobby,/arena,/shoot-them-all,/lets-running,/merge,/nebula-survivor,/xiaoxiaole,/this-route-does-not-exist").split(",").filter(Boolean);
+const VIEWPORT_DEFS = {
+  desktop: { width: 1440, height: 900, mobile: false, dpr: 1 },
+  mobile: { width: 375, height: 812, mobile: true, dpr: 2 },
+  tablet: { width: 768, height: 1024, mobile: false, dpr: 2 },
+  wide: { width: 2560, height: 1440, mobile: false, dpr: 1 },
+  tiny: { width: 320, height: 568, mobile: true, dpr: 2 },
+};
 const VIEWPORTS = argVal("viewports", "desktop,mobile").split(",").filter(Boolean).map((n) => ({
   name: n,
-  ...(n === "mobile"
-    ? { width: 375, height: 812, mobile: true, dpr: 2 }
-    : { width: 1440, height: 900, mobile: false, dpr: 1 }),
+  ...(VIEWPORT_DEFS[n] || VIEWPORT_DEFS.desktop),
 }));
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const EDGE_EXE = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
+const CHROME_EXE = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+/** CDP 无响应时自动拉起浏览器（Crashpad 禁用 + 工作区 profile，R8 踩坑配方） */
+async function ensureBrowser() {
+  try { await (await fetch(CDP_HTTP + "/json/version")).text(); return true; } catch {}
+  if (typeof process === "undefined" || !process.getuid && !process.title) {}
+  try {
+    const { spawn } = await import("node:child_process");
+    const exe = (await import("node:fs")).existsSync(EDGE_EXE) ? EDGE_EXE : CHROME_EXE;
+    const flags = ["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--disable-features=Crashpad","--no-first-run","--window-size=1440,900","--remote-debugging-port=9333","--remote-allow-origins=*","--no-proxy-server","--user-data-dir=C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\.ui-polish\\edge-profile","about:blank"];
+    const child = spawn(exe, flags, { stdio: "ignore", detached: true });
+    child.unref();
+  } catch {}
+  for (let i = 0; i < 30; i++) {
+    await sleep(2000);
+    try { await (await fetch(CDP_HTTP + "/json/version")).text(); return true; } catch {}
+  }
+  return false;
+}
+
 
 /** 零依赖 PNG 解码（8bit、RGB/RGBA；Adam interlace 不支持，CDP 截图无 interlace） */
 function decodePng(buf) {
@@ -95,9 +120,12 @@ function verifyPixels(base64, dpr, violations, dialogs = []) {
     const [left, top, w, h] = v.rect;
     const raw = { r: v.fg[0], g: v.fg[1], b: v.fg[2], a: (v.fg[3] ?? 100) / 100 };
     if (w < 8 || h < 8) continue;
-    const elInDialog = inDialog(left + w / 2, top + h / 2);
-    const ix = Math.max(4, w * 0.12), iy = Math.max(4, Math.min(8, h * 0.25));
-    const pts = [[left + ix, top + iy], [left + w - ix, top + iy], [left + ix, top + h - iy], [left + w - ix, top + h - iy]];
+    const elInDialog = v.inDialogEl !== undefined ? v.inDialogEl === true : inDialog(left + w / 2, top + h / 2);
+    const vw = png.width / dpr, vh = png.height / dpr;
+    const vTop = Math.max(0, top), vBottom = Math.min(top + h, vh), vLeft = Math.max(0, left), vRight = Math.min(left + w, vw);
+    if (vBottom - vTop < 6 || vRight - vLeft < 6) { out.push({ x: v.x.slice(0, 24), need: v.need, domRatio: v.ratio, obscured: true, note: "元素大部分在视口外" }); continue; }
+    const padY = Math.min(8, (vBottom - vTop) / 2), padX = Math.min(Math.max(4, w * 0.11), (vRight - vLeft) / 3);
+    const pts = [[vLeft + padX, vTop + padY], [vRight - padX, vTop + padY], [vLeft + padX, vBottom - padY], [vRight - padX, vBottom - padY]];
     const obscuredSamples = pts.filter(([x, y]) => !elInDialog && inDialog(x, y)).length;
     if (obscuredSamples === pts.length) { out.push({ x: v.x.slice(0, 24), need: v.need, domRatio: v.ratio, obscured: true, note: "元素被打开的弹层遮罩覆盖，采样无代表性（弹层关闭后复核）" }); continue; }
     const samples = pts.map(([x, y]) => { const px = samplePng(png, (x + 0.5) * dpr, (y + 0.5) * dpr); return { r: px[0], g: px[1], b: px[2] }; });
@@ -129,6 +157,7 @@ class Cdp {
 }
 
 async function newTab(route) {
+  await ensureBrowser();
   const t = await (await fetch(CDP_HTTP + "/json/new?about:blank", { method: "PUT" })).json();
   const cdp = new Cdp(t.webSocketDebuggerUrl);
   cdp.targetId = t.id;
@@ -287,7 +316,7 @@ const AUDIT_FN = `() => {
     const need = large ? 3 : 4.5;
     if (rr < need) {
       const key = Math.round(rr * 100) + "|" + Math.floor(sizePx);
-      if (!seen[key]) { seen[key] = 1; bad.push({ x: txt.slice(0, 40), size: Math.round(sizePx), weight: s.fontWeight, ratio: Math.round(rr * 100) / 100, need, fg: [fg.r, fg.g, fg.b, Math.round(fg.a * 100)], bg: [Math.round(bg.r), Math.round(bg.g), Math.round(bg.b)], rect: [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)] }); }
+      if (!seen[key]) { seen[key] = 1; bad.push({ x: txt.slice(0, 40), size: Math.round(sizePx), weight: s.fontWeight, ratio: Math.round(rr * 100) / 100, need, fg: [fg.r, fg.g, fg.b, Math.round(fg.a * 100)], bg: [Math.round(bg.r), Math.round(bg.g), Math.round(bg.b)], rect: [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)], inDialogEl: !!el.closest('[role=dialog]') }); }
     }
   }
   out.contrastViolations = bad;
