@@ -629,6 +629,25 @@ svg { max-width:100%; }
 .float-text.time { color:#4ecdc4; }
 
 @media (max-width:480px){ .mode-chip { min-height:64px; padding:8px 10px; gap:2px; } .mode-chip b { font-size:13px; } }
+/* ---------- 数据统计 ---------- */
+.stats-card { max-width:440px; text-align:left; }
+.stats-card .modal-title { text-align:center; }
+.stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:12px 0 4px; }
+.stat-cell { background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:8px 4px; text-align:center; }
+.stat-cell b { display:block; font-size:18px; font-weight:900; margin-top:3px; font-variant-numeric:tabular-nums; }
+.stat-cell span { font-size:10px; color:var(--text-mute); font-weight:600; letter-spacing:.5px; }
+.stat-cell small { display:block; font-size:9px; color:var(--text-mute); margin-top:2px; }
+.stats-mode-row { margin-top:10px; }
+.stats-mode-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:6px; }
+.stats-h { font-size:12px; color:var(--text-mute); letter-spacing:1px; margin:12px 0 8px; }
+.ach-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.ach-cell { background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:9px 4px; text-align:center; font-size:11px; color:var(--text-soft); }
+.ach-cell .a-ic { color:var(--y); }
+.ach-cell.locked { opacity:.45; filter:grayscale(.5); }
+.ach-cell.locked .a-ic { color:var(--text-mute); }
+.ach-cell b { display:block; margin:4px 0 2px; font-weight:800; }
+.ach-cell small { color:var(--text-mute); font-size:9px; }
+@media (max-width:480px){ .stats-mode-grid { grid-template-columns:repeat(2,1fr); } }
 /* 减少动效（设置关闭时） */
 .reduce-motion * { animation-duration:.01ms !important; transition-duration:.08s !important; }
 .reduce-motion .bg-cloud::after, .reduce-motion .bg-neon::after { animation:none !important; }

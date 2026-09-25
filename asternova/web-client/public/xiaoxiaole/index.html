@@ -9,7 +9,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
-<link rel="stylesheet" href="./styles.css?v=2.27">
+<link rel="stylesheet" href="./styles.css?v=2.28">
 </head>
 <body>
 
@@ -137,6 +137,7 @@
       <div class="menu-utilities">
         <button id="menuSkin">方块皮肤</button>
         <button id="menuLeaderboard">排行榜</button>
+        <button id="menuStats">数据统计</button>
         <button id="menuBg">游戏背景</button>
         <button id="menuRefresh">刷新资源</button>
         <button id="menuSound">音效</button>
@@ -211,6 +212,7 @@
     <div class="modal-stats" id="modeEndStats"></div>
     <div class="modal-actions">
       <button class="menu-btn primary" id="modeEndRetry">再来一局</button>
+      <button class="menu-btn" id="modeEndShare">分享成绩</button>
       <button class="menu-btn ghost" id="modeEndMenu">回主菜单</button>
     </div>
   </div>
@@ -239,6 +241,20 @@
     <div class="lb-sections" id="lbSections"></div>
     <div class="modal-actions">
       <button class="menu-btn ghost" id="lbClose">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 数据统计 -->
+<div class="modal" id="modalStats">
+  <div class="modal-card stats-card">
+    <h2 class="modal-title">数据统计</h2>
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="stats-mode-row" id="statsModes"></div>
+    <h3 class="stats-h">成就墙</h3>
+    <div class="ach-grid" id="achGrid"></div>
+    <div class="modal-actions">
+      <button class="menu-btn ghost" id="statsClose">关闭</button>
     </div>
   </div>
 </div>
@@ -272,6 +288,7 @@
     <div class="modal-actions">
       <button class="menu-btn primary" id="nextLevelBtn">下一关</button>
       <button class="menu-btn" id="winRetryBtn">再玩一次</button>
+      <button class="menu-btn" id="winShareBtn">分享成绩</button>
       <button class="menu-btn ghost" id="winMenuBtn">回主菜单</button>
     </div>
   </div>
@@ -330,6 +347,10 @@
         <button class="mini-btn skin-settings-btn" id="settingsSkin">自定义图片</button>
       </div>
       <div class="setting-row">
+        <span>数据统计</span>
+        <button class="mini-btn skin-settings-btn" id="settingsStats">查看</button>
+      </div>
+      <div class="setting-row">
         <label for="setQuality">特效质量</label>
         <select id="setQuality" class="select">
           <option value="auto">自动</option>
@@ -369,6 +390,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<script src="./game.js?v=2.27"></script>
+<script src="./game.js?v=2.28"></script>
 </body>
 </html>

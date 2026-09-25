@@ -12,7 +12,7 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.27';
+const CACHE_VER = '2.28';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -796,6 +796,7 @@ function hideAllModal(){ document.querySelectorAll('.modal').forEach(m=>m.classL
 function gotoMenu(){
   state='menu'; showScreen('screenMenu'); hideAllModal();
   $('gameShell').hidden=true; stopBgMusic(); stopTimer(); timerExpired=false;
+  sessionTimeMs=0; playStartTs=0;
   clearBoard(); combo=0; busy=false; clearSelection(); selected=null;
   syncBgStars();
   const unlocked=Math.min(SAVE.unlocked,LEVELS.length);
@@ -831,6 +832,7 @@ async function startLevel(idx){
   $('introGoals').innerHTML=currentLevel.goals.map(g=>{const m=GOAL_META[g.t];return `<div>${ic(m.icon,'sm')} ${m.label} <b>${g.v}</b></div>`;}).join('') + (currentLevel.moves===0?'':'<div>'+ic('target','sm')+' '+currentLevel.moves+' 步内完成</div>');
   sfx.init(); await sleep(1600);
   state='playing'; showScreen(null); $('gameShell').hidden=false;
+  bumpPlay(); timeStart();
   syncBgStars();
   levelPill.textContent=`Level ${currentLevel.id}`; levelNum.textContent=currentLevel.id; levelName.textContent=currentLevel.name;
   hintEl.textContent = `${currentLevel.name} · ${currentLevel.moves===0?'无限步数':currentLevel.moves+'步内'}完成目标`;
@@ -840,8 +842,8 @@ async function startLevel(idx){
   if(soundOn) startBgMusic();
 }
 
-function pauseGame(){ if(state!=='playing') return; state='paused'; clearHint(); showModal('modalPause'); stopBgMusic(); if(mode===M_TIMED) stopTimer(); $('pauseEndBtn').hidden = mode!==M_ENDLESS; sfx.btn(); $('pauseVol').value=settings.volume; const pm=$('pauseMuteBtn'); if(pm){ pm.innerHTML=ic(soundOn?'sound':'mute'); pm.classList.toggle('off',!soundOn); } }
-function resumeGame(){ if(state!=='paused') return; state='playing'; hideAllModal(); if(mode===M_TIMED) resumeTimer(); if(soundOn) startBgMusic(); sfx.btn(); scheduleHint(); }
+function pauseGame(){ if(state!=='playing') return; state='paused'; clearHint(); timeFlush(); showModal('modalPause'); stopBgMusic(); if(mode===M_TIMED) stopTimer(); $('pauseEndBtn').hidden = mode!==M_ENDLESS; sfx.btn(); $('pauseVol').value=settings.volume; const pm=$('pauseMuteBtn'); if(pm){ pm.innerHTML=ic(soundOn?'sound':'mute'); pm.classList.toggle('off',!soundOn); } }
+function resumeGame(){ if(state!=='paused') return; state='playing'; hideAllModal(); timeStart(); if(mode===M_TIMED) resumeTimer(); if(soundOn) startBgMusic(); sfx.btn(); scheduleHint(); }
 
 function winLevel(){
   if(mode===M_DAILY){
@@ -852,6 +854,7 @@ function winLevel(){
     return;
   }
   if(mode!==M_CAMPAIGN){ finishMode(); return; }
+  recordEnd(); bumpEnd(true);
   state='win'; stopBgMusic(); sfx.win(); confetti();
   const movesRatio = isInfiniteMoves() ? 0.5 : moves/Math.max(1,currentLevel.moves);
   let stars=1; if(movesRatio>=0.3) stars=2; if(movesRatio>=0.5) stars=3;
@@ -875,6 +878,7 @@ function loseLevel(){
     showModeResult(M_DAILY,rank,false);
     return;
   }
+  recordEnd(); bumpEnd(false);
   state='lose'; stopBgMusic(); sfx.lose();
   if(Q.shake){ appEl.classList.add('shake'); setTimeout(()=>appEl.classList.remove('shake'),350); }
   const gap=currentLevel.target-score;
@@ -953,6 +957,7 @@ async function startMode(m){
   }
   sfx.init(); await sleep(1500);
   state='playing'; showScreen(null); $('gameShell').hidden=false;
+  bumpPlay(); timeStart();
   syncBgStars();
   levelPill.textContent={endless:'无尽模式',timed:'限时模式',daily:'每日挑战'}[m];
   levelNum.textContent=im.num; levelName.textContent=im.name;
@@ -978,6 +983,8 @@ function finishMode(){
 }
 function showModeResult(m, rank, win){
   state=(m===M_DAILY&&!win)?'lose':'win';
+  recordEnd();
+  if(m===M_DAILY) bumpEnd(win);
   stopTimer(); stopBgMusic();
   if(win){ sfx.win(); confetti(); } else { sfx.lose(); }
   const titles={endless:'无尽模式结算',timed:'时间到！',daily:win?'今日挑战完成':'挑战未完成'};
@@ -1045,6 +1052,120 @@ document.getElementById('lbClose').onclick=()=>{ hideAllModal(); };
 document.getElementById('modeEndRetry').onclick=()=>{ hideAllModal(); startMode(mode); };
 document.getElementById('modeEndMenu').onclick=()=>{ hideAllModal(); gotoMenu(); };
 document.getElementById('pauseEndBtn').onclick=()=>{ hideAllModal(); finishMode(); };
+// ---------- 数据统计 + 成绩分享卡片 ----------
+const STATS = {
+  get(){ try{ return JSON.parse(localStorage.getItem('xxl-stats')||'null')||{}; }catch(e){ return {}; } },
+  set(v){ try{ localStorage.setItem('xxl-stats', JSON.stringify(v)); }catch(e){} },
+  bump(fn){ const s=STATS.get(); fn(s); STATS.set(s); },
+};
+let playStartTs=0, sessionTimeMs=0;
+function timeStart(){ playStartTs=Date.now(); }
+function timeFlush(){ if(playStartTs>0){ sessionTimeMs+=Date.now()-playStartTs; playStartTs=0; } }
+function recordEnd(){ timeFlush(); STATS.bump(s=>{ s.totalTimeMs=(s.totalTimeMs||0)+sessionTimeMs; s.maxCombo=Math.max(s.maxCombo||0, stats.maxCombo); }); sessionTimeMs=0; }
+function bumpPlay(){ STATS.bump(s=>{ s.plays=(s.plays||0)+1; s.byMode=s.byMode||{}; const bm=s.byMode[mode]=s.byMode[mode]||{}; bm.plays=(bm.plays||0)+1; }); }
+function bumpEnd(win){ STATS.bump(s=>{ s.byMode=s.byMode||{}; const bm=s.byMode[mode]=s.byMode[mode]||{}; if(win){ s.wins=(s.wins||0)+1; bm.wins=(bm.wins||0)+1; } else { s.losses=(s.losses||0)+1; } }); }
+function fmtDur(ms){ const m=Math.round(ms/60000); if(m<60) return m+' 分钟'; return Math.floor(m/60)+' 小时 '+(m%60)+' 分'; }
+
+// ---------- 统计面板 ----------
+function openStats(){
+  const s=STATS.get();
+  const total=s.totalTimeMs||0, plays=s.plays||0, wins=s.wins||0, losses=s.losses||0;
+  const grid=$('statsGrid'); grid.innerHTML='';
+  const cells=[
+    ['总时长', fmtDur(total)],
+    ['总局数', plays],
+    ['胜率', (wins+losses)>0?Math.round(wins/(wins+losses)*100)+'%':'—'],
+    ['总消除', totalClears],
+    ['最高连击', '×'+(s.maxCombo||0)],
+    ['星级', Object.keys(SAVE.stars).reduce((a,k)=>a+(+SAVE.stars[k]||0),0)+' / '+(LEVELS.length*3)],
+  ];
+  for(const [k,v] of cells){ const el=document.createElement('div'); el.className='stat-cell'; el.innerHTML='<span>'+k+'</span><b>'+v+'</b>'; grid.appendChild(el); }
+  const bm=s.byMode||{};
+  const mk=(m,l)=>{ const b=bm[m]||{}; const best=(lbGet(m)[0]||{}).score; return '<div class="stat-cell"><span>'+l+'</span><b>'+(b.plays||0)+' 局</b><small>'+(best?('最佳 '+best):'暂无成绩')+'</small></div>'; };
+  $('statsModes').innerHTML='<span class="stats-h">模式战绩</span><div class="stats-mode-grid">'+mk('campaign','闯关模式')+mk('endless','无尽模式')+mk('timed','限时模式')+mk('daily','每日挑战')+'</div>';
+  // 成就墙
+  const ach=$('achGrid'); ach.innerHTML='';
+  for(const a of ACHIEVEMENTS){
+    const un=achState[a.id];
+    const el=document.createElement('div'); el.className='ach-cell'+(un?'':' locked');
+    el.innerHTML='<span class="a-ic">'+ic(a.icon,'sm')+'</span><b>'+a.name+'</b><small>'+(un?((new Date(un).getMonth()+1)+'/'+new Date(un).getDate()+' 解锁'):'未解锁')+'</small>';
+    ach.appendChild(el);
+  }
+  showModal('modalStats'); sfx.btn();
+}
+
+// ---------- 成绩分享卡片 ----------
+function shareCard(){
+  const W=750, H=1200;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const c=cv.getContext('2d');
+  const bg=c.createLinearGradient(0,0,W,H); bg.addColorStop(0,'#17203a'); bg.addColorStop(.55,'#11182b'); bg.addColorStop(1,'#0a0e1c');
+  c.fillStyle=bg; c.fillRect(0,0,W,H);
+  c.strokeStyle='rgba(78,205,196,.22)'; c.lineWidth=5;
+  c.beginPath(); c.arc(W/2,380,235,0,Math.PI*2); c.stroke();
+  c.strokeStyle='rgba(255,107,107,.16)';
+  c.beginPath(); c.arc(W/2,380,292,0,Math.PI*2); c.stroke();
+  for(let i=0;i<40;i++){ const a=Math.random()*Math.PI*2, r=280+Math.random()*420; c.fillStyle='rgba(255,255,255,'+(.02+Math.random()*.08)+')'; c.beginPath(); c.arc(W/2+Math.cos(a)*r,380+Math.sin(a)*r,1.5+Math.random()*2.5,0,Math.PI*2); c.fill(); }
+  c.textAlign='center';
+  c.fillStyle='rgba(255,255,255,.6)'; c.font='600 26px "PingFang SC","Microsoft YaHei",sans-serif';
+  c.fillText('HUANRUI MATCH-3', W/2, 90);
+  c.fillStyle='#ffffff'; c.font='900 62px "PingFang SC","Microsoft YaHei",sans-serif';
+  c.fillText('桓睿消消乐', W/2, 162);
+  const modeTxt={campaign:(currentLevel&&currentLevel.name)||'闯关模式',endless:'无尽模式',timed:'限时模式',daily:'每日挑战'}[mode]||'闯关模式';
+  c.fillStyle='rgba(255,255,255,.78)'; c.font='600 30px "PingFang SC","Microsoft YaHei",sans-serif';
+  c.fillText(modeTxt, W/2, 232);
+  c.fillStyle='#ffd93d'; c.font='900 170px sans-serif';
+  c.fillText(String(score), W/2, 452);
+  c.fillStyle='rgba(255,255,255,.55)'; c.font='600 28px sans-serif';
+  c.fillText('S C O R E', W/2, 500);
+  c.strokeStyle='rgba(255,255,255,.16)'; c.beginPath(); c.moveTo(130,580); c.lineTo(W-130,580); c.stroke();
+  const items=[
+    ['最高连击', '×'+stats.maxCombo],
+    ['消除方块', stats.clears],
+    ['火箭', stats.rockets],
+    ['日期', new Date().toLocaleDateString('zh-CN')],
+  ];
+  let y=690;
+  for(const it of items){
+    c.fillStyle='rgba(255,255,255,.55)'; c.textAlign='left'; c.font='600 28px "PingFang SC","Microsoft YaHei",sans-serif';
+    c.fillText(it[0], W/2-160, y);
+    c.fillStyle='#fff'; c.textAlign='right';
+    c.fillText(String(it[1]), W/2+160, y);
+    y+=96;
+  }
+  if(mode==='campaign'){
+    const stars=SAVE.stars[currentLevel.id]||0;
+    c.fillStyle='#ffd93d'; c.font='900 72px sans-serif'; c.textAlign='center';
+    c.fillText('★'.repeat(stars)+'☆'.repeat(3-stars), W/2, 1000);
+  }
+  c.fillStyle='rgba(255,255,255,.38)'; c.font='400 24px "PingFang SC","Microsoft YaHei",sans-serif'; c.textAlign='center';
+  c.fillText('Asternova Arcade · '+new Date().toLocaleDateString('zh-CN'), W/2, H-70);
+  return cv;
+}
+function downloadCard(cv){
+  const a=document.createElement('a');
+  a.download='huanrui-score.png'; a.href=cv.toDataURL('image/png');
+  document.body.appendChild(a); a.click(); a.remove();
+  showToast('成绩卡片已保存');
+}
+function shareScore(){
+  const cv=shareCard(); sfx.btn();
+  if('undefined'!==typeof navigator&&navigator.share&&navigator.canShare){
+    cv.toBlob(blob=>{
+      if(!blob){ downloadCard(cv); return; }
+      const file=new File([blob],'huanrui-score.png',{type:'image/png'});
+      if(navigator.canShare({files:[file]})){
+        navigator.share({files:[file], title:'桓睿消消乐成绩'}).catch(()=>downloadCard(cv));
+      } else downloadCard(cv);
+    },'image/png');
+  } else { downloadCard(cv); }
+}
+
+document.getElementById('menuStats').onclick=()=>{ openStats(); };
+document.getElementById('settingsStats').onclick=()=>{ openStats(); };
+document.getElementById('statsClose').onclick=()=>{ hideAllModal(); };
+document.getElementById('winShareBtn').onclick=()=>{ shareScore(); };
+document.getElementById('modeEndShare').onclick=()=>{ shareScore(); };
 // ---------- 事件绑定 ----------
 $('brandBtn').onclick=()=>{ sfx.btn(); gotoMenu(); };
 $('bgBtn').onclick=()=>cycleBg();
