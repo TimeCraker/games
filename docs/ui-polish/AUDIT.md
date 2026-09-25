@@ -8,6 +8,70 @@
 
 ---
 
+## R6（本轮）· 移动端缩放壳读治理 + 键盘端到端闭环
+
+### 隔轮评审（R5 改动）
+
+- R5 全部改动在真实浏览器键鼠下复验：头像弹层（R5 新接 useDialogA11y）打开聚焦、Tab 陷阱、Esc 关闭通过；游戏壳 skip link / 返回钮 / landmark 维持全绿（全量复扫）。**通过，无 revert。**
+- 评审手段升级：新增 `docs/ui-polish/tools/interact.mjs`（CDP 真实键鼠 e2e），替代 R1–R4 的「逻辑级验证」，历史遗留 `[P1] Esc/Tab 端到端复验` 一并在本轮闭环。
+
+### 修复清单（批次一，即时复验）
+
+| 级 | 方向 | 位置 | 前值 → 后值 | 验证 |
+| --- | --- | --- | --- | --- |
+| P1 | 触控 | `src/components/game-shell/StagePortal.tsx`（新增） | 无共享方案 → 共享 portal 组件（SSR 首帧内联防 hydration mismatch，effect 后挂 document.body） | lint 0；三游戏弹层出壳生效 |
+| P1 | 触控 | merge/nebula/star-dash（MergeGame/NebulaSurvivorGame/StarDashGame） | 规则弹层、GameOver、升级三选一全在缩放壳内（按钮实测 11–19px）→ 全部出壳；「知道了/开始任务/继续游戏/重新开始」实测 **44–51px**（前 14–19px）；移动端返回钮 floating 变体、暂停/规则 44×44、再来一局底部 44×44 | 扫描 small 数 8+ → **0**（仅剩 16×16 checkbox 见保留）；interact 首落点 inside-dialog 且按钮 h=51 |
+| P1 | 触控 | `LoopingBgmControl.tsx` | 无 portal + 弹层打开时压住弹层 CTA（merge/nebula 扫描 0.61–0.64 重叠）→ portal + `hidden`（弹层打开即隐藏）+ `elevated` | 重叠 2+1 → **0** |
+| P1 | 键盘 | `src/hooks/useDialogA11y.ts` | 闭包捕获一次性 root：弹层经 portal 搬运后 root 失联，焦点陷阱静默失效（实测焦点逃逸到 skip link）→ 每键实时解析 ref、isConnected 检查、不可聚焦时 60ms×20 重试聚焦 | interact：5 组弹层 Tab 陷阱全部 越界=0；Esc 语义全对 |
+| P1 | 键盘 | 五弹层 e2e | R1–R4 仅逻辑级 → login-reset / lobby-avatar / merge / nebula-briefing（Esc 不关闭，语义正确）/ star-dash 全部真实键鼠 PASS（18/18） | `interact-summary.json` |
+| P2 | 工具 | audit.mjs | 伪元素扩区豁免在缩放上下文误用 → 累计 transform 缩放检测（scale<0.9 标记）；fixed 层与滚动内容重叠豁免 | 本轮复扫全部归零 |
+
+### 跳过 + 原因
+
+- 渐变底对比度像素级验证器（PNG 采样）：时间盒内未及，merge 两处「黑字」经手工核算 ≈5.6:1+ 为扫描器盲区，继续排队。
+- /arena 深层战场 HUD：仍需真实对战会话（无后端），守卫态正常。
+- push：本会话无凭据（`SEC_E_NO_CREDENTIALS`）×3 指数退避失败 → 提交留本地；不碰凭据（红线）。
+
+### 保留 + 原因
+
+- 规则弹层 16×16 checkbox：scale=1 原生尺寸 + 整行 `<label>` 包裹（有效目标 ≥40px，R1 已定案），保留。
+- 游戏内玩法控件（星爆/跳跃/滑铲/摇杆）随画布缩放：属游戏载体而非 chrome（rules §3 针对交互 chrome），保留。
+- `arena/page.tsx:173` exhaustive-deps warning：涉守卫时序（R1 定案），保留。
+- 桌面视图 chrome 维持原位（无缩放问题，portal 仅移动端路径复用同一弹层出口）。
+
+### 验证汇总
+
+- `npm run build` ×3 全绿（每次修复重建）· `npm run lint` 0 errors 1 warning（保留项）。
+- `npx tsc --noEmit`：**本任务触碰文件 0 错误**；全仓 23 个存量类型错误均在未触碰文件（core-defense 遗留模块/StarFieldBg/OrientationLockType 等，基线即如此，rules §7 既有认知）。
+- 全量扫描（20 组合）：横向溢出 0 · 重叠 0 · 截断 0 · 跳档 0 · 无标签控件 0 · console 0（404 路由仅预期项）· main/skip/h1 全达标 · 小目标仅存保留项。
+- interact.mjs：**18/18 PASS**。
+
+### Commits（本仓库，累计 6 个本地提交未推送）
+
+1. `dd6d73e fix(a11y): 移动端游戏 chrome 出缩放壳 + 弹层焦点陷阱 portal 免疫`（6 文件）
+2. `c9e28f5 test(ui-polish): 键鼠端到端验证器与缩放感知扫描器`（2 文件）
+3. （R5 累计：80c1649 / 09742e2 / 91f6cc4 / ca2f956）
+- push 结果：3 次重试均 `SEC_E_NO_CREDENTIALS` 失败 → 留本地待凭据（本轮与上轮同因）。
+
+### 剩余队列（R7+ 候选）
+
+- [P1] merge 渐变底对比度像素级验证器（PNG 解码采样，消除评估盲区并推广到全站）。
+- [P2] iframe 壳内部 a11y（xiaoxiaole 同源页可注入审计；arena Godot 跨域仅外围）。
+- [P2] 工艺轮：lobby 卡片光晕呼吸 2.6s 入 token；星象台 fine-grid 透明度节奏；弹层容器配方逐页核对（rules §4）。
+- [P3] Tab 环落点按元素身份去重（现按签名去重，多空输入框会塌缩）；暂停态弹层 trap 专项。
+- [P3] 弱网（CDP 节流）/超长用户名/emoji 昵称/极端分数边界深扫。
+- [P3] ResultOverlay 族（merge GameOver 已在列外）nebula/nova-ball 分支核查。
+
+### 踩坑（本轮）
+
+1. **portal 迁移绕过了 useDialogA11y 的闭包 root**：首帧内联（防 hydration mismatch）→ effect 后迁 body，旧 hook 实例持有的 root 失联，陷阱静默失效且「首帧 display:none 不可聚焦」→ 修复为每键实时解析 + 重试聚焦；interact 工具在真实键鼠下成功复现（R1–R4 IAB 环境无法复现的正是此类）。
+2. **程序化 `el.click()` 不移动焦点**：焦点归还断言需先 `focus()` 再 `click()` 模拟真实用户（interact 已修正）。
+3. **AnimatePresence exit 保留 DOM 200–400ms**：Esc 断言需轮询至 2s，此前后 400ms 判定误报「未关闭」。
+4. 仓库有并发 git 写者（`.git/index.lock` 瞬时冲突 + art/*.glb 被外部进程改动）：提交一律显式路径 add，绝不 `git add -A`。
+5. Chrome headless 对个別 mp3 偶发 `ERR_CACHE_OPERATION_NOT_SUPPORTED`（range+compression 交互），非站点缺陷，console 计数豁免。
+
+---
+
 ## R5（本轮）· 全路由硬验证基线重建 + 批次一修复
 
 ### 隔轮评审（R4/R3 改动）
