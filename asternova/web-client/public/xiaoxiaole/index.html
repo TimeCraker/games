@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light" data-bg="cloud">
+<html lang="zh-CN" data-theme="dark" data-bg="cloud">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#eef2f7">
-<meta name="description" content="消消乐 - 立体三消闯关游戏">
+<meta name="theme-color" content="#0b0e18">
+<meta name="description" content="消消乐 · 立体三消闯关 — 12 关闯关、无尽爬升、限时冲刺、每日挑战，支持自定义方块皮肤。">
 <title>消消乐</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
-<link rel="stylesheet" href="./styles.css?v=2.33">
+<link rel="stylesheet" href="./styles.css?v=2.40">
 </head>
 <body>
 
@@ -17,26 +17,28 @@
 <div class="bg-layer bg-cloud"></div>
 <div class="bg-layer bg-neon"></div>
 <div class="bg-layer bg-photo"></div>
-<canvas class="bg-particles" id="bgParticles"></canvas>
+<canvas class="bg-particles" id="bgParticles" aria-hidden="true"></canvas>
 
-<!-- ===== 全局顶栏（主菜单+游戏都可用） ===== -->
+<!-- ===== 浮层控制组（关卡选择等非沉浸界面使用） ===== -->
 <div class="global-bar">
-  <button class="icon-btn" id="bgBtn" title="切换背景" aria-label="切换背景"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg></span></button>
-  <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14a8 8 0 11-9-11 6.5 6.5 0 009 11z"/></svg></span></button>
-  <button class="icon-btn" id="soundBtn" title="声音" aria-label="声音"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 9a4 4 0 010 6M19 7a8 8 0 010 10"/></svg></span></button>
-  <button class="icon-btn" id="settingsBtn" title="设置" aria-label="设置"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 005 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 005 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 5a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span></button>
+  <button class="icon-btn" id="bgBtn" title="切换背景" aria-label="切换背景"></button>
+  <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题"></button>
+  <button class="icon-btn" id="soundBtn" title="声音" aria-label="声音"></button>
+  <button class="icon-btn" id="settingsBtn" title="设置" aria-label="打开设置"></button>
 </div>
 
 <!-- ===== 游戏外壳 ===== -->
 <div class="game-shell" id="gameShell" hidden>
 
   <header class="topbar">
-    <div class="brand" id="brandBtn">
-      <span class="brand-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5l2.6 7.9L22.5 12l-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z"/></svg></span>
+    <div class="brand" id="brandBtn" role="button" tabindex="0" aria-label="返回主菜单">
+      <span class="brand-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1.5l2.6 7.9L22.5 12l-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z"/></svg></span>
       <span class="brand-title">消消乐</span>
     </div>
     <div class="level-pill" id="levelPill">Level 1</div>
     <div class="actions">
+      <button class="icon-btn" id="helpBtn" title="玩法说明" aria-label="玩法说明"></button>
+      <button class="icon-btn" id="hintBtn" title="提示" aria-label="提示一步"></button>
       <button class="back-menu-btn" id="homeBtn" title="返回主菜单" aria-label="返回主菜单"><span class="ic" id="homeBtnIcon"></span><span class="bm-label">主菜单</span></button>
       <button class="icon-btn" id="gameSoundBtn" title="静音" aria-label="静音"></button>
       <button class="icon-btn" id="pauseBtn" title="暂停" aria-label="暂停"></button>
@@ -51,15 +53,15 @@
         <div class="panel-name" id="levelName">初见消消乐</div>
       </div>
       <div class="panel-card">
-        <div class="panel-title"><span class="ic sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></span>本关目标</div>
+        <div class="panel-title"><span class="ic sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></span>本关目标</div>
         <div class="goals" id="goals"></div>
       </div>
       <div class="panel-card">
-        <div class="panel-title"><span class="ic sm"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5l2.6 7.9L22.5 12l-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z"/></svg></span>特殊方块</div>
+        <div class="panel-title"><span class="ic sm"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1.5l2.6 7.9L22.5 12l-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z"/></svg></span>特殊方块</div>
         <div class="legend" id="legendBox">
-          <div class="legend-row"><span class="legend-badge rocket"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M15 8l4 4-4 4M9 8l-4 4 4 4"/></svg></span></span><span>直线连4 · 火箭清整行/整列</span></div>
-          <div class="legend-row"><span class="legend-badge bomb"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="15" r="6.5"/><path d="M16 9l2-2"/><path d="M18 7l1.5-1.5"/><circle cx="20" cy="5" r="1.2" fill="currentColor" stroke="none"/><path d="M14.5 9.5l1.5-1.5"/></svg></span></span><span>T/L形5连 · 爆炸清除周围</span></div>
-          <div class="legend-row"><span class="legend-badge rainbow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 19a9 9 0 0118 0"/><path d="M6.5 19a5.5 5.5 0 0111 0"/><path d="M10 19a2 2 0 014 0"/></svg></span></span><span>直线连5 · 清除全场同款</span></div>
+          <div class="legend-row"><span class="legend-badge rocket"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h18"/><path d="M15 8l4 4-4 4M9 8l-4 4 4 4"/></svg></span></span><span>直线连 4 · 火箭清整行 / 整列</span></div>
+          <div class="legend-row"><span class="legend-badge bomb"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="15" r="6.5"/><path d="M16 9l2-2"/><path d="M18 7l1.5-1.5"/><circle cx="20" cy="5" r="1.2" fill="currentColor" stroke="none"/><path d="M14.5 9.5l1.5-1.5"/></svg></span></span><span>T / L 形 5 连 · 爆炸清除周围</span></div>
+          <div class="legend-row"><span class="legend-badge rainbow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 19a9 9 0 0118 0"/><path d="M6.5 19a5.5 5.5 0 0111 0"/><path d="M10 19a2 2 0 014 0"/></svg></span></span><span>直线连 5 · 清除全场同款</span></div>
         </div>
       </div>
     </aside>
@@ -82,26 +84,28 @@
       <div class="board-wrap" id="boardWrap">
         <div class="board-3d">
           <div class="board" id="board"></div>
-          <canvas class="fx-layer" id="fxCanvas"></canvas>
-          <div class="float-layer" id="floatLayer"></div>
+          <canvas class="fx-layer" id="fxCanvas" aria-hidden="true"></canvas>
+          <div class="float-layer" id="floatLayer" aria-hidden="true"></div>
         </div>
       </div>
-      <div class="hint" id="hint">滑动或点选相邻方块交换 · 三连消除</div>
+      <div class="progress-row">
+        <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
+        <div class="progress-text" id="progressText">0 / 2000</div>
+      </div>
+      <div class="hint" id="hint">点选相邻方块交换 · 三连即消除</div>
     </section>
 
     <aside class="panel panel-right">
       <div class="panel-card score-card">
-        <div class="panel-title"><span class="ic sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v6a5 5 0 01-10 0z"/><path d="M7 6H4v1a4 4 0 003 4M17 6h3v1a4 4 0 01-3 4"/><path d="M12 15v3M8.5 21h7l-1-3h-5z"/></svg></span>得分板</div>
+        <div class="panel-title"><span class="ic sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v6a5 5 0 01-10 0z"/><path d="M7 6H4v1a4 4 0 003 4M17 6h3v1a4 4 0 01-3 4"/><path d="M12 15v3M8.5 21h7l-1-3h-5z"/></svg></span>得分板</div>
         <div class="big-score" id="bigScore">0</div>
-        <div class="progress-wrap">
-          <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
-          <div class="progress-text" id="progressText">0 / 2000</div>
+        <div class="stat-rows" style="margin-top:12px">
+          <div class="stat-row"><span>本关最佳</span><b id="bestScore">0</b></div>
         </div>
       </div>
       <div class="panel-card">
-        <div class="panel-title"><span class="ic sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="7" width="3" height="10" rx="1"/><rect x="17" y="13" width="3" height="4" rx="1"/></svg></span>战绩</div>
+        <div class="panel-title"><span class="ic sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="7" width="3" height="10" rx="1"/><rect x="17" y="13" width="3" height="4" rx="1"/></svg></span>本局战绩</div>
         <div class="stat-rows">
-          <div class="stat-row"><span>最高分</span><b id="bestScore">0</b></div>
           <div class="stat-row"><span>消除方块</span><b id="statClears">0</b></div>
           <div class="stat-row"><span>最高连击</span><b id="statCombo">×0</b></div>
           <div class="stat-row"><span>已用步数</span><b id="statMoves">0</b></div>
@@ -117,35 +121,70 @@
 <!-- 主菜单 -->
 <div class="screen screen-menu show" id="screenMenu">
   <div class="menu-cover">
+
     <div class="menu-content">
       <div class="menu-eyebrow"><span></span>MATCH-3 PUZZLE</div>
       <h1 class="menu-title">消消乐</h1>
-      <p class="menu-sub">交换、连击、清场，挑战全部 12 关。</p>
+      <p class="menu-sub">交换、连击、清场 — 12 关闯关、无尽爬升、60 秒冲刺与每日挑战，都在同一块棋盘上。</p>
+      <div class="menu-progress">
+        <span class="menu-chip"><span class="ic" id="menuStarIcon"></span><span id="menuStars">0 / 36 星</span></span>
+        <span class="menu-chip"><span class="ic" id="menuBestIcon"></span><span id="menuBest">最高分 0</span></span>
+      </div>
       <div class="menu-actions">
         <button class="menu-cta" id="menuContinue">
           <span>开始游戏</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </button>
         <button class="menu-levels-btn" id="menuLevels">
-          <span>关卡选择</span><small id="menuProgress">01 / 12</small>
+          <span class="ml-label">关卡选择</span>
+          <small id="menuProgress">01 / 12</small>
         </button>
       </div>
-      <div class="menu-modes">
-        <button class="mode-chip" id="menuEndless"><span class="mode-ic"></span><b>无尽模式</b><small>难度逐级爬升</small></button>
-        <button class="mode-chip" id="menuTimed"><span class="mode-ic"></span><b>限时模式</b><small>60秒冲刺</small></button>
-        <button class="mode-chip" id="menuDaily"><span class="mode-ic"></span><b>每日挑战</b><small>每天同一题</small></button>
-      </div>
-      <div class="menu-features">
-        <button class="feat-card" id="menuSkin"><span class="feat-ic" id="menuSkinIcon"></span><span class="feat-text"><b>方块皮肤</b><small>上传照片换方块</small></span></button>
-        <button class="feat-card" id="menuLeaderboard"><span class="feat-ic" id="menuLbIcon"></span><span class="feat-text"><b>排行榜</b><small>各模式 TOP 10</small></span></button>
-        <button class="feat-card" id="menuStats"><span class="feat-ic" id="menuStatsIcon"></span><span class="feat-text"><b>数据统计</b><small>战绩与成就墙</small></span></button>
-      </div>
-      <div class="menu-utilities">
-        <button class="util-btn" id="menuBg"><span class="util-ic" id="menuBgIcon"></span><span id="menuBgLabel">游戏背景</span></button>
-        <button class="util-btn" id="menuSound"><span class="util-ic" id="menuSoundIcon"></span><span id="menuSoundLabel">音效 · 开</span></button>
-        <button class="util-btn" id="menuRefresh"><span class="util-ic" id="menuRefreshIcon"></span><span>刷新资源</span></button>
-      </div>
     </div>
+
+    <div class="menu-rail">
+      <section>
+        <div class="sec-label">玩法模式</div>
+        <div class="mode-list">
+          <button class="mode-chip" id="menuEndless">
+            <span class="mode-ic"></span>
+            <span class="mode-txt"><b>无尽模式</b><small>难度逐级爬升，方块种类递增</small></span>
+            <span class="mode-best" id="bestEndless"></span>
+          </button>
+          <button class="mode-chip" id="menuTimed">
+            <span class="mode-ic"></span>
+            <span class="mode-txt"><b>限时模式</b><small>60 秒冲刺，连击可加时</small></span>
+            <span class="mode-best" id="bestTimed"></span>
+          </button>
+          <button class="mode-chip" id="menuDaily">
+            <span class="mode-ic"></span>
+            <span class="mode-txt"><b>每日挑战</b><small>每天同一题，全服同盘</small></span>
+            <span class="mode-best" id="bestDaily"></span>
+          </button>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-label">个性化与记录</div>
+        <div class="feature-list">
+          <button class="feat-card" id="menuSkin"><span class="feat-ic" id="menuSkinIcon"></span><span class="feat-text"><b>方块皮肤</b><small>传图或选图库</small></span></button>
+          <button class="feat-card" id="menuLeaderboard"><span class="feat-ic" id="menuLbIcon"></span><span class="feat-text"><b>排行榜</b><small>各模式 TOP 10</small></span></button>
+          <button class="feat-card" id="menuStats"><span class="feat-ic" id="menuStatsIcon"></span><span class="feat-text"><b>数据统计</b><small>战绩与成就墙</small></span></button>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-label">偏好设置</div>
+        <div class="menu-utilities">
+          <button class="util-btn" id="menuBg"><span class="util-ic" id="menuBgIcon"></span><span id="menuBgLabel">背景 · 云海白昼</span></button>
+          <button class="util-btn" id="menuSound"><span class="util-ic" id="menuSoundIcon"></span><span id="menuSoundLabel">音效 · 开</span></button>
+          <button class="util-btn" id="menuTheme"><span class="util-ic" id="menuThemeIcon"></span><span id="menuThemeLabel">主题 · 深夜</span></button>
+          <button class="util-btn" id="menuSettings"><span class="util-ic" id="menuSettingsIcon"></span><span>设置</span></button>
+          <button class="util-btn" id="menuRefresh"><span class="util-ic" id="menuRefreshIcon"></span><span>刷新资源</span></button>
+        </div>
+      </section>
+    </div>
+
   </div>
 </div>
 
@@ -153,10 +192,17 @@
 <div class="screen screen-levels" id="screenLevels">
   <div class="levels-inner">
     <div class="levels-head">
-      <button class="icon-btn back-btn" id="levelsBack" aria-label="返回"></button>
-      <h2>选择关卡</h2>
+      <div class="levels-head-row">
+        <button class="icon-btn back-btn" id="levelsBack" aria-label="返回主菜单"></button>
+        <h2>选择关卡</h2>
+      </div>
+      <div class="levels-summary">
+        <span class="menu-chip" id="levelsSummaryStars"><span class="ic"></span><span>0 / 36 星</span></span>
+        <span class="menu-chip" id="levelsSummaryNext"><span class="ic"></span><span>下一关：第 1 关</span></span>
+      </div>
     </div>
     <div class="levels-grid" id="levelsGrid"></div>
+    <p class="levels-foot">通关即解锁下一关 · 剩余步数越多，星级越高</p>
   </div>
 </div>
 
@@ -173,27 +219,33 @@
 <!-- ===== 弹窗 ===== -->
 
 <!-- 方块皮肤 -->
-<div class="modal" id="modalSkin">
+<div class="modal" id="modalSkin" role="dialog" aria-modal="true" aria-label="方块皮肤">
   <div class="modal-card skin-card">
-    <h2 class="modal-title">方块皮肤</h2>
-    <p class="modal-sub">上传照片，或从内置图库点选 4 张 · 自动 1:1 裁剪</p>
+    <button class="modal-close" data-close="modalSkin" aria-label="关闭"></button>
+    <div class="modal-head">
+      <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5-10 10"/></svg></div>
+      <h2 class="modal-title">方块皮肤</h2>
+      <p class="modal-sub">上传照片，或从内置图库点选 4 张 · 自动 1:1 裁剪</p>
+    </div>
     <div class="skin-grid" id="skinGrid"></div>
     <div class="skin-lib-head"><span class="lib-dot"></span>内置图库 · 点选 4 张（按顺序作为方块 1~4）</div>
     <div class="lib-grid" id="libGrid"></div>
     <div class="modal-actions">
       <button class="menu-btn primary" id="skinApply" disabled>应用皮肤</button>
       <button class="menu-btn" id="skinAuto">自动裁剪剩余照片</button>
-      <button class="menu-btn" id="skinReset">恢复默认头像</button>
+      <button class="menu-btn" id="skinReset">恢复默认方块</button>
       <button class="menu-btn ghost" id="skinClose">关闭</button>
     </div>
   </div>
 </div>
 
 <!-- 1:1 裁剪 -->
-<div class="modal" id="modalCrop">
+<div class="modal" id="modalCrop" role="dialog" aria-modal="true" aria-label="裁剪图片">
   <div class="modal-card crop-card">
-    <h2 class="modal-title">裁剪 1:1</h2>
-    <p class="modal-sub">拖动移动 · 滚轮 / 双指缩放</p>
+    <div class="modal-head">
+      <h2 class="modal-title">裁剪 1:1</h2>
+      <p class="modal-sub">拖动移动 · 双指或滚轮缩放 · 输出 512×512</p>
+    </div>
     <div class="crop-stage"><canvas id="cropCanvas" aria-label="裁剪画布"></canvas></div>
     <div class="crop-controls">
       <button class="music-btn" id="cropOut" title="缩小" aria-label="缩小"></button>
@@ -208,12 +260,14 @@
 </div>
 
 <!-- 模式结算 -->
-<div class="modal" id="modalModeEnd">
+<div class="modal" id="modalModeEnd" role="dialog" aria-modal="true" aria-label="本局结算">
   <div class="modal-card">
-    <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v6a5 5 0 01-10 0z"/><path d="M7 6H4v1a4 4 0 003 4M17 6h3v1a4 4 0 01-3 4"/><path d="M12 15v3M8.5 21h7l-1-3h-5z"/></svg></div>
-    <h2 class="modal-title" id="modeEndTitle">结算</h2>
-    <div class="modal-score" id="modeEndScore">0</div>
-    <div class="mode-end-rank" id="modeEndRank"></div>
+    <div class="modal-head">
+      <div class="modal-emoji" id="modeEndEmoji"></div>
+      <h2 class="modal-title" id="modeEndTitle">结算</h2>
+      <div class="modal-score" id="modeEndScore">0</div>
+      <div class="mode-end-rank" id="modeEndRank"></div>
+    </div>
     <div class="modal-stats" id="modeEndStats"></div>
     <div class="modal-actions">
       <button class="menu-btn primary" id="modeEndRetry">再来一局</button>
@@ -224,13 +278,16 @@
 </div>
 
 <!-- 每日挑战入口 -->
-<div class="modal" id="modalDaily">
+<div class="modal" id="modalDaily" role="dialog" aria-modal="true" aria-label="每日挑战">
   <div class="modal-card">
-    <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/></svg></div>
-    <h2 class="modal-title">每日挑战</h2>
-    <div class="modal-sub" id="dailyDate">—</div>
+    <button class="modal-close" data-close="modalDaily" aria-label="关闭"></button>
+    <div class="modal-head">
+      <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/></svg></div>
+      <h2 class="modal-title">每日挑战</h2>
+      <p class="modal-sub" id="dailyDate">—</p>
+    </div>
     <div class="daily-strip" id="dailyStrip"></div>
-    <div class="modal-sub" id="dailyBest">—</div>
+    <p class="modal-sub" id="dailyBest">—</p>
     <div class="modal-actions">
       <button class="menu-btn primary" id="dailyGo">开始挑战</button>
       <button class="menu-btn ghost" id="dailyClose">取消</button>
@@ -239,10 +296,14 @@
 </div>
 
 <!-- 排行榜 -->
-<div class="modal" id="modalLeaderboard">
+<div class="modal" id="modalLeaderboard" role="dialog" aria-modal="true" aria-label="排行榜">
   <div class="modal-card lb-card">
-    <h2 class="modal-title">排行榜</h2>
-    <p class="modal-sub">各模式 TOP 10 · 本地记录</p>
+    <button class="modal-close" data-close="modalLeaderboard" aria-label="关闭"></button>
+    <div class="modal-head">
+      <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v6a5 5 0 01-10 0z"/><path d="M7 6H4v1a4 4 0 003 4M17 6h3v1a4 4 0 01-3 4"/><path d="M12 15v3M8.5 21h7l-1-3h-5z"/></svg></div>
+      <h2 class="modal-title">排行榜</h2>
+      <p class="modal-sub">本机记录 · 各模式 TOP 10</p>
+    </div>
     <div class="lb-sections" id="lbSections"></div>
     <div class="modal-actions">
       <button class="menu-btn ghost" id="lbClose">关闭</button>
@@ -251,9 +312,14 @@
 </div>
 
 <!-- 数据统计 -->
-<div class="modal" id="modalStats">
+<div class="modal" id="modalStats" role="dialog" aria-modal="true" aria-label="数据统计">
   <div class="modal-card stats-card">
-    <h2 class="modal-title">数据统计</h2>
+    <button class="modal-close" data-close="modalStats" aria-label="关闭"></button>
+    <div class="modal-head">
+      <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="7" width="3" height="10" rx="1"/><rect x="17" y="13" width="3" height="4" rx="1"/></svg></div>
+      <h2 class="modal-title">数据统计</h2>
+      <p class="modal-sub">总战绩、模式分布与成就墙</p>
+    </div>
     <div class="stats-grid" id="statsGrid"></div>
     <div class="stats-mode-row" id="statsModes"></div>
     <h3 class="stats-h">成就墙</h3>
@@ -264,31 +330,74 @@
   </div>
 </div>
 
-<div class="modal" id="modalPause">
+<!-- 玩法说明 -->
+<div class="modal" id="modalHelp" role="dialog" aria-modal="true" aria-label="玩法说明">
+  <div class="modal-card help-card">
+    <button class="modal-close" data-close="modalHelp" aria-label="关闭"></button>
+    <div class="modal-head">
+      <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.2 9a2.8 2.8 0 015.4 1c0 1.9-2.6 2.1-2.6 4"/><circle cx="12" cy="17.5" r="1" fill="currentColor" stroke="none"/></svg></div>
+      <h2 class="modal-title">玩法说明</h2>
+      <p class="modal-sub">三消、特殊方块与模式规则</p>
+    </div>
+    <div class="help-list">
+      <div class="help-item">
+        <span class="legend-badge"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V7a2 2 0 114 0v4"/><path d="M13 11V6a2 2 0 114 0v5"/><path d="M17 11V8a2 2 0 114 0v7a6 6 0 01-6 6h-2a6 6 0 01-6-6v-3a2 2 0 114 0"/></svg></span></span>
+        <div><b>拖动或点选相邻方块</b><small>连线三个以上同款方块即可消除；连击越高，单次得分越多。</small></div>
+      </div>
+      <div class="help-item">
+        <span class="legend-badge rocket"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h18"/><path d="M15 8l4 4-4 4M9 8l-4 4 4 4"/></svg></span></span>
+        <div><b>直线 4 连 → 火箭</b><small>与相邻方块交换后，清除整行或整列。</small></div>
+      </div>
+      <div class="help-item">
+        <span class="legend-badge bomb"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="15" r="6.5"/><path d="M16 9l2-2"/><path d="M18 7l1.5-1.5"/><circle cx="20" cy="5" r="1.2" fill="currentColor" stroke="none"/><path d="M14.5 9.5l1.5-1.5"/></svg></span></span>
+        <div><b>T / L 形 5 连 → 炸弹</b><small>引爆时清除周围 3×3 范围，可连锁引爆。</small></div>
+      </div>
+      <div class="help-item">
+        <span class="legend-badge rainbow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 19a9 9 0 0118 0"/><path d="M6.5 19a5.5 5.5 0 0111 0"/><path d="M10 19a2 2 0 014 0"/></svg></span></span>
+        <div><b>直线 5 连 → 彩虹</b><small>交换后清除场上全部同款方块；与特殊方块组合有额外效果。</small></div>
+      </div>
+      <div class="help-item">
+        <span class="legend-badge"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span></span>
+        <div><b>限时模式加时</b><small>高连击会奖励额外时间，单局最多累计 +10 秒。</small></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="menu-btn ghost" id="helpClose">知道了</button>
+    </div>
+  </div>
+</div>
+
+<!-- 暂停 -->
+<div class="modal" id="modalPause" role="dialog" aria-modal="true" aria-label="游戏暂停">
   <div class="modal-card">
-    <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.5" height="14" rx="1.2"/><rect x="13.5" y="5" width="3.5" height="14" rx="1.2"/></svg></div>
-    <h2 class="modal-title">游戏暂停</h2>
+    <div class="modal-head">
+      <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="5" width="3.5" height="14" rx="1.2"/><rect x="13.5" y="5" width="3.5" height="14" rx="1.2"/></svg></div>
+      <h2 class="modal-title">游戏暂停</h2>
+      <p class="modal-sub">进度已保留，随时回来</p>
+    </div>
     <div class="pause-volume">
       <button class="icon-btn sm" id="pauseMuteBtn" title="静音" aria-label="静音"></button>
       <input type="range" id="pauseVol" min="0" max="100" class="range" aria-label="音量">
     </div>
     <div class="modal-actions">
       <button class="menu-btn primary" id="resumeBtn">继续游戏</button>
-      <button class="menu-btn" id="restartBtn2">重新开始</button>
-      <button class="menu-btn" id="pauseBgBtn">换背景</button>
       <button class="menu-btn primary" id="pauseEndBtn" hidden>结算成绩</button>
+      <button class="menu-btn" id="restartBtn2">重新开始</button>
+      <button class="menu-btn" id="pauseBgBtn">换个背景</button>
       <button class="menu-btn" id="pauseSettingsBtn">设置</button>
       <button class="menu-btn ghost" id="pauseMenuBtn">回主菜单</button>
     </div>
   </div>
 </div>
 
-<div class="modal" id="modalWin">
+<div class="modal" id="modalWin" role="dialog" aria-modal="true" aria-label="关卡完成">
   <div class="modal-card">
-    <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l7-7M10 14L4 5l9 5z"/><path d="M14 3l.7 2M18 7l2 .7M15.5 8.5L17 7"/></svg></div>
-    <h2 class="modal-title">关卡完成</h2>
-    <div class="stars" id="winStars"></div>
-    <div class="modal-score" id="winScore">0</div>
+    <div class="modal-head">
+      <div class="modal-emoji ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21l7-7M10 14L4 5l9 5z"/><path d="M14 3l.7 2M18 7l2 .7M15.5 8.5L17 7"/></svg></div>
+      <h2 class="modal-title">关卡完成</h2>
+      <div class="stars" id="winStars"></div>
+      <div class="modal-score" id="winScore">0</div>
+    </div>
     <div class="modal-stats" id="winStats"></div>
     <div class="modal-actions">
       <button class="menu-btn primary" id="nextLevelBtn">下一关</button>
@@ -299,12 +408,14 @@
   </div>
 </div>
 
-<div class="modal" id="modalLose">
+<div class="modal" id="modalLose" role="dialog" aria-modal="true" aria-label="挑战失败">
   <div class="modal-card">
-    <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 15a4 4 0 018 0M9 9h.01M15 9h.01"/></svg></div>
-    <h2 class="modal-title">步数用完</h2>
-    <div class="modal-sub" id="loseSub">差一点就成功了</div>
-    <div class="modal-score" id="loseScore">0</div>
+    <div class="modal-head">
+      <div class="modal-emoji danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 15a4 4 0 018 0M9 9h.01M15 9h.01"/></svg></div>
+      <h2 class="modal-title">步数用完</h2>
+      <p class="modal-sub" id="loseSub">差一点就成功了</p>
+      <div class="modal-score" id="loseScore">0</div>
+    </div>
     <div class="modal-actions">
       <button class="menu-btn primary" id="loseRetryBtn">再来一次</button>
       <button class="menu-btn ghost" id="loseMenuBtn">回主菜单</button>
@@ -312,45 +423,57 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <!-- 设置面板 -->
-<div class="modal" id="modalSettings">
+<div class="modal" id="modalSettings" role="dialog" aria-modal="true" aria-label="设置">
   <div class="modal-card settings-card">
-    <h2 class="modal-title">设置</h2>
+    <button class="modal-close" data-close="modalSettings" aria-label="关闭"></button>
+    <div class="modal-head">
+      <div class="modal-emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 005 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 005 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 5a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+      <h2 class="modal-title">设置</h2>
+    </div>
     <div class="settings-sections">
       <section class="set-section">
         <div class="set-head">声音</div>
         <div class="setting-row">
           <span>音效</span>
-          <label class="switch"><input type="checkbox" id="setSfx"><span class="slider"></span></label>
+          <label class="switch"><input type="checkbox" id="setSfx" aria-label="音效开关"><span class="slider"></span></label>
         </div>
         <div class="setting-row">
           <span>背景音乐</span>
-          <label class="switch"><input type="checkbox" id="setMusic"><span class="slider"></span></label>
+          <label class="switch"><input type="checkbox" id="setMusic" aria-label="背景音乐开关"><span class="slider"></span></label>
         </div>
         <div class="setting-row music-row">
-          <span>曲目</span>
+          <label>曲目</label>
           <div class="music-picker">
-            <button class="music-btn" id="musicPrev" aria-label="上一首">‹</button>
+            <button class="music-btn" id="musicPrev" aria-label="上一首"></button>
             <span class="music-label" id="musicLabel">Puzzle Loop</span>
-            <button class="music-btn" id="musicNext" aria-label="下一首">›</button>
+            <button class="music-btn" id="musicNext" aria-label="下一首"></button>
           </div>
         </div>
         <div class="setting-row">
           <label for="setVol">音量</label>
-          <input type="range" id="setVol" min="0" max="100" value="45" class="range">
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="range" id="setVol" min="0" max="100" value="45" class="range" aria-label="音量">
+            <b class="set-val" id="setVolVal">45</b>
+          </div>
         </div>
       </section>
       <section class="set-section">
         <div class="set-head">体验</div>
         <div class="setting-row">
+          <label for="setTheme">主题</label>
+          <select id="setTheme" class="select">
+            <option value="dark">深夜</option>
+            <option value="light">暖纸</option>
+          </select>
+        </div>
+        <div class="setting-row">
           <span>动效</span>
-          <label class="switch"><input type="checkbox" id="setMotion"><span class="slider"></span></label>
+          <label class="switch"><input type="checkbox" id="setMotion" aria-label="动效开关"><span class="slider"></span></label>
         </div>
         <div class="setting-row">
           <span>触觉反馈</span>
-          <label class="switch"><input type="checkbox" id="setHaptic"><span class="slider"></span></label>
+          <label class="switch"><input type="checkbox" id="setHaptic" aria-label="触觉反馈开关"><span class="slider"></span></label>
         </div>
         <div class="setting-row">
           <label for="setQuality">特效质量</label>
@@ -372,6 +495,10 @@
           <span>数据统计</span>
           <button class="mini-btn skin-settings-btn" id="settingsStats">查看</button>
         </div>
+        <div class="setting-row">
+          <span>玩法说明</span>
+          <button class="mini-btn skin-settings-btn" id="settingsHelp">查看</button>
+        </div>
       </section>
     </div>
     <div class="modal-actions">
@@ -380,30 +507,27 @@
   </div>
 </div>
 
-<!-- 成就通知 -->
-<div class="achievement" id="achievement"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="achievement" id="achievement" role="status" aria-live="polite"></div>
 
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
-    // 清理所有旧的 Service Worker，注册新版
     navigator.serviceWorker.getRegistrations().then(regs => {
       const old = regs.filter(r => r.active && r.active.scriptURL.indexOf('sw-v21.js') === -1);
       return Promise.all(old.map(r => r.unregister()));
     }).then(() => {
       return navigator.serviceWorker.register('./sw-v21.js');
     }).then(reg => {
-      // 立即检查更新，新版接管后刷新一次
       const hadSW = !!navigator.serviceWorker.controller;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if(hadSW) window.location.reload();
       });
-      // 强制拉取新 SW
       reg.update().catch(()=>{});
     }).catch(()=>{});
   });
 }
 </script>
-<script src="./game.js?v=2.33"></script>
+<script src="./game.js?v=2.40"></script>
 </body>
 </html>

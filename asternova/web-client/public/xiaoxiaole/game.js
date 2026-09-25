@@ -15,11 +15,13 @@ const DEFAULT_LIB = [1,2,0,3];   // 02剑姬 · 03星空 · 01Q版女仆 · 04�
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.33';
+const CACHE_VER = '2.40';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
 const Z_DRAG = IS_MOBILE ? 0 : 18;
+// 宿主嵌入（iframe）标记：为外部返回按钮预留安全区
+try{ if(window.self!==window.top) document.documentElement.classList.add('is-embedded'); }catch(e){ document.documentElement.classList.add('is-embedded'); }
 
 // ---------- SVG 图标系统 ----------
 const SVG = {
@@ -57,6 +59,12 @@ const SVG = {
   clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   calendarDay:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/></svg>',
   refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-2.64-6.36"/><path d="M21 3v6h-6"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  chevL:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  chevR:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  help:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 9a2.8 2.8 0 015.4 1c0 1.9-2.6 2.1-2.6 4"/><circle cx="12" cy="17.5" r="1" fill="currentColor" stroke="none"/></svg>',
+  bulb:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 18h5M10.5 21h3"/><path d="M12 3a6 6 0 00-3.6 10.8V16h7.2v-2.2A6 6 0 0012 3z"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 005 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 005 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 5a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>',
 };
 function ic(name, cls=''){ return `<span class="ic ${cls}">${SVG[name]||''}</span>`; }
 
@@ -134,7 +142,7 @@ const SAVE = {
   saveStars(lvl,s){ this.stars[lvl]=Math.max(this.stars[lvl]||0,s); localStorage.setItem('xxl-stars',JSON.stringify(this.stars)); },
   saveBest(lvl,s){ this.best[lvl]=Math.max(this.best[lvl]||0,s); localStorage.setItem('xxl-best',JSON.stringify(this.best)); },
 };
-const themePref = localStorage.getItem('xxl-theme')||'light';
+const themePref = localStorage.getItem('xxl-theme')||'dark';
 const bgPref = localStorage.getItem('xxl-bg')||'cloud';
 const soundPref = localStorage.getItem('xxl-sound'); soundOn = soundPref===null?true:soundPref==='1';
 
@@ -221,7 +229,7 @@ function measure(){
   boardEl.style.setProperty('--tile-size',tileSize+'px');
   boardEl.style.setProperty('--gap',GAP+'px'); boardEl.style.setProperty('--board-pad',PAD+'px');
 }
-const posOf=(r,c)=>({x:c*cellUnit,y:r*cellUnit});
+const posOf=(r,c)=>({x:PAD+c*cellUnit,y:PAD+r*cellUnit});
 
 // ---------- 方块 ----------
 function makeTile(r,c,type,special=SPECIAL.NONE){
@@ -489,7 +497,7 @@ function freeParticle(p){ if(particlePool.length<MAX_PARTICLES){ for(const k in 
 function resizeFx(){ dpr=Math.min(window.devicePixelRatio||1, Q.dpr); const rect=boardEl.getBoundingClientRect(); if(rect.width<=0) return; fxCanvas.width=rect.width*dpr; fxCanvas.height=rect.height*dpr; fxCanvas.style.width=rect.width+'px'; fxCanvas.style.height=rect.height+'px'; }
 function spawnParticles(r,c,type,rainbow){
   if(!settings.motion) return;
-  const {x,y}=posOf(r,c); const cx=(x+tileSize/2+PAD)*dpr, cy=(y+tileSize/2+PAD)*dpr;
+  const {x,y}=posOf(r,c); const cx=(x+tileSize/2)*dpr, cy=(y+tileSize/2)*dpr;
   const colors=rainbow?['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa']:[ACCENT[type],'#ffffff'];
   const n = Q.particles;
   for(let i=0;i<n;i++){ const a=(Math.PI*2*i)/n+Math.random()*.4; const sp=(1.8+Math.random()*2.6)*dpr;
@@ -501,7 +509,7 @@ function spawnParticles(r,c,type,rainbow){
 }
 function shockwave(r,c,sp){
   if(!settings.motion||Q.shockwaves<=0) return;
-  const {x,y}=posOf(r,c); const cx=(x+tileSize/2+PAD)*dpr, cy=(y+tileSize/2+PAD)*dpr;
+  const {x,y}=posOf(r,c); const cx=(x+tileSize/2)*dpr, cy=(y+tileSize/2)*dpr;
   const col = sp===SPECIAL.RAINBOW?'#a78bfa':sp===SPECIAL.BOMB?'#ff6b6b':sp===SPECIAL.ROCKET_V?'#ffaa3c':'#4ecdc4';
   for(let k=0;k<Q.shockwaves;k++){ if(particles.length>=MAX_PARTICLES) break; const p=newParticle(); Object.assign(p,{ring:true,x:cx,y:cy,r:6*dpr,life:1,decay:.04,color:col}); particles.push(p); }
   ensureParticleLoop();
@@ -521,7 +529,7 @@ function tickParticles(){
 function ensureParticleLoop(){ if(particleRAF===null && particles.length>0) particleRAF=requestAnimationFrame(tickParticles); }
 function stopParticleLoop(){ if(particleRAF!==null){ cancelAnimationFrame(particleRAF); particleRAF=null; } ctx.clearRect(0,0,fxCanvas.width,fxCanvas.height); particles.length=0; }
 function comboFlash(level){ const f=document.querySelector('.combo-flash')||(()=>{const d=document.createElement('div');d.className='combo-flash';document.body.appendChild(d);return d;})(); const col = level>=8?'rgba(167,139,250,.35)':level>=5?'rgba(255,107,107,.3)':'rgba(255,217,61,.25)'; f.style.background=`radial-gradient(ellipse at center,${col},transparent 70%)`; if(f.animate){ f.animate([{opacity:0},{opacity:1,offset:.3},{opacity:0}],{duration:400,easing:'ease-out'}); } else { f.classList.remove('on'); f.classList.add('on'); } }
-function floatText(pos,text,cls=''){ const el=document.createElement('div'); el.className='float-text '+cls; el.textContent=text; el.style.left=(pos.x+PAD)+'px'; el.style.top=(pos.y+PAD+(pos.dy||0))+'px'; floatLayer.appendChild(el); setTimeout(()=>el.remove(),950); }
+function floatText(pos,text,cls=''){ const el=document.createElement('div'); el.className='float-text '+cls; el.textContent=text; el.style.left=pos.x+'px'; el.style.top=(pos.y+(pos.dy||0))+'px'; floatLayer.appendChild(el); setTimeout(()=>el.remove(),950); }
 function centerOf(set){ let sx=0,sy=0,n=0; for(const k of set){const{r,c}=parseKey(k);const{x,y}=posOf(r,c);sx+=x+tileSize/2;sy+=y+tileSize/2;n++;} return {x:sx/n,y:sy/n}; }
 const parseKey=k=>{const[r,c]=k.split(',').map(Number);return{r,c};};
 
@@ -773,6 +781,11 @@ function syncBgStars(){
 function setTheme(t){
   document.documentElement.dataset.theme=t;
   $('themeBtn').innerHTML = ic(t==='light'?'moon':'sun');
+  const st=$('setTheme'); if(st) st.value=t;
+  const mtl=$('menuThemeLabel'); if(mtl) mtl.innerHTML='主题 <span class="util-sub">· '+(t==='light'?'暖纸':'深夜')+'</span>';
+  const mti=$('menuThemeIcon'); if(mti) mti.innerHTML=ic(t==='light'?'moon':'sun');
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', t==='light'?'#f4f1e9':'#0b0e18');
   localStorage.setItem('xxl-theme',t);
 }
 function setBg(key){
@@ -784,7 +797,7 @@ function setBg(key){
   bgIdx=BG_LIST.findIndex(b=>b.key===key);
   const cur=BG_LIST[bgIdx];
   $('bgBtn').innerHTML = ic(cur.icon);
-  const mb=$('menuBgLabel'); if(mb) mb.textContent = `背景 · ${cur.name}`;
+  const mb=$('menuBgLabel'); if(mb) mb.innerHTML = '背景 <span class="util-sub">· '+cur.name+'</span>';
   const mbi=$('menuBgIcon'); if(mbi) mbi.innerHTML = ic(cur.icon);
   localStorage.setItem('xxl-bg',key);
   syncBgStars();
@@ -814,8 +827,23 @@ function showScreen(id){
   document.documentElement.classList.toggle('menu-active',id==='screenMenu');
   document.documentElement.classList.toggle('game-active',id===null && state==='playing');
 }
-function showModal(id){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show')); if(id) $(id).classList.add('show'); }
-function hideAllModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show')); }
+let modalStack=[];
+function showModal(id){
+  document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show'));
+  if(!id) return;
+  const el=$(id); if(!el) return;
+  el.classList.add('show');
+  if(modalStack[modalStack.length-1]!==id) modalStack.push(id);
+}
+function hideAllModal(){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show')); modalStack=[]; }
+// 逐层返回：优先回到上一层弹窗，其次回到暂停面板
+function backModal(){
+  if(modalStack.length) modalStack.pop();
+  const prev=modalStack[modalStack.length-1];
+  document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show'));
+  if(prev){ $(prev).classList.add('show'); return; }
+  if(state==='paused') showModal('modalPause');
+}
 
 function gotoMenu(){
   state='menu'; showScreen('screenMenu'); hideAllModal();
@@ -824,25 +852,53 @@ function gotoMenu(){
   clearBoard(); combo=0; busy=false; clearSelection(); selected=null;
   syncBgStars();
   const unlocked=Math.min(SAVE.unlocked,LEVELS.length);
-  $('menuContinue').querySelector('span').textContent = unlocked>1 ? `继续第 ${unlocked} 关` : '开始游戏';
+  const cleared = starTotal() >= LEVELS.length*3 || (SAVE.stars[LEVELS.length]||0)>0;
+  $('menuContinue').querySelector('span').textContent = cleared ? '重玩最后一关' : (unlocked>1 ? `继续第 ${unlocked} 关` : '开始游戏');
   $('menuProgress').textContent = `${String(unlocked).padStart(2,'0')} / ${LEVELS.length}`;
+  $('menuStars').textContent = starTotal()+' / '+(LEVELS.length*3)+' 星';
+  $('menuBest').textContent = '最高分 '+bestOfAll();
+  const mb={bestEndless:M_ENDLESS,bestTimed:M_TIMED,bestDaily:M_DAILY};
+  for(const id in mb){
+    const el=$(id); if(!el) continue;
+    const top=(lbGet(mb[id])[0]||{}).score;
+    el.textContent = top ? '最高 '+top : '';
+  }
 }
+function starTotal(){ return Object.keys(SAVE.stars).reduce((a,k)=>a+(+SAVE.stars[k]||0),0); }
+function bestOfAll(){ let m=0; for(const k in SAVE.best){ const v=+SAVE.best[k]||0; if(v>m) m=v; } return m; }
+
 function gotoLevels(){
   state='levels'; showScreen('screenLevels'); hideAllModal(); $('gameShell').hidden=true; renderLevelsGrid();
 }
 function renderLevelsGrid(){
   const grid=$('levelsGrid'); grid.innerHTML='';
+  const nextIdx=Math.min(SAVE.unlocked,LEVELS.length);
   LEVELS.forEach((lv,i)=>{
     const unlocked=(i+1)<=SAVE.unlocked;
     const stars=SAVE.stars[lv.id]||0;
-    const card=document.createElement('div'); card.className='level-card'+(unlocked?'':' locked');
+    const best=SAVE.best[lv.id]||0;
+    const isCurrent=(i+1)===nextIdx;
+    const card=document.createElement('button'); card.type='button';
+    card.className='level-card'+(unlocked?'':' locked')+(isCurrent?' current':'');
     card.style.setProperty('--accent-c',ACCENT[i%4]);
     const starHtml=[0,1,2].map(k=>k<stars?ic('star','sm'):ic('starO','sm')).join('');
-    const moveTxt = lv.moves===0?'无限步':'步';
-    card.innerHTML=`<div class="lc-num">${lv.id}</div><div class="lc-name">${lv.name}</div><div class="lc-stars">${starHtml}</div><div class="lc-meta">${lv.moves===0?'∞ 步':lv.moves+' 步'}</div>${unlocked?'':'<div class="lc-lock">'+ic('lock','sm')+'</div>'}`;
+    card.innerHTML='<div class="lc-num">'+String(lv.id).padStart(2,'0')+'</div>'
+      +'<div class="lc-name">'+lv.name+'</div>'
+      +'<div class="lc-stars">'+starHtml+'</div>'
+      +'<div class="lc-meta">'+ic(lv.moves===0?'infinity':'target','sm')+(lv.moves===0?'无限步':lv.moves+' 步')+'</div>'
+      +(best?'<div class="lc-best">最佳 '+best+'</div>':'')
+      +(unlocked?(isCurrent?'<div class="lc-tag">继续</div>':''):'<div class="lc-lock">'+ic('lock','sm')+'</div>');
     if(unlocked) card.onclick=()=>{ sfx.btn(); startLevel(i); };
+    else card.setAttribute('aria-disabled','true');
     grid.appendChild(card);
   });
+  const sum=$('levelsSummaryStars');
+  if(sum&&sum.lastElementChild) sum.lastElementChild.textContent=starTotal()+' / '+(LEVELS.length*3)+' 星';
+  const nx=$('levelsSummaryNext');
+  if(nx&&nx.lastElementChild){
+    const u=Math.min(SAVE.unlocked,LEVELS.length);
+    nx.lastElementChild.textContent = (starTotal()>=LEVELS.length*3) ? '已全部三星通关' : ('下一关：第 '+u+' 关 · '+LEVELS[u-1].name);
+  }
 }
 
 async function startLevel(idx){
@@ -1017,6 +1073,8 @@ function showModeResult(m, rank, win){
   $('modeEndTitle').textContent=titles[m];
   $('modeEndScore').textContent=score;
   $('modeEndStats').innerHTML='最高连击 <b>×'+stats.maxCombo+'</b> · 消除 <b>'+stats.clears+'</b>'+(stats.rockets>0?' · 火箭 <b>'+stats.rockets+'</b>':'')+(stats.bombs>0?' · 炸弹 <b>'+stats.bombs+'</b>':'')+(stats.rainbows>0?' · 彩虹 <b>'+stats.rainbows+'</b>':'');
+  const me=$('modeEndEmoji');
+  if(me){ me.innerHTML = win?SVG.party:SVG.sad; me.classList.toggle('ok',!!win); me.classList.toggle('danger',!win); }
   $('modeEndRank').innerHTML=rank>0? ic('trophy','inline')+' 历史第 <b>'+rank+'</b> 名':'未进入 TOP10';
   $('modeEndRetry').textContent = m===M_DAILY? '再战一次（保留最佳）' : '再来一局';
   showModal('modalModeEnd');
@@ -1045,23 +1103,23 @@ function renderDailyStrip(){
 }
 
 // ---------- 排行榜弹窗 ----------
-function openLeaderboard(){
-  const box=$('lbSections'); box.innerHTML='';
-  const meta={endless:['无尽模式','infinity'],timed:['限时模式','clock'],daily:['每日挑战','calendarDay']};
-  for(const m in meta){
-    const list=lbGet(m);
-    const sec=document.createElement('div'); sec.className='lb-section';
-    let rows='';
-    if(list.length===0){ rows='<div class="lb-empty">暂无成绩，快去挑战吧</div>'; }
-    else{
-      list.forEach((e,i)=>{
-        rows+='<div class="lb-row'+(i<3?' top'+(i+1):'')+'"><span class="lb-rank">'+(i+1)+'</span><span class="lb-score">'+e.score+'</span><span class="lb-meta">连击 ×'+e.combo+' · '+fmtTs(e.ts)+'</span></div>';
-      });
-    }
-    sec.innerHTML='<div class="lb-head">'+ic(meta[m][1],'sm')+' '+meta[m][0]+'</div>'+rows;
-    box.appendChild(sec);
+let lbTab=M_ENDLESS;
+function openLeaderboard(){ renderLb(); showModal('modalLeaderboard'); sfx.btn(); }
+function renderLb(){
+  const box=$('lbSections'); if(!box) return;
+  const meta={endless:['无尽','infinity'],timed:['限时','clock'],daily:['每日','calendarDay']};
+  const tabs=Object.keys(meta).map(m=>'<button class="lb-tab'+(m===lbTab?' on':'')+'" data-lb="'+m+'" role="tab" aria-selected="'+(m===lbTab)+'">'+ic(meta[m][1],'sm')+meta[m][0]+'</button>').join('');
+  const list=lbGet(lbTab);
+  let body;
+  if(list.length===0){
+    body='<div class="lb-empty">'+ic('trophy','lg')+'<span>这个模式还没有成绩</span><button class="menu-btn" data-lbgo="1">去挑战一局</button></div>';
+  } else {
+    body='<div class="lb-list">'+list.map((e,i)=>'<div class="lb-row'+(i<3?' top'+(i+1):'')+'"><span class="lb-rank">'+(i+1)+'</span><span class="lb-score">'+e.score+'</span><span class="lb-meta">连击 ×'+(e.combo||0)+' · '+fmtTs(e.ts)+'</span></div>').join('')+'</div>';
   }
-  showModal('modalLeaderboard'); sfx.btn();
+  box.innerHTML='<div class="lb-tabs" role="tablist">'+tabs+'</div>'+body;
+  box.querySelectorAll('[data-lb]').forEach(b=>{ b.onclick=()=>{ lbTab=b.dataset.lb; sfx.btn(); renderLb(); }; });
+  const go=box.querySelector('[data-lbgo]');
+  if(go) go.onclick=()=>{ hideAllModal(); sfx.init(); sfx.btn(); startMode(lbTab); };
 }
 
 // ---------- 模式绑定 ----------
@@ -1073,8 +1131,8 @@ document.getElementById('menuTimed').onclick=()=>{ sfx.init(); sfx.btn(); startM
 document.getElementById('menuDaily').onclick=()=>{ openDailyModal(); };
 document.getElementById('menuLeaderboard').onclick=()=>{ openLeaderboard(); };
 document.getElementById('dailyGo').onclick=()=>{ hideAllModal(); sfx.init(); sfx.btn(); startMode(M_DAILY); };
-document.getElementById('dailyClose').onclick=()=>{ hideAllModal(); };
-document.getElementById('lbClose').onclick=()=>{ hideAllModal(); };
+document.getElementById('dailyClose').onclick=()=>{ backModal(); };
+document.getElementById('lbClose').onclick=()=>{ backModal(); };
 document.getElementById('modeEndRetry').onclick=()=>{ hideAllModal(); startMode(mode); };
 document.getElementById('modeEndMenu').onclick=()=>{ hideAllModal(); gotoMenu(); };
 document.getElementById('pauseEndBtn').onclick=()=>{ hideAllModal(); finishMode(); };
@@ -1189,7 +1247,7 @@ function shareScore(){
 
 document.getElementById('menuStats').onclick=()=>{ openStats(); };
 document.getElementById('settingsStats').onclick=()=>{ openStats(); };
-document.getElementById('statsClose').onclick=()=>{ hideAllModal(); };
+document.getElementById('statsClose').onclick=()=>{ backModal(); };
 document.getElementById('winShareBtn').onclick=()=>{ shareScore(); };
 document.getElementById('modeEndShare').onclick=()=>{ shareScore(); };
 // ---------- 程序化 8-bit 背景音乐 ----------
@@ -1271,9 +1329,25 @@ attachRipple(document.getElementById('menuEndless'));
 attachRipple(document.getElementById('menuTimed'));
 attachRipple(document.getElementById('menuDaily'));
 // ---------- 事件绑定 ----------
-$('brandBtn').onclick=()=>{ sfx.btn(); gotoMenu(); };
+let quitArmAt=0;
+function requestQuit(){
+  const running = state==='playing'||state==='paused';
+  if(running && Date.now()-quitArmAt>3400){
+    quitArmAt=Date.now();
+    const lbl=$('homeBtn').querySelector('.bm-label'); if(lbl) lbl.textContent='再按一次退出';
+    showToast('本局还在进行 · 再按一次返回主菜单', 2600);
+    clearTimeout(requestQuit._t);
+    requestQuit._t=setTimeout(()=>{ const l=$('homeBtn').querySelector('.bm-label'); if(l) l.textContent='主菜单'; quitArmAt=0; },3400);
+    return;
+  }
+  quitArmAt=0;
+  const l=$('homeBtn').querySelector('.bm-label'); if(l) l.textContent='主菜单';
+  sfx.btn(); gotoMenu();
+}
+function openHelp(){ if(state==='playing') pauseGame(); showModal('modalHelp'); sfx.btn(); }
+$('brandBtn').onclick=()=>{ requestQuit(); };
 $('bgBtn').onclick=()=>cycleBg();
-$('homeBtn').onclick=()=>{ sfx.btn(); gotoMenu(); };
+$('homeBtn').onclick=()=>{ requestQuit(); };
 $('themeBtn').onclick=()=>{ setTheme(document.documentElement.dataset.theme==='light'?'dark':'light'); sfx.btn(); };
 $('soundBtn').onclick=()=>toggleSound();
 $('gameSoundBtn').onclick=()=>toggleSound();
@@ -1284,6 +1358,16 @@ $('menuContinue').onclick=()=>{ sfx.init(); sfx.btn(); startBgMusic(); startLeve
 $('menuLevels').onclick=()=>{ sfx.btn(); gotoLevels(); };
 $('menuBg').onclick=()=>cycleBg();
 $('menuRefresh').onclick=()=>refreshAssets();
+$('menuSettings').onclick=()=>{ openSettings(); };
+$('menuTheme').onclick=()=>{ setTheme(document.documentElement.dataset.theme==='light'?'dark':'light'); sfx.btn(); };
+$('helpBtn').onclick=()=>{ openHelp(); };
+$('hintBtn').onclick=()=>{ sfx.btn(); showHint(); };
+$('helpClose').onclick=()=>{ backModal(); sfx.btn(); };
+$('settingsHelp').onclick=()=>{ openHelp(); };
+document.querySelectorAll('.modal-close[data-close]').forEach(b=>{ b.onclick=()=>{ backModal(); sfx.btn(); }; });
+// 点击遮罩关闭（结果类与裁剪弹窗除外）
+const SCRIM_CLOSE=['modalLeaderboard','modalStats','modalDaily','modalHelp','modalSkin','modalSettings'];
+document.querySelectorAll('.modal').forEach(m=>{ m.addEventListener('pointerdown',e=>{ if(e.target===m && SCRIM_CLOSE.indexOf(m.id)>=0) backModal(); }); });
 $('menuSound').onclick=()=>toggleSound();
 $('levelsBack').onclick=()=>{ sfx.btn(); gotoMenu(); };
 $('resumeBtn').onclick=()=>resumeGame();
@@ -1311,6 +1395,8 @@ function openSettings(){ showModal('modalSettings'); syncSettingsUI(); sfx.btn()
 function syncSettingsUI(){
   $('setSfx').checked=settings.sfx; $('setMusic').checked=settings.music; $('setVol').value=settings.volume;
   $('setMotion').checked=settings.motion; $('setHaptic').checked=settings.haptic; $('setQuality').value=settings.quality;
+  const tv=$('setVolVal'); if(tv) tv.textContent=settings.volume;
+  const st=$('setTheme'); if(st) st.value=document.documentElement.dataset.theme||'dark';
   updateMusicLabel();
 }
 function applySettings(){
@@ -1326,12 +1412,13 @@ function applySettings(){
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn); const gsb=$('gameSoundBtn'); if(gsb){ gsb.innerHTML=ic(soundOn?'sound':'mute'); gsb.classList.toggle('off',!soundOn); }
 }
 $('settingsBtn').onclick=()=>openSettings();
-$('pauseSettingsBtn').onclick=()=>{ hideAllModal(); openSettings(); };
+$('pauseSettingsBtn').onclick=()=>{ openSettings(); };
 $('pauseBgBtn').onclick=()=>{ cycleBg(); };
-$('settingsClose').onclick=()=>{ hideAllModal(); sfx.btn(); if(state==='playing'){ scheduleHint(); } else if(state==='paused'){ showModal('modalPause'); } };
+$('settingsClose').onclick=()=>{ backModal(); sfx.btn(); if(state==='playing'){ scheduleHint(); } };
 $('setSfx').onchange=e=>{ settings.sfx=e.target.checked; settings.save(); soundOn=settings.sfx; applySettings(); sfx.btn(); };
 $('setMusic').onchange=e=>{ settings.music=e.target.checked; settings.save(); applySettings(); sfx.btn(); };
-$('setVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); if(masterGain) masterGain.gain.value=settings.volume/100; if(bgAudio) bgAudio.volume=(settings.volume/100)*0.55; SynthMusic.setVol((settings.volume/100)*0.5); };
+$('setVol').oninput=e=>{ settings.volume=+e.target.value; settings.save(); const vv=$('setVolVal'); if(vv) vv.textContent=settings.volume; if(masterGain) masterGain.gain.value=settings.volume/100; if(bgAudio) bgAudio.volume=(settings.volume/100)*0.55; SynthMusic.setVol((settings.volume/100)*0.5); };
+$('setTheme').onchange=e=>{ setTheme(e.target.value); sfx.btn(); };
 $('setMotion').onchange=e=>{ settings.motion=e.target.checked; settings.save(); applySettings(); };
 $('setHaptic').onchange=e=>{ settings.haptic=e.target.checked; settings.save(); if(settings.haptic) haptic(30); };
 $('setQuality').onchange=e=>{ settings.quality=e.target.value; settings.save(); applySettings(); sfx.btn(); };
@@ -1345,7 +1432,12 @@ if('ResizeObserver' in window){ new ResizeObserver(()=>{ if(!$('gameShell').hidd
 function relayoutAll(){ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r]?.[c]; if(!t) continue; const{x,y}=posOf(r,c); t.el.style.width=t.el.style.height=tileSize+'px'; t.el.style.setProperty('--tx',x+'px'); t.el.style.setProperty('--ty',y+'px'); t.el.style.transform=`translate3d(${x}px,${y}px,${Z_TILE}px)`; } }
 document.addEventListener('touchmove',e=>{ if(e.touches.length>1) e.preventDefault(); },{passive:false});
 document.addEventListener('gesturestart',e=>e.preventDefault());
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&(state==='playing'||state==='paused')){ state==='playing'?pauseGame():resumeGame(); } });
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  const open=[...document.querySelectorAll('.modal.show')].pop();
+  if(open){ if(open.id==='modalPause') resumeGame(); else backModal(); return; }
+  if(state==='playing') pauseGame(); else if(state==='paused') resumeGame();
+});
 
 // ---------- 自定义皮肤（传图 + 1:1 裁剪 + IndexedDB 持久化） ----------
 const SkinDB = (() => {
@@ -1553,13 +1645,13 @@ function renderSkinGrid(){
     const slotEl=document.createElement('div'); slotEl.className='skin-slot';
     slotEl.style.setProperty('--ring-c',ACCENT[i]);
     const has=!!cropDraft[i];
-    const stateTxt = libSel[i]>=0 ? ('图库 '+(libSel[i]+1)) : (has?'已就绪':'待上传');
+    const stateTxt = libSel[i]>=0 ? ('图库'+(libSel[i]+1)) : (has?'自定义':'待上传');
     slotEl.innerHTML = '<div class="skin-preview">' + (has ? '<img src="'+cropDraft[i]+'" alt="">' : '<span class="skin-ph">'+ic('image')+'</span>') + '</div>' +
       '<div class="skin-row"><span class="skin-label">方块 '+(i+1)+'</span><span class="skin-state'+(has?' ok':'')+'">'+stateTxt+'</span></div>' +
       '<div class="skin-actions">' +
-        '<button class="mini-btn" data-act="pick" data-i="'+i+'">'+(has?'重传':'上传')+'</button>' +
-        '<button class="mini-btn" data-act="crop" data-i="'+i+'"'+(pendingSrc[i]?'':' disabled')+'>裁剪</button>' +
-        '<button class="mini-btn" data-act="clear" data-i="'+i+'"'+(has?'':' disabled')+'>清除</button>' +
+        '<button class="mini-btn ico" data-act="pick" data-i="'+i+'" title="'+(has?'重新上传照片':'上传照片')+'" aria-label="'+(has?'重新上传照片':'上传照片')+'">'+ic('image')+'</button>' +
+        '<button class="mini-btn ico" data-act="crop" data-i="'+i+'" title="裁剪 1:1" aria-label="裁剪 1:1"'+(pendingSrc[i]?'':' disabled')+'>'+ic('fit')+'</button>' +
+        '<button class="mini-btn ico" data-act="clear" data-i="'+i+'" title="清除" aria-label="清除"'+(has?'':' disabled')+'>'+ic('close')+'</button>' +
       '</div>';
     grid.appendChild(slotEl);
   }
@@ -1675,9 +1767,9 @@ document.getElementById('settingsSkin').onclick=()=>{ openSkinModal(); };
 document.getElementById('skinApply').onclick=()=>{ applySkin(); };
 document.getElementById('skinAuto').onclick=()=>{ autoCropRemaining(); };
 document.getElementById('skinReset').onclick=()=>{ resetSkin(); };
-document.getElementById('skinClose').onclick=()=>{ hideAllModal(); };
+document.getElementById('skinClose').onclick=()=>{ backModal(); };
 document.getElementById('cropOk').onclick=()=>{ confirmCrop(); };
-document.getElementById('cropCancel').onclick=()=>{ crop.close(); hideAllModal(); showModal('modalSkin'); renderSkinGrid(); };
+document.getElementById('cropCancel').onclick=()=>{ crop.close(); renderSkinGrid(); backModal(); if(!document.querySelector('.modal.show')) showModal('modalSkin'); };
 document.getElementById('skinGrid').addEventListener('click',e=>{
   const btn=e.target.closest('button[data-act]'); if(!btn) return;
   const i=+btn.dataset.i, act=btn.dataset.act;
@@ -1701,9 +1793,16 @@ function start(){
   setTheme(themePref); setBg(bgPref);
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn); const gsb=$('gameSoundBtn'); if(gsb){ gsb.innerHTML=ic(soundOn?'sound':'mute'); gsb.classList.toggle('off',!soundOn); }
   $('pauseBtn').innerHTML=ic('pause'); $('levelsBack').innerHTML=ic('back');
-  $('homeBtnIcon').innerHTML=ic('home');
+  $('homeBtnIcon').innerHTML=ic('home'); $('helpBtn').innerHTML=ic('help'); $('hintBtn').innerHTML=ic('bulb');
   $('menuSkinIcon').innerHTML=ic('image'); $('menuLbIcon').innerHTML=ic('trophy'); $('menuStatsIcon').innerHTML=ic('chart');
   $('menuRefreshIcon').innerHTML=ic('refresh'); $('menuSoundIcon').innerHTML=ic(soundOn?'sound':'mute'); $('menuBgIcon').innerHTML=ic(BG_LIST[bgIdx]?BG_LIST[bgIdx].icon:'cloud');
+  $('menuSettingsIcon').innerHTML=ic('gear');
+  $('musicPrev').innerHTML=ic('chevL'); $('musicNext').innerHTML=ic('chevR');
+  const mStar=$('menuStarIcon'); if(mStar) mStar.innerHTML=SVG.star;
+  const mBest=$('menuBestIcon'); if(mBest) mBest.innerHTML=SVG.trophy;
+  const lss=$('levelsSummaryStars'); if(lss&&lss.firstElementChild) lss.firstElementChild.innerHTML=SVG.star;
+  const lsn=$('levelsSummaryNext'); if(lsn&&lsn.firstElementChild) lsn.firstElementChild.innerHTML=SVG.target;
+  document.querySelectorAll('.modal-close[data-close]').forEach(b=>{ b.innerHTML=ic('close'); });
   $('menuSoundLabel').textContent=`音效 · ${soundOn?'开':'关'}`;
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
   syncBgStars();
