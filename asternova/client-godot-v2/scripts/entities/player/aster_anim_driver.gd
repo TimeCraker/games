@@ -59,6 +59,10 @@ func _on_state_changed(old_state: int, new_state: int) -> void:
 		rig.travel("Land")
 		return
 
+	# 退出攻击状态回到移动/待机 → 自动收刀纳鞘，恢复常态仙气身姿
+	if old_state in [PlayerCombatFSM.State.ATTACK, PlayerCombatFSM.State.IAIJUTSU_DASH] and new_state in [PlayerCombatFSM.State.IDLE, PlayerCombatFSM.State.MOVE, PlayerCombatFSM.State.SPRINT]:
+		rig.sheathe_sword(false)
+
 	rig.travel(STATE_TO_NODE.get(new_state, "Locomotion"))
 
 func _on_combo_stage(stage: int) -> void:

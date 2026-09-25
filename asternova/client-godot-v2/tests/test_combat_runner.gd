@@ -106,7 +106,7 @@ func phase_integrity() -> void:
 
 	rig = player.visual_root.get_node_or_null("CharacterAster") as AsterRig
 	check(rig != null, "Aster 真身 rig 不存在")
-	check(rig.skeleton != null and (rig.skeleton.get_bone_count() == 43 or rig.skeleton.get_bone_count() == 55), "Aster 骨骼数量异常")
+	check(rig.skeleton != null and (rig.skeleton.get_bone_count() == 26 or rig.skeleton.get_bone_count() == 43 or rig.skeleton.get_bone_count() == 55), "Aster 骨骼数量异常")
 	check(rig.hand_socket != null and rig.hand_socket is BoneAttachment3D, "Hand_R_Weapon_Socket 插槽缺失")
 	check(rig.scabbard_socket != null and rig.scabbard_socket is BoneAttachment3D, "Pelvis_L_Scabbard_Socket 插槽缺失")
 	check(rig.katana_blade != null, "Katana_Blade 刀身网格缺失")

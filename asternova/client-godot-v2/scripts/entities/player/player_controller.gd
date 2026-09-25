@@ -228,6 +228,9 @@ func align_visual_rotation(delta: float) -> void:
 		var target_y: float = atan2(-look_dir.x, -look_dir.z)
 		visual_root.rotation.y = lerp_angle(visual_root.rotation.y, target_y, delta * 15.0)
 
+	if not is_sliding:
+		visual_root.rotation.x = lerp_angle(visual_root.rotation.x, 0.0, delta * 10.0)
+
 # ==================== 身法与动作指令 ====================
 
 func start_slide() -> void:

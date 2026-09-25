@@ -76,6 +76,13 @@ func _setup_animation_system() -> void:
 		anim_player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_PHYSICS
 		var lib := anim_player.get_animation_library("")
 		
+		# 规范化：去除 Blender 导出动作自带的 _001 后缀
+		for anim_name in lib.get_animation_list():
+			if anim_name.ends_with("_001"):
+				var base_name := anim_name.trim_suffix("_001")
+				if not lib.has_animation(base_name):
+					lib.add_animation(base_name, lib.get_animation(anim_name))
+
 		# 桥接别名映射表：将 Rigify 原生动捕剪辑映射给 FSM / AnimationTree
 		var aliases := {
 			"idle": "Idle", "LightIdle": "Idle", "LightWalking": "Walk",
@@ -90,8 +97,11 @@ func _setup_animation_system() -> void:
 		}
 		for alias_name in aliases:
 			var src: String = aliases[alias_name]
-			if lib.has_animation(src) and not lib.has_animation(alias_name):
-				lib.add_animation(alias_name, lib.get_animation(src))
+			if not lib.has_animation(alias_name):
+				if lib.has_animation(src):
+					lib.add_animation(alias_name, lib.get_animation(src))
+				elif lib.has_animation(src + "_001"):
+					lib.add_animation(alias_name, lib.get_animation(src + "_001"))
 				
 		for clip in LOOP_CLIPS:
 			if lib.has_animation(clip):
@@ -204,7 +214,13 @@ func _apply_npr(root: Node) -> void:
 			_setup_mesh(child)
 		_apply_npr(child)
 
+const BODY_ATLAS_FALLBACK := "res://models/aster/aster_character_tripo_rgb_91dd1df3-fea7-483d-9c92-9417d503d11f.jpg"
+
 func _setup_mesh(mi: MeshInstance3D) -> void:
+	# 白名单防御：只给角色本体与佩刀挂载材质，防御任何未知辅助网格
+	if not (mi.name.begins_with("Aster_") or mi.name.begins_with("tripo_") or mi.name.begins_with("Katana_")):
+		return
+
 	for i in mi.mesh.get_surface_count():
 		var src := mi.get_active_material(i)
 		var albedo_tex: Texture2D = null
@@ -212,20 +228,25 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 			albedo_tex = src.albedo_texture
 		elif src is ShaderMaterial:
 			albedo_tex = src.get_shader_parameter("albedo_texture")
-		# Godot 可能在部分刀身表面丢失共享图集 -> 黑面渲染兜底
-		if albedo_tex == null and mi.name.begins_with("Katana"):
-			albedo_tex = load(KATANA_ATLAS_FALLBACK)
+		# 贴图回退兜底
+		if albedo_tex == null:
+			if mi.name.begins_with("Katana"):
+				albedo_tex = load(KATANA_ATLAS_FALLBACK)
+			elif mi.name.begins_with("Aster_") or mi.name.begins_with("tripo_"):
+				albedo_tex = load(BODY_ATLAS_FALLBACK)
 		var mat := ShaderMaterial.new()
 		mat.render_priority = 0
 		mat.shader = SHADER_TOON
-		mat.set_shader_parameter("albedo_color", Color(1, 1, 1, 1))
+		mat.set_shader_parameter("albedo_color", Color(1.0, 1.0, 1.0, 1.0))
 		mat.set_shader_parameter("albedo_texture", albedo_tex)
 		mat.set_shader_parameter("desaturation", 0.0)
 		mat.set_shader_parameter("use_alpha_scissor", false)
 		mat.set_shader_parameter("shadow_tint", SHADOW_TINT)
 		mat.set_shader_parameter("ramp_threshold", RAMP_THRESHOLD)
 		mat.set_shader_parameter("ramp_smoothness", RAMP_SMOOTHNESS)
-		mat.set_shader_parameter("shadow_strength", 0.45)
+		mat.set_shader_parameter("shadow_strength", 0.55)
+		mat.set_shader_parameter("ambient_intensity", 0.58)
+		mat.set_shader_parameter("direct_intensity", 0.42)
 		mat.set_shader_parameter("enable_rim", true)
 		mat.set_shader_parameter("rim_color", RIM_COLOR)
 		mat.set_shader_parameter("rim_threshold", 0.65)
@@ -247,16 +268,41 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 		mi.set_surface_override_material(i, mat)
 
 func _locate_katana() -> void:
-	katana_blade = hand_socket.get_node_or_null("Katana_Blade") as MeshInstance3D
-	if katana_blade:
-		# §3 拔刀挂载 = authored 握持滚转基（掌心对齐）+ 握心回拉补偿：
-		# 使刀柄握心（网格 +Y 0.13）精确落点右手掌心（插槽骨原点），绝不脱手悬空
-		hand_drawn_transform = Transform3D(Basis.IDENTITY, DRAW_GRIP_COMPENSATION)
-		is_drawn = true
-	# 纳刀标定：刀鞘分件的 authored 变换 = 两分件网格空间重合（Koiguchi 对齐入鞘）
-	var scab := scabbard_socket.get_node_or_null("Katana_Scabbard") as MeshInstance3D
+	if skeleton == null:
+		skeleton = find_child("Skeleton3D", true, false) as Skeleton3D
+	if hand_socket == null and skeleton != null:
+		hand_socket = skeleton.get_node_or_null("Hand_R_Weapon_Socket") as BoneAttachment3D
+		if hand_socket == null:
+			hand_socket = skeleton.find_child("Hand_R_Weapon_Socket", true, false) as BoneAttachment3D
+	if scabbard_socket == null and skeleton != null:
+		scabbard_socket = skeleton.get_node_or_null("Pelvis_L_Scabbard_Socket") as BoneAttachment3D
+		if scabbard_socket == null:
+			scabbard_socket = skeleton.find_child("Pelvis_L_Scabbard_Socket", true, false) as BoneAttachment3D
+
+	# 刀鞘定位与纳刀基准标定
+	var scab: MeshInstance3D = null
+	if scabbard_socket:
+		scab = scabbard_socket.get_node_or_null("Katana_Scabbard") as MeshInstance3D
+	if scab == null:
+		scab = find_child("Katana_Scabbard", true, false) as MeshInstance3D
 	if scab:
 		sheathe_transform = scab.transform
+
+	# 刀身定位（支持初始在鞘或在手）
+	if hand_socket:
+		katana_blade = hand_socket.get_node_or_null("Katana_Blade") as MeshInstance3D
+	if katana_blade == null and scabbard_socket:
+		katana_blade = scabbard_socket.get_node_or_null("Katana_Blade") as MeshInstance3D
+	if katana_blade == null:
+		katana_blade = find_child("Katana_Blade", true, false) as MeshInstance3D
+
+	if katana_blade:
+		hand_drawn_transform = Transform3D(Basis.IDENTITY, DRAW_GRIP_COMPENSATION)
+		# 若初始在刀鞘下，直接标记为已纳刀
+		if scabbard_socket and katana_blade.get_parent() == scabbard_socket:
+			is_drawn = false
+		else:
+			is_drawn = true
 
 ## 刀柄握心世界坐标（拔刀态 = 右手掌心；物理抓握断言用）
 func get_grip_center_world() -> Vector3:
@@ -284,6 +330,11 @@ func get_palm_center_world() -> Vector3:
 func draw_sword(instant: bool = true) -> void:
 	if is_drawn or katana_blade == null:
 		return
+	if hand_socket == null:
+		_locate_katana()
+	if hand_socket == null:
+		push_warning("AsterRig: draw_sword failed, hand_socket is null")
+		return
 	is_drawn = true
 	_mount_blade(hand_socket, hand_drawn_transform if instant else hand_drawn_transform)
 	blade_drawn_changed.emit(true)
@@ -291,12 +342,22 @@ func draw_sword(instant: bool = true) -> void:
 func sheathe_sword(instant: bool = true) -> void:
 	if not is_drawn or katana_blade == null:
 		return
+	if scabbard_socket == null:
+		_locate_katana()
+	if scabbard_socket == null:
+		push_warning("AsterRig: sheathe_sword failed, scabbard_socket is null")
+		return
 	is_drawn = false
 	_mount_blade(scabbard_socket, sheathe_transform)
 	clear_trail()
 	blade_drawn_changed.emit(false)
 
 func _mount_blade(new_parent: Node3D, local_transform: Transform3D) -> void:
+	if new_parent == null or katana_blade == null:
+		return
+	if katana_blade.get_parent() == new_parent:
+		katana_blade.transform = local_transform
+		return
 	if katana_blade.get_parent() != null:
 		katana_blade.get_parent().remove_child(katana_blade)
 	new_parent.add_child(katana_blade)

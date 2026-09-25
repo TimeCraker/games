@@ -256,7 +256,19 @@ def sample_src_frame(clip, t, lib_rest):
     return rot, hips_pos
 
 
-def apply_frame(src_rot, hips_delta_b):
+# ==================== 姿态补偿定义（任务书目标 1 & 2） ====================
+# 1. 挺拔前倾补偿（+6.8°，注入前行动量，彻底告别步态后仰）
+Q_LEAN_FORWARD = Quaternion(Vector((1.0, 0.0, 0.0)), -math.radians(6.8))
+LOCOMOTION_CLIPS = {"LightWalking", "LightRunning", "Sprint", "crouch-run"}
+
+# 2. 双臂舒展补偿（消灭胸前架剑与插胸，右手回到大腿侧自然微摆，左手自然搭鞘）
+Q_R_UPPER_RELAX = Quaternion(Vector((0.0, 0.3, 0.95)).normalized(), math.radians(38.0))
+Q_R_FORE_RELAX = Quaternion(Vector((0.0, 0.0, 1.0)), math.radians(-15.0))
+Q_L_UPPER_RELAX = Quaternion(Vector((0.0, -0.3, 0.95)).normalized(), math.radians(-25.0))
+Q_L_FORE_RELAX = Quaternion(Vector((0.0, 0.0, 1.0)), math.radians(10.0))
+ARM_RELAX_CLIPS = {"LightIdle", "idle", "LightWalking", "LightRunning"}
+
+def apply_frame(src_rot, hips_delta_b, clip_name=""):
     """全 43 骨按「实际层级」递推全局姿态；映射骨/扭骨写 basis 通道。
     必须用实际父链合成（如 L_Thigh 的实际父是 Pelvis 而非语义父 Hips），
     跳层会让整条腿携带未映射骨 rest 的恒定偏转。
@@ -279,14 +291,35 @@ def apply_frame(src_rot, hips_delta_b):
         if src is not None:
             m_b = qmul(dst_rest_rot[src], src_rest_used[src].inverted())
             dg = qmul(m_b, src_rot[src])
-            grot[name] = dg
-            gpos[name] = pp + pq @ rl_pos
+
+            # 挺拔前倾补偿（仅针对行进剪辑的躯干骨骼）
+            if clip_name in LOCOMOTION_CLIPS and name in ("Waist", "Spine01"):
+                dg = qmul(Q_LEAN_FORWARD, dg)
+
             limit = HEAD_CLAMP.get(src)
             basis = qmul(rl_rot.inverted(), qmul(pq.inverted(), dg))
+
+            # 双臂舒展补偿（局部 basis 调整，扭骨自动跟随插值）
+            if clip_name in ARM_RELAX_CLIPS:
+                if name == "R_Upperarm":
+                    basis = qmul(basis, Q_R_UPPER_RELAX)
+                    dg = qmul(pq, qmul(rl_rot, basis))
+                elif name == "R_Forearm":
+                    basis = qmul(basis, Q_R_FORE_RELAX)
+                    dg = qmul(pq, qmul(rl_rot, basis))
+                elif name == "L_Upperarm":
+                    basis = qmul(basis, Q_L_UPPER_RELAX)
+                    dg = qmul(pq, qmul(rl_rot, basis))
+                elif name == "L_Forearm":
+                    basis = qmul(basis, Q_L_FORE_RELAX)
+                    dg = qmul(pq, qmul(rl_rot, basis))
+
             if limit is not None and basis.angle > limit:
                 basis = Quaternion(basis.axis, limit)
             pb.location = rl_pos
             pb.rotation_quaternion = basis
+            grot[name] = dg
+            gpos[name] = pp + pq @ rl_pos
             dst_global_rot[src] = dg
             dst_global_rot[name] = dg  # Aster 名别名，供扭骨查询
             _DBG[src] = {"dg": dg}
@@ -411,7 +444,7 @@ def bake_clip(name, clip, lib_rest):
         if hips_pos is not None and hip_t0 is not None:
             d_godot = [(hips_pos[i] - hip_t0[i]) * hips_scale for i in range(3)]
             hips_delta_b = gvec_to_b(d_godot)
-        apply_frame(src_rot, hips_delta_b)
+        apply_frame(src_rot, hips_delta_b, clip_name=name)
         for bone, pb in pb_map.items():
             pb.keyframe_insert("rotation_quaternion", frame=f)
             if bone == "Hips":
