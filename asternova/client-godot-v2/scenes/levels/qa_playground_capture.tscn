@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://qa_pg_cap1"]
+
+[ext_resource type="PackedScene" uid="uid://bplayground_v2_core" path="res://scenes/levels/combat_playground.tscn" id="1_base"]
+[ext_resource type="Script" path="res://scripts/qa_capture_playground.gd" id="2_qa"]
+
+[node name="CombatPlayground" instance=ExtResource("1_base")]
+
+[node name="QACapture" type="Node" parent="."]
+script = ExtResource("2_qa")
