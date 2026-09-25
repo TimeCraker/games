@@ -8,6 +8,11 @@ type Props = {
   basePath?: string
   storageKey: string
   className?: string
+  /**
+   * 页面底部存在 fixed 工具栏/CTADock（如大厅「开始匹配」）时置 true，
+   * 将控制条上移避免与关键 CTA 点击区重叠。
+   */
+  elevated?: boolean
 }
 
 const FILE_CANDIDATES = [
@@ -31,7 +36,7 @@ function normalizePublicAudioPath(path: string): string {
     .join("/")
 }
 
-export function LoopingBgmControl({ src, basePath, storageKey, className = "" }: Props) {
+export function LoopingBgmControl({ src, basePath, storageKey, className = "", elevated = false }: Props) {
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const lastNonZeroRef = React.useRef(0.6)
   const [open, setOpen] = React.useState(false)
@@ -120,7 +125,11 @@ export function LoopingBgmControl({ src, basePath, storageKey, className = "" }:
       <audio ref={audioRef} src={resolvedSrc} loop preload="auto" onError={onAudioError} />
 
       <div
-        className={`fixed bottom-[max(0.85rem,env(safe-area-inset-bottom))] right-[max(0.85rem,env(safe-area-inset-right))] z-[120] ${className}`}
+        className={`fixed right-[max(0.85rem,env(safe-area-inset-right))] z-[120] ${
+          elevated
+            ? "bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))]"
+            : "bottom-[max(0.85rem,env(safe-area-inset-bottom))]"
+        } ${className}`}
       >
         <div className="flex items-center gap-2 rounded-full border border-white/15 bg-black/55 px-2 py-1.5 shadow-[0_8px_28px_rgba(0,0,0,0.45)] backdrop-blur-md">
           <button

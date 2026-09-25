@@ -43,6 +43,16 @@ export class StaPixiApp {
     container.appendChild(canvas)
     this.app = app
 
+    // Pixi v8 默认开启 AccessibilitySystem 并注入一个 1×1 的隐藏可聚焦按钮
+    // （aria-label="select to enable accessibility for this content"）。
+    // 本作没有任何 accessible 语义对象，它只是键盘 Tab 的隐形陷阱：移除以保持 Tab 环干净。
+    try {
+      ;(app as unknown as { accessibility?: { destroy?: () => void } }).accessibility?.destroy?.()
+      container.querySelectorAll<HTMLElement>('[title*="enable accessibility"], [aria-label*="enable accessibility"]').forEach((n) => n.remove())
+    } catch {
+      /* ignore */
+    }
+
     const starField = new StarFieldBg()
     this.starField = starField
     app.stage.addChild(starField.container)

@@ -26,6 +26,16 @@ export function StaRoot() {
     const host = hostRef.current
     if (!host) return
 
+    // Pixi v8 会在初始化期间（时机不定）注入 1×1 的无语义 accessibility 按钮节点；
+    // 一次性销毁可能发生在节点创建之前而漏网。用 MutationObserver 兜底移除，
+    // 避免键盘 Tab 落入隐形的 1px 焦点陷阱。
+    const cleanPixiA11yNodes = () => {
+      host.querySelectorAll<HTMLElement>('button[title*="enable accessibility"], [aria-label*="enable accessibility"]').forEach((n) => n.remove())
+    }
+    cleanPixiA11yNodes()
+    const mo = new MutationObserver(cleanPixiA11yNodes)
+    mo.observe(host, { childList: true, subtree: true })
+
     const pixi = new StaPixiApp()
     pixiRef.current = pixi
     let cancelled = false
@@ -44,6 +54,7 @@ export function StaRoot() {
       })
 
     return () => {
+      mo.disconnect()
       cancelled = true
       pixi.destroy()
       pixiRef.current = null

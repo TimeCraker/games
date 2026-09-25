@@ -20,22 +20,24 @@ export function MobileLandscapeGameShell({ children, designWidth = 1280, designH
 
   if (!isMobile) {
     return (
-      <div className="relative min-h-[100dvh] min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-black">
+      <main id="main-content" tabIndex={-1} className="relative min-h-[100dvh] min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-black">
         {children}
-      </div>
+      </main>
     )
   }
 
   return (
-    <ScaleFitGameStage defaultWidth={designWidth} defaultHeight={designHeight}>
-      <div className="relative h-full w-full bg-black">
-        {isPortraitMobile ? (
-        <div className="pointer-events-none absolute left-1/2 top-[max(0.5rem,env(safe-area-inset-top))] z-[20] max-w-[92vw] -translate-x-1/2 rounded-full border border-white/12 bg-black/55 px-3 py-1 text-center text-[10px] leading-snug text-white/60 backdrop-blur-md">
-          竖屏自适应模式
+    <main id="main-content" tabIndex={-1} className="relative">
+      <ScaleFitGameStage defaultWidth={designWidth} defaultHeight={designHeight}>
+        <div className="relative h-full w-full bg-black">
+          {isPortraitMobile ? (
+          <div className="pointer-events-none absolute left-1/2 top-[max(0.5rem,env(safe-area-inset-top))] z-[20] max-w-[92vw] -translate-x-1/2 rounded-full border border-white/12 bg-black/55 px-3 py-1 text-center text-[10px] leading-snug text-white/60 backdrop-blur-md">
+            竖屏自适应模式
+          </div>
+          ) : null}
+          <div className="mobile-game-landscape-fill h-full w-full overflow-hidden">{children}</div>
         </div>
-        ) : null}
-        <div className="mobile-game-landscape-fill h-full w-full overflow-hidden">{children}</div>
-      </div>
-    </ScaleFitGameStage>
+      </ScaleFitGameStage>
+    </main>
   )
 }

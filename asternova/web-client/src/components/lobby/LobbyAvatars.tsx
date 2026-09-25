@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { AnimatePresence, motion } from "framer-motion"
+import { useDialogA11y } from "@/src/hooks/useDialogA11y"
 
 export const LOBBY_AVATAR_STORAGE_KEY = "asternova-lobby-avatar-id"
 
@@ -197,6 +198,8 @@ export function LobbyAvatarPickerModal({
   currentId: LobbyAvatarId
   onSelect: (id: LobbyAvatarId) => void
 }) {
+  // Esc 关闭 + Tab 焦点陷阱（与登录重置弹层同款 useDialogA11y）
+  const dialogRef = useDialogA11y<HTMLDivElement>({ open, onClose })
   return (
     <AnimatePresence>
       {open ? (
@@ -214,6 +217,7 @@ export function LobbyAvatarPickerModal({
             onClick={onClose}
           />
           <motion.div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="lobby-avatar-picker-title"

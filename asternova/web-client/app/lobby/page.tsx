@@ -347,8 +347,11 @@ export default function LobbyPage() {
         variants={pageVariants}
         initial="hidden"
         animate="show"
+        id="main-content"
+        tabIndex={-1}
         className="relative z-10 mx-auto max-w-6xl space-y-12 px-4 py-9 pb-40 sm:space-y-14 sm:px-6 sm:py-11 sm:pb-36 md:space-y-[3.25rem] md:pb-32"
       >
+        <h1 className="sr-only">AsterNova 游戏大厅</h1>
         <motion.section variants={sectionVariants} className="space-y-6">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex gap-4">
@@ -657,7 +660,7 @@ export default function LobbyPage() {
         currentId={avatarId}
         onSelect={setAvatarId}
       />
-      <LoopingBgmControl src="/audio/lobby/my_track  startgame.mp3" storageKey="bgm-volume:lobby" />
+      <LoopingBgmControl src="/audio/lobby/my_track  startgame.mp3" storageKey="bgm-volume:lobby" elevated />
     </div>
   )
 }

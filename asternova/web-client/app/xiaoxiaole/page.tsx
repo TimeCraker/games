@@ -4,7 +4,7 @@ import { GameBackButton } from "@/src/components/ui/GameBackButton"
 
 export default function XiaoxiaolePage() {
   return (
-    <div className="fixed inset-0 z-50 bg-space-black">
+    <main id="main-content" tabIndex={-1} className="fixed inset-0 z-50 bg-space-black">
       <h1 className="sr-only">桓睿消消乐</h1>
       <GameBackButton variant="floating" />
       <iframe
@@ -13,6 +13,6 @@ export default function XiaoxiaolePage() {
         className="h-full w-full border-0"
         allow="autoplay; fullscreen"
       />
-    </div>
+    </main>
   )
 }
