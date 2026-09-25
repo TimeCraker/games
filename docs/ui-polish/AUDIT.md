@@ -8,6 +8,59 @@
 
 ---
 
+## R11（本轮）· 轨 2 数据轮：死样式清理 + 恒等令牌化 + 深扫语料
+
+### 隔轮评审（R10 改动）
+
+- R10 光痕 0.88s→0.9s（--duration-slow）：计算样式复核 0.9s ✓；hover 截图对像素 diff 0.068%（局限在动画相位差，bbox 覆盖卡片行与黑洞画布，属环境动噪声非结构变化）→ **通过，无 revert。**
+
+### 修复清单（轨 2）
+
+| 级 | 方向 | 位置 | 前值 → 后值 | 验证 |
+| --- | --- | --- | --- | --- |
+| P2 | 工艺·删繁就简 | `app/globals.css` | 死样式 2 处：`gravity-scan`（keyframes+class）、`pulse-scan`（keyframes）零组件引用 → 删除（rules 新增「死样式纪律」：无引用即删，删前 grep 取证） | 全仓 grep 0 残留；home 前后截图 diff 0.198%（黑洞画布动画噪声，结构零变化）；build ✓ |
+| P2 | 工艺·恒等令牌 | `LoopingBgmControl.tsx` | BGM 外环提醒 ping `[animation-duration:2.6s]` 字面值 → `var(--duration-ambient)`（值恒等 2600ms，零视觉变化）；内环 1.8s 保留为差拍提醒环 | 计算样式前后均 1.8s/2.6s ✓ |
+| P2 | 语料 | 数据采集 | login tabs 切换 transition 0.15s（150–300 带内），属性 color/bg/border/outline ✓；BGM 双环 1.8/2.6（保留差拍设计）；wide 第二行单卡左对齐栅格起点（723=gridLeft，正常网格流） | telemetry2 全部澄清 |
+
+### 深扫（本轮轮空补偿项，全过）
+
+- **超长文案注入**（120 字标题 + 120 字描述）：桌面卡高 319px / 移动 279px 纵向扩展，**双视口页面级横向溢出均为 0**，网格自适应完好。
+- 回归扫描 4 路由 × 双视口 8/8 绿。
+
+### 跳过 + 原因
+
+- BGM 内环 1.8s 令牌化：双环差拍为既有提醒设计（无视觉评审模型可核验改动审美）→ 保留原样。
+- 其余无。
+
+### 保留 + 原因
+
+- 见上（BGM 内环）；规则弹层 checkbox 等历史定案维持。
+
+### 验证汇总
+
+- build ✓ · lint：本项目触碰文件 0 errors（全仓仅历史保留 warning arena:173，本轮入口 exit-code 表现异常已隔离核实与改动无关）。
+- 证据：`home-scan-before/after.png`、R10 hover 截图对（artifacts，不进仓库）。
+
+### Commits（本仓库）
+
+1. `style(web): 清理死样式 + BGM 提醒环挂 ambient 令牌 / remove dead styles, ambient-token the BGM ping ring`
+2. `docs(ui-polish): R11 轨2数据轮台账与死样式纪律 / R11 craft-ledger and dead-style discipline`
+- push 结果：正常。
+
+### 剩余队列（R12+ 候选）
+
+- [P2工艺] login 头像/logo hover 旋摆 0.5s 与 150–300 带的关系语料；Toaster(sonner) 入场时长语料。
+- [P3] 弱网加载态截图评审（R9 已采证，转入隔轮评审材料）；首页黑洞画布在 slow3G 下的首帧占位样式。
+- [P3] xiaoxiaole 内嵌页 service worker 缓存行为与 404 恢复路径取证。
+
+### 踩坑（本轮）
+
+1. 惯性操作：先给死样式做令牌化（gravity-scan 7s）→ grep 后发现元素已不存在（死类），随即改道为删除；令牌化前必须先验引用存在。
+2. 一次成型脚本的括号计数目测不可靠 → 表达式写入前用平衡计数器+Function 编译双重校验（三次翻车后的规则）。
+3. `[role=tab]` 语料首次在 lobby 采样为空 → 采样页面应为 login（数据页与断言页要一致）。
+
+---
+
 ## R10（本轮）· 轨 2 工艺首轮：动效令牌归一 + 文案/排版语料采集
 
 ### 隔轮评审（R9 改动）
