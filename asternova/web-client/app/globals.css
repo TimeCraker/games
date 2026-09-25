@@ -284,12 +284,6 @@ body {
   -webkit-mask-size: 100% 100%;
   animation: wave-move 3s linear infinite !important;
 }
-@keyframes pulse-scan {
-  0% { transform: translateY(-12%); opacity: 0.55; }
-  50% { transform: translateY(26%); opacity: 0.90; }
-  100% { transform: translateY(-12%); opacity: 0.55; }
-}
-
 .mobile-game-landscape-fill > * {
   box-sizing: border-box;
   height: 100% !important;
@@ -378,18 +372,6 @@ body {
       transparent 268deg, rgba(56, 189, 248, 0.55) 269deg, rgba(56, 189, 248, 0.55) 271deg, transparent 272deg,
       transparent 358deg, rgba(56, 189, 248, 0.55) 359deg, rgba(56, 189, 248, 0.55) 360deg
     );
-}
-
-/* 引力扫描:首页主时刻(一个精心设计的动效,非散布) */
-@keyframes gravity-scan {
-  0% { transform: translateY(-100%) scaleY(0.6); opacity: 0; }
-  12% { opacity: 0.65; }
-  50% { transform: translateY(0%) scaleY(1); opacity: 0.45; }
-  88% { opacity: 0.65; }
-  100% { transform: translateY(100%) scaleY(0.6); opacity: 0; }
-}
-.gravity-scan-line {
-  animation: gravity-scan 7s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 
 /* 数据 mono:坐标/测量值(craft 允许数据/测量场景用等宽) */

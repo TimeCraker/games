@@ -147,7 +147,7 @@ export function LoopingBgmControl({ src, basePath, storageKey, className = "", e
             {audible ? (
               <>
                 <span className="pointer-events-none absolute inset-0 rounded-full border border-white/40 opacity-80 animate-ping [animation-duration:1.8s]" />
-                <span className="pointer-events-none absolute -inset-1 rounded-full border border-white/25 opacity-70 animate-ping [animation-duration:2.6s]" />
+                <span className="pointer-events-none absolute -inset-1 rounded-full border border-white/25 opacity-70 animate-ping [animation-duration:var(--duration-ambient)]" />
               </>
             ) : null}
             <span
