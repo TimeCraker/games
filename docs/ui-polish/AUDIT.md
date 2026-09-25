@@ -8,6 +8,64 @@
 
 ---
 
+## R8（本轮）· 全路由键盘轮转 + 边界数据深扫 + 配方测量闭环
+
+### 隔轮评审（R7 改动）
+
+- R7 修复（消消乐 label、ambient 令牌）与既有战线复验：全量扫描 + interact 33/33 + edge 15/15 全绿。**通过，无 revert。**
+
+### 修复/新增清单
+
+| 级 | 方向 | 位置 | 前值 → 后值 | 验证 |
+| --- | --- | --- | --- | --- |
+| P2 | 键盘 | `docs/ui-polish/tools/interact.mjs` | 仅 login/弹层场景 → 五页面（home/login/lobby/xiaoxiaole/404）Tab 环轮转：首选=skip link、环内全部落点可见、页内无名可见按钮=0（×3 断言/页）；落点身份改坐标+文本+aria 闭环 | 33/33 全绿 |
+| P3 | 弱网 | `docs/ui-polish/tools/edge.mjs`（新增） | 无弱网覆盖 → CDP 节流（150kbps/700ms）五路由渲染完整性（h1=1 + 横向溢出 0） | 5/5 渲染完整 |
+| P3 | 离线 | edge.mjs | 无取证 → 离线加载呈现浏览器默认错误页（本站无离线壳/SW 属设计内情况，取证登记） | 记录保留 |
+| P3 | 极端数据 | edge.mjs | 无 → 80 字 CJK+emoji 昵称种子进大厅：头部 span ellipsis 截断、无页面级溢出 | PASS |
+| P2 | 配方核对 | edge.mjs | 「弹层容器配方逐页核对」入队 → 双视口实测：merge/nebula 规则弹层 = 桌面 32px 全圆角/420px/glass 4%+8%/blur40/p-6，移动 28px 顶圆角底抽屉/p-4，与 rules §4 完全一致；star 保留居中全圆角变体（§4 允许） | 实测达标，无需改码 |
+| P2 | 工具稳定性 | audit/interact/edge + `ensure-chrome.ps1`（新增） | 多轮累计未关闭标签致浏览器崩溃 + 沙箱收紧后 AppData 写被拒（Chromium crashpad 直接退出）→ 统一 Target.closeTarget 关标签；看护脚本以「Crashpad 禁用 + 工作区 profile」配方拉起，CDP 掉线自愈 | 连续特训稳定跑完三套件 |
+
+### 跳过 + 原因
+
+- 弹层配方仅在「打开态」可测：login 重置弹层初始关闭 → 留待 push 前补测（低级，不影响验收口径，已在 R3/登深扫中人工复核过其玻璃工艺）。
+- push：本会话无凭据（SEC_E_NO_CREDENTIALS）×3 → 留本地。
+
+### 保留 + 原因
+
+- 规则弹层 16×16 checkbox（6 扫描 small=1）：整行 label + 原生尺寸，R1 定案保留。
+- 离线无自定义断网页：无离线壳是产品定位（深空大厅要求在线）；新增 SW/offline 页属「新增花活+运行时依赖」，默认禁止。
+- 慢网下首屏依赖字体/分块（自托管 next/font，可缓存）：弱网渲染完整性已实测达标。
+
+### 验证汇总
+
+- build 无改动（纯工具轮；web 侧零文件变更）· lint 基线 0 errors。
+- audit 全量扫描：main/skip/h1/未标签/溢出/重叠/截断/console 全绿（仅保留项）。
+- interact：**33/33**。edge：**15/15**。
+- 浏览器后端随笔：Chrome→Edge（Chromium 153 同 CDP 协议），配方入 ensure-chrome.ps1。
+
+### Commits（本仓库，累计 12 个本地提交未推送）
+
+1. `caf91be test(ui-polish): 边界扫描器、全路由 Tab 环与浏览器看护脚本`
+2. （历史 11 个见前轮台账）
+- push 结果：无凭据失败，留本地。
+
+### 剩余队列（R9+ 候选）
+
+- [P2] lobby/arena 深度可达状态走查（带真实后端 or 更深种子）；login 重置弹层打开态配方补测。
+- [P2] 工艺轮：星象台 fine-grid 透明度节奏数据化复核（本轮未及）；nebula pausedUpgrade 弹层与 ResultOverlay 分支的配方语料并入 edge 配方表。
+- [P3] 更多视口矩阵（768×1024 / 2560×1440 / 极小 320×568）复用现扫描器跑一遍；弱网矩阵加 3G/4G 档与图片延迟对 404 页影响。
+- [P3] 多语言标题（英文 locale）与文档 title 模板联动检查。
+
+### 踩坑（本轮）
+
+1. **沙箱收紧：AppData Local 写入被拒** → Chromium crashpad 写 throttle_store.dat 即退出（Chrome/Edge 同因）；配方 `--disable-features=Crashpad` + 工作区 user-data-dir 解决；网络沙箱 ACL grant 报错为非致命噪声。
+2. **标签泄漏导致浏览器崩溃**：历轮脚本只关 WS 不关标签，几百轮后 Chrome 崩 → 三工具统一 closeTarget；显见崩溃后必须先清 profile 锁再拉起。
+3. **并行工具运行造成键事件丢包**（interact lobby-avatar Esc 偶发失败）：两个 CDP 套件严禁并发，全部串行（已固化接管流程）。
+4. 仓库外部进程周期性跑 git（art/model 文件）→ 偶发 index.lock；提交遇锁只等重试，禁止强删锁。
+5. 首轮「环内落点不可见」误报：skip link 聚焦后 200ms translate 入场未完成即测量 → 落点判定加 280ms 就位等待；BODY 落点为环耗尽终点而非违规。
+
+---
+
 ## R7（本轮）· 对比度评估盲区闭环 + 内嵌游戏审计 + 工艺令牌
 
 ### 隔轮评审（R6 改动）
