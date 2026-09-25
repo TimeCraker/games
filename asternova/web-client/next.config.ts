@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // 页面数据收集用 worker_threads 而非 fork（Windows 沙箱禁管道 stdio 时 fork 会 EPERM）
+  experimental: {
+    workerThreads: true,
+  },
   turbopack: {
     root: appRoot,
     resolveAlias: {
