@@ -8,6 +8,61 @@
 
 ---
 
+## R10（本轮）· 轨 2 工艺首轮：动效令牌归一 + 文案/排版语料采集
+
+### 隔轮评审（R9 改动）
+
+- R9 仅工具变更（web 零文件改动）；本轮回归扫描 6 路由 × 2 视口零回归，工具自愈续跑。**通过，无 revert。**
+- 评审方式说明：本部署无视觉模型 → 轨 2 证据改用「计算样式前后值 + 同视口截图对 + 下轮数字复核」；本轮截图对已存 artifacts（见下）。
+
+### 修复清单（轨 2 · 三件套齐全）
+
+| 级 | 方向 | 位置 | 前值 → 后值 | 验证 |
+| --- | --- | --- | --- | --- |
+| P2 | 工艺·动效令牌 | `app/globals.css` lobby 光痕 | `animation: lobby-enter-sheen 0.88s ease-out` 硬编码 → `var(--duration-slow)`（900ms，rules §6 既有「一次性装饰扫光」令牌） | 计算样式 0.88s → 0.9s；截图对 `lobby-hover-before/after.png`；hover 光晕/transition 值不变（0.3s 在 150–300 带内） |
+| P2 | 工艺·规则补录 | `docs/ui-polish/rules.md` §6 | 无「一次性扫光」归属 → 补录：装饰扫光/电影感过渡挂 `--duration-slow` | — |
+
+### 数据化语料（无码项，全数达标）
+
+- **CTA 动词分布**（wide 采 2560）：进入×5 / 开始匹配 / 登录 / 返回大厅 / 知道了 / 开始任务 / 重新开始 —— 与 rules §6 动词清单一致，无近义动词散落。
+- **大厅 wide 布局断言**：2560px 下 5 卡首行 4 卡（lg:grid-cols-4 生效），第 5 卡换行 —— 符合预期。
+- **ResultOverlay 动效语料**（静态核查）：springSnappy / cinematicEase 双共享令牌 + closeOnEsc:false 语义，无裸 ease/时长散落。
+- **hover 时序**：tile transition-duration 0.3s（150–300 带内 ✓）、呼吸 2.6s（--duration-ambient ✓）、光痕 0.9s（--duration-slow ✓）—— 三类动效三档令牌齐整。
+
+### 跳过 + 原因
+
+- 纯视觉审美项（饱和度/留白/字重微调）：无视觉评审模型可用，三件套 c 无法独立核验 → 依纪律跳过，不拍脑袋。
+
+### 保留 + 原因
+
+- `--duration-base: 500ms` 与 `--duration-slow` 邻接：用途分属「页面区块过渡」与「装饰扫光」，暂不变更层级（R2 已定）。光痕取 slow 是保守归一（0.88→0.9s 视觉近零差异）。
+- 规则弹层 checkbox 等 R1 定案项维持。
+
+### 验证汇总
+
+- build ✓ · lint 基线 0 errors · 回归扫描 6 路由 × 双视口：landmark/溢出/跳档/重叠/console **0 回归**。
+- 证据文件：`.ui-polish/artifacts/shots/lobby-hover-before.png` / `lobby-hover-after.png`（不进仓库）；计算样式前后值见上表。
+
+### Commits（本仓库）
+
+1. `style(web): 光痕时长归一 --duration-slow / normalize hover sheen to --duration-slow token`
+2. `docs(ui-polish): R10 轨2首轮台账与规则补录`
+- push 结果：本轮 push 正常（凭据恢复后的第二轮验证）。
+
+### 剩余队列（R11+ 候选）
+
+- [P2工艺] loopbgm ping 环（1.8s/2.6s 双频）入 ambient 令牌家族并一轮化。
+- [P3] wide 档 5 卡换行留白比例断言（第 2 行单卡视觉重心）；loading 骨架/首帧截图评审。
+- [P3] login 双 tab 切换动效时长语料（tabs transition 150ms?）。
+- 待部署：同前。
+
+### 踩坑（本轮）
+
+- hover 态证据需真实指针：CDP Input.dispatchMouseEvent 悬停后取 :hover 匹配 + 光痕计算样式；直接 toggle class 无法触发 CSS :hover。
+- wide 语料里 CTA 文本含卡片内部 span 文本，动词统计需按业务 CTA 元素级（span.enter-pill）采样，整卡 textContent 会混入标题。
+
+---
+
 ## R9（本轮）· 视口矩阵 + 多档弱网 + 配方与网格节奏数据化
 
 ### 隔轮评审（R8 改动）
