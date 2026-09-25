@@ -1,5 +1,5 @@
 /* ============================================================
-   桓睿消消乐 v2.1 - 完整游戏版
+   消消乐 v2.1 - 完整游戏版
    关卡系统 · 界面状态机 · 背景系统 · SVG图标 · 增强动效音效
    ============================================================ */
 (() => {
@@ -12,7 +12,7 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.31';
+const CACHE_VER = '2.32';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -66,7 +66,7 @@ const BG_LIST = [
 
 // 关卡配置 (moves: 0 = 无限步数)
 const LEVELS = [
-  { id:1,  name:'初见桓睿',   target:2000, moves:0,  goals:[{t:'score',v:2000}] },
+  { id:1,  name:'初见消消乐',   target:2000, moves:0,  goals:[{t:'score',v:2000}] },
   { id:2,  name:'渐入佳境',   target:3000, moves:0,  goals:[{t:'score',v:3000}] },
   { id:3,  name:'连击初体验', target:3500, moves:0,  goals:[{t:'score',v:3500},{t:'combo',v:3}] },
   { id:4,  name:'步数挑战',   target:3000, moves:30, goals:[{t:'score',v:3000}] },
@@ -77,7 +77,7 @@ const LEVELS = [
   { id:9,  name:'双重目标',   target:5000, moves:24, goals:[{t:'score',v:5000},{t:'bomb',v:2}] },
   { id:10, name:'彩虹盛宴',   target:6000, moves:22, goals:[{t:'score',v:6000},{t:'rainbow',v:2}] },
   { id:11, name:'极限连击',   target:7000, moves:20, goals:[{t:'score',v:7000},{t:'combo',v:5}] },
-  { id:12, name:'桓睿大师',   target:8000, moves:18, goals:[{t:'score',v:8000},{t:'combo',v:5},{t:'rainbow',v:2}] },
+  { id:12, name:'消消乐大师',   target:8000, moves:18, goals:[{t:'score',v:8000},{t:'combo',v:5},{t:'rainbow',v:2}] },
 ];
 const GOAL_META = {
   score:  { icon:'star',     label:'达到分数' },
@@ -179,7 +179,7 @@ const ACHIEVEMENTS = [
   { id:'clear8', name:'清场达人', desc:'单次消除 8 个方块', icon:'star' },
   { id:'beat1', name:'闯关启程', desc:'通关第 1 关', icon:'trophy' },
   { id:'beat6', name:'彩虹猎手', desc:'通关第 6 关', icon:'trophy' },
-  { id:'beat12', name:'桓睿大师', desc:'通关全部关卡', icon:'trophy' },
+  { id:'beat12', name:'消消乐大师', desc:'通关全部关卡', icon:'trophy' },
   { id:'total500', name:'消消达人', desc:'累计消除 500 个方块', icon:'chart' },
   { id:'daily_win', name:'每日一题', desc:'完成一次每日挑战', icon:'calendarDay' },
 ];
@@ -1131,9 +1131,9 @@ function shareCard(){
   for(let i=0;i<40;i++){ const a=Math.random()*Math.PI*2, r=280+Math.random()*420; c.fillStyle='rgba(255,255,255,'+(.02+Math.random()*.08)+')'; c.beginPath(); c.arc(W/2+Math.cos(a)*r,380+Math.sin(a)*r,1.5+Math.random()*2.5,0,Math.PI*2); c.fill(); }
   c.textAlign='center';
   c.fillStyle='rgba(255,255,255,.6)'; c.font='600 26px "PingFang SC","Microsoft YaHei",sans-serif';
-  c.fillText('HUANRUI MATCH-3', W/2, 90);
+  c.fillText('MATCH-3 PUZZLE', W/2, 90);
   c.fillStyle='#ffffff'; c.font='900 62px "PingFang SC","Microsoft YaHei",sans-serif';
-  c.fillText('桓睿消消乐', W/2, 162);
+  c.fillText('消消乐', W/2, 162);
   const modeTxt={campaign:(currentLevel&&currentLevel.name)||'闯关模式',endless:'无尽模式',timed:'限时模式',daily:'每日挑战'}[mode]||'闯关模式';
   c.fillStyle='rgba(255,255,255,.78)'; c.font='600 30px "PingFang SC","Microsoft YaHei",sans-serif';
   c.fillText(modeTxt, W/2, 232);
@@ -1167,7 +1167,7 @@ function shareCard(){
 }
 function downloadCard(cv){
   const a=document.createElement('a');
-  a.download='huanrui-score.png'; a.href=cv.toDataURL('image/png');
+  a.download='xiaoxiaole-score.png'; a.href=cv.toDataURL('image/png');
   document.body.appendChild(a); a.click(); a.remove();
   showToast('成绩卡片已保存');
 }
@@ -1176,9 +1176,9 @@ function shareScore(){
   if('undefined'!==typeof navigator&&navigator.share&&navigator.canShare){
     cv.toBlob(blob=>{
       if(!blob){ downloadCard(cv); return; }
-      const file=new File([blob],'huanrui-score.png',{type:'image/png'});
+      const file=new File([blob],'xiaoxiaole-score.png',{type:'image/png'});
       if(navigator.canShare({files:[file]})){
-        navigator.share({files:[file], title:'桓睿消消乐成绩'}).catch(()=>downloadCard(cv));
+        navigator.share({files:[file], title:'消消乐成绩'}).catch(()=>downloadCard(cv));
       } else downloadCard(cv);
     },'image/png');
   } else { downloadCard(cv); }

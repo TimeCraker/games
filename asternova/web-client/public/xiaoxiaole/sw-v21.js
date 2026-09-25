@@ -1,4 +1,4 @@
-// 桓睿消消乐 Service Worker v2.11 - 智能缓存 + 自动更新
+// 消消乐 Service Worker v2.11 - 智能缓存 + 自动更新
 const CACHE = 'xxl-v2.25';
 const CORE_ASSETS = [
   './',

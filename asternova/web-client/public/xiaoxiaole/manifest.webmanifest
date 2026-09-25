@@ -1,7 +1,7 @@
 {
-  "name": "桓睿消消乐",
+  "name": "消消乐",
   "short_name": "消消乐",
-  "description": "桓睿消消乐 - 立体三消游戏",
+  "description": "消消乐 - 立体三消游戏",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

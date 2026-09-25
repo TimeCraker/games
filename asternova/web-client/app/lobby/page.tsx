@@ -158,7 +158,7 @@ const ARCADE: ArcadeTile[] = [
   {
     href: "/xiaoxiaole",
     category: "Match-3",
-    title: "桓睿消消乐",
+    title: "消消乐",
     blurb: "立体三消 · 12关闯关",
     Icon: Gem,
     accent: "from-amber-400/25 to-orange-400/10",

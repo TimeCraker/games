@@ -19,7 +19,7 @@
     <rect x="138" y="82" width="80" height="80" rx="20" fill="url(#g4)" transform="rotate(7 178 122)"/>
   </g>
   <!-- 标题 -->
-  <text x="360" y="98" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="52" font-weight="900" fill="#ffffff" letter-spacing="2">桓睿消消乐</text>
-  <text x="360" y="132" font-family="'Helvetica Neue',sans-serif" font-size="16" font-weight="700" fill="#5fe3d9" letter-spacing="4">HUANRUI MATCH-3</text>
+  <text x="360" y="98" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="52" font-weight="900" fill="#ffffff" letter-spacing="2">消消乐</text>
+  <text x="360" y="132" font-family="'Helvetica Neue',sans-serif" font-size="16" font-weight="700" fill="#5fe3d9" letter-spacing="4">MATCH-3 PUZZLE</text>
   <text x="360" y="156" font-family="'PingFang SC',sans-serif" font-size="14" fill="#8b94a8" letter-spacing="1">纯前端 · 零依赖 · 跨平台三消闯关</text>
 </svg>
