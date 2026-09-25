@@ -95,8 +95,23 @@ export function LoopingBgmControl({ src, basePath, storageKey, className = "", e
 
     tryPlay()
     window.addEventListener("pointerdown", tryPlay, { once: true })
-    return () => window.removeEventListener("pointerdown", tryPlay)
+    return () => {
+      window.removeEventListener("pointerdown", tryPlay)
+      // portal 切换会重建 audio 元素：旧元素必须显式暂停，否则声音遗留
+      el.pause()
+    }
   }, [resolvedSrc])
+
+  // 卸载即停：被移出 DOM 的媒体元素不会自动暂停，路由离开后声音会继续（前台黑洞音效串场 bug）
+  React.useEffect(() => {
+    return () => {
+      const el = audioRef.current
+      if (!el) return
+      el.pause()
+      el.removeAttribute("src")
+      el.load()
+    }
+  }, [])
 
   const onAudioError = React.useCallback(() => {
     if (src) {
