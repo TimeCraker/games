@@ -8,6 +8,29 @@
 
 ---
 
+## R13（修复轮 · 目标暂停期间上线修复）· 首页 BGM 离站串场
+
+### 问题
+
+进入大厅后首页黑洞环境音仍在播放。根因：`LoopingBgmControl` 卸载时只任由 React 移除 `<audio>` DOM 节点，从无 `pause()`——被移出 DOM 的媒体元素不会自动暂停。
+
+### 修复
+
+| 级 | 方向 | 位置 | 前值 → 后值 | 验证 |
+| --- | --- | --- | --- | --- |
+| P0 | 音频 | `src/components/audio/LoopingBgmControl.tsx` | 两处遗漏 → ① 卸载 cleanup 显式 pause + 清 src/load；② portal 重建元素的 resolvedSrc cleanup 同步 pause 旧元素 | build/lint 绿；SPA 离站后 BGM 引用 disconnected+paused；4 路由烟扫 8/8 |
+
+- rules.md 新增「媒体纪律」条款（pause-on-unmount，portal 重建先停旧元素）。
+- 预期行为：离开首页黑洞 BGM 即止；进入大厅后点击任意处按既有设计启动大厅 BGM。
+
+### Commits（本仓库）
+
+1. `fix(web): BGM 离站串场——卸载与 portal 重建显式暂停 / pause BGM on unmount & portal rebuild`
+2. `docs(ui-polish): R13 修复台账与媒体纪律 / R13 fix ledger and media-lifecycle rule`
+- push：正常。
+
+---
+
 ## R12（收尾轮）· 用户手动叫停 → 暂停打磨
 
 ### 隔轮评审（R11 改动）

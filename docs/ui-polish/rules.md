@@ -39,6 +39,7 @@
 ## 6. 动效与排版
 
 - 时长 token：`--duration-fast: 200ms`（hover/微交互 150–300ms 区间）；缓动 `--ease-cinematic`；氛围呼吸类循环动效统一 `--duration-ambient: 2600ms`（R7 起，lobby 光晕已挂接）；一次性装饰扫光/电影感过渡挂 `--duration-slow: 900ms`（R10 起，lobby 光痕由 0.88s 归一至该令牌）；低于秒级的重复闪烁禁用。
+- 媒体纪律（R13 起）：`<audio>/<video>` 组件必须在卸载 cleanup 显式 `pause()`——浏览器不会自动暂停被移出 DOM 的媒体元素（前台曾现「离开首页后黑洞 BGM 串场」）；portal 重建元素时同样要先停旧元素。
 - 死样式纪律（R11 起）：keyframes/工具类无任何组件引用即删（删繁就简）；删除前 grep 全仓取证。
 - 字体：正文 Geist Sans；数据/坐标 `font-mono-data`（JetBrains Mono + tnum）；品牌大字 Orbitron（`.aster-title`）。
 - 间距/圆角走 token：`--radius` 阶梯、`max-w-aster`（1180px）容器。
