@@ -270,14 +270,34 @@ func _setup_mesh(mi: MeshInstance3D) -> void:
 func _locate_katana() -> void:
 	if skeleton == null:
 		skeleton = find_child("Skeleton3D", true, false) as Skeleton3D
-	if hand_socket == null and skeleton != null:
-		hand_socket = skeleton.get_node_or_null("Hand_R_Weapon_Socket") as BoneAttachment3D
+	if skeleton != null:
 		if hand_socket == null:
-			hand_socket = skeleton.find_child("Hand_R_Weapon_Socket", true, false) as BoneAttachment3D
-	if scabbard_socket == null and skeleton != null:
-		scabbard_socket = skeleton.get_node_or_null("Pelvis_L_Scabbard_Socket") as BoneAttachment3D
+			hand_socket = skeleton.get_node_or_null("Hand_R_Weapon_Socket") as BoneAttachment3D
+			if hand_socket == null:
+				hand_socket = skeleton.find_child("Hand_R_Weapon_Socket", true, false) as BoneAttachment3D
+			if hand_socket == null:
+				var b_idx := skeleton.find_bone("Hand_R_Weapon_Socket")
+				if b_idx == -1:
+					b_idx = skeleton.find_bone("R_Hand")
+				if b_idx != -1:
+					var ba := BoneAttachment3D.new()
+					ba.name = "Hand_R_Weapon_Socket"
+					ba.bone_name = skeleton.get_bone_name(b_idx)
+					skeleton.add_child(ba)
+					hand_socket = ba
+
 		if scabbard_socket == null:
-			scabbard_socket = skeleton.find_child("Pelvis_L_Scabbard_Socket", true, false) as BoneAttachment3D
+			scabbard_socket = skeleton.get_node_or_null("Pelvis_L_Scabbard_Socket") as BoneAttachment3D
+			if scabbard_socket == null:
+				scabbard_socket = skeleton.find_child("Pelvis_L_Scabbard_Socket", true, false) as BoneAttachment3D
+			if scabbard_socket == null:
+				var s_idx := skeleton.find_bone("Pelvis_L_Scabbard_Socket")
+				if s_idx != -1:
+					var ba := BoneAttachment3D.new()
+					ba.name = "Pelvis_L_Scabbard_Socket"
+					ba.bone_name = skeleton.get_bone_name(s_idx)
+					skeleton.add_child(ba)
+					scabbard_socket = ba
 
 	# 刀鞘定位与纳刀基准标定
 	var scab: MeshInstance3D = null
