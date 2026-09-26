@@ -66,7 +66,8 @@ export class StarFieldBg {
       }
       return stops[stops.length - 1].c
     }
-    const strips = 64
+    // 显式标注 number：否则 TS 会把 64 收窄成字面量类型，令下方 strips === 1 判定报「无重叠」错误
+    const strips: number = 64
     const sh = HEIGHT / strips
     for (let i = 0; i < strips; i++) {
       const p = strips === 1 ? 0 : i / (strips - 1)
@@ -79,9 +80,9 @@ export class StarFieldBg {
   private buildL1() {
     const rnd = mulberry32(20260810)
     const blobs = [
-      { x: WIDTH * 0.25, y: HEIGHT * 0.22, r: 320, color: PALETTE.azurite, a: 0.1 },
-      { x: WIDTH * 0.78, y: HEIGHT * 0.35, r: 280, color: PALETTE.violet, a: 0.09 },
-      { x: WIDTH * 0.5, y: HEIGHT * 0.78, r: 360, color: PALETTE.cyan, a: 0.07 },
+      { x: WIDTH * 0.25, y: HEIGHT * 0.22, r: 320, color: PALETTE.amber, a: 0.11 },
+      { x: WIDTH * 0.78, y: HEIGHT * 0.35, r: 280, color: PALETTE.jade, a: 0.09 },
+      { x: WIDTH * 0.5, y: HEIGHT * 0.78, r: 360, color: PALETTE.amberBright, a: 0.06 },
     ]
     for (const b of blobs) {
       const c = new Container()
@@ -135,15 +136,15 @@ export class StarFieldBg {
     const grid = new Graphics()
     const step = 64
     for (let x = 0; x <= WIDTH; x += step) {
-      grid.moveTo(x, 0).lineTo(x, HEIGHT).stroke({ width: 1, color: 0x9bb0ff, alpha: 0.05 })
+      grid.moveTo(x, 0).lineTo(x, HEIGHT).stroke({ width: 1, color: PALETTE.line, alpha: 0.06 })
     }
     for (let y = 0; y <= HEIGHT; y += step) {
-      grid.moveTo(0, y).lineTo(WIDTH, y).stroke({ width: 1, color: 0x9bb0ff, alpha: 0.05 })
+      grid.moveTo(0, y).lineTo(WIDTH, y).stroke({ width: 1, color: PALETTE.line, alpha: 0.06 })
     }
     this.container.addChild(grid)
 
     const scan = new Graphics()
-    scan.rect(0, 0, WIDTH, 2).fill({ color: PALETTE.cyan, alpha: 0.5 })
+    scan.rect(0, 0, WIDTH, 2).fill({ color: PALETTE.amber, alpha: 0.45 })
     this.container.addChild(scan)
     return scan
   }

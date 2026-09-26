@@ -11,23 +11,36 @@ export const WIDTH = 720
 export const HEIGHT = 1280
 
 /**
- * 星海星云三色锚点（Stage Spec §6.1）—— 游戏内物体功能色。
- * 紫色（violet）只做 UI 专属，游戏内物体层退出紫粉色域。
+ * 街机统一色板 —— 与 app/globals.css 的 --amber-* / --ink-* / --arcade-* 对齐。
+ *
+ * 2026-09-27 换色：原表以 azurite(青) 为主色，另用 violet/cyan 画星云与扫描线，
+ * 实测在近乎空白的画布上呈现为「深蓝 + 青 + 紫」——正是主站已清除的 AI 味组合，
+ * 与冷黑 + 琥珀的品牌体系不符（Stage Spec §6.1 的三色锚点在此作废，以本条为准）。
+ *
+ * 角色分工：琥珀 = 玩家/能量/奖励（品牌主色）；翠玉 = 普通晶体（本游戏副色）；
+ * 信号红 = 危险；信号绿 = 治疗/过关；冷灰 = 中性描边。
  */
 export const PALETTE = {
-  azurite: 0x5ac8f0, // 友方 / 玩家 / 能量（球、发射器、HP、普通晶体）
-  amber: 0xf5b83a, // 暴击 / 奖励 / 弱点（共鸣核心、遗物稀有度金）
-  magenta: 0xe8445f, // 危险 / 敌人 / 伤害（敌人本体、伤害数字、Boss）
-  emerald: 0x34d399, // 治疗 / 过关 / 生命星云
-  violet: 0xa855f7, // UI 专属（按钮 / focus / 玻璃描边）
-  cyan: 0x38bdf8, // UI 次级强调
+  /** 玩家 / 发射器 / 陨星 / 能量 / 奖励（品牌主色） */
+  amber: 0xd8a33c,
+  amberBright: 0xe9be69,
+  amberPale: 0xf2d79b,
+  /** 普通晶体（本游戏副色：翠玉） */
+  jade: 0x7fb39e,
+  jadeLight: 0xcfe8de,
+  /** 危险 / 敌人 / 伤害（信号色） */
+  danger: 0xc0503a,
+  /** 治疗 / 过关（信号色） */
+  life: 0x4f8d6b,
+  /** 中性描边（冷灰，替代原淡蓝 0xc7ecff） */
+  line: 0x8c949e,
 } as const
 
-/** 深空背景 L0 三段垂直渐变（hex 近似 Stage Spec §6.2 的 oklch） */
+/** 深空背景 L0 三段垂直渐变（冷中性黑，已去紫相） */
 export const BG_GRADIENT = {
-  top: 0x080912,
-  mid: 0x0e1130,
-  bot: 0x05060f,
+  top: 0x08090d,
+  mid: 0x0b0d12,
+  bot: 0x050608,
 } as const
 
 /**

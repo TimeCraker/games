@@ -8,16 +8,16 @@ import { ParticleSystem } from "./ParticleSystem"
 function paintCrystal(g: Graphics): void {
   const r = PHYS.pegRadius
   const pts = [0, -r * 1.15, r, -r * 0.55, r, r * 0.55, 0, r * 1.15, -r, r * 0.55, -r, -r * 0.55]
-  g.poly(pts).fill({ color: PALETTE.azurite, alpha: 0.5 })
-  g.poly(pts).stroke({ width: 1.3, color: 0xc7ecff, alpha: 0.85 })
+  g.poly(pts).fill({ color: PALETTE.jade, alpha: 0.5 })
+  g.poly(pts).stroke({ width: 1.3, color: PALETTE.jadeLight, alpha: 0.85 })
   g.circle(0, -r * 0.2, r * 0.32).fill({ color: 0xffffff, alpha: 0.5 })
 }
 
 /** 画陨星（Azurite 球 + 外辉光 + 高光）。 */
 function paintBall(g: Graphics): void {
   const r = PHYS.ballRadius
-  g.circle(0, 0, r * 1.85).fill({ color: PALETTE.azurite, alpha: 0.18 })
-  g.circle(0, 0, r).fill({ color: PALETTE.azurite, alpha: 0.95 })
+  g.circle(0, 0, r * 1.85).fill({ color: PALETTE.amber, alpha: 0.18 })
+  g.circle(0, 0, r).fill({ color: PALETTE.amber, alpha: 0.95 })
   g.circle(0, 0, r).stroke({ width: 1.2, color: 0xffffff, alpha: 0.9 })
   g.circle(-r * 0.3, -r * 0.35, r * 0.32).fill({ color: 0xffffff, alpha: 0.85 })
 }
@@ -82,7 +82,7 @@ export class BattleScene {
       this.shake(1.6)
     } else if (e.type === "node-clear") {
       this.particles.burst(e.x, e.y, PALETTE.amber, 22, 1.6)
-      this.particles.burst(WIDTH / 2, HEIGHT * 0.55, PALETTE.azurite, 18, 1.4)
+      this.particles.burst(WIDTH / 2, HEIGHT * 0.55, PALETTE.jade, 18, 1.4)
       this.shake(6)
       this.showToast("节点清空 · NODE CLEAR")
     } else if (e.type === "launch") {
@@ -91,7 +91,7 @@ export class BattleScene {
   }
 
   private colorForKind(kind: string): number {
-    return kind === "peg-crystal" ? PALETTE.azurite : PALETTE.amber
+    return kind === "peg-crystal" ? PALETTE.jade : PALETTE.amber
   }
 
   private showToast(text: string): void {
@@ -145,7 +145,7 @@ export class BattleScene {
       const alpha = after
         ? Math.max(0.06, 0.3 - (i - firstHit) * 0.02)
         : Math.max(0.12, 0.5 - (i / Math.max(1, points.length - 1)) * 0.3)
-      this.trajectory.circle(p.x, p.y, after ? 1.8 : 2.4).fill({ color: 0xc7ecff, alpha })
+      this.trajectory.circle(p.x, p.y, after ? 1.8 : 2.4).fill({ color: 0xf2d79b, alpha })
     }
     if (firstHit >= 0 && firstHit < points.length) {
       const p = points[firstHit]
@@ -202,7 +202,7 @@ export class BattleScene {
         const t = i / Math.max(1, this.trail.length - 1)
         this.trailGraphics
           .circle(p.x, p.y, 1.4 + t * 2.4)
-          .fill({ color: PALETTE.azurite, alpha: 0.06 + t * 0.22 })
+          .fill({ color: PALETTE.amberBright, alpha: 0.06 + t * 0.22 })
       }
     } else if (this.trail.length) {
       this.trail.length = 0
@@ -211,21 +211,21 @@ export class BattleScene {
 
   private paintLauncherBase(): Graphics {
     const g = new Graphics()
-    g.circle(0, 0, 16).fill({ color: 0x0e1130, alpha: 0.85 })
-    g.circle(0, 0, 16).stroke({ width: 1.6, color: PALETTE.azurite, alpha: 0.8 })
-    g.circle(0, 0, 6).fill({ color: PALETTE.azurite, alpha: 0.95 })
+    g.circle(0, 0, 16).fill({ color: 0x111316, alpha: 0.85 })
+    g.circle(0, 0, 16).stroke({ width: 1.6, color: PALETTE.amber, alpha: 0.8 })
+    g.circle(0, 0, 6).fill({ color: PALETTE.amber, alpha: 0.95 })
     return g
   }
 
   private paintLauncherBarrel(): Graphics {
     const g = new Graphics()
-    g.moveTo(0, 4).lineTo(0, 30).stroke({ width: 3, color: PALETTE.azurite, alpha: 0.9 })
+    g.moveTo(0, 4).lineTo(0, 30).stroke({ width: 3, color: PALETTE.amber, alpha: 0.9 })
     g
       .moveTo(0, 30)
       .lineTo(-4, 24)
       .moveTo(0, 30)
       .lineTo(4, 24)
-      .stroke({ width: 2, color: PALETTE.azurite, alpha: 0.8 })
+      .stroke({ width: 2, color: PALETTE.amber, alpha: 0.8 })
     return g
   }
 

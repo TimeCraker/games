@@ -8,6 +8,7 @@ import { GameBackButton } from "@/src/components/ui/GameBackButton"
 import type { GameEngine } from "./engine/GameEngine"
 import { HEIGHT, WIDTH } from "./constants"
 import { StaGameShell } from "./StaGameShell"
+import { StaHud } from "./StaHud"
 import { StaPixiApp } from "./render/StaPixiApp"
 
 /**
@@ -26,6 +27,9 @@ export function StaRoot() {
   // 注：StaPixiApp.gameEngine 是 getter，其类型已是返回值本身，
   // 套 ReturnType<> 会让 tsc 报「不是函数类型」，故直接标注类类型。
   const engineRef = React.useRef<GameEngine | null>(null)
+  // HUD 需要引擎实例才能轮询读数。不能直接在渲染期读 engineRef（React 规则：
+  // "Cannot access refs during render"），故挂载完成后再落到 state。
+  const [engine, setEngine] = React.useState<GameEngine | null>(null)
   const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
@@ -54,6 +58,7 @@ export function StaRoot() {
           return
         }
         engineRef.current = pixi.gameEngine
+        setEngine(pixi.gameEngine)
       })
       .catch((e: unknown) => {
         if (!cancelled) setError(e instanceof Error ? e.message : String(e))
@@ -65,6 +70,7 @@ export function StaRoot() {
       pixi.destroy()
       pixiRef.current = null
       engineRef.current = null
+      setEngine(null)
     }
   }, [])
 
@@ -111,6 +117,9 @@ export function StaRoot() {
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
         />
+
+        {/* HUD 覆盖在画布之上；pointer-events-none，不抢瞄准/发射的指针事件 */}
+        <StaHud engine={engine} />
 
         {/* 品牌字随画布缩放（装饰）；返回钮必须保持真实 44px+ 命中区，
             故移出缩放容器用 floating 变体固定在安全区左上角 */}

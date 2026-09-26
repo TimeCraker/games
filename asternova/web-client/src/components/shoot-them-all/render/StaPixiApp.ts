@@ -29,7 +29,7 @@ export class StaPixiApp {
       width: WIDTH,
       height: HEIGHT,
       antialias: true,
-      background: 0x05060f,
+      background: 0x050608,
       resolution: Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 2),
       autoDensity: true,
       preference: "webgl",
@@ -59,6 +59,13 @@ export class StaPixiApp {
 
     const engine = new GameEngine()
     this.engine = engine
+
+    // 只读调试钩子：本作的内部状态（球速 / 相位 / 物理是否真的在步进）无法从 DOM 观察，
+    // 而自动化探针又必须能断言这些量（历史上正是靠它才发现「球卡在发射位、物理未推进」）。
+    // 仅挂引用，不改任何游戏逻辑；__ 前缀避免与业务命名冲突。
+    if (typeof window !== "undefined") {
+      ;(window as unknown as { __staEngine?: GameEngine }).__staEngine = engine
+    }
     const battle = new BattleScene(engine)
     this.battle = battle
     engine.onEvent = battle.handleEngineEvent
@@ -72,6 +79,9 @@ export class StaPixiApp {
   }
 
   destroy(): void {
+    if (typeof window !== "undefined") {
+      delete (window as unknown as { __staEngine?: GameEngine }).__staEngine
+    }
     this.engine?.destroy()
     this.engine = null
     this.battle = null

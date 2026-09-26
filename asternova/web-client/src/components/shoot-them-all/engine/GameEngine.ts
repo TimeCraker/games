@@ -8,14 +8,31 @@ import { PhysicsWorld } from "./PhysicsWorld"
 
 export type StaPhase = "aiming" | "flying" | "resolving" | "game-over"
 
+/** HUD 只读快照（React 层按 ~8Hz 轮询，避免每帧 setState）。 */
+export type StaHudState = {
+  phase: StaPhase
+  /** 当前节点序号，从 1 起 */
+  node: number
+  score: number
+  /** 累计出手数 */
+  shots: number
+  /** 本次出手已撞碎的晶体数（连击） */
+  combo: number
+  bestCombo: number
+  pegsLeft: number
+  pegsTotal: number
+  /** 已清除比例 0~1 */
+  clearRatio: number
+}
+
 /** 引擎事件（引擎层零 Pixi；渲染层订阅以触发粒子/屏震/音效）。 */
 export type EngineEvent =
   | { type: "launch" }
   | { type: "peg-broken"; x: number; y: number; kind: string }
   | { type: "node-clear"; x: number; y: number }
 
-/** 75% 清除即过关（Stage Spec §3.8 晶体节点）。 */
-const NODE_CLEAR_RATIO = 0.75
+/** 75% 清除即过关（Stage Spec §3.8 晶体节点）。HUD 的过关刻度线共用此值。 */
+export const NODE_CLEAR_RATIO = 0.75
 /** 清空后停留庆祝再进入下一簇（毫秒）。 */
 const RESOLVE_MS = 1100
 
@@ -32,6 +49,13 @@ export class GameEngine {
   phase: StaPhase = "aiming"
   aimAngle = 0
   score = 0
+  /** 当前节点序号（1 起，每次节点清空后 +1） */
+  node = 1
+  /** 累计出手数 */
+  shots = 0
+  /** 本次出手的连击数（撞碎一颗 +1，出手时归零） */
+  combo = 0
+  bestCombo = 0
   /** 供渲染层订阅的事件回调。 */
   onEvent: ((e: EngineEvent) => void) | null = null
 
@@ -53,6 +77,35 @@ export class GameEngine {
     return this.ball
   }
 
+  /** 本节点剩余晶体数（HUD 用） */
+  get pegsLeft(): number {
+    return this.registry.countKind("peg-crystal")
+  }
+
+  get pegsTotalCount(): number {
+    return this.pegsTotal
+  }
+
+  /**
+   * HUD 只读快照。这些数值全部来自引擎真实状态，
+   * 不是为了让 HUD「好看」而编的占位数字。
+   */
+  hudSnapshot(): StaHudState {
+    const left = this.pegsLeft
+    const total = this.pegsTotal
+    return {
+      phase: this.phase,
+      node: this.node,
+      score: this.score,
+      shots: this.shots,
+      combo: this.combo,
+      bestCombo: this.bestCombo,
+      pegsLeft: left,
+      pegsTotal: total,
+      clearRatio: total > 0 ? (total - left) / total : 0,
+    }
+  }
+
   predictTrajectory(): TrajectoryResult {
     if (this.phase !== "aiming") return { points: [], firstHit: -1 }
     return this.predictor.predict(this.aimAngle)
@@ -68,6 +121,8 @@ export class GameEngine {
 
   launch(): void {
     if (this.phase !== "aiming" || !this.ball) return
+    this.shots += 1
+    this.combo = 0
     const v = PHYS.v0
     Matter.Body.setStatic(this.ball.body, false)
     Matter.Body.setVelocity(this.ball.body, {
@@ -120,6 +175,7 @@ export class GameEngine {
     Matter.Body.setAngularVelocity(this.ball.body, 0)
     this.phase = "aiming"
     this.ballStopSince = 0
+    this.combo = 0
   }
 
   private triggerNodeClear(): void {
@@ -138,6 +194,7 @@ export class GameEngine {
 
   /** resolving 结束：清残余钉 → 生新簇 → 球回锚 → aiming。 */
   private completeNode(): void {
+    this.node += 1
     this.clearPegs()
     this.spawnPegs()
     this.respawnBall()
@@ -169,9 +226,20 @@ export class GameEngine {
   }
 
   private spawnBall(): void {
+    // ⚠️ 不要在这里写 isStatic: true（2026-09-27 修）。
+    //
+    // matter-js 0.20 的 Body.create 先在 Common.extend 阶段把 options.isStatic 拷进 body，
+    // 随后 _initProperties 才调用 Body.setStatic(body, true)；而 setStatic 记录恢复快照的
+    // 条件是 `if (!part.isStatic)` —— 此时它已经是 true，于是 `_original` 从未被记录。
+    // 后果：之后任何 setStatic(body, false) 都命中 `else if (part._original)` 为空而变成空操作，
+    // 质量/摩擦/弹性永远停在静态值（mass=Infinity、friction=1、restitution=0）。
+    // 一旦 launch() 给它赋速度，重力累加得到 force=Infinity，Body.update 里
+    // `force / mass` = Infinity/Infinity = NaN，位置与速度永久污染成 NaN：
+    // 球的速度判定 / 出界判定 / 静止判定全部失效，**每次打开页面只能开一炮，之后永久卡死**。
+    //
+    // 正确做法：先建动态体，再显式 setStatic(true)，这样 _original 才会被正确记录。
     const body = Matter.Bodies.circle(PHYS.launchAnchor.x, PHYS.launchAnchor.y, PHYS.ballRadius, {
       label: "meteor",
-      isStatic: true,
       restitution: PHYS.ballRestitution,
       friction: PHYS.ballFriction,
       frictionAir: PHYS.ballFrictionAir,
@@ -179,6 +247,9 @@ export class GameEngine {
       slop: PHYS.ballSlop,
     })
     Matter.Composite.add(this.physics.world, body)
+    // 关键：显式转静态，这样 setStatic 才会把动态期的质量/摩擦/弹性记进 _original，
+    // launch() 里的 setStatic(body, false) 才有东西可恢复。
+    Matter.Body.setStatic(body, true)
     const e: Entity = { id: body.id, kind: "ball", body, hp: 1, alive: true }
     this.registry.register(e)
     this.ball = e
@@ -211,6 +282,8 @@ export class GameEngine {
       Matter.Composite.remove(this.physics.world, body)
       this.registry.unregister(body.id)
       this.score += 100
+      this.combo += 1
+      if (this.combo > this.bestCombo) this.bestCombo = this.combo
       this.onEvent?.({ type: "peg-broken", x, y, kind: e.kind })
 
       // 75% 清空检测
