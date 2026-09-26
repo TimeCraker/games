@@ -15,7 +15,7 @@ const DEFAULT_LIB = [1,2,0,3];   // 02剑姬 · 03星空 · 01Q版女仆 · 04�
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.40';
+const CACHE_VER = '2.41';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -134,27 +134,55 @@ const MUSIC_LIST = [
 ];
 let bgAudio=null, musicIdx=0;
 
+// ---------- 安全存储 / Safe storage（读写失败与损坏兜底 + 版本迁移信封） ----------
+const STORE_VERSION = '2';
+const store = (()=>{
+  let avail = true;
+  try{ localStorage.setItem('__xxl_probe__','1'); localStorage.removeItem('__xxl_probe__'); }
+  catch(e){ avail = false; }
+  const mem = {};
+  function get(key){ try{ return avail ? localStorage.getItem(key) : (key in mem ? mem[key] : null); }catch(e){ return (key in mem ? mem[key] : null); } }
+  function set(key,val){ try{ if(avail) localStorage.setItem(key,String(val)); }catch(e){} mem[key]=String(val); }
+  function remove(key){ try{ if(avail) localStorage.removeItem(key); }catch(e){} delete mem[key]; }
+  return { get, set, remove };
+})();
+// 解析 JSON：损坏时备份到 <key>.corrupt 再回退默认，绝不静默清空
+function loadJSON(key, fallback){
+  const raw = store.get(key);
+  if(raw == null) return fallback;
+  try{ return JSON.parse(raw); }
+  catch(e){ try{ store.set(key+'.corrupt', raw); }catch(_){} store.remove(key); return fallback; }
+}
+function saveJSON(key, val){ try{ store.set(key, JSON.stringify(val)); return true; }catch(e){ return false; } }
+function loadJSONObj(key){ const v = loadJSON(key, {}); return (v && typeof v==='object' && !Array.isArray(v)) ? v : {}; }
+function loadJSONArr(key){ const v = loadJSON(key, []); return Array.isArray(v) ? v : []; }
+function migrateStore(){
+  const v = store.get('xxl-save-v');
+  if(v == null) store.set('xxl-save-v', STORE_VERSION);
+  // 未来版本阶梯迁移在此按 STORE_VERSION 递增追加
+}
+
 const SAVE = {
-  get unlocked(){ return +localStorage.getItem('xxl-unlocked')||1; },
-  set unlocked(v){ localStorage.setItem('xxl-unlocked', v); },
-  stars: JSON.parse(localStorage.getItem('xxl-stars')||'{}'),
-  best: JSON.parse(localStorage.getItem('xxl-best')||'{}'),
-  saveStars(lvl,s){ this.stars[lvl]=Math.max(this.stars[lvl]||0,s); localStorage.setItem('xxl-stars',JSON.stringify(this.stars)); },
-  saveBest(lvl,s){ this.best[lvl]=Math.max(this.best[lvl]||0,s); localStorage.setItem('xxl-best',JSON.stringify(this.best)); },
+  get unlocked(){ const v=+store.get('xxl-unlocked'); return (v>=1)?v:1; },
+  set unlocked(v){ store.set('xxl-unlocked', v); },
+  stars: loadJSONObj('xxl-stars'),
+  best: loadJSONObj('xxl-best'),
+  saveStars(lvl,s){ this.stars[lvl]=Math.max(this.stars[lvl]||0,s); saveJSON('xxl-stars', this.stars); },
+  saveBest(lvl,s){ this.best[lvl]=Math.max(this.best[lvl]||0,s); saveJSON('xxl-best', this.best); },
 };
-const themePref = localStorage.getItem('xxl-theme')||'dark';
-const bgPref = localStorage.getItem('xxl-bg')||'cloud';
-const soundPref = localStorage.getItem('xxl-sound'); soundOn = soundPref===null?true:soundPref==='1';
+const themePref = store.get('xxl-theme')||'dark';
+const bgPref = store.get('xxl-bg')||'cloud';
+const soundPref = store.get('xxl-sound'); soundOn = soundPref===null?true:soundPref==='1';
 
 // 设置
 const settings = {
-  sfx: localStorage.getItem('xxl-sfx')!=='0',
-  music: localStorage.getItem('xxl-music')!=='0',
-  volume: +localStorage.getItem('xxl-vol')||45,
-  motion: localStorage.getItem('xxl-motion')!=='0',
-  haptic: localStorage.getItem('xxl-haptic')!=='0',
-  quality: localStorage.getItem('xxl-quality')||'auto',
-  save(){ localStorage.setItem('xxl-sfx',this.sfx?'1':'0'); localStorage.setItem('xxl-music',this.music?'1':'0'); localStorage.setItem('xxl-vol',this.volume); localStorage.setItem('xxl-motion',this.motion?'1':'0'); localStorage.setItem('xxl-haptic',this.haptic?'1':'0'); localStorage.setItem('xxl-quality',this.quality); }
+  sfx: store.get('xxl-sfx')!=='0',
+  music: store.get('xxl-music')!=='0',
+  volume: +store.get('xxl-vol')||45,
+  motion: store.get('xxl-motion')!=='0',
+  haptic: store.get('xxl-haptic')!=='0',
+  quality: store.get('xxl-quality')||'auto',
+  save(){ store.set('xxl-sfx',this.sfx?'1':'0'); store.set('xxl-music',this.music?'1':'0'); store.set('xxl-vol',this.volume); store.set('xxl-motion',this.motion?'1':'0'); store.set('xxl-haptic',this.haptic?'1':'0'); store.set('xxl-quality',this.quality); }
 };
 soundOn = settings.sfx;
 
@@ -194,12 +222,12 @@ const ACHIEVEMENTS = [
   { id:'total500', name:'消消达人', desc:'累计消除 500 个方块', icon:'chart' },
   { id:'daily_win', name:'每日一题', desc:'完成一次每日挑战', icon:'calendarDay' },
 ];
-const achState = JSON.parse(localStorage.getItem('xxl-ach')||'{}');
-let totalClears = +localStorage.getItem('xxl-total')||0;
+const achState = loadJSONObj('xxl-ach');
+let totalClears = +store.get('xxl-total')||0;
 function unlockAchievement(id){
   if(achState[id]) return;
   const a = ACHIEVEMENTS.find(x=>x.id===id); if(!a) return;
-  achState[id]=Date.now(); localStorage.setItem('xxl-ach',JSON.stringify(achState));
+  achState[id]=Date.now(); saveJSON('xxl-ach', achState);
   showAchievement(a);
 }
 function showAchievement(a){
@@ -378,7 +406,7 @@ async function cascade(){
     for(const k of collectSpecialTriggers(matched)) toRemove.add(k);
     toRemove=expandSpecials(toRemove);
     const gain=scoreFor(toRemove.size,combo);
-    score+=gain; stats.clears+=toRemove.size; totalClears+=toRemove.size; localStorage.setItem('xxl-total',totalClears);
+    score+=gain; stats.clears+=toRemove.size; totalClears+=toRemove.size; store.set('xxl-total',totalClears);
     updateHUD();
     const center=centerOf(toRemove);
     if(mode===M_TIMED&&combo>=2&&timeBonusTotal<TIME_BONUS_CAP){
@@ -754,7 +782,7 @@ function startBgMusic(){
 function stopBgMusic(){ if(bgAudio){ bgAudio.pause(); } SynthMusic.stop(); }
 function switchMusic(idx){
   musicIdx = (idx+MUSIC_LIST.length)%MUSIC_LIST.length;
-  localStorage.setItem('xxl-music-idx',musicIdx);
+  store.set('xxl-music-idx',musicIdx);
   if(bgAudio) bgAudio.pause();
   SynthMusic.stop();
   if(settings.music&&state==='playing') startBgMusic();
@@ -786,7 +814,7 @@ function setTheme(t){
   const mti=$('menuThemeIcon'); if(mti) mti.innerHTML=ic(t==='light'?'moon':'sun');
   const meta=document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute('content', t==='light'?'#f4f1e9':'#0b0e18');
-  localStorage.setItem('xxl-theme',t);
+  store.set('xxl-theme',t);
 }
 function setBg(key){
   document.documentElement.dataset.bg=key.startsWith('photo')?'photo':key;
@@ -799,7 +827,7 @@ function setBg(key){
   $('bgBtn').innerHTML = ic(cur.icon);
   const mb=$('menuBgLabel'); if(mb) mb.innerHTML = '背景 <span class="util-sub">· '+cur.name+'</span>';
   const mbi=$('menuBgIcon'); if(mbi) mbi.innerHTML = ic(cur.icon);
-  localStorage.setItem('xxl-bg',key);
+  store.set('xxl-bg',key);
   syncBgStars();
 }
 // 刷新资源: 清 SW 缓存 + 注销 SW + 强制 reload (普通用户无法 F12 清缓存的兜底)
@@ -970,21 +998,21 @@ function confetti(){ const colors=ACCENT; for(let i=0;i<70;i++){ particles.push(
 
 // ---------- 模式系统（无尽/限时/每日 + 本地排行榜） ----------
 const LB_KEY={endless:'xxl-lb-endless',timed:'xxl-lb-timed',daily:'xxl-lb-daily'};
-function lbGet(m){ try{ return JSON.parse(localStorage.getItem(LB_KEY[m])||'[]'); }catch(e){ return []; } }
+function lbGet(m){ return loadJSONArr(LB_KEY[m]); }
 function lbSubmit(m, obj){
   const list=lbGet(m);
   const entry={score:obj.score, combo:obj.maxCombo, ts:Date.now()};
   list.push(entry);
   list.sort((a,b)=> b.score-a.score || b.ts-a.ts);
   const top=list.slice(0,10);
-  try{ localStorage.setItem(LB_KEY[m], JSON.stringify(top)); }catch(e){}
+  saveJSON(LB_KEY[m], top);
   return top.indexOf(entry)+1; // 0 = 未进榜
 }
-function dailyRecall(){ try{ return JSON.parse(localStorage.getItem('xxl-daily-results')||'{}'); }catch(e){ return {}; } }
+function dailyRecall(){ return loadJSONObj('xxl-daily-results'); }
 function dailyStash(score){
   const r=dailyRecall(); const key=todayKey(); const prev=(r[key]&&r[key].score)||0;
   r[key]={score:Math.max(prev,score), ts:Date.now()};
-  try{ localStorage.setItem('xxl-daily-results', JSON.stringify(r)); }catch(e){}
+  saveJSON('xxl-daily-results', r);
 }
 function fmtTs(ts){ const d=new Date(ts); return (d.getMonth()+1)+'/'+d.getDate()+' '+(d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes(); }
 
@@ -1138,8 +1166,8 @@ document.getElementById('modeEndMenu').onclick=()=>{ hideAllModal(); gotoMenu();
 document.getElementById('pauseEndBtn').onclick=()=>{ hideAllModal(); finishMode(); };
 // ---------- 数据统计 + 成绩分享卡片 ----------
 const STATS = {
-  get(){ try{ return JSON.parse(localStorage.getItem('xxl-stats')||'null')||{}; }catch(e){ return {}; } },
-  set(v){ try{ localStorage.setItem('xxl-stats', JSON.stringify(v)); }catch(e){} },
+  get(){ return loadJSONObj('xxl-stats'); },
+  set(v){ saveJSON('xxl-stats', v); },
   bump(fn){ const s=STATS.get(); fn(s); STATS.set(s); },
 };
 let playStartTs=0, sessionTimeMs=0;
@@ -1492,15 +1520,15 @@ const SkinDB = (() => {
         tx.onerror=()=>res(null);
       });
     }catch(e){}
-    try{ localStorage.removeItem(LS); }catch(e){}
+    store.remove(LS);
   }
-  function lsGet(){ try{ return JSON.parse(localStorage.getItem(LS)||'null'); }catch(e){ return null; } }
-  function lsSet(v){ try{ localStorage.setItem(LS,JSON.stringify(v)); return true; }catch(e){ return false; } }
+  function lsGet(){ return loadJSON(LS, null); }
+  function lsSet(v){ return saveJSON(LS, v); }
   return { get:get, set:set, clear:clear };
 })();
 
 let skinSet=null;
-const skinActiveFlag = ()=> localStorage.getItem('xxl-skin-active')==='custom';
+const skinActiveFlag = ()=> store.get('xxl-skin-active')==='custom';
 const skinCustom = ()=> !!(skinSet&&skinSet.imgs&&skinSet.imgs.filter(Boolean).length===TYPES);
 const skinActive = ()=> skinActiveFlag()&&skinCustom();
 function faceSrcOf(i){ return skinActive()? skinSet.imgs[i] : FACE_IMG[i]; }
@@ -1745,7 +1773,7 @@ async function applySkin(){
   skinSet={v:1, imgs:cropDraft.slice(), ts:Date.now()};
   const ok=await SkinDB.set(skinSet);
   if(!ok) showToast('存储空间不足，皮肤仅本次生效');
-  localStorage.setItem('xxl-skin-active','custom');
+  store.set('xxl-skin-active','custom');
   applySkinToBoard();
   predecodeFaces();
   renderSkinGrid();
@@ -1753,7 +1781,7 @@ async function applySkin(){
   showToast('自定义皮肤已应用！');
 }
 function resetSkin(){
-  localStorage.setItem('xxl-skin-active','default');
+  store.set('xxl-skin-active','default');
   applySkinToBoard();
   predecodeFaces();
   for(let i=0;i<TYPES;i++){ pendingSrc[i]=null; slotFromFile[i]=false; libSel[i]=DEFAULT_LIB[i]; cropDraft[i]=LIB_FACES[DEFAULT_LIB[i]]; }
@@ -1790,6 +1818,7 @@ document.getElementById('cropIn').onclick=()=>crop.zoomAt(180,180,1.25);
 document.getElementById('cropFit').onclick=()=>crop.fitCenter();
 // ---------- 启动 ----------
 function start(){
+  migrateStore();
   setTheme(themePref); setBg(bgPref);
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn); const gsb=$('gameSoundBtn'); if(gsb){ gsb.innerHTML=ic(soundOn?'sound':'mute'); gsb.classList.toggle('off',!soundOn); }
   $('pauseBtn').innerHTML=ic('pause'); $('levelsBack').innerHTML=ic('back');
@@ -1807,7 +1836,7 @@ function start(){
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
   syncBgStars();
   initBgStars(); syncBgStars();
-  musicIdx = Math.min(+localStorage.getItem('xxl-music-idx')||0, MUSIC_LIST.length-1);
+  musicIdx = Math.min(+store.get('xxl-music-idx')||0, MUSIC_LIST.length-1);
   // 预解码方块图，避免首次交换/洗牌解码抖动
   predecodeFaces(); loadSkin();
   gotoMenu();
