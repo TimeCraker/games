@@ -26,11 +26,10 @@
   --ring: oklch(0.708 0 0);
   /* ===== 2026-09-26 色板重构：Terminal Industrial =====
      删除 Tailwind 默认 violet-500 / sky-400 / indigo-500 / pink-400（AI 味来源），
-     收敛为「冷中性黑 + 单一琥珀」。旧名保留为兼容别名，仅重指向新色板。 */
-  --brand-violet: #D8A33C;
-  --brand-cyan: #8C949E;
-  --brand-indigo: #6B7480;
-  --brand-pink: #C0503A;
+     收敛为「冷中性黑 + 单一琥珀」。
+     2026-09-27：原先保留的 --brand-violet / -cyan / -indigo / -pink 四个兼容别名已删除 ——
+     它们名字是旧色相、值却是新品牌色，全仓零引用却持续误导（本次排查就为此多花了一轮）。
+     需要品牌色请直接用 --amber-* / --fog-* / --ink-* / --signal-*。 */
 
   /* Primitive：中性冷黑（无紫相） */
   --ink-1000: #050607;
@@ -76,11 +75,11 @@
     rgb(216 163 60 / 0.05),
     transparent 70%
   );
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
+  --chart-1: #D8A33C;
+  --chart-2: #C08069;
+  --chart-3: #7FB39E;
+  --chart-4: #A8BED6;
+  --chart-5: #8A6519;
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -102,11 +101,9 @@
   --elev-md: 0 12px 36px -8px rgb(0 0 0 / 0.6);
   --elev-lg: 0 24px 80px -16px rgb(0 0 0 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.06);
 
-  /* 单一琥珀辉光（原 glow-violet / glow-cyan 双色霓虹已废弃） */
+  /* 单一琥珀辉光（原双色霓虹辉光已废弃；其兼容别名一并删除） */
   --glow-accent: 0 0 0 1px rgb(216 163 60 / 0.25), 0 0 32px -8px rgb(216 163 60 / 0.35);
   --glow-accent-strong: 0 0 0 1px rgb(216 163 60 / 0.45), 0 0 44px -6px rgb(216 163 60 / 0.5);
-  --glow-violet: var(--glow-accent);  /* 兼容别名（nova-ball 旧引用） */
-  --glow-cyan: var(--glow-accent);
 
   /* 玻璃配方：收口 blur 8/12/28/40 + GlassPanel 硬编码 */
   --glass-bg: rgb(255 255 255 / 0.03);
@@ -147,10 +144,6 @@
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
-  --color-brand-cyan: var(--brand-cyan);
-  --color-brand-violet: var(--brand-violet);
-  --color-brand-indigo: var(--brand-indigo);
-  --color-brand-pink: var(--brand-pink);
   --font-display: var(--font-orbitron);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -226,8 +219,6 @@
   --shadow-lg: var(--elev-lg);
   --shadow-glow-accent: var(--glow-accent);
   --shadow-glow-accent-strong: var(--glow-accent-strong);
-  --shadow-glow-violet: var(--glow-accent);
-  --shadow-glow-cyan: var(--glow-accent);
 }
 
 /* Stage A：常量 token（字号阶梯 / 时长 / 容器 / 玻璃 blur）
@@ -283,11 +274,11 @@ body {
   --border: rgb(255 255 255 / 10%);
   --input: rgb(255 255 255 / 15%);
   --ring: #D8A33C;
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
+  --chart-1: #D8A33C;
+  --chart-2: #C08069;
+  --chart-3: #7FB39E;
+  --chart-4: #A8BED6;
+  --chart-5: #8A6519;
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -350,7 +341,8 @@ body {
   font-family: var(--font-orbitron), sans-serif;
   font-weight: 700;
   letter-spacing: 0.22em;
-  color: #f5f5ff;
+  /* 2026-09-27：原 #f5f5ff 是带紫相的淡白，改冷中性 paper */
+  color: var(--paper);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 .aster-slogan {

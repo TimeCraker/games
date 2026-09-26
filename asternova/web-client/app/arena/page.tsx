@@ -311,8 +311,9 @@ export default function ArenaPage() {
                 <div className="mx-auto mt-6 w-full max-w-xl">
                   <div className="h-2.5 overflow-hidden rounded-full border border-white/20 bg-white/10">
                     <div
-                      className="h-full rounded-full bg-[linear-gradient(90deg,rgba(255,255,255,0.85),rgba(167,243,208,0.92),rgba(147,197,253,0.9))] transition-[width] duration-300 ease-out"
-                      style={{ width: `${loadingProgress}%`, boxShadow: "0 0 24px rgba(167,243,208,0.35)" }}
+                      // 2026-09-27 收色：原为白→薄荷绿→天蓝渐变 + 绿光晕（AI 味来源之一）
+                      className="h-full rounded-full bg-[linear-gradient(90deg,rgba(216,163,60,0.5),rgba(233,190,105,0.95),rgba(216,163,60,0.65))] transition-[width] duration-300 ease-out"
+                      style={{ width: `${loadingProgress}%`, boxShadow: "0 0 24px rgba(216,163,60,0.4)" }}
                     />
                   </div>
                   <div className="mt-2 flex items-center justify-between text-[11px] tracking-[0.14em] text-white/55">
@@ -335,10 +336,11 @@ export default function ArenaPage() {
             key={countdown}
             className="font-display animate-in zoom-in-50 fade-in duration-500 text-[10rem] font-black italic tracking-tighter text-transparent"
             style={{
-              WebkitTextStroke: "2px rgba(255,255,255,0.8)",
-              backgroundImage: "linear-gradient(to bottom right, #f9a8d4, #a855f7, #67e8f9)",
+              // 2026-09-27 收色：原为粉→紫→青三色渐变 + 紫色辉光，是整站最扎眼的一处 AI 味
+              WebkitTextStroke: "2px rgba(255,255,255,0.75)",
+              backgroundImage: "linear-gradient(to bottom right, #FFF6E2, #E9BE69, #A87C24)",
               WebkitBackgroundClip: "text",
-              filter: "drop-shadow(0 0 40px rgba(168,85,247,0.6))",
+              filter: "drop-shadow(0 0 40px rgba(216,163,60,0.55))",
             }}
           >
             {countdown}

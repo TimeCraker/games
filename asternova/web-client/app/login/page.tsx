@@ -297,7 +297,8 @@ export default function LoginPage() {
       </div>
 
       <div className="pointer-events-none absolute inset-0 opacity-70">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(56,189,248,0.18),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(168,85,247,0.18),transparent_50%),radial-gradient(circle_at_40%_80%,rgba(34,197,94,0.10),transparent_45%)]" />
+        {/* 2026-09-27 收色：原为天蓝 / 紫 / 绿三色氛围斑，改冷黑底上的琥珀 + 单一信号绿点缀 */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(216,163,60,0.16),transparent_45%),radial-gradient(circle_at_80%_30%,rgba(233,190,105,0.12),transparent_50%),radial-gradient(circle_at_40%_80%,rgba(79,141,107,0.10),transparent_45%)]" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/70 to-black" />
       </div>
 
