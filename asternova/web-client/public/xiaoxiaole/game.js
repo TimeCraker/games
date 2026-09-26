@@ -15,7 +15,7 @@ const DEFAULT_LIB = [1,2,0,3];   // 02剑姬 · 03星空 · 01Q版女仆 · 04�
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4, CROSS:5 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.46';
+const CACHE_VER = '2.47';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -1682,6 +1682,20 @@ const pendingSrc=[null,null,null,null];
 const libSel=[-1,-1,-1,-1];        // 槽位对应的内置图库编号（-1 = 非图库来源）
 const slotFromFile=[false,false,false,false]; // 槽位是否来自上传图片
 
+// ---------- 方块样式开关（像素/描边/圆角）+ 持久化 ----------
+const tileStyle = loadJSONObj('xxl-tile-style');
+function applyTileStyle(){
+  const t=tileStyle;
+  document.documentElement.classList.toggle('tile-pixel', !!t.pixel);
+  document.documentElement.classList.toggle('tile-outline', !!t.outline);
+  document.documentElement.classList.toggle('tile-round', !!t.round);
+}
+function syncTileStyleUI(){
+  const p=$('tilePixel'); if(p) p.checked=!!tileStyle.pixel;
+  const o=$('tileOutline'); if(o) o.checked=!!tileStyle.outline;
+  const r=$('tileRound'); if(r) r.checked=!!tileStyle.round;
+}
+
 async function decodeSource(file){
   let source=null;
   if('createImageBitmap' in window){
@@ -1856,6 +1870,7 @@ function openSkinModal(){
   renderLibGrid();
   renameTarget=-1; syncSetSaveBtn();
   if($('setName')) $('setName').value='';
+  syncTileStyleUI();
   showModal('modalSkin');
   loadSavedSets();
   sfx.btn();
@@ -2017,6 +2032,9 @@ document.getElementById('setsList').addEventListener('click',e=>{
   else if(act==='rename') startRenameSet(i);
   else if(act==='del') deleteSet(i);
 });
+$('tilePixel').onchange=e=>{ tileStyle.pixel=e.target.checked; saveJSON('xxl-tile-style',tileStyle); applyTileStyle(); sfx.btn(); };
+$('tileOutline').onchange=e=>{ tileStyle.outline=e.target.checked; saveJSON('xxl-tile-style',tileStyle); applyTileStyle(); sfx.btn(); };
+$('tileRound').onchange=e=>{ tileStyle.round=e.target.checked; saveJSON('xxl-tile-style',tileStyle); applyTileStyle(); sfx.btn(); };
 document.getElementById('cropOut').innerHTML=ic('zoomOut');
 document.getElementById('cropIn').innerHTML=ic('zoomIn');
 document.getElementById('cropFit').innerHTML=ic('fit');
@@ -2027,6 +2045,7 @@ document.getElementById('cropFit').onclick=()=>crop.fitCenter();
 function start(){
   migrateStore();
   setTheme(themePref); setBg(bgPref);
+  applyTileStyle();
   $('soundBtn').innerHTML=ic(soundOn?'sound':'mute'); $('soundBtn').classList.toggle('off',!soundOn); const gsb=$('gameSoundBtn'); if(gsb){ gsb.innerHTML=ic(soundOn?'sound':'mute'); gsb.classList.toggle('off',!soundOn); }
   $('pauseBtn').innerHTML=ic('pause'); $('levelsBack').innerHTML=ic('back');
   $('homeBtnIcon').innerHTML=ic('home'); $('helpBtn').innerHTML=ic('help'); $('hintBtn').innerHTML=ic('bulb');

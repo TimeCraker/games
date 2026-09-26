@@ -9,7 +9,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
-<link rel="stylesheet" href="./styles.css?v=2.46">
+<link rel="stylesheet" href="./styles.css?v=2.47">
 </head>
 <body>
 
@@ -237,6 +237,12 @@
       <button class="mini-btn skin-settings-btn" id="setSaveBtn">存为配方</button>
     </div>
     <div class="sets-list" id="setsList"></div>
+    <div class="skin-sets-head"><span class="lib-dot"></span>方块样式</div>
+    <div class="style-toggles">
+      <div class="style-tgl"><span>像素化</span><label class="switch"><input type="checkbox" id="tilePixel" aria-label="像素化方块"><span class="slider"></span></label></div>
+      <div class="style-tgl"><span>描边</span><label class="switch"><input type="checkbox" id="tileOutline" aria-label="方块描边"><span class="slider"></span></label></div>
+      <div class="style-tgl"><span>圆角</span><label class="switch"><input type="checkbox" id="tileRound" aria-label="方块圆角"><span class="slider"></span></label></div>
+    </div>
     <div class="modal-actions">
       <button class="menu-btn primary" id="skinApply" disabled>应用皮肤</button>
       <button class="menu-btn" id="skinAuto">自动裁剪剩余照片</button>
@@ -539,6 +545,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<script src="./game.js?v=2.46"></script>
+<script src="./game.js?v=2.47"></script>
 </body>
 </html>

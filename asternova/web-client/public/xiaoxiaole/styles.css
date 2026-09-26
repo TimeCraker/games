@@ -959,6 +959,13 @@ svg{max-width:100%;}
 .set-name-text{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .set-acts{display:flex;gap:5px;flex-shrink:0;}
 .set-acts .mini-btn{flex:none;padding:6px 9px;font-size:11px;}
+.style-toggles{display:flex;flex-direction:column;gap:8px;margin-bottom:4px;}
+.style-tgl{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--hairline);font-size:13px;color:var(--text-soft);}
+/* 方块样式开关效果（仅改视觉渲染） */
+.tile-pixel .tile img{image-rendering:pixelated;}
+.tile-pixel .tile{border-radius:10%;}
+.tile-outline .tile .ring{border-width:3px;opacity:.95;}
+.tile-round .tile{border-radius:40%;}
 .crop-card{max-width:400px;}
 .crop-stage{
   position:relative;width:min(72vw,340px);margin:14px auto 12px;aspect-ratio:1;
