@@ -7,7 +7,7 @@
 import * as React from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { NebulaPixiHost } from "./render/NebulaPixiHost"
-import type { NebulaEngine, UpgradeOffer } from "./nebulaEngine"
+import type { NebulaEngine, UpgradeOffer, UpgradeTrackId } from "./nebulaEngine"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { LiquidBar } from "@/src/components/ui/LiquidBar"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
@@ -86,6 +86,64 @@ function NebulaIconHeart({ className }: { className?: string }) {
           strokeLinejoin="round"
         />
       </svg>
+    </span>
+  )
+}
+
+/** 五条升级轨道的显示元数据（纯视觉，不改平衡） */
+const TRACK_META: Record<
+  UpgradeTrackId,
+  { label: string; cap: number; bar: string; line: string; chip: string }
+> = {
+  fire_salvo: { label: "弹幕", cap: 6, bar: "from-pink-300 to-rose-500", line: "text-pink-200/80", chip: "bg-pink-400/12 text-pink-100/85" },
+  fire_rate: { label: "射速", cap: 6, bar: "from-rose-300 to-fuchsia-500", line: "text-rose-200/80", chip: "bg-rose-400/12 text-rose-100/85" },
+  ring_count: { label: "星环", cap: 12, bar: "from-violet-300 to-purple-500", line: "text-violet-200/80", chip: "bg-violet-400/12 text-violet-100/85" },
+  ring_spin: { label: "环速", cap: 6, bar: "from-indigo-300 to-violet-500", line: "text-indigo-200/80", chip: "bg-indigo-400/12 text-indigo-100/85" },
+  afterburner: { label: "推进", cap: 6, bar: "from-cyan-300 to-sky-500", line: "text-cyan-200/80", chip: "bg-cyan-400/12 text-cyan-100/85" },
+}
+
+function formatTime(sec: number): string {
+  const s = Math.max(0, Math.floor(sec))
+  const m = Math.floor(s / 60)
+  return `${m}:${String(s % 60).padStart(2, "0")}`
+}
+
+function TrackGlyph({ id, className }: { id: UpgradeTrackId; className?: string }) {
+  const attrs = { fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round", strokeLinejoin: "round" } as const
+  let inner: React.ReactNode
+  if (id === "fire_salvo") inner = <path d="M12 4.5 17 19.5 12 16 7 19.5Z" />
+  else if (id === "fire_rate") inner = (<><circle cx="12" cy="12" r="4.1" /><path d="M12 3v3.2M12 17.8V21M3 12h3.2M17.8 12H21" /></>)
+  else if (id === "ring_count") inner = (<><circle cx="12" cy="12" r="6.4" /><circle cx="18.4" cy="12" r="2" fill="currentColor" stroke="none" /></>)
+  else if (id === "ring_spin") inner = <path d="M12 5.5a6.5 6.5 0 0 1 6.5 6.5M12 18.5a6.5 6.5 0 0 1-6.5-6.5" />
+  else inner = <path d="M6.5 17.5 17.5 6.5M13 6.5h4.5V11M11 17.5H6.5V13" />
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" className={className} aria-hidden {...attrs}>
+      {inner}
+    </svg>
+  )
+}
+
+/** 遥测盘角括号（可识别签名，非通用圆角卡片） */
+function PanelCorners({ className }: { className?: string }) {
+  return (
+    <>
+      <svg className={`pointer-events-none absolute left-1.5 top-1.5 h-3 w-3 ${className ?? "text-cyan-300/70"}`} viewBox="0 0 12 12" fill="none" aria-hidden>
+        <path d="M1 11V3.5A2.5 2.5 0 0 1 3.5 1H11" stroke="currentColor" strokeWidth="1.4" />
+      </svg>
+      <svg className={`pointer-events-none absolute bottom-1.5 right-1.5 h-3 w-3 ${className ?? "text-cyan-300/70"}`} viewBox="0 0 12 12" fill="none" aria-hidden>
+        <path d="M11 1v7.5A2.5 2.5 0 0 1 8.5 11H1" stroke="currentColor" strokeWidth="1.4" />
+      </svg>
+    </>
+  )
+}
+
+function Pips({ level, max, barClass }: { level: number; max: number; barClass: string }) {
+  const shown = Math.min(max, 12)
+  return (
+    <span className="flex items-center gap-[3px]">
+      {Array.from({ length: shown }, (_, i) => (
+        <span key={i} className={`h-[3px] w-[3px] rounded-full ${i < level ? "bg-gradient-to-r " + barClass : "bg-white/12"}`} />
+      ))}
     </span>
   )
 }
@@ -202,12 +260,17 @@ function UpgradeCard({
   onPick: () => void
   index: number
 }) {
-  const accent =
-    offer.trackId === "fire_salvo" || offer.trackId === "fire_rate"
-      ? "from-pink-400/35 via-rose-400/20 to-fuchsia-600/25"
-      : offer.trackId === "ring_count" || offer.trackId === "ring_spin"
-        ? "from-violet-400/35 via-purple-500/22 to-indigo-700/25"
-        : "from-cyan-400/30 via-sky-500/22 to-blue-700/28"
+  const meta = TRACK_META[offer.trackId]
+  const cap = meta.cap
+  const parsed = /(\d+)\/(\d+)/.exec(offer.badgeLabel)
+  const cur = offer.badgeLabel === "MAX" ? cap : parsed ? parseInt(parsed[1], 10) : 0
+  const tier: "NEW" | "MAX" | "UPGRADE" = offer.isNew ? "NEW" : cur >= cap ? "MAX" : "UPGRADE"
+  const tierChip =
+    tier === "NEW"
+      ? { label: "首次解锁", cls: "border-violet-300/30 bg-violet-400/15 text-violet-100/90" }
+      : tier === "MAX"
+        ? { label: "已满级", cls: "border-amber-300/30 bg-amber-400/15 text-amber-200/90" }
+        : { label: "进阶强化", cls: "border-cyan-300/25 bg-cyan-400/12 text-cyan-100/85" }
 
   return (
     <motion.button
@@ -216,26 +279,41 @@ function UpgradeCard({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 0.08 * index, type: "spring", stiffness: 320, damping: 26 }}
       onClick={onPick}
-      className="group relative w-full max-w-[280px] overflow-hidden rounded-[1.35rem] border-[0.5px] border-white/[0.18] bg-white/[0.07] text-left shadow-[0_1px_0_rgba(255,255,255,0.07)_inset,0_24px_80px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur-2xl transition hover:border-white/25 hover:bg-white/[0.09] active:scale-[0.99] sm:max-w-none"
+      className="group relative w-full max-w-[280px] overflow-hidden rounded-2xl border border-white/[0.14] bg-surface-2/75 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl transition hover:border-white/25 hover:bg-surface-2/90 active:scale-[0.99] sm:max-w-none"
       style={{ WebkitBackdropFilter: "blur(28px) saturate(160%)" }}
     >
-      <div className={`pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br ${accent} opacity-90 blur-2xl`} />
+      <div className={`pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-gradient-to-br ${meta.bar} opacity-30 blur-2xl`} />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-40 transition group-hover:opacity-90" />
+
       <div className="relative p-4 sm:p-5">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/50">Upgrade</p>
-            <h3 className="mt-1.5 text-lg font-semibold tracking-tight text-white sm:text-xl">{offer.title}</h3>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-2.5">
+            <span className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.06] ${meta.line}`}>
+              <TrackGlyph id={offer.trackId} />
+            </span>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-mono-data text-[9px] uppercase tracking-[0.2em] text-white/40">{meta.label}</span>
+                <span className={`rounded-full border px-1.5 py-px text-[9px] font-semibold tracking-wide ${tierChip.cls}`}>{tierChip.label}</span>
+              </div>
+              <h3 className="mt-1 font-display text-[15px] font-semibold leading-tight tracking-tight text-white sm:text-base">
+                {offer.title}
+              </h3>
+            </div>
           </div>
-          <span className="shrink-0 rounded-full border-[0.5px] border-white/15 bg-black/30 px-2.5 py-1 text-[11px] font-medium tabular-nums text-white/55">
-            {offer.badgeLabel === "MAX" ? "MAX" : offer.badgeLabel}
+          <span className="shrink-0 rounded-md border border-white/12 bg-black/30 px-2 py-1 font-mono-data text-[10px] font-semibold tabular-nums text-white/70">
+            {offer.badgeLabel}
           </span>
         </div>
-        <p className="mt-3 text-[13px] leading-relaxed text-white/55">{offer.desc}</p>
-        <div className="mt-4 flex items-center justify-between gap-2">
-          <span className="text-[11px] text-fuchsia-200/70">
-            {offer.isNew ? "新能力" : "强化"}
-          </span>
-          <span className="rounded-full bg-gradient-to-r from-pink-400/85 via-fuchsia-500/80 to-violet-500/85 px-4 py-1.5 text-[12px] font-semibold text-gray-950 shadow-lg shadow-fuchsia-500/15">
+
+        <p className="mt-3 min-h-[2.6rem] text-[12px] leading-relaxed text-white/55">{offer.desc}</p>
+
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Pips level={cur} max={cap} barClass={meta.bar} />
+            <span className="font-mono-data text-[10px] tabular-nums text-white/40">{cur}/{cap}</span>
+          </div>
+          <span className={`inline-flex items-center rounded-full bg-gradient-to-r ${meta.bar} px-4 py-1.5 text-[12px] font-semibold text-gray-950 shadow-lg`}>
             选取
           </span>
         </div>
@@ -295,6 +373,8 @@ export function NebulaSurvivorGame() {
     choices: [] as UpgradeOffer[],
     upgradeRerollsLeft: 0,
     gameOver: false,
+    upgrades: { fire_salvo: 1, fire_rate: 1, ring_count: 0, ring_spin: 0, afterburner: 0 } as Record<UpgradeTrackId, number>,
+    gameTime: 0,
   })
 
   const syncUi = React.useCallback(() => {
@@ -313,6 +393,8 @@ export function NebulaSurvivorGame() {
       choices: g.upgradeChoices,
       upgradeRerollsLeft: g.upgradeRerollsLeft,
       gameOver: g.gameOver,
+      upgrades: { ...g.upgrades },
+      gameTime: g.gameTime,
     })
   }, [])
 
@@ -442,15 +524,14 @@ export function NebulaSurvivorGame() {
 
   return (
     <div className="relative flex h-dvh min-h-0 flex-col overflow-hidden bg-space-black text-white">
-      <div className="relative z-10 flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.07] px-3 py-2.5 backdrop-blur-xl sm:px-5 sm:py-3">
-        {isMobile ? <span aria-hidden="true" /> : <GameBackButton variant="header" label="大厅" />}
-        <div className="text-center">
-          <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/50">AsterNova</div>
-          <div className="font-display text-sm font-semibold text-white sm:text-base">
-            Nebula Survivor
-          </div>
+      <div className="relative z-10 flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.07] bg-black/30 px-3 py-2 backdrop-blur-xl sm:px-5 sm:py-2.5">
+        <div className="flex w-24 items-center sm:w-28">
+          {isMobile ? null : <GameBackButton variant="header" label="大厅" />}
         </div>
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="font-display text-[11px] font-semibold uppercase tracking-[0.32em] text-white sm:text-sm">
+          Nebula Survivor
+        </div>
+        <div className="flex w-24 items-center justify-end gap-1.5 sm:w-28">
           {!isMobile ? (
             <>
               <button
@@ -461,7 +542,7 @@ export function NebulaSurvivorGame() {
                   setRulesModalKind("pause")
                   setRulesModalOpen(true)
                 }}
-                className="rounded-full border-[0.5px] border-white/15 bg-white/[0.06] px-2 py-1 text-[11px] font-medium text-white/75 disabled:pointer-events-none disabled:opacity-35 sm:px-2.5 sm:text-xs"
+                className="flex min-h-[32px] items-center justify-center rounded-full border border-white/12 bg-white/[0.06] px-3 text-[11px] font-medium text-white/80 backdrop-blur-md transition hover:bg-white/[0.11] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-35"
               >
                 暂停
               </button>
@@ -472,16 +553,12 @@ export function NebulaSurvivorGame() {
                   setRulesModalKind("reference")
                   setRulesModalOpen(true)
                 }}
-                className="rounded-full border-[0.5px] border-white/15 bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-white/75 disabled:pointer-events-none disabled:opacity-35 sm:px-3 sm:text-xs"
+                className="flex min-h-[32px] items-center justify-center rounded-full border border-white/12 bg-white/[0.06] px-3 text-[11px] font-medium text-white/80 backdrop-blur-md transition hover:bg-white/[0.11] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-35"
               >
                 规则
               </button>
             </>
           ) : null}
-          <div className="text-right font-mono-data text-[11px] leading-tight text-white/55 sm:text-xs">
-            <div className="text-white/50">击杀 {ui.kills}</div>
-            <div className="text-white/80">分 {ui.score}</div>
-          </div>
         </div>
       </div>
 
@@ -523,26 +600,54 @@ export function NebulaSurvivorGame() {
       ) : null}
 
       <div className="relative min-h-0 flex-1">
-        <div className="pointer-events-none absolute left-3 top-2 z-10 flex w-52 flex-col gap-2.5 rounded-2xl border border-glass-border bg-glass-bg px-3 py-2.5 shadow-lg backdrop-blur-glass-md sm:left-5 sm:top-4 sm:w-56">
-          <div className="flex items-center justify-between font-mono-data text-[10px] uppercase tracking-[0.18em] text-white/50">
-            <span>Wave {ui.worldTier}</span>
-            <span>Lv {ui.level}</span>
+        <div className="pointer-events-none absolute left-3 top-2 z-10 w-[15rem] sm:left-5 sm:top-4 sm:w-64">
+          <div className="relative flex flex-col gap-2.5 overflow-hidden rounded-xl border border-white/10 bg-surface-2/80 px-3.5 py-3 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-glass-md">
+            <PanelCorners />
+            <div className="flex items-baseline justify-between font-mono-data">
+              <span className="text-[11px] font-semibold tracking-[0.14em] text-white/85">
+                WAVE <span className="text-cyan-200/90">{String(ui.worldTier).padStart(2, "0")}</span>
+              </span>
+              <span className="text-[10px] uppercase tracking-[0.18em] text-white/45">
+                LV <span className="text-white/80">{ui.level}</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-6 shrink-0 text-right font-mono-data text-[10px] font-semibold tracking-wider text-white/60">HP</span>
+              <LiquidBar value={ui.hp} max={ui.maxHp} variant="hp" skew={false} className="h-2 flex-1 rounded-full" />
+              <span className="w-11 shrink-0 text-right font-mono-data text-[10px] tabular-nums text-white/55">
+                {Math.round(ui.hp)}/{ui.maxHp}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-6 shrink-0 text-right font-mono-data text-[10px] font-semibold tracking-wider text-emerald-200/60">XP</span>
+              <LiquidBar value={ui.xp} max={ui.xpToNext} variant="xp" className="flex-1 rounded-full" />
+              <span className="w-11 shrink-0 text-right font-mono-data text-[10px] tabular-nums text-white/55">
+                {Math.floor(ui.xp)}/{ui.xpToNext}
+              </span>
+            </div>
+            <div className="flex items-center justify-between border-t border-white/[0.07] pt-2 font-mono-data text-[10px] tabular-nums">
+              <span className="text-white/45">击杀 <span className="text-white/85">{ui.kills}</span></span>
+              <span className="h-3 w-px bg-white/10" />
+              <span className="text-white/45">得分 <span className="text-cyan-200/85">{ui.score}</span></span>
+              <span className="h-3 w-px bg-white/10" />
+              <span className="text-white/45">威胁 <span className="text-rose-300/80">{ui.worldTier >= 5 ? "高" : ui.worldTier >= 3 ? "中" : "低"}</span></span>
+            </div>
+            <div className="flex items-center justify-between border-t border-white/[0.07] pt-2">
+              {(Object.keys(TRACK_META) as UpgradeTrackId[]).map((id) => {
+                const lv = ui.upgrades[id]
+                const meta = TRACK_META[id]
+                const active = lv > 0
+                return (
+                  <div key={id} className="flex w-8 flex-col items-center gap-1" title={`${meta.label} Lv${lv}`}>
+                    <TrackGlyph id={id} className={active ? meta.line : "text-white/22"} />
+                    <span className={`font-mono-data text-[9px] leading-none tabular-nums ${active ? "text-white/70" : "text-white/20"}`}>
+                      {active ? lv : "·"}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="w-4 shrink-0 text-right font-mono-data text-[10px] font-semibold text-white/60">HP</span>
-            <LiquidBar value={ui.hp} max={ui.maxHp} variant="hp" skew={false} className="h-2 flex-1 rounded-full" />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-4 shrink-0 text-right font-mono-data text-[10px] font-semibold text-emerald-200/60">XP</span>
-            <LiquidBar value={ui.xp} max={ui.xpToNext} variant="xp" className="flex-1 rounded-full" />
-          </div>
-          <div className="flex items-center justify-between font-mono-data text-[10px] tabular-nums text-white/50">
-            <span>
-              {Math.floor(ui.xp)}/{ui.xpToNext}
-            </span>
-            <span className="text-white/50">每分钟升档</span>
-          </div>
-          <p className="text-[9px] leading-tight text-emerald-200/40">青绿光球+十字为急救包（稀有）</p>
         </div>
 
         <div
@@ -590,7 +695,7 @@ export function NebulaSurvivorGame() {
                 </span>
               </div>
             ) : null}
-            <h2 id="nebula-rules-title" className="mt-1.5 text-center text-xl font-semibold tracking-tight text-white sm:text-2xl">
+            <h2 id="nebula-rules-title" className="mt-2 text-center font-display text-2xl font-bold uppercase tracking-[0.18em] text-white [text-shadow:0_0_28px_rgba(56,189,248,0.4)] sm:text-3xl">
               Nebula Survivor
             </h2>
             <p className="mt-1 text-center text-[12px] text-white/50">
@@ -655,10 +760,13 @@ export function NebulaSurvivorGame() {
             <button
               type="button"
               onClick={closeRulesPrimary}
-              className="mt-4 w-full rounded-2xl bg-white py-3.5 text-[15px] font-semibold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition hover:bg-white/90"
+              className="mt-4 w-full rounded-xl bg-gradient-to-r from-cyan-400/90 via-sky-400/85 to-violet-500/85 py-3.5 text-[15px] font-semibold text-gray-950 shadow-[0_10px_32px_-8px_rgba(56,189,248,0.55)] transition hover:brightness-110 active:scale-[0.99]"
             >
               {rulesModalKind === "briefing" ? "开始任务" : rulesModalKind === "pause" ? "继续游戏" : "返回游戏"}
             </button>
+            <p className="mt-3 text-center font-display text-[10px] uppercase tracking-[0.3em] text-white/30">
+              AsterNova · Arcade
+            </p>
           </div>
         </div>
       ) : null}
@@ -731,8 +839,11 @@ export function NebulaSurvivorGame() {
             title="信号丢失"
             subtitle="暗物质潮淹没宇航服护盾"
             stats={[
-              { label: "本局得分", value: ui.score },
+              { label: "得分", value: ui.score },
               { label: "击杀", value: ui.kills },
+              { label: "存活", value: formatTime(ui.gameTime) },
+              { label: "等级", value: ui.level },
+              { label: "波次", value: ui.worldTier },
             ]}
             actionLabel="再闯星云"
             onAction={restart}
