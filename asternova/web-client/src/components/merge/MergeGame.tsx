@@ -38,7 +38,7 @@ export type StarTier = {
   level: number
   radius: number
   name: string
-  /** 高光 → 边缘：粉珊瑚 → 琥珀 → 青绿 → 天蓝 → 月灰（避免刺眼电紫） */
+  /** 高光 → 边缘的渐变节点（由下方 tierPalette 的单调坡道生成） */
   highlight: string
   core: string
   mid: string
@@ -47,19 +47,53 @@ export type StarTier = {
   glow: string
 }
 
-/** 10 档：更大半径 + 每档独立渐变节点 */
-export const STAR_TIERS: StarTier[] = [
-  { level: 1, radius: 20, name: "星尘", highlight: "#fff8fb", core: "#ffeef6", mid: "#ffd0e5", rim: "#fb9cc8", edge: "rgba(251,113,133,0.9)", glow: "rgba(253,164,175,0.48)" },
-  { level: 2, radius: 24, name: "微光", highlight: "#fff5f7", core: "#ffe4e9", mid: "#fda4af", rim: "#fb7185", edge: "rgba(251,113,133,0.88)", glow: "rgba(251,113,133,0.44)" },
-  { level: 3, radius: 28, name: "流萤", highlight: "#fff5f3", core: "#ffe7dc", mid: "#fdbcb4", rim: "#fb7185", edge: "rgba(251,113,133,0.86)", glow: "rgba(253,186,168,0.42)" },
-  { level: 4, radius: 32, name: "晨星", highlight: "#fff8f3", core: "#ffedd5", mid: "#fdba74", rim: "#fb923c", edge: "rgba(249,115,22,0.85)", glow: "rgba(251,146,60,0.4)" },
-  { level: 5, radius: 36, name: "辉星", highlight: "#fffbeb", core: "#fef3c7", mid: "#fcd34d", rim: "#f59e0b", edge: "rgba(217,119,6,0.88)", glow: "rgba(245,158,11,0.42)" },
-  { level: 6, radius: 40, name: "琥光", highlight: "#fffbeb", core: "#fef9c3", mid: "#fde047", rim: "#ca8a04", edge: "rgba(202,138,4,0.9)", glow: "rgba(234,179,8,0.45)" },
-  { level: 7, radius: 45, name: "潮青", highlight: "#f0fdfa", core: "#ccfbf1", mid: "#5eead4", rim: "#0d9488", edge: "rgba(13,148,136,0.88)", glow: "rgba(45,212,191,0.44)" },
-  { level: 8, radius: 50, name: "天幕", highlight: "#f0f9ff", core: "#e0f2fe", mid: "#7dd3fc", rim: "#0284c7", edge: "rgba(2,132,199,0.9)", glow: "rgba(56,189,248,0.42)" },
-  { level: 9, radius: 56, name: "瀚波", highlight: "#eff6ff", core: "#dbeafe", mid: "#60a5fa", rim: "#1d4ed8", edge: "rgba(29,78,216,0.9)", glow: "rgba(59,130,246,0.44)" },
-  { level: 10, radius: 62, name: "星冕", highlight: "#fefdfb", core: "#f8fafc", mid: "#e2e8f0", rim: "#94a3b8", edge: "rgba(71,85,105,0.92)", glow: "rgba(148,163,184,0.5)" },
+/** 每档的半径与名称（半径越大越难堆稳，名字承载「进化到第几级」的语感） */
+const TIER_NAMES = ["星尘", "微光", "流萤", "晨星", "辉星", "琥光", "鎏金", "熔金", "瀚光", "星冕"] as const
+const TIER_RADII = [20, 24, 28, 32, 36, 40, 45, 50, 56, 62] as const
+
+/**
+ * 每档的 [色相, 饱和度, 明度]。刻意做成「冷灰 → 古铜 → 金 → 白热」四段式，
+ * **而不是线性插值** —— 线性从 215° 走到 42° 会经过 120° 绿，
+ * 实测渲染出糖果薄荷绿（同属不属于品牌体系的 AI 味）。
+ * 故显式给表：1–3 级是低饱和冷灰（矿石感），4 级起跳到暖区，
+ * 4–10 级在 58°→30° 的窄暖色带里靠明度(63→91)与饱和(30→60)拉开档次。
+ * 全程避开 90–160°（绿）与 270–330°（紫/品红）。
+ */
+const TIER_RAMP: ReadonlyArray<readonly [number, number, number]> = [
+  [210, 12, 44], // 1 星尘 · 冷灰
+  [198, 16, 52], // 2 微光 · 钢灰
+  [183, 20, 58], // 3 流萤 · 灰青
+  [58, 30, 63], // 4 晨星 · 浅古铜
+  [53, 40, 68], // 5 辉星
+  [48, 48, 72], // 6 琥光
+  [43, 55, 77], // 7 鎏金
+  [38, 60, 81], // 8 熔金
+  [34, 58, 86], // 9 瀚光
+  [30, 52, 91], // 10 星冕 · 白热
 ]
+
+function tierPalette(level: number): Pick<StarTier, "highlight" | "core" | "mid" | "rim" | "edge" | "glow"> {
+  const [hue, sat, light] = TIER_RAMP[Math.min(TIER_RAMP.length - 1, Math.max(0, level - 1))]
+  const h = (s: number, l: number) =>
+    `hsl(${hue}, ${Math.round(Math.min(100, s))}%, ${Math.round(Math.max(0, Math.min(97, l)))}%)`
+  const rimLight = Math.max(22, light - 17)
+  return {
+    highlight: h(sat * 0.5, light + 30),
+    core: h(sat * 0.72, light + 18),
+    mid: h(sat, light),
+    rim: h(sat, rimLight),
+    edge: `hsla(${hue}, ${sat}%, ${Math.round(rimLight)}%, 0.9)`,
+    glow: `hsla(${hue}, ${sat}%, ${Math.round(Math.min(92, light))}%, 0.46)`,
+  }
+}
+
+/** 10 档：更大半径 + 每档独立渐变节点 */
+export const STAR_TIERS: StarTier[] = TIER_NAMES.map((name, i) => ({
+  level: i + 1,
+  radius: TIER_RADII[i],
+  name,
+  ...tierPalette(i + 1),
+}))
 
 type StarBody = Body & { starLevel?: number }
 
@@ -110,7 +144,7 @@ function NextDropPanel({ tier }: { tier: StarTier }) {
             width: Math.min(72, tier.radius * 2.1),
             height: Math.min(72, tier.radius * 2.1),
             background: tierOrbCssBackground(tier),
-            boxShadow: `0 0 20px ${tier.glow}, 0 0 36px rgba(45,212,191,0.1), inset 0 0 14px rgba(255,255,255,0.35)`,
+            boxShadow: `0 0 20px ${tier.glow}, 0 0 36px rgba(216,163,60,0.12), inset 0 0 14px rgba(255,255,255,0.35)`,
             border: "0.5px solid rgba(255,255,255,0.22)",
           }}
         />
@@ -126,7 +160,7 @@ function NextDropPanel({ tier }: { tier: StarTier }) {
 function MergeIconDrop({ className, iconClass }: { className?: string; iconClass?: string }) {
   return (
     <span
-      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-300/40 to-amber-300/30 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
+      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-200/40 to-amber-400/28 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
       aria-hidden
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -147,7 +181,7 @@ function MergeIconDrop({ className, iconClass }: { className?: string; iconClass
 function MergeIconFuse({ className, iconClass }: { className?: string; iconClass?: string }) {
   return (
     <span
-      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-200/38 to-teal-400/28 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
+      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-200/38 to-[#8CBEAA]/26 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
       aria-hidden
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -169,7 +203,7 @@ function MergeIconFuse({ className, iconClass }: { className?: string; iconClass
 function MergeIconDanger({ className, iconClass }: { className?: string; iconClass?: string }) {
   return (
     <span
-      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-400/32 to-orange-400/25 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
+      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#C08069]/32 to-[#B8724F]/25 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
       aria-hidden
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -190,7 +224,7 @@ function MergeIconDanger({ className, iconClass }: { className?: string; iconCla
 function MergeIconNext({ className, iconClass }: { className?: string; iconClass?: string }) {
   return (
     <span
-      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-300/32 to-sky-500/28 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
+      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#A8BED6]/32 to-[#5E7994]/26 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
       aria-hidden
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -463,7 +497,7 @@ const confirmMergeRules = React.useCallback(() => {
     Events.on(render, "afterRender", () => {
       const ctx = render.context
       ctx.save()
-      ctx.strokeStyle = "rgba(248, 113, 113, 0.55)"
+      ctx.strokeStyle = "rgba(192, 80, 58, 0.6)"
       ctx.lineWidth = 1.5
       ctx.setLineDash([6, 6])
       ctx.beginPath()
@@ -471,7 +505,7 @@ const confirmMergeRules = React.useCallback(() => {
       ctx.lineTo(WORLD_W - 12, DANGER_Y)
       ctx.stroke()
       ctx.setLineDash([])
-      ctx.fillStyle = "rgba(248, 113, 113, 0.1)"
+      ctx.fillStyle = "rgba(192, 80, 58, 0.11)"
       ctx.fillRect(0, 0, WORLD_W, DANGER_Y)
       ctx.restore()
 
@@ -567,8 +601,8 @@ const confirmMergeRules = React.useCallback(() => {
       <div
         className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-500"
         style={{
-          background: `radial-gradient(42rem 42rem at ${mouseNorm.x * 100}% ${mouseNorm.y * 100}%, rgba(251,146,60,0.08), transparent 55%),
-            radial-gradient(36rem 36rem at ${mouseNorm.x * 100 + 8}% ${mouseNorm.y * 100 - 5}%, rgba(45,212,191,0.07), transparent 50%)`,
+          background: `radial-gradient(42rem 42rem at ${mouseNorm.x * 100}% ${mouseNorm.y * 100}%, rgba(216,163,60,0.08), transparent 55%),
+            radial-gradient(36rem 36rem at ${mouseNorm.x * 100 + 8}% ${mouseNorm.y * 100 - 5}%, rgba(192,128,105,0.06), transparent 50%)`,
         }}
       />
 
@@ -622,7 +656,7 @@ const confirmMergeRules = React.useCallback(() => {
           className="relative mx-auto w-full"
         >
           <div
-            className="relative overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] p-2.5 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_24px_80px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.03),0_40px_100px_rgba(45,212,191,0.07)] backdrop-blur-[22px] backdrop-saturate-150 sm:rounded-[28px] sm:p-3"
+            className="relative overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] p-2.5 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_24px_80px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.03),0_40px_100px_rgba(192,128,105,0.06)] backdrop-blur-[22px] backdrop-saturate-150 sm:rounded-[28px] sm:p-3"
             style={{ WebkitBackdropFilter: "blur(22px) saturate(150%)" }}
           >
             <div className="mb-2 flex items-baseline justify-between gap-3 px-0.5 sm:mb-3">
@@ -632,7 +666,9 @@ const confirmMergeRules = React.useCallback(() => {
               <span className="font-mono-data text-[13px] tabular-nums text-white/85 sm:text-[14px]">
                 <span className="text-white/90">{score}</span>
                 <span className="mx-1 text-white/50">/</span>
-                <span className="text-white/50">最高 {best !== null ? formatScore(best) : 0}</span>
+                {/* 历史最高来自记录总线（局末才写入），故局中取 max(历史最高, 本局分数)，
+                    避免本局已破纪录时显示成「1960 / 最高 960」这种自相矛盾的读数 */}
+                <span className="text-white/50">最高 {formatScore(Math.max(best ?? 0, score))}</span>
               </span>
             </div>
 
@@ -653,14 +689,14 @@ const confirmMergeRules = React.useCallback(() => {
                       {ripples.map((rp) => (
                         <motion.div
                           key={rp.id}
-                          className="pointer-events-none absolute rounded-full border border-amber-200/30 bg-gradient-to-br from-rose-300/22 to-teal-500/16"
+                          className="pointer-events-none absolute rounded-full border border-amber-200/30 bg-gradient-to-br from-amber-200/22 to-[#C08069]/16"
                           style={{
                             left: `${((rp.x - rp.r) / WORLD_W) * 100}%`,
                             top: `${((rp.y - rp.r) / WORLD_H) * 100}%`,
                             width: `${((rp.r * 2) / WORLD_W) * 100}%`,
                             height: `${((rp.r * 2) / WORLD_H) * 100}%`,
                             boxShadow:
-                              "0 0 28px rgba(251,146,60,0.28), 0 0 52px rgba(45,212,191,0.16), inset 0 0 22px rgba(255,255,255,0.1)",
+                              "0 0 28px rgba(216,163,60,0.3), 0 0 52px rgba(192,128,105,0.16), inset 0 0 22px rgba(255,255,255,0.1)",
                           }}
                           initial={{ scale: 0.2, opacity: 0.85 }}
                           animate={{ scale: 3.2, opacity: 0 }}
@@ -687,7 +723,7 @@ const confirmMergeRules = React.useCallback(() => {
                           borderRadius: "50%",
                           transform: "translateY(-50%)",
                           background: tierOrbCssBackground(previewTier),
-                          boxShadow: `0 0 18px ${previewTier.glow}, 0 0 32px rgba(45,212,191,0.14), inset 0 0 14px rgba(255,255,255,0.32)`,
+                          boxShadow: `0 0 18px ${previewTier.glow}, 0 0 32px rgba(192,128,105,0.16), inset 0 0 14px rgba(255,255,255,0.32)`,
                           opacity: 0.92,
                           border: "0.5px solid rgba(255,255,255,0.24)",
                         }}
@@ -718,7 +754,7 @@ const confirmMergeRules = React.useCallback(() => {
               <button
                 type="button"
                 onClick={restart}
-                className="min-h-[44px] min-w-[44px] rounded-full border border-white/10 bg-gradient-to-r from-rose-400/90 via-amber-400/88 to-teal-500/88 px-6 py-2.5 text-[13px] font-semibold text-gray-950 shadow-[0_12px_40px_rgba(45,212,191,0.22),0_0_0_1px_rgba(255,255,255,0.15)_inset] transition hover:brightness-105 active:scale-[0.98]"
+                className="min-h-[44px] min-w-[44px] rounded-full border border-white/10 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 px-6 py-2.5 text-[13px] font-semibold text-gray-950 shadow-[0_12px_40px_rgba(45,212,191,0.22),0_0_0_1px_rgba(255,255,255,0.15)_inset] transition hover:brightness-105 active:scale-[0.98]"
               >
                 再来一局
               </button>
@@ -730,7 +766,7 @@ const confirmMergeRules = React.useCallback(() => {
             <button
               type="button"
               onClick={restart}
-              className="min-h-[44px] min-w-[44px] rounded-full border border-white/10 bg-gradient-to-r from-rose-400/90 via-amber-400/88 to-teal-500/88 px-5 py-2.5 text-[12px] font-semibold text-gray-950 shadow-[0_12px_40px_rgba(45,212,191,0.22),0_0_0_1px_rgba(255,255,255,0.15)_inset] transition hover:brightness-105 active:scale-[0.98] sm:min-h-0 sm:px-6 sm:text-[13px]"
+              className="min-h-[44px] min-w-[44px] rounded-full border border-white/10 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 px-5 py-2.5 text-[12px] font-semibold text-gray-950 shadow-[0_12px_40px_rgba(45,212,191,0.22),0_0_0_1px_rgba(255,255,255,0.15)_inset] transition hover:brightness-105 active:scale-[0.98] sm:min-h-0 sm:px-6 sm:text-[13px]"
             >
               再来一局
             </button>
@@ -772,7 +808,7 @@ const confirmMergeRules = React.useCallback(() => {
                 <div>
                   <div className="font-medium text-white/95">下落</div>
                   <div className="mt-0.5 text-[13px] text-white/55">
-                    在画面上移动准星；<span className="text-rose-200/90">点击</span>、按{" "}
+                    在画面上移动准星；<span className="text-hud-accent-bright">点击</span>、按{" "}
                     <span className="text-amber-200/90">E</span> 或 <span className="text-amber-200/90">空格</span>{" "}
                     在准星位置释放当前球。
                   </div>
@@ -783,7 +819,7 @@ const confirmMergeRules = React.useCallback(() => {
                 <div>
                   <div className="font-medium text-white/95">合成</div>
                   <div className="mt-0.5 text-[13px] text-white/55">
-                    两颗<span className="text-teal-200/90">相同等级</span>的球相撞会合成更高一级，并获得分数。
+                    两颗<span className="text-[#8CBEAA]">相同等级</span>的球相撞会合成更高一级，并获得分数。
                   </div>
                 </div>
               </li>
@@ -792,7 +828,7 @@ const confirmMergeRules = React.useCallback(() => {
                 <div>
                   <div className="font-medium text-white/95">警戒线</div>
                   <div className="mt-0.5 text-[13px] text-white/55">
-                    堆叠超过顶部<span className="text-rose-200/85">红色虚线</span>并持续约 3 秒，本局结束。
+                    堆叠超过顶部<span className="text-[#D98A72]">红色虚线</span>并持续约 3 秒，本局结束。
                   </div>
                 </div>
               </li>
@@ -815,7 +851,7 @@ const confirmMergeRules = React.useCallback(() => {
                 type="checkbox"
                 checked={dontShowRulesAgain}
                 onChange={(e) => setDontShowRulesAgain(e.target.checked)}
-                className="h-4 w-4 rounded-md border-white/30 bg-white/10 text-teal-500 focus:ring-teal-400/50"
+                className="h-4 w-4 rounded-md border-white/30 bg-white/10 text-hud-accent focus:ring-hud-accent/50"
               />
               下次不再显示规则（本机记住）
             </label>
@@ -823,7 +859,7 @@ const confirmMergeRules = React.useCallback(() => {
             <button
               type="button"
               onClick={confirmMergeRules}
-              className="mt-5 w-full rounded-2xl bg-gradient-to-r from-rose-400/90 via-amber-400/88 to-teal-500/88 py-3.5 text-[15px] font-semibold text-gray-950 shadow-lg shadow-teal-500/15 transition hover:brightness-105 active:scale-[0.99]"
+              className="mt-5 w-full rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 py-3.5 text-[15px] font-semibold text-gray-950 shadow-lg shadow-amber-500/20 transition hover:brightness-105 active:scale-[0.99]"
             >
               知道了
             </button>

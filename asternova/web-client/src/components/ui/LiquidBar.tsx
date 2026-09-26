@@ -31,8 +31,8 @@ const VARIANT_CFG: Record<
   },
   xp: {
     height: "h-2",
-    track: "border-emerald-950/40",
-    fill: "bg-gradient-to-b from-[#b8ffd9] via-[#34d399] to-[#065f46]",
+    track: "border-hud-line",
+    fill: "bg-gradient-to-b from-[#A8D4BC] via-[#4F8D6B] to-[#2C5741]",
     defaultSkew: false,
   },
   progress: {
@@ -85,7 +85,7 @@ export function LiquidBar({
         className={cn(
           "relative h-full rounded-full transition-[width] duration-300 ease-out",
           success
-            ? "liquid-success bg-gradient-to-r from-emerald-300 via-green-500 to-lime-400 shadow-glow-cyan"
+            ? "liquid-success bg-gradient-to-r from-[#A8D4BC] via-[#4F8D6B] to-[#2C5741] shadow-glow-accent"
             : cfg.fill,
         )}
         style={{ width: `${pct}%` }}

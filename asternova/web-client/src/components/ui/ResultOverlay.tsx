@@ -123,14 +123,16 @@ export function ResultOverlay({
             {heading}
           </h2>
 
-          {subtitle && <p className="mt-3 text-sm text-white/55">{subtitle}</p>}
+          {/* 2026-09-27 A′：巨型标题保住拉丁展示词的冲击力，中文说明提权到可读主力
+              （原为 13px / white·55，实测偏弱，中文承担的信息被压没） */}
+          {subtitle && <p className="mt-3 text-[15px] leading-relaxed text-hud-text">{subtitle}</p>}
 
           {stats && stats.length > 0 && (
             <div className="mt-6 flex items-stretch justify-center gap-6">
               {stats.map((s) => (
                 <div key={s.label} className="flex flex-col">
                   <span className="font-mono-data text-2xl font-bold text-white">{s.value}</span>
-                  <span className="font-mono-data mt-1 text-[10px] uppercase tracking-[0.18em] text-white/50">
+                  <span className="font-mono-data mt-1 text-[11px] tracking-[0.14em] text-hud-text-dim">
                     {s.label}
                   </span>
                 </div>

@@ -2,7 +2,7 @@
 
 /**
  * AsterNova - Star Dash
- * Canvas 无限跑酷：双段跳、滑铲、视差星空、粉紫霓虹美学。
+ * Canvas 无限跑酷：双段跳、滑铲、视差星空、琥珀星空美学。
  * 游戏状态全部放在 ref 中，由 requestAnimationFrame 驱动，避免每帧 setState。
  */
 
@@ -170,7 +170,7 @@ function strokeRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w:
 function DashIconJump({ className, iconClass }: { className?: string; iconClass?: string }) {
   return (
     <span
-      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-300/40 to-violet-500/35 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
+      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-200/40 to-amber-500/30 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
       aria-hidden
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -197,7 +197,7 @@ function DashIconJump({ className, iconClass }: { className?: string; iconClass?
 function DashIconSlide({ className, iconClass }: { className?: string; iconClass?: string }) {
   return (
     <span
-      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-300/35 to-purple-600/35 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
+      className={`flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#A8BED6]/35 to-[#5E7994]/30 ${iconClass ?? "h-11 w-11"} ${className ?? ""}`}
       aria-hidden
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -653,7 +653,7 @@ export function StarDashGame() {
           let sx = (st.x - offset * speedMul) % wrapW
           if (sx < 0) sx += wrapW
           ctx.globalAlpha = st.a * (twinkle ? 0.75 + 0.25 * Math.sin(ts * 0.004 + st.x) : 1)
-          ctx.fillStyle = "#e8e4ff"
+          ctx.fillStyle = "#EDEAE3"
           ctx.beginPath()
           ctx.arc(sx, st.y, st.s, 0, Math.PI * 2)
           ctx.fill()
@@ -661,21 +661,21 @@ export function StarDashGame() {
         ctx.globalAlpha = 1
       }
 
-      ctx.fillStyle = "#06060f"
+      ctx.fillStyle = "#050608"
       ctx.fillRect(0, 0, w, h)
       const g = ctx.createLinearGradient(0, 0, 0, h)
-      g.addColorStop(0, "#0a0614")
-      g.addColorStop(0.55, "#0d0820")
-      g.addColorStop(1, "#12081c")
+      g.addColorStop(0, "#08090D")
+      g.addColorStop(0.55, "#0B0D12")
+      g.addColorStop(1, "#0E1117")
       ctx.fillStyle = g
       ctx.fillRect(0, 0, w, h)
 
       drawParallaxStars(s.paraFar, s.starsFar, 0.12, true)
       drawParallaxStars(s.paraNear, s.starsNear, 0.22, false)
 
-      ctx.strokeStyle = "rgba(168, 85, 247, 0.25)"
+      ctx.strokeStyle = "rgba(216, 163, 60, 0.22)"
       ctx.lineWidth = 2
-      ctx.shadowColor = "rgba(236, 72, 153, 0.4)"
+      ctx.shadowColor = "rgba(216, 163, 60, 0.32)"
       ctx.shadowBlur = 12
       ctx.beginPath()
       ctx.moveTo(0, s.groundY)
@@ -694,9 +694,9 @@ export function StarDashGame() {
         for (const tr of s.trail) {
           ctx.globalAlpha = tr.alpha * 0.45
           const lg = ctx.createLinearGradient(tr.x, tr.y, tr.x + PLAYER_W, tr.y + tr.h)
-          lg.addColorStop(0, "rgba(255, 182, 232, 0.5)")
-          lg.addColorStop(0.5, "rgba(216, 180, 254, 0.45)")
-          lg.addColorStop(1, "rgba(167, 139, 250, 0.35)")
+          lg.addColorStop(0, "rgba(255, 238, 206, 0.5)")
+          lg.addColorStop(0.5, "rgba(233, 190, 105, 0.45)")
+          lg.addColorStop(1, "rgba(168, 124, 36, 0.35)")
           ctx.fillStyle = lg
           fillRoundRect(ctx, tr.x, tr.y, PLAYER_W, tr.h, 10)
         }
@@ -706,24 +706,24 @@ export function StarDashGame() {
       for (const o of s.obstacles) {
         ctx.save()
         if (boostOnDraw) {
-          ctx.shadowColor = "rgba(253, 186, 116, 0.95)"
+          ctx.shadowColor = "rgba(233, 190, 105, 0.95)"
           ctx.shadowBlur = 26
         } else {
-          ctx.shadowColor = "rgba(244, 114, 182, 0.9)"
+          ctx.shadowColor = "rgba(192, 80, 58, 0.75)"
           ctx.shadowBlur = o.kind === "overhang" ? 20 : 16
         }
         const og = ctx.createLinearGradient(o.x, o.y, o.x + o.w, o.y + o.h)
         if (boostOnDraw) {
-          og.addColorStop(0, "rgba(254, 215, 170, 0.95)")
-          og.addColorStop(0.5, "rgba(251, 113, 133, 0.88)")
-          og.addColorStop(1, "rgba(192, 132, 252, 0.82)")
+          og.addColorStop(0, "rgba(255, 246, 224, 0.95)")
+          og.addColorStop(0.5, "rgba(233, 190, 105, 0.9)")
+          og.addColorStop(1, "rgba(192, 80, 58, 0.8)")
         } else {
-          og.addColorStop(0, "rgba(251, 207, 232, 0.95)")
-          og.addColorStop(0.5, "rgba(192, 132, 252, 0.85)")
-          og.addColorStop(1, "rgba(139, 92, 246, 0.75)")
+          og.addColorStop(0, "rgba(226, 160, 140, 0.95)")
+          og.addColorStop(0.5, "rgba(192, 80, 58, 0.88)")
+          og.addColorStop(1, "rgba(122, 46, 34, 0.85)")
         }
         ctx.fillStyle = og
-        ctx.strokeStyle = boostOnDraw ? "rgba(255, 248, 220, 0.55)" : "rgba(255, 255, 255, 0.35)"
+        ctx.strokeStyle = boostOnDraw ? "rgba(255, 248, 220, 0.55)" : "rgba(242, 244, 245, 0.28)"
         ctx.lineWidth = boostOnDraw ? 2 : 1.5
         fillRoundRect(ctx, o.x, o.y, o.w, o.h, 6)
         strokeRoundRect(ctx, o.x, o.y, o.w, o.h, 6)
@@ -734,9 +734,9 @@ export function StarDashGame() {
         ctx.save()
         ctx.globalAlpha = 0.18 + 0.07 * Math.sin(ts * 0.014)
         const wg = ctx.createLinearGradient(0, 0, w, h)
-        wg.addColorStop(0, "rgba(251, 113, 133, 0.55)")
-        wg.addColorStop(0.45, "rgba(217, 70, 239, 0.4)")
-        wg.addColorStop(1, "rgba(99, 102, 241, 0.5)")
+        wg.addColorStop(0, "rgba(233, 190, 105, 0.45)")
+        wg.addColorStop(0.45, "rgba(216, 163, 60, 0.35)")
+        wg.addColorStop(1, "rgba(122, 46, 34, 0.35)")
         ctx.fillStyle = wg
         ctx.fillRect(0, 0, w, h)
         ctx.globalAlpha = 0.35
@@ -756,9 +756,9 @@ export function StarDashGame() {
         if (pu.taken) continue
         ctx.save()
         if (pu.kind === "magnet") {
-          ctx.shadowColor = "rgba(244, 114, 182, 0.95)"
+          ctx.shadowColor = "rgba(111, 158, 138, 0.9)"
           ctx.shadowBlur = 20
-          ctx.strokeStyle = "rgba(252, 231, 243, 0.9)"
+          ctx.strokeStyle = "rgba(214, 233, 224, 0.9)"
           ctx.lineWidth = 2.5
           ctx.beginPath()
           ctx.arc(pu.x, pu.y, pu.r, 0, Math.PI * 2)
@@ -770,12 +770,12 @@ export function StarDashGame() {
           ctx.arc(pu.x + 6, pu.y + 3, pu.r * 0.35, -0.5, Math.PI)
           ctx.stroke()
         } else {
-          ctx.shadowColor = "rgba(125, 211, 252, 0.9)"
+          ctx.shadowColor = "rgba(126, 156, 192, 0.9)"
           ctx.shadowBlur = 18
           const sg = ctx.createRadialGradient(pu.x, pu.y, 0, pu.x, pu.y, pu.r)
-          sg.addColorStop(0, "rgba(224, 242, 254, 0.95)")
-          sg.addColorStop(0.5, "rgba(125, 211, 252, 0.5)")
-          sg.addColorStop(1, "rgba(59, 130, 246, 0.25)")
+          sg.addColorStop(0, "rgba(232, 240, 250, 0.95)")
+          sg.addColorStop(0.5, "rgba(126, 156, 192, 0.5)")
+          sg.addColorStop(1, "rgba(58, 86, 120, 0.3)")
           ctx.fillStyle = sg
           ctx.beginPath()
           ctx.moveTo(pu.x, pu.y - pu.r * 0.85)
@@ -799,9 +799,9 @@ export function StarDashGame() {
         ctx.shadowBlur = 14
         const sg = ctx.createRadialGradient(st.x, st.y, 0, st.x, st.y, st.r * 2)
         sg.addColorStop(0, "#fff7ed")
-        sg.addColorStop(0.35, "#fbcfe8")
-        sg.addColorStop(0.7, "#c084fc")
-        sg.addColorStop(1, "rgba(139, 92, 246, 0.2)")
+        sg.addColorStop(0.35, "#F2D79B")
+        sg.addColorStop(0.7, "#D8A33C")
+        sg.addColorStop(1, "rgba(168, 124, 36, 0.2)")
         ctx.fillStyle = sg
         ctx.beginPath()
         ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2)
@@ -812,7 +812,7 @@ export function StarDashGame() {
       for (const p of s.particles) {
         const t = p.life / p.maxLife
         ctx.globalAlpha = Math.max(0, t)
-        ctx.fillStyle = `rgba(244, 182, 232, ${0.4 + t * 0.5})`
+        ctx.fillStyle = `rgba(242, 215, 155, ${0.4 + t * 0.5})`
         ctx.beginPath()
         ctx.arc(p.x, p.y, 4 * t, 0, Math.PI * 2)
         ctx.fill()
@@ -820,12 +820,12 @@ export function StarDashGame() {
       ctx.globalAlpha = 1
 
       ctx.save()
-      ctx.shadowColor = "rgba(236, 72, 153, 0.75)"
+      ctx.shadowColor = "rgba(216, 163, 60, 0.6)"
       ctx.shadowBlur = 22
       const pg = ctx.createLinearGradient(px, py, px + PLAYER_W, py + ph)
-      pg.addColorStop(0, "#ffe4f0")
-      pg.addColorStop(0.45, "#f0abfc")
-      pg.addColorStop(1, "#a78bfa")
+      pg.addColorStop(0, "#FFF6E2")
+      pg.addColorStop(0.45, "#E9BE69")
+      pg.addColorStop(1, "#D8A33C")
       ctx.fillStyle = pg
       ctx.strokeStyle = "rgba(255,255,255,0.5)"
       ctx.lineWidth = 2
@@ -844,10 +844,10 @@ export function StarDashGame() {
         ctx.fillText(`星尘 × ${s.scoreStars}`, w - 18, 52)
         let lineY = 68
         if (s.boostReady) {
-          ctx.fillStyle = "rgba(253, 186, 116, 0.95)"
+          ctx.fillStyle = "rgba(233, 190, 105, 0.95)"
           ctx.fillText("星爆就绪 · 点「星爆」或按 E", w - 18, lineY)
         } else {
-          ctx.fillStyle = "rgba(251, 207, 232, 0.78)"
+          ctx.fillStyle = "rgba(214, 233, 224, 0.85)"
           ctx.fillText(`再 ${s.starsTowardBoost} 颗 → 星爆加速`, w - 18, lineY)
         }
         lineY += 16
@@ -857,12 +857,12 @@ export function StarDashGame() {
           lineY += 16
         }
         if (magnetOnDraw) {
-          ctx.fillStyle = "rgba(244, 114, 182, 0.85)"
+          ctx.fillStyle = "rgba(140, 190, 168, 0.9)"
           ctx.fillText("磁吸星尘", w - 18, lineY)
           lineY += 16
         }
         if (s.shieldCharges > 0) {
-          ctx.fillStyle = "rgba(125, 211, 252, 0.9)"
+          ctx.fillStyle = "rgba(126, 156, 192, 0.9)"
           ctx.fillText(`护盾 × ${s.shieldCharges}`, w - 18, lineY)
         }
       }
@@ -984,7 +984,7 @@ export function StarDashGame() {
                 <DashIconSlide />
                 <div>
                   <div className="font-medium text-white/95">滑铲</div>
-                  <div className="mt-0.5 text-[13px] text-white/55">手指在画面上向下滑，或按 ↓ / 右下按钮。矮身钻过<span className="text-pink-200/90">悬空横梁</span>。</div>
+                  <div className="mt-0.5 text-[13px] text-white/55">手指在画面上向下滑，或按 ↓ / 右下按钮。矮身钻过<span className="text-hud-accent-bright">悬空横梁</span>。</div>
                 </div>
               </li>
               <li className="flex gap-3 rounded-2xl bg-white/[0.05] p-3">
@@ -997,14 +997,14 @@ export function StarDashGame() {
                 </div>
               </li>
               <li className="flex gap-3 rounded-2xl bg-white/[0.05] p-3">
-                <span className="flex h-11 w-11 shrink-0 flex-col items-center justify-center gap-0.5 rounded-2xl bg-gradient-to-br from-sky-300/30 to-pink-400/25 px-1 text-[10px] font-semibold leading-none text-white/90" aria-hidden>
+                <span className="flex h-11 w-11 shrink-0 flex-col items-center justify-center gap-0.5 rounded-2xl bg-gradient-to-br from-[#A8BED6]/32 to-[#5E7994]/28 px-1 text-[10px] font-semibold leading-none text-white/90" aria-hidden>
                   <span>∞</span>
                   <span>盾</span>
                 </span>
                 <div>
                   <div className="font-medium text-white/95">道具（约每 20 秒）</div>
                   <div className="mt-0.5 text-[13px] text-white/55">
-                    <span className="text-pink-200/85">磁吸</span>自动拉近星尘；<span className="text-sky-200/85">护盾</span>抵挡一次撞击。
+                    <span className="text-[#8CBEAA]">磁吸</span>自动拉近星尘；<span className="text-[#A8BED6]">护盾</span>抵挡一次撞击。
                   </div>
                 </div>
               </li>
@@ -1015,7 +1015,7 @@ export function StarDashGame() {
                 type="checkbox"
                 checked={dontShowRulesAgain}
                 onChange={(e) => setDontShowRulesAgain(e.target.checked)}
-                className="h-4 w-4 rounded-md border-white/30 bg-white/10 text-violet-500 focus:ring-violet-400/50"
+                className="h-4 w-4 rounded-md border-white/30 bg-white/10 text-hud-accent focus:ring-hud-accent/50"
               />
               下次不再显示规则（本机记住）
             </label>
