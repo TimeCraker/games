@@ -13,9 +13,9 @@ const FACE_IMG = ['./assets/faces/face0.jpg','./assets/faces/face1.jpg','./asset
 const LIB_FACES = ['./assets/faces/lib/01.jpg','./assets/faces/lib/02.jpg','./assets/faces/lib/03.jpg','./assets/faces/lib/04.jpg','./assets/faces/lib/05.jpg','./assets/faces/lib/06.jpg','./assets/faces/lib/07.jpg','./assets/faces/lib/08.jpg','./assets/faces/lib/09.jpg'];
 const DEFAULT_LIB = [1,2,0,3];   // 02剑姬 · 03星空 · 01Q版女仆 · 04龙娘
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
-const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
+const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4, CROSS:5 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.43';
+const CACHE_VER = '2.44';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -55,6 +55,7 @@ const SVG = {
   fit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V5a2 2 0 012-2h4M15 3h4a2 2 0 012 2v4M21 15v4a2 2 0 01-2 2h-4M9 21H5a2 2 0 01-2-2v-4"/></svg>',
   rocketH:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M15 8l4 4-4 4M9 8l-4 4 4 4"/></svg>',
   rocketV:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M8 15l4 4 4-4M8 9l4-4 4 4"/></svg>',
+  cross:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5V3M12 19v2M5 12H3M19 12h2"/><path d="M9 8l3 4 3-4M9 16l3-4 3 4M8 9l4 3-4 3M16 9l-4 3 4 3"/></svg>',
   infinity:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16C3.8 16 2.5 14.2 2.5 12S3.8 8 6 8c1.5 0 2.5 1 3.5 3 1 2 2 3 3.5 3 2.2 0 3.5-1.8 3.5-4s-1.3-4-3.5-4c-1.5 0-2.5 1-3.5 3-1 2-2 3-3.5 3z"/></svg>',
   clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   calendarDay:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/></svg>',
@@ -293,6 +294,7 @@ function makeTile(r,c,type,special=SPECIAL.NONE){
   if(special===SPECIAL.ROCKET_V) el.classList.add('special-rocket-v');
   if(special===SPECIAL.BOMB) el.classList.add('special-bomb');
   if(special===SPECIAL.RAINBOW) el.classList.add('special-rainbow');
+  if(special===SPECIAL.CROSS) el.classList.add('special-cross');
   el.dataset.r=r; el.dataset.c=c; el.dataset.type=type;
   const face=document.createElement('div'); face.className='face';
   const img=document.createElement('img'); img.src=faceSrcOf(type); img.draggable=false; img.alt='';
@@ -301,7 +303,7 @@ function makeTile(r,c,type,special=SPECIAL.NONE){
   const ring=document.createElement('div'); ring.className='ring';
   const corner=document.createElement('div'); corner.className='corner'; corner.textContent=type+1;
   el.appendChild(face); el.appendChild(ring); el.appendChild(corner);
-  if(special!==SPECIAL.NONE){ const badge=document.createElement('span'); badge.className='badge'; badge.innerHTML=ic(({[SPECIAL.BOMB]:'bomb',[SPECIAL.RAINBOW]:'rainbow',[SPECIAL.ROCKET_H]:'rocketH',[SPECIAL.ROCKET_V]:'rocketV'})[special]||'star'); el.appendChild(badge); }
+  if(special!==SPECIAL.NONE){ const badge=document.createElement('span'); badge.className='badge'; badge.innerHTML=ic(({[SPECIAL.BOMB]:'bomb',[SPECIAL.RAINBOW]:'rainbow',[SPECIAL.ROCKET_H]:'rocketH',[SPECIAL.ROCKET_V]:'rocketV',[SPECIAL.CROSS]:'cross'})[special]||'star'); el.appendChild(badge); }
   const {x,y}=posOf(r,c);
   el.style.setProperty('--tx',x+'px'); el.style.setProperty('--ty',y+'px');
   el.style.transform=`translate3d(${x}px,${y}px,${Z_TILE}px)`;
@@ -334,6 +336,8 @@ function initBoard(){
 function createsMatch(r,c,type){
   if(c>=2&&board[r][c-1]?.type===type&&board[r][c-2]?.type===type) return true;
   if(r>=2&&board[r-1][c]?.type===type&&board[r-2][c]?.type===type) return true;
+  // 2×2 正方形（开局/洗牌避免预存在，保证「交换成 2×2」才是十字炮触发点）
+  if(r>=1&&c>=1&&board[r-1][c-1]?.type===type&&board[r-1][c]?.type===type&&board[r][c-1]?.type===type) return true;
   return false;
 }
 function clearBoard(){
@@ -355,6 +359,18 @@ function findAllMatches(){
       if(k-r>=3){ const cells=[]; for(let i=r;i<k;i++){cells.push({r:i,c});matched.add(`${i},${c}`);} runs.push({cells,type:t.type,dir:'v',len:k-r}); } r=k; }
   }
   return {matched,runs};
+}
+// 2×2 同色正方形检测（用于十字炮：直线 4/5/T·L 之外的第 4 种生成规则）
+function findSquares(){
+  const out=[];
+  for(let r=0;r<ROWS-1;r++)for(let c=0;c<COLS-1;c++){
+    const a=board[r][c]; if(!a) continue;
+    const b=board[r][c+1], d=board[r+1][c], e=board[r+1][c+1];
+    if(b&&d&&e&&b.type===a.type&&d.type===a.type&&e.type===a.type){
+      out.push({r,c,type:a.type,cells:[{r,c},{r,c:c+1},{r:r+1,c},{r:r+1,c:c+1}]});
+    }
+  }
+  return out;
 }
 
 // ---------- 交换 ----------
@@ -380,11 +396,13 @@ async function trySwap(r1,c1,r2,c2){
       if(other.special===SPECIAL.BOMB){ for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++) add(r+dr,c+dc); }
       else if(other.special===SPECIAL.ROCKET_H){ for(let nc=0;nc<COLS;nc++) add(r,nc); }
       else if(other.special===SPECIAL.ROCKET_V){ for(let nr=0;nr<ROWS;nr++) add(nr,c); }
+      else if(other.special===SPECIAL.CROSS){ for(let nc=0;nc<COLS;nc++) add(r,nc); for(let nr=0;nr<ROWS;nr++) add(nr,c); }
       else { add(r,c); }
     }
     const targets=Array.from(set).map(parseKey);
     if(other.special===SPECIAL.BOMB) sfx.bomb();
     if(other.special===SPECIAL.ROCKET_H||other.special===SPECIAL.ROCKET_V) sfx.special(SPECIAL.ROCKET_H);
+    if(other.special===SPECIAL.CROSS) sfx.special(SPECIAL.CROSS);
     await removeCells(targets,{rainbow:other.special===SPECIAL.RAINBOW});
     combo=0; await cascade(); afterMove(); return;
   }
@@ -392,7 +410,8 @@ async function trySwap(r1,c1,r2,c2){
   swapData(r1,c1,r2,c2);
   await Promise.all([placeTile(a,r2,c2),placeTile(b,r1,c1)]); sfx.swap();
   const {matched}=findAllMatches();
-  if(matched.size>0){ combo=0; await cascade(); }
+  const squares=findSquares();
+  if(matched.size>0 || squares.length>0){ combo=0; await cascade(); }
   else { swapData(r2,c2,r1,c1); await Promise.all([placeTile(a,r1,c1),placeTile(b,r2,c2)]); sfx.invalid(); showToast('这里消除不了哦～'); }
   afterMove();
 }
@@ -425,9 +444,11 @@ function checkGoalsMet(){
 async function cascade(){
   while(true){
     const {matched,runs}=findAllMatches();
-    if(matched.size===0) break;
+    const squares=findSquares();
+    if(matched.size===0 && squares.length===0) break;
     combo++; stats.maxCombo=Math.max(stats.maxCombo,combo);
-    const specials=planSpecials(runs);
+    const specials=planSpecials(runs, squares);
+    for(const sq of squares) for(const cell of sq.cells) matched.add(cell.r+','+cell.c);
     let toRemove=new Set(matched);
     for(const k of collectSpecialTriggers(matched)) toRemove.add(k);
     toRemove=expandSpecials(toRemove);
@@ -461,7 +482,7 @@ async function cascade(){
   combo=0; updateHUD();
 }
 function scoreFor(n,c){ return Math.round(n*30*(1+(c-1)*0.5)); }
-function planSpecials(runs){
+function planSpecials(runs, squares=[]){
   const out=[]; const planned=new Set();
   const key=(r,c)=>r+','+c;
   // 1) 直线 5+ → 彩虹
@@ -497,6 +518,14 @@ function planSpecials(runs){
     out.push({r:mid.r,c:mid.c,type:run.type,special:run.dir==='h'?SPECIAL.ROCKET_H:SPECIAL.ROCKET_V});
     stats.rockets++;
   }
+  // 4) 2×2 正方形 → 十字炮（清整行 + 整列）
+  for(const sq of squares){
+    const k=key(sq.r,sq.c);
+    if(planned.has(k)) continue;
+    planned.add(k);
+    out.push({r:sq.r,c:sq.c,type:sq.type,special:SPECIAL.CROSS});
+    stats.crosses++; goalProgress.cross=(goalProgress.cross||0)+1;
+  }
   if(combo>=2) goalProgress.combo=Math.max(goalProgress.combo||0,combo);
   return out;
 }
@@ -508,6 +537,7 @@ function expandSpecials(set){
     if(t.special===SPECIAL.BOMB){ for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++) add(r+dr,c+dc); }
     else if(t.special===SPECIAL.ROCKET_H){ for(let nc=0;nc<COLS;nc++) add(r,nc); }
     else if(t.special===SPECIAL.ROCKET_V){ for(let nr=0;nr<ROWS;nr++) add(nr,c); }
+    else if(t.special===SPECIAL.CROSS){ for(let nc=0;nc<COLS;nc++) add(r,nc); for(let nr=0;nr<ROWS;nr++) add(nr,c); }
   }
   return result;
 }
@@ -734,8 +764,8 @@ function findHintMove(){
     if(board[r][c]&&board[r][c].special!==SPECIAL.NONE) return {r1:r,c1:c,r2:r,c2:Math.min(COLS-1,c+1)};
   }
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
-    if(c<COLS-1){ swapData(r,c,r,c+1); const m=findAllMatches().matched.size; swapData(r,c,r,c+1); if(m) return {r1:r,c1:c,r2:r,c2:c+1}; }
-    if(r<ROWS-1){ swapData(r,c,r+1,c); const m=findAllMatches().matched.size; swapData(r,c,r+1,c); if(m) return {r1:r,c1:c,r2:r+1,c2:c}; }
+    if(c<COLS-1){ swapData(r,c,r,c+1); const m=findAllMatches().matched.size||findSquares().length; swapData(r,c,r,c+1); if(m) return {r1:r,c1:c,r2:r,c2:c+1}; }
+    if(r<ROWS-1){ swapData(r,c,r+1,c); const m=findAllMatches().matched.size||findSquares().length; swapData(r,c,r+1,c); if(m) return {r1:r,c1:c,r2:r+1,c2:c}; }
   }
   return null;
 }
@@ -744,8 +774,8 @@ function findHintMove(){
 function hasPossibleMove(){
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const t=board[r][c]; if(t&&t.special!==SPECIAL.NONE) return true; }
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
-    if(c<COLS-1){ swapData(r,c,r,c+1); const m=findAllMatches().matched.size; swapData(r,c,r,c+1); if(m) return true; }
-    if(r<ROWS-1){ swapData(r,c,r+1,c); const m=findAllMatches().matched.size; swapData(r,c,r+1,c); if(m) return true; }
+    if(c<COLS-1){ swapData(r,c,r,c+1); const m=findAllMatches().matched.size||findSquares().length; swapData(r,c,r,c+1); if(m) return true; }
+    if(r<ROWS-1){ swapData(r,c,r+1,c); const m=findAllMatches().matched.size||findSquares().length; swapData(r,c,r+1,c); if(m) return true; }
   }
   return false;
 }
@@ -757,7 +787,7 @@ async function shuffleBoard(){
     let idx=0;
     for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ if(board[r][c]){ board[r][c].type=types[idx++]; board[r][c].el.dataset.type=board[r][c].type; board[r][c].el.className=`tile t${board[r][c].type}`; const img=board[r][c].el.querySelector('img'); if(img) img.src=faceSrcOf(board[r][c].type); } }
     attempts++;
-  } while((findAllMatches().matched.size>0||!hasPossibleMove())&&attempts<50);
+  } while((findAllMatches().matched.size>0||findSquares().length>0||!hasPossibleMove())&&attempts<50);
   boardEl.querySelectorAll('.tile').forEach(e=>{e.classList.add('spawning');setTimeout(()=>e.classList.remove('spawning'),450);});
   await sleep(500); busy=false;
 }
@@ -774,7 +804,7 @@ const sfx=(()=>{
     invalid:()=>tone(180,0.18,'sawtooth',0.18,0.6),
     clear:(combo)=>{ const base=523+(combo-1)*70; tone(base,0.12,'triangle',0.22,1.5); setTimeout(()=>tone(base*1.5,0.1,'sine',0.16),60); },
     bomb:()=>{ noise(0.3,0.5); tone(120,0.3,'sawtooth',0.3,0.4); },
-    special:(sp)=>{ if(sp===SPECIAL.RAINBOW){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,0.15,'triangle',0.2),i*50)); } else if(sp===SPECIAL.ROCKET_H||sp===SPECIAL.ROCKET_V){ tone(620,0.1,'square',0.18,2.6); setTimeout(()=>{ noise(0.18,0.28); tone(180,0.3,'sawtooth',0.2,0.3); },70); } else { tone(80,0.2,'sawtooth',0.3,2); noise(0.15,0.3); } },
+    special:(sp)=>{ if(sp===SPECIAL.RAINBOW){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,0.15,'triangle',0.2),i*50)); } else if(sp===SPECIAL.ROCKET_H||sp===SPECIAL.ROCKET_V){ tone(620,0.1,'square',0.18,2.6); setTimeout(()=>{ noise(0.18,0.28); tone(180,0.3,'sawtooth',0.2,0.3); },70); } else if(sp===SPECIAL.CROSS){ tone(520,0.09,'square',0.2,2.2); setTimeout(()=>{ tone(740,0.12,'triangle',0.2); noise(0.2,0.3); },70); } else { tone(80,0.2,'sawtooth',0.3,2); noise(0.15,0.3); } },
     win:()=>{ [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,0.3,'triangle',0.3),i*120)); },
     lose:()=>{ [400,330,260].forEach((f,i)=>setTimeout(()=>tone(f,0.35,'sawtooth',0.25),i*150)); },
     achieve:()=>{ [659,784,988,1319].forEach((f,i)=>setTimeout(()=>tone(f,0.25,'triangle',0.25),i*90)); },
@@ -963,7 +993,7 @@ async function startLevel(idx){
   $('movesLabel').textContent='步数';
   levelIdx=idx; currentLevel=LEVELS[idx];
   score=0; moves=currentLevel.moves; usedMoves=0; combo=0; busy=false;
-  stats={clears:0,maxCombo:0,bombs:0,rainbows:0,rockets:0}; goalProgress={};
+  stats={clears:0,maxCombo:0,bombs:0,rainbows:0,rockets:0,crosses:0}; goalProgress={};
   state='intro'; showScreen('screenIntro');
   $('introNum').textContent=currentLevel.id; $('introName').textContent=currentLevel.name;
   $('introGoals').innerHTML=currentLevel.goals.map(g=>{const m=GOAL_META[g.t];return `<div>${ic(m.icon,'sm')} ${m.label} <b>${g.v}</b></div>`;}).join('') + (currentLevel.moves===0?'':'<div>'+ic('target','sm')+' '+currentLevel.moves+' 步内完成</div>');
@@ -1073,7 +1103,7 @@ function renderTimeUI(ms){
 async function startMode(m){
   mode=m; dailyRng=null;
   score=0; moves=0; usedMoves=0; combo=0; busy=false;
-  stats={clears:0,maxCombo:0,bombs:0,rainbows:0,rockets:0}; goalProgress={};
+  stats={clears:0,maxCombo:0,bombs:0,rainbows:0,rockets:0,crosses:0}; goalProgress={};
   currentLevel=null;
   if(m===M_DAILY){
     let h=0; const s=todayKey(); for(let i=0;i<s.length;i++) h=(Math.imul(31,h)+s.charCodeAt(i))|0;
