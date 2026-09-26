@@ -25,7 +25,7 @@ const CinematicBlackHole = dynamic(
 )
 
 const fieldClass =
-  "h-11 rounded-xl border-white/[0.11] bg-black/45 text-[15px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-[border-color,box-shadow] placeholder:text-white/50 focus-visible:border-white/22 focus-visible:ring-2 focus-visible:ring-violet-400/25"
+  "h-11 rounded-xl border-white/[0.11] bg-black/45 text-[15px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-[border-color,box-shadow] placeholder:text-white/50 focus-visible:border-white/22 focus-visible:ring-2 focus-visible:ring-hud-accent/25"
 
 const labelClass = "text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50"
 
@@ -281,10 +281,10 @@ export default function LoginPage() {
           transition={{ duration: 1.15, delay: 0.22, ease: cinematicEase }}
         >
           <motion.div
-            className="absolute inset-0 rounded-full border border-violet-300/35"
+            className="absolute inset-0 rounded-full border border-hud-accent/35"
             style={{
               background:
-                "conic-gradient(from 210deg, rgba(255,182,193,0.0), rgba(255,182,193,0.5), rgba(168,85,247,0.45), rgba(96,165,250,0.0))",
+                "conic-gradient(from 210deg, rgba(216,163,60,0.0), rgba(233,190,105,0.5), rgba(216,163,60,0.45), rgba(168,124,36,0.0))",
               maskImage: "radial-gradient(circle, transparent 64%, black 72%, transparent 78%)",
               WebkitMaskImage: "radial-gradient(circle, transparent 64%, black 72%, transparent 78%)",
               filter: "blur(1.4px)",
@@ -364,7 +364,7 @@ export default function LoginPage() {
               className="mt-6 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-[1px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
             >
               <div className="flex items-center gap-3 rounded-[0.95rem] bg-black/32 px-3.5 py-2.5 sm:gap-4 sm:px-4 sm:py-3">
-                <Mail className="hidden h-4 w-4 shrink-0 text-violet-300/75 sm:block" strokeWidth={2} aria-hidden />
+                <Mail className="hidden h-4 w-4 shrink-0 text-hud-accent/75 sm:block" strokeWidth={2} aria-hidden />
                 <p className="min-w-0 flex-1 text-[12px] leading-snug text-white/50 sm:text-[12.5px]">
                   <span className="font-medium text-white/78">新用户</span>
                   用邮箱验证码即可；未注册时会引导设置账号。
@@ -397,7 +397,7 @@ export default function LoginPage() {
                 <Input
                   value={guestInviteCode}
                   onChange={(e) => setGuestInviteCode(e.target.value)}
-                  className="h-9 border-white/[0.08] bg-black/35 text-[13px] text-white/90 placeholder:text-white/50 focus-visible:border-white/20 focus-visible:ring-1 focus-visible:ring-violet-400/20"
+                  className="h-9 border-white/[0.08] bg-black/35 text-[13px] text-white/90 placeholder:text-white/50 focus-visible:border-white/20 focus-visible:ring-1 focus-visible:ring-hud-accent/20"
                   placeholder="输入邀请码"
                   aria-label="游客邀请码"
                 />
@@ -464,7 +464,7 @@ export default function LoginPage() {
                           setResetEmail(identifier.includes("@") ? identifier : "")
                           setResetOpen(true)
                         }}
-                        className="relative text-[12px] font-medium text-cyan-200/85 transition hover:text-cyan-100 before:absolute before:-inset-x-2 before:-inset-y-3.5 before:content-['']"
+                        className="relative text-[12px] font-medium text-hud-accent/85 transition hover:text-hud-accent-bright before:absolute before:-inset-x-2 before:-inset-y-3.5 before:content-['']"
                       >
                         忘记密码？
                       </button>

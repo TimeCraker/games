@@ -242,13 +242,13 @@ export default function ArenaPage() {
         <div className="mt-8 flex items-center gap-3">
           <Link
             href="/login"
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/16 bg-white/[0.08] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-white/[0.14] focus-visible:ring-2 focus-visible:ring-violet-400/70"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/16 bg-white/[0.08] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-white/[0.14] focus-visible:ring-2 focus-visible:ring-hud-accent/70"
           >
             前往登录
           </Link>
           <Link
             href="/"
-            className="inline-flex min-h-11 items-center rounded-full border border-glass-border bg-glass-bg px-6 py-2.5 text-sm font-medium text-white/90 backdrop-blur-glass-md transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-violet-400/70"
+            className="inline-flex min-h-11 items-center rounded-full border border-glass-border bg-glass-bg px-6 py-2.5 text-sm font-medium text-white/90 backdrop-blur-glass-md transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-hud-accent/70"
           >
             返回首页
           </Link>
@@ -268,8 +268,8 @@ export default function ArenaPage() {
           aria-label="请横屏游戏"
         >
           <div
-            className="font-display max-w-md text-lg font-semibold leading-relaxed text-cyan-100/95"
-            style={{ textShadow: "0 0 24px rgba(34,211,238,0.35)" }}
+            className="font-display max-w-md text-lg font-semibold leading-relaxed text-hud-paper"
+            style={{ textShadow: "0 0 24px rgb(216 163 60 / 0.35)" }}
           >
             为了获得最佳游戏体验，请关闭系统的屏幕旋转锁定，并将手机横置。
           </div>

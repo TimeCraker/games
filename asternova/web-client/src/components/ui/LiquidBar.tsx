@@ -20,13 +20,13 @@ const VARIANT_CFG: Record<
   hp: {
     height: "h-7",
     track: "border-white/30",
-    fill: "bg-gradient-to-r from-fuchsia-300 via-pink-500 to-violet-900",
+    fill: "bg-gradient-to-r from-hud-red to-[#7A2E20]",
     defaultSkew: true,
   },
   energy: {
     height: "h-3",
     track: "border-white/20",
-    fill: "bg-gradient-to-r from-yellow-400 to-cyan-400",
+    fill: "bg-gradient-to-r from-hud-accent-bright to-hud-accent-dim",
     defaultSkew: true,
   },
   xp: {
@@ -38,7 +38,7 @@ const VARIANT_CFG: Record<
   progress: {
     height: "h-3.5",
     track: "border-white/14",
-    fill: "bg-gradient-to-r from-pink-300 via-purple-400 to-indigo-400",
+    fill: "bg-gradient-to-r from-hud-accent to-hud-accent-dim",
     defaultSkew: false,
   },
 }

@@ -40,12 +40,12 @@ export function GameLoadingScreen({
           {hasProgress ? (
             <div className="h-2.5 w-full overflow-hidden rounded-full border border-white/20 bg-white/10">
               <div
-                className="h-full rounded-full bg-[linear-gradient(90deg,rgba(255,255,255,0.85),rgba(167,243,208,0.92),rgba(147,197,253,0.9))] shadow-glow-cyan transition-[width] duration-300"
+                className="h-full rounded-full bg-[linear-gradient(90deg,rgb(168_124_36/0.9),rgb(216_163_60/0.95),rgb(233_190_105/0.9))] shadow-glow-accent transition-[width] duration-300"
                 style={{ width: `${pct}%` }}
               />
             </div>
           ) : (
-            <Loader2 className="h-7 w-7 animate-spin text-brand-violet/80" />
+            <Loader2 className="h-7 w-7 animate-spin text-hud-accent/80" />
           )}
         </div>
 

@@ -118,8 +118,8 @@ vec3 starfield(vec2 uv) {
 
   float neb = fbm(uv * 3.5 + vec2(0.0, u_time * 0.01));
   vec3 bg = vec3(0.0025, 0.003, 0.008);
-  bg += vec3(0.008, 0.012, 0.02) * neb * 0.12;
-  bg += vec3(0.65, 0.72, 0.85) * star * 0.38;
+  bg += vec3(0.022, 0.016, 0.008) * neb * 0.12;
+  bg += vec3(0.82, 0.79, 0.72) * star * 0.38;
   return bg;
 }
 
@@ -175,20 +175,36 @@ void main() {
   bright *= mix(1.0, 0.48, pow(recede, 1.05));
 
   float innerHot = smoothstep(diskRadius + 0.016, diskRadius - 0.018, diskR);
-  vec3 colBlue = vec3(0.18, 0.58, 1.0);
-  vec3 colPurple = vec3(0.62, 0.18, 1.0);
-  vec3 colWhite = vec3(0.98, 0.99, 1.0);
-  vec3 diskBase = mix(colPurple, colBlue, 0.5 + 0.5 * sin(rotAngle * 3.0));
+
+  // 2026-09-27：径向温度剖面 —— 内缘白热 → 中段金 → 外缘深橙红
+  // 物理依据：吸积盘温度随半径单调下降，内缘最热。角向差异只应由多普勒不对称贡献，
+  // 原先用 sin(rotAngle*3) 做角向配色，效果是「糖果条纹」，既不像黑洞也显平。
+  float tRad = clamp((diskRadius + 0.055 - diskR) / 0.11, 0.0, 1.0); // 1=内缘, 0=外缘
+
+  // 多普勒温度色移：接近侧整体更热（偏白热），远离侧更冷（偏深红）。
+  // 注：原版蓝/紫之所以好看，本质是这里的蓝移/红移；此处保留该物理机制，
+  //     但把它约束在暖色族内表达，不引入冷色相。
+  float tDop = clamp(tRad + (approach - 0.5) * 0.40, 0.0, 1.0);
+
+  vec3 cOuter = vec3(0.70, 0.18, 0.035);  // 外缘：深橙红
+  vec3 cMid   = vec3(1.00, 0.58, 0.14);   // 中段：金（面积主导）
+  vec3 cInner = vec3(1.00, 0.86, 0.62);   // 内缘：白热暖
+  vec3 cCore  = vec3(0.90, 0.95, 1.00);   // 极内缘：冷白（仅最窄一环）
+
+  vec3 diskBase = mix(cOuter, cMid, smoothstep(0.0, 0.55, tDop));
+  diskBase = mix(diskBase, cInner, smoothstep(0.55, 0.98, tDop));
+  diskBase = mix(diskBase, cCore, smoothstep(0.94, 1.0, tDop) * 0.80);
+
   vec3 diskColor = diskBase * bright;
-  diskColor = mix(diskColor, colWhite * (1.2 + bright * 0.35), innerHot * approach);
+  diskColor = mix(diskColor, cCore * (1.15 + bright * 0.30), innerHot * approach * 0.70);
 
   float streak = 0.9 + 0.1 * sin(rotAngle * 9.0 + u_time * 0.35);
   streak *= 0.92 + 0.08 * sin(rotAngle * 4.0 - u_time * 0.18);
   vec3 disk = diskColor * (mainRing * 0.95 + innerRing * 0.65) * streak;
 
-  // 黑洞边缘环形光圈：更细、更精致的蓝紫波浪流动
+  // 黑洞边缘环形光圈：更细、更精致的琥珀波浪流动
   float edgeR = eventHorizon + 0.125;
-  float edgeW = 0.011;
+  float edgeW = 0.0085;
   float edgeRing = exp(-abs(r - edgeR) / edgeW);
 
   // 低频主波 + 高频细纹：无接缝角向映射 + 1.5x 速度
@@ -203,14 +219,17 @@ void main() {
   float thicknessWave = 0.975 + 0.025 * waveFine;
   edgeRing *= ripple * thicknessWave;
 
-  vec3 edgePurple = vec3(0.62, 0.18, 1.0);
-  vec3 edgeBlue = vec3(0.2, 0.64, 1.0);
-  vec3 edgeWhiteBlue = vec3(0.9, 0.97, 1.0);
+  // 2026-09-27：光子环走「深橙 → 暖金 → 白热」梯度，冷调仅在最亮交叠处点缀
+  vec3 edgeWarmDeep = vec3(0.72, 0.34, 0.06);
+  vec3 edgeWarm = vec3(1.00, 0.70, 0.26);
+  vec3 edgeHot = vec3(1.00, 0.95, 0.84);
+  vec3 edgeCool = vec3(0.84, 0.90, 1.00);
   float gradA = 0.5 + 0.5 * sin(dot(nrm, vec2(cos(u_time * 0.24), sin(u_time * 0.24))) * 1.8);
   float gradB = 0.5 + 0.5 * sin(dot(nrm, vec2(cos(-u_time * 0.2), sin(-u_time * 0.2))) * 2.8);
-  vec3 edgeCol = mix(edgePurple, edgeBlue, gradA);
-  edgeCol = mix(edgeCol, edgeWhiteBlue, 0.08 * gradB);
-  vec3 edgeHalo = edgeCol * edgeRing * 0.98;
+  vec3 edgeCol = mix(edgeWarmDeep, edgeWarm, gradA);
+  edgeCol = mix(edgeCol, edgeHot, 0.16 * gradB);
+  edgeCol = mix(edgeCol, edgeCool, 0.10 * gradA * gradB);
+  vec3 edgeHalo = edgeCol * edgeRing * 0.78;
 
   // 靠近视界的吞噬暗晕
   float swallow = 1.0 - smoothstep(eventHorizon * 1.02, eventHorizon * 3.4, r);
@@ -245,7 +264,7 @@ void main() {
 
     const composer = new EffectComposer(renderer)
     composer.addPass(new RenderPass(scene, camera))
-    composer.addPass(new UnrealBloomPass(new THREE.Vector2(width, height), 0.62, 0.34, 0.3))
+    composer.addPass(new UnrealBloomPass(new THREE.Vector2(width, height), 0.48, 0.30, 0.32))
 
     wrap.appendChild(renderer.domElement)
     renderer.domElement.className = "absolute inset-0 z-0 pointer-events-none"
@@ -377,7 +396,7 @@ void main() {
   return (
     <div
       ref={wrapRef}
-      className={`fixed inset-0 z-0 pointer-events-none w-screen h-screen bg-black ${className}`.trim()}
+      className={`fixed inset-0 z-0 pointer-events-none w-screen h-screen bg-ink-900 ${className}`.trim()}
       style={{ opacity }}
     />
   )

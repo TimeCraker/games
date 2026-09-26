@@ -24,10 +24,39 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --brand-cyan: #38bdf8;
-  --brand-violet: #a855f7;
-  --brand-indigo: #6366f1;
-  --brand-pink: #f472b6;
+  /* ===== 2026-09-26 色板重构：Terminal Industrial =====
+     删除 Tailwind 默认 violet-500 / sky-400 / indigo-500 / pink-400（AI 味来源），
+     收敛为「冷中性黑 + 单一琥珀」。旧名保留为兼容别名，仅重指向新色板。 */
+  --brand-violet: #D8A33C;
+  --brand-cyan: #8C949E;
+  --brand-indigo: #6B7480;
+  --brand-pink: #C0503A;
+
+  /* Primitive：中性冷黑（无紫相） */
+  --ink-1000: #050607;
+  --ink-900: #0A0B0D;
+  --ink-800: #111316;
+  --ink-700: #181B1F;
+  --ink-600: #22262B;
+  --ink-500: #2E3339;
+
+  /* Primitive：文字阶 */
+  --fog-400: #6B7480;
+  --fog-300: #8C949E;
+  --fog-200: #B4BAC2;
+  --fog-100: #E2E5E8;
+  --paper: #F2F4F5;
+
+  /* Primitive：唯一强调色（琥珀） */
+  --amber-700: #8A6519;
+  --amber-600: #A87C24;
+  --amber-500: #D8A33C;
+  --amber-400: #E9BE69;
+  --amber-300: #F2D79B;
+
+  /* Primitive：语义信号色（低饱和） */
+  --signal-red: #C0503A;
+  --signal-green: #4F8D6B;
   --chart-1: oklch(0.809 0.105 251.813);
   --chart-2: oklch(0.623 0.214 259.815);
   --chart-3: oklch(0.546 0.245 262.881);
@@ -43,23 +72,37 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* ===== Stage A：深空黑统一 / surface 派生层（收口全站 10 处散落黑）===== */
-  --space-black: oklch(0.045 0.015 280);
-  --surface-1: oklch(0.07 0.018 280);
-  --surface-2: oklch(0.1 0.02 280);
-  --surface-3: oklch(0.14 0.022 280);
+  /* ===== 2026-09-26：surface 派生层 → 中性冷黑（原 hue 280 紫相已去除）===== */
+  --space-black: var(--ink-900);
+  --surface-1: var(--ink-800);
+  --surface-2: var(--ink-700);
+  --surface-3: var(--ink-600);
 
-  /* Elevation：tinted 到 hue 280（非纯黑），收口 8+ 套散落阴影 */
-  --elev-sm: 0 2px 10px -2px oklch(0.1 0.05 280 / 0.55);
-  --elev-md: 0 12px 36px -8px oklch(0.08 0.04 280 / 0.6);
-  --elev-lg: 0 24px 80px -16px oklch(0.05 0.03 280 / 0.7), inset 0 1px 0 oklch(1 0 0 / 0.06);
-  --glow-violet: 0 0 60px oklch(0.58 0.24 295 / 0.45);
-  --glow-cyan: 0 0 60px oklch(0.78 0.16 220 / 0.4);
+  /* Elevation：中性 tint（非纯黑亦非紫） */
+  --elev-sm: 0 2px 10px -2px rgb(0 0 0 / 0.55);
+  --elev-md: 0 12px 36px -8px rgb(0 0 0 / 0.6);
+  --elev-lg: 0 24px 80px -16px rgb(0 0 0 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.06);
+
+  /* 单一琥珀辉光（原 glow-violet / glow-cyan 双色霓虹已废弃） */
+  --glow-accent: 0 0 0 1px rgb(216 163 60 / 0.25), 0 0 32px -8px rgb(216 163 60 / 0.35);
+  --glow-accent-strong: 0 0 0 1px rgb(216 163 60 / 0.45), 0 0 44px -6px rgb(216 163 60 / 0.5);
+  --glow-violet: var(--glow-accent);  /* 兼容别名（nova-ball 旧引用） */
+  --glow-cyan: var(--glow-accent);
 
   /* 玻璃配方：收口 blur 8/12/28/40 + GlassPanel 硬编码 */
-  --glass-bg: oklch(1 0 0 / 0.04);
-  --glass-border: oklch(1 0 0 / 0.08);
-  --glass-highlight: oklch(1 0 0 / 0.06);
+  --glass-bg: rgb(255 255 255 / 0.03);
+  --glass-border: rgb(255 255 255 / 0.07);
+  --glass-highlight: rgb(255 255 255 / 0.05);
+
+  /* 工业风工具 token（2026-09-26 新增） */
+  --chamfer-sm: 6px;
+  --chamfer-md: 10px;
+  --scanline: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.022) 0 1px, transparent 1px 3px);
+  --grain-opacity: 0.03;
+  --ease-instrument: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-fast: 150ms;
+  --dur-base: 220ms;
+  --dur-slow: 320ms;
 
   /* 容器 / 间距（供 var() 引用） */
   --section-gap: clamp(2.5rem, 6vw, 5rem);
@@ -122,12 +165,42 @@
   --color-glass-border: var(--glass-border);
   --color-glass-highlight: var(--glass-highlight);
 
-  /* 覆盖 Tailwind 默认阴影，统一为 tinted elevation + 品牌 glow */
+  /* ===== 2026-09-26 HUD 色板（Terminal Industrial）
+     用 hud-* 前缀，避免与 shadcn 的 --color-accent / Tailwind 内置 amber-* 撞名 ===== */
+  --color-ink-1000: var(--ink-1000);
+  --color-ink-900: var(--ink-900);
+  --color-ink-800: var(--ink-800);
+  --color-ink-700: var(--ink-700);
+  --color-ink-600: var(--ink-600);
+  --color-ink-500: var(--ink-500);
+  --color-fog-400: var(--fog-400);
+  --color-fog-300: var(--fog-300);
+  --color-fog-200: var(--fog-200);
+  --color-fog-100: var(--fog-100);
+  --color-paper: var(--paper);
+  --color-hud-accent: var(--amber-500);
+  --color-hud-accent-bright: var(--amber-400);
+  --color-hud-accent-dim: var(--amber-600);
+  --color-hud-line: var(--ink-600);
+  --color-hud-line-strong: var(--ink-500);
+  --color-hud-panel: var(--ink-700);
+  --color-hud-raised: var(--ink-800);
+  --color-hud-sunken: var(--ink-1000);
+  --color-hud-text: var(--fog-100);
+  --color-hud-text-dim: var(--fog-300);
+  --color-hud-text-faint: var(--fog-400);
+  --color-hud-paper: var(--paper);
+  --color-hud-red: var(--signal-red);
+  --color-hud-green: var(--signal-green);
+
+  /* 覆盖 Tailwind 默认阴影，统一为中性 elevation + 单一琥珀 glow */
   --shadow-sm: var(--elev-sm);
   --shadow-md: var(--elev-md);
   --shadow-lg: var(--elev-lg);
-  --shadow-glow-violet: var(--glow-violet);
-  --shadow-glow-cyan: var(--glow-cyan);
+  --shadow-glow-accent: var(--glow-accent);
+  --shadow-glow-accent-strong: var(--glow-accent-strong);
+  --shadow-glow-violet: var(--glow-accent);
+  --shadow-glow-cyan: var(--glow-accent);
 }
 
 /* Stage A：常量 token（字号阶梯 / 时长 / 容器 / 玻璃 blur）
@@ -164,24 +237,25 @@ body {
 }
 
 .dark {
-  --background: oklch(0.06 0.015 280);
-  --foreground: oklch(0.985 0.004 280);
-  --card: oklch(0.1 0.018 280);
-  --card-foreground: oklch(0.985 0.004 280);
-  --popover: oklch(0.1 0.018 280);
-  --popover-foreground: oklch(0.985 0.004 280);
-  --primary: oklch(0.985 0.004 280);
-  --primary-foreground: oklch(0.06 0.015 280);
-  --secondary: oklch(0.16 0.012 280);
-  --secondary-foreground: oklch(0.985 0.004 280);
-  --muted: oklch(0.16 0.012 280);
-  --muted-foreground: oklch(0.68 0.02 280);
-  --accent: oklch(0.16 0.012 280);
-  --accent-foreground: oklch(0.985 0.004 280);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0.004 280 / 10%);
-  --input: oklch(1 0.004 280 / 15%);
-  --ring: oklch(0.62 0.2 295);
+  /* 2026-09-26：全部去紫相（原 chroma 0.012~0.02 @ hue 280 → 中性） */
+  --background: #0A0B0D;
+  --foreground: #E2E5E8;
+  --card: #111316;
+  --card-foreground: #E2E5E8;
+  --popover: #111316;
+  --popover-foreground: #E2E5E8;
+  --primary: #E2E5E8;
+  --primary-foreground: #0A0B0D;
+  --secondary: #181B1F;
+  --secondary-foreground: #E2E5E8;
+  --muted: #181B1F;
+  --muted-foreground: #8C949E;
+  --accent: #181B1F;
+  --accent-foreground: #E2E5E8;
+  --destructive: #C0503A;
+  --border: rgb(255 255 255 / 10%);
+  --input: rgb(255 255 255 / 15%);
+  --ring: #D8A33C;
   --chart-1: oklch(0.809 0.105 251.813);
   --chart-2: oklch(0.623 0.214 259.815);
   --chart-3: oklch(0.546 0.245 262.881);
@@ -219,8 +293,8 @@ body {
 
 /* ===== AsterNova 设计系统：浏览器表面（craft「建造 vs 组装」信号） ===== */
 ::selection {
-  background: var(--brand-violet);
-  color: #fff;
+  background: var(--amber-500);
+  color: var(--ink-900);
 }
 ::-webkit-scrollbar {
   width: 10px;
@@ -236,11 +310,11 @@ body {
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.4);
+  background: rgb(216 163 60 / 0.4);
   background-clip: padding-box;
 }
 :focus-visible {
-  outline: 2px solid var(--brand-violet);
+  outline: 2px solid var(--amber-500);
   outline-offset: 2px;
 }
 
@@ -292,52 +366,114 @@ body {
   min-width: 0 !important;
 }
 
-/* 大厅 · 小游戏卡片「进入」微光呼吸 */
-@keyframes lobby-arcade-enter-glow {
-  0%,
-  100% {
-    box-shadow:
-      0 0 18px rgba(255, 255, 255, 0.14),
-      0 0 36px rgba(255, 255, 255, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.42);
-  }
-  50% {
-    box-shadow:
-      0 0 28px rgba(255, 255, 255, 0.28),
-      0 0 48px rgba(255, 255, 255, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.55);
-  }
+/* ===== 大厅 · 工业终端 HUD 组件（2026-09-26）
+   替换原「SaaS 玻璃药丸 + 白色霓虹呼吸 + 多色渐变」，
+   全部改为中性硬边 + 单一琥珀。零外部文件依赖。 ===== */
+
+/* 斜切角：工业硬边，替代大圆角 */
+.hud-chamfer {
+  clip-path: polygon(
+    var(--chamfer-md) 0, 100% 0,
+    100% calc(100% - var(--chamfer-md)), calc(100% - var(--chamfer-md)) 100%,
+    0 100%, 0 var(--chamfer-md)
+  );
+}
+.hud-chamfer-sm {
+  clip-path: polygon(
+    var(--chamfer-sm) 0, 100% 0,
+    100% calc(100% - var(--chamfer-sm)), calc(100% - var(--chamfer-sm)) 100%,
+    0 100%, 0 var(--chamfer-sm)
+  );
 }
 
-.lobby-arcade-enter-pill {
-  animation: lobby-arcade-enter-glow var(--duration-ambient) ease-in-out infinite;
+/* CRT 扫描线覆盖层 */
+.hud-scanlines {
+  background-image: var(--scanline);
+  pointer-events: none;
 }
 
-.group:hover .lobby-arcade-enter-pill {
-  animation: none;
-  box-shadow:
-    0 0 32px rgba(255, 255, 255, 0.38),
-    0 0 56px rgba(255, 255, 255, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+/* 颗粒噪点：内联 feTurbulence，零外部文件 */
+.hud-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
 }
 
-@keyframes lobby-enter-sheen {
-  0% {
-    transform: translateX(-120%) skewX(-18deg);
-    opacity: 0;
-  }
-  18% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(320%) skewX(-18deg);
-    opacity: 0;
-  }
-}
-
-.lobby-arcade-sheen {
-  transform: translateX(-120%) skewX(-18deg);
+/* 四角括号：游戏 HUD 签名装饰（hover 或 data-active 时点亮） */
+.hud-corners::before,
+.hud-corners::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
   opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-instrument);
+}
+/* 注意：.hud-chamfer 斜切的是「左上 / 右下」两角，
+   故括号必须放在「右上 / 左下」这两角，否则会被 clip-path 裁掉。 */
+.hud-corners::before {
+  top: 0;
+  right: 0;
+  border-top: 2px solid var(--amber-500);
+  border-right: 2px solid var(--amber-500);
+}
+.hud-corners::after {
+  bottom: 0;
+  left: 0;
+  border-bottom: 2px solid var(--amber-500);
+  border-left: 2px solid var(--amber-500);
+}
+/* 2026-09-27 修复：原规则只有后代选择器 `.group:hover .hud-corners`，
+   而大厅卡片把 .group 与 .hud-corners 放在同一元素上 → 永远不匹配，
+   实测 5 个元素匹配数 0、伪元素 opacity 恒为 0。此处补齐同元素用法。 */
+.hud-corners:hover::before,
+.hud-corners:hover::after,
+.hud-corners:focus-visible::before,
+.hud-corners:focus-visible::after,
+.group:hover .hud-corners::before,
+.group:hover .hud-corners::after,
+.hud-corners[data-active="true"]::before,
+.hud-corners[data-active="true"]::after {
+  opacity: 1;
+}
+
+/* 悬停扫描光带：单色横向扫过（替代原白色 sheen） */
+@keyframes hud-sweep {
+  0% { transform: translateX(-130%) skewX(-14deg); opacity: 0; }
+  22% { opacity: 1; }
+  100% { transform: translateX(330%) skewX(-14deg); opacity: 0; }
+}
+.hud-sweep {
+  transform: translateX(-130%) skewX(-14deg);
+  opacity: 0;
+}
+.group:hover .hud-sweep {
+  animation: hud-sweep var(--dur-slow) var(--ease-instrument) forwards;
+}
+
+/* 匹配中：琥珀进度条（替代旋转图标） */
+@keyframes hud-progress {
+  0% { transform: scaleX(0); transform-origin: left; }
+  50% { transform: scaleX(0.72); transform-origin: left; }
+  51% { transform: scaleX(0.72); transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
+}
+.hud-progress {
+  animation: hud-progress 1.4s var(--ease-instrument) infinite;
+}
+
+/* 刻度尺：分段主标题的工业分隔 */
+.hud-rule {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgb(140 148 158 / 0.28) 0 1px,
+    transparent 1px 12px
+  );
 }
 
 .group:hover .lobby-arcade-enter-pill .lobby-arcade-sheen {
@@ -345,10 +481,11 @@ body {
 }
 
 /* ===== 星象观测台:星图坐标网格 + 赤道仪刻度 + 引力扫描(committed 视觉决策) ===== */
+/* 2026-09-26：紫/青双色网格 → 单一中性雾灰（去 AI 味） */
 .star-chart-grid {
   background-image:
-    linear-gradient(to right, rgba(168, 85, 247, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgb(140 148 158 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(140 148 158 / 0.05) 1px, transparent 1px);
   background-size: 64px 64px;
   -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 30%, transparent 85%);
   mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 30%, transparent 85%);
@@ -362,15 +499,16 @@ body {
 }
 
 /* 赤道仪刻度环:围绕焦点元素的坐标刻度(四向准星 + 主环) */
+/* 2026-09-26：紫环 + 青刻度 → 单一琥珀四向准星 */
 .reticle-ring {
   background:
-    radial-gradient(circle, transparent 58%, rgba(168, 85, 247, 0.22) 59%, rgba(168, 85, 247, 0.22) 60%, transparent 61%),
+    radial-gradient(circle, transparent 58%, rgb(216 163 60 / 0.22) 59%, rgb(216 163 60 / 0.22) 60%, transparent 61%),
     conic-gradient(
       from 0deg,
-      transparent 0deg, transparent 88deg, rgba(56, 189, 248, 0.55) 89deg, rgba(56, 189, 248, 0.55) 91deg, transparent 92deg,
-      transparent 178deg, rgba(56, 189, 248, 0.55) 179deg, rgba(56, 189, 248, 0.55) 181deg, transparent 182deg,
-      transparent 268deg, rgba(56, 189, 248, 0.55) 269deg, rgba(56, 189, 248, 0.55) 271deg, transparent 272deg,
-      transparent 358deg, rgba(56, 189, 248, 0.55) 359deg, rgba(56, 189, 248, 0.55) 360deg
+      transparent 0deg, transparent 88deg, rgb(216 163 60 / 0.55) 89deg, rgb(216 163 60 / 0.55) 91deg, transparent 92deg,
+      transparent 178deg, rgb(216 163 60 / 0.55) 179deg, rgb(216 163 60 / 0.55) 181deg, transparent 182deg,
+      transparent 268deg, rgb(216 163 60 / 0.55) 269deg, rgb(216 163 60 / 0.55) 271deg, transparent 272deg,
+      transparent 358deg, rgb(216 163 60 / 0.55) 359deg, rgb(216 163 60 / 0.55) 360deg
     );
 }
 
@@ -383,10 +521,10 @@ body {
 /* 观测窗口:卡片底部的星图网格 + 内发光 */
 .observation-window {
   position: relative;
-  background-color: rgba(8, 8, 20, 0.55);
+  background-color: rgb(17 19 22 / 0.72);
   background-image:
-    linear-gradient(to right, rgba(168, 85, 247, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(56, 189, 248, 0.045) 1px, transparent 1px);
+    linear-gradient(to right, rgb(216 163 60 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(216 163 60 / 0.035) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
@@ -407,7 +545,7 @@ body {
 }
 
 @utility nova-canvas-shell {
-  background: linear-gradient(180deg, rgba(15, 16, 28, 0.84), rgba(8, 8, 14, 0.92));
+  background: linear-gradient(180deg, rgb(24 27 31 / 0.84), rgb(10 11 13 / 0.92));
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.04),
     var(--elev-lg),
@@ -441,7 +579,7 @@ body {
 /* ===== 键盘焦点统一样式 · 2026-09-22 =====
    游戏壳 HUD 大量按钮无焦点样式；此处兜底全站（鼠标点击不显示环） */
 :focus-visible {
-  outline: 2px solid rgba(139, 92, 246, 0.7);
+  outline: 2px solid rgb(216 163 60 / 0.75);
   outline-offset: 2px;
   border-radius: 6px;
 }

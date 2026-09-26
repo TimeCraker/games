@@ -85,7 +85,7 @@ export function ResultOverlay({
           className={cn(
             "pointer-events-none absolute inset-0",
             victory
-              ? "bg-[radial-gradient(1000px_420px_at_50%_40%,oklch(0.78_0.16_220/0.18),transparent_60%)]"
+              ? "bg-[radial-gradient(1000px_420px_at_50%_40%,rgb(216_163_60/0.16),transparent_60%)]"
               : "bg-[radial-gradient(1000px_420px_at_50%_40%,oklch(0.6_0.22_25/0.16),transparent_60%)]",
           )}
         />
@@ -95,7 +95,7 @@ export function ResultOverlay({
             className={cn(
               "font-display text-[clamp(3rem,9vw,6.6rem)] font-black italic leading-none tracking-widest",
               victory
-                ? "text-cyan-400 drop-shadow-[0_0_50px_rgba(34,211,238,0.8)]"
+                ? "text-hud-accent drop-shadow-[0_0_50px_rgb(216_163_60/0.55)]"
                 : "text-red-500 drop-shadow-[0_0_50px_rgba(220,38,38,0.8)]",
             )}
           >

@@ -26,14 +26,14 @@ export default function NotFoundPage() {
       <div className="relative z-10">
         <p className="font-mono-data text-[12px] uppercase tracking-[0.4em] text-white/50">SIGNAL LOST</p>
         <h1 className="mt-5 font-orbitron text-6xl font-black tracking-[0.06em] text-white sm:text-7xl">
-          4<span className="text-violet-400">0</span>4
+          4<span className="text-hud-accent">0</span>4
         </h1>
         <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/50">
           你寻找的坐标不存在于星图之中。它可能已陨落、漂移，或从未存在。
         </p>
         <Link
           href="/lobby"
-          className="mt-9 inline-flex min-h-11 items-center gap-2 rounded-full border border-glass-border bg-glass-bg px-6 py-2.5 text-sm font-medium text-white/90 backdrop-blur-glass-md transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-space-black"
+          className="mt-9 inline-flex min-h-11 items-center gap-2 rounded-full border border-glass-border bg-glass-bg px-6 py-2.5 text-sm font-medium text-white/90 backdrop-blur-glass-md transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-space-black"
         >
           返回游戏大厅
           <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
