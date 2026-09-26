@@ -15,7 +15,7 @@ const DEFAULT_LIB = [1,2,0,3];   // 02剑姬 · 03星空 · 01Q版女仆 · 04�
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.42';
+const CACHE_VER = '2.43';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -205,6 +205,32 @@ function resolveQuality(){
   return settings.quality==='auto'?detectQuality():settings.quality;
 }
 let Q = QUALITY_PRESETS[resolveQuality()];
+
+// ---------- FPS 探针 / FPS probe：auto 档按实际帧率单调降档（不升档），暂停/隐藏即停 ----------
+const FPS_ORDER = ['high','medium','low'];
+let fpsRaf=null, fpsProbeOn=false, fpsPrev=0, fpsWin=[], fpsLowCount=0, fpsTierIdx=null;
+function fpsShouldProbe(){ return settings.quality==='auto' && settings.motion && !matchMedia('(prefers-reduced-motion: reduce)').matches; }
+function fpsStop(){ if(fpsRaf!=null){ cancelAnimationFrame(fpsRaf); fpsRaf=null; } fpsProbeOn=false; }
+function fpsStart(){
+  fpsStop();
+  if(!fpsShouldProbe() || state!=='playing') return;
+  fpsProbeOn=true; fpsPrev=performance.now(); fpsWin=[]; fpsLowCount=0;
+  fpsRaf=requestAnimationFrame(fpsLoop);
+}
+function fpsLoop(now){
+  if(!fpsProbeOn){ fpsRaf=null; return; }
+  const dt=now-fpsPrev; fpsPrev=now;
+  if(dt>0) fpsWin.push(dt);
+  if(fpsWin.length>=60){
+    const fps=fpsWin.length*1000/fpsWin.reduce((a,b)=>a+b,0);
+    fpsWin=[];
+    const base=Math.max(0, FPS_ORDER.indexOf(resolveQuality()));
+    const tier = fpsTierIdx!=null ? fpsTierIdx : base;
+    if(fps<30){ if(++fpsLowCount>=2 && tier<FPS_ORDER.length-1){ fpsTierIdx=tier+1; Q=QUALITY_PRESETS[FPS_ORDER[fpsTierIdx]]; resizeFx(); showToast('已切换流畅模式'); } }
+    else fpsLowCount=0;
+  }
+  fpsRaf=requestAnimationFrame(fpsLoop);
+}
 
 // 成就系统
 const ACHIEVEMENTS = [
@@ -875,7 +901,7 @@ function backModal(){
 
 function gotoMenu(){
   state='menu'; showScreen('screenMenu'); hideAllModal();
-  $('gameShell').hidden=true; stopBgMusic(); stopTimer(); timerExpired=false;
+  $('gameShell').hidden=true; stopBgMusic(); stopTimer(); fpsStop(); timerExpired=false;
   sessionTimeMs=0; playStartTs=0;
   clearBoard(); combo=0; busy=false; clearSelection(); selected=null;
   syncBgStars();
@@ -951,10 +977,11 @@ async function startLevel(idx){
   measure(); resizeFx();
   initBoard(); updateHUD();
   if(soundOn) startBgMusic();
+  fpsStart();
 }
 
-function pauseGame(){ if(state!=='playing') return; state='paused'; clearHint(); timeFlush(); showModal('modalPause'); stopBgMusic(); if(mode===M_TIMED) stopTimer(); $('pauseEndBtn').hidden = mode!==M_ENDLESS; sfx.btn(); $('pauseVol').value=settings.volume; const pm=$('pauseMuteBtn'); if(pm){ pm.innerHTML=ic(soundOn?'sound':'mute'); pm.classList.toggle('off',!soundOn); } }
-function resumeGame(){ if(state!=='paused') return; state='playing'; hideAllModal(); timeStart(); if(mode===M_TIMED) resumeTimer(); if(soundOn) startBgMusic(); sfx.btn(); scheduleHint(); }
+function pauseGame(){ if(state!=='playing') return; state='paused'; clearHint(); timeFlush(); showModal('modalPause'); stopBgMusic(); fpsStop(); if(mode===M_TIMED) stopTimer(); $('pauseEndBtn').hidden = mode!==M_ENDLESS; sfx.btn(); $('pauseVol').value=settings.volume; const pm=$('pauseMuteBtn'); if(pm){ pm.innerHTML=ic(soundOn?'sound':'mute'); pm.classList.toggle('off',!soundOn); } }
+function resumeGame(){ if(state!=='paused') return; state='playing'; hideAllModal(); timeStart(); if(mode===M_TIMED) resumeTimer(); if(soundOn) startBgMusic(); fpsStart(); sfx.btn(); scheduleHint(); }
 
 function winLevel(){
   if(mode===M_DAILY){
@@ -966,7 +993,7 @@ function winLevel(){
   }
   if(mode!==M_CAMPAIGN){ finishMode(); return; }
   recordEnd(); bumpEnd(true);
-  state='win'; stopBgMusic(); sfx.win(); confetti();
+  state='win'; stopBgMusic(); fpsStop(); sfx.win(); confetti();
   const movesRatio = isInfiniteMoves() ? 0.5 : moves/Math.max(1,currentLevel.moves);
   let stars=1; if(movesRatio>=0.3) stars=2; if(movesRatio>=0.5) stars=3;
   SAVE.saveStars(currentLevel.id,stars); SAVE.saveBest(currentLevel.id,score);
@@ -990,7 +1017,7 @@ function loseLevel(){
     return;
   }
   recordEnd(); bumpEnd(false);
-  state='lose'; stopBgMusic(); sfx.lose();
+  state='lose'; stopBgMusic(); fpsStop(); sfx.lose();
   if(Q.shake){ appEl.classList.add('shake'); setTimeout(()=>appEl.classList.remove('shake'),350); }
   const gap=currentLevel.target-score;
   $('loseScore').textContent=score;
@@ -1083,13 +1110,14 @@ async function startMode(m){
   initBoard(); updateHUD();
   if(m===M_TIMED){ startTimer(); }
   if(soundOn) startBgMusic();
+  fpsStart();
 }
 
 // ---------- 结算与遗弃 ----------
 function finishMode(){
   if(state!=='playing'&&state!=='paused') return;
   const m=mode;
-  stopTimer(); stopBgMusic(); confetti(); sfx.win();
+  stopTimer(); stopBgMusic(); fpsStop(); confetti(); sfx.win();
   state='win';
   const rank=lbSubmit(m,{score,maxCombo:stats.maxCombo});
   showModeResult(m,rank,true);
@@ -1463,6 +1491,9 @@ function applySettings(){
   SynthMusic.setVol((settings.volume/100)*0.5);
   document.documentElement.classList.toggle('reduce-motion',!settings.motion);
   Q = QUALITY_PRESETS[resolveQuality()];
+  fpsTierIdx = null;
+  if(fpsShouldProbe()){ if(state==='playing') fpsStart(); }
+  else { fpsStop(); }
   if(!$('gameShell').hidden){ resizeFx(); }
   syncBgStars();
   soundOn=settings.sfx;
@@ -1872,6 +1903,6 @@ function start(){
 }
 start();
 
-document.addEventListener('visibilitychange',()=>{ syncBgStars(); if(document.hidden){ stopParticleLoop(); if(state==='playing'&&mode===M_TIMED) pauseGame(); } });
+document.addEventListener('visibilitychange',()=>{ syncBgStars(); if(document.hidden){ stopParticleLoop(); fpsStop(); if(state==='playing'&&mode===M_TIMED) pauseGame(); } else if(state==='playing'){ fpsStart(); } });
 
 })();
