@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from "next"
 import { NebulaSurvivorPageClient } from "@/src/components/game-pages/NebulaSurvivorPageClient"
+import { ARCADE_BRAND, arcadeMetadataTitle } from "@/src/components/arcade/brand"
+
+const brand = ARCADE_BRAND["nebula-survivor"]
 
 export const metadata: Metadata = {
-  title: "星云求生",
-  description: "星云之中生存到底",
+  title: arcadeMetadataTitle("nebula-survivor"),
+  description: brand.tagline,
 }
 
 export const viewport: Viewport = {

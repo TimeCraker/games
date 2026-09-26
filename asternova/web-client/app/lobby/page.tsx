@@ -8,6 +8,9 @@ import { toast } from "sonner"
 import dynamic from "next/dynamic"
 
 import { cinematicEase } from "@/src/lib/motion"
+import { ARCADE_LIST, type ArcadeSlug } from "@/src/components/arcade/brand"
+import { formatScore } from "@/src/components/arcade/records"
+import { useArcadeBest } from "@/src/components/arcade/useArcadeRecords"
 import { KEY_ART, type KeyArtSlug } from "@/src/lib/keyArt"
 import {
   LobbyAvatarPickerModal,
@@ -42,59 +45,31 @@ type ArcadeTile = {
   featured?: boolean
 }
 
-const ARCADE: ArcadeTile[] = [
-  {
-    slug: "nebula-survivor",
-    href: "/nebula-survivor",
-    index: "01",
-    category: "Survivor",
-    title: "Nebula Survivor",
-    titleZh: "星域突围",
-    blurb: "俯视角肉鸽 · 三选一构筑 · 五条强化轨道",
-    Icon: Hud.HudRadar,
-    featured: true,
-  },
-  {
-    slug: "shoot-them-all",
-    href: "/shoot-them-all",
-    index: "02",
-    category: "Physics",
-    title: "Shoot Them All",
-    titleZh: "弹珠风暴",
-    blurb: "物理弹射 · 连锁清场",
-    Icon: Hud.HudTarget,
-  },
-  {
-    slug: "lets-running",
-    href: "/lets-running",
-    index: "03",
-    category: "Runner",
-    title: "Let's Running",
-    titleZh: "星轨疾驰",
-    blurb: "跑酷滑铲 · 极限冲刺",
-    Icon: Hud.HudRunner,
-  },
-  {
-    slug: "merge",
-    href: "/merge",
-    index: "04",
-    category: "Merge",
-    title: "AsterNova Merge",
-    titleZh: "星核进化",
-    blurb: "合成星球 · 十级进化",
-    Icon: Hud.HudMerge,
-  },
-  {
-    slug: "xiaoxiaole",
-    href: "/xiaoxiaole",
-    index: "05",
-    category: "Match-3",
-    title: "StarMatrix",
-    titleZh: "星阵消消乐",
-    blurb: "立体三消 · 12 关闯关",
-    Icon: Hud.HudHexGem,
-  },
-]
+/**
+ * 卡片图标：唯一无法放进 brand.ts 的东西（brand.ts 必须保持纯数据，
+ * 因为 5 个路由的服务端组件要 import 它来生成 metadata）。
+ * 名字 / 中文标注 / 分类 / 序号 / 文案全部来自 ARCADE_LIST，此处不再重复。
+ */
+const ARCADE_ICONS: Record<ArcadeSlug, React.ComponentType<Hud.HudIconProps>> = {
+  "nebula-survivor": Hud.HudRadar,
+  "shoot-them-all": Hud.HudTarget,
+  "lets-running": Hud.HudRunner,
+  merge: Hud.HudMerge,
+  xiaoxiaole: Hud.HudHexGem,
+}
+
+/** 卡片视图模型：全部字段派生自 brand.ts 单一真源，只补一个 Icon。 */
+const ARCADE: ArcadeTile[] = ARCADE_LIST.map((b) => ({
+  slug: b.slug,
+  href: b.href,
+  index: b.index,
+  category: b.category,
+  title: b.titleEn,
+  titleZh: b.titleZh,
+  blurb: b.tagline,
+  Icon: ARCADE_ICONS[b.slug],
+  featured: b.featured,
+}))
 
 const ARCADE_ART = "/art/arcade"
 
@@ -203,6 +178,9 @@ function ArcadeCard({
 }) {
   const { Icon, featured } = tile
   const art = KEY_ART[tile.slug]
+  // 历史最高分：单一来源 asternova.arcade.v1。无记录时为 null → 不渲染徽标
+  // （而不是渲染「最高 0」，避免把「没玩过」和「玩过但 0 分」混为一谈）。
+  const best = useArcadeBest(tile.slug)
 
   return (
     <motion.button
@@ -294,11 +272,18 @@ function ArcadeCard({
             {tile.blurb}
           </p>
 
-          {/* 常亮行动召唤 */}
-          <span className="mt-3.5 inline-flex items-center gap-1.5 border border-hud-accent/55 bg-hud-accent/15 px-3 py-1.5 text-[12.5px] font-medium text-hud-accent-bright backdrop-blur-sm transition-colors duration-150 group-hover:border-hud-accent group-hover:bg-hud-accent group-hover:text-ink-1000">
-            {loading ? "载入中" : "进入"}
-            <Hud.HudChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
-          </span>
+          {/* 常亮行动召唤 + 历史最高分（此前 5 个游戏零记录沉淀，卡片也无记录位） */}
+          <div className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span className="inline-flex items-center gap-1.5 border border-hud-accent/55 bg-hud-accent/15 px-3 py-1.5 text-[12.5px] font-medium text-hud-accent-bright backdrop-blur-sm transition-colors duration-150 group-hover:border-hud-accent group-hover:bg-hud-accent group-hover:text-ink-1000">
+              {loading ? "载入中" : "进入"}
+              <Hud.HudChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
+            </span>
+            {best !== null ? (
+              <span className="font-mono-data text-[11px] tabular-nums text-hud-text-faint">
+                最高 <span className="text-hud-accent-bright">{formatScore(best)}</span>
+              </span>
+            ) : null}
+          </div>
         </div>
       </div>
 

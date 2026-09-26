@@ -413,7 +413,7 @@ export class NebulaScene {
     }
 
     // 平滑转向（避免瞬间跳变）
-    let target = this.playerAngle
+    const target = this.playerAngle
     let da = target - this.playerSprite.rotation
     while (da > Math.PI) da -= TAU
     while (da < -Math.PI) da += TAU

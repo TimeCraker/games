@@ -1,9 +1,13 @@
 import type { Metadata } from "next"
 import type { ReactNode } from "react"
 
+import { ARCADE_BRAND, arcadeMetadataTitle } from "@/src/components/arcade/brand"
+
+const brand = ARCADE_BRAND["xiaoxiaole"]
+
 export const metadata: Metadata = {
-  title: "消消乐",
-  description: "轻松上头的三消小游戏",
+  title: arcadeMetadataTitle("xiaoxiaole"),
+  description: brand.tagline,
 }
 
 export default function Layout({ children }: { children: ReactNode }) {

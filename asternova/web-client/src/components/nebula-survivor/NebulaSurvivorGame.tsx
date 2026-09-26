@@ -6,6 +6,7 @@
 
 import * as React from "react"
 import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from "framer-motion"
+import { BrandMark } from "@/src/components/arcade/BrandMark"
 import { NebulaPixiHost } from "./render/NebulaPixiHost"
 import { nebulaSfx } from "./render/NebulaSfx"
 import { Volume2, VolumeX } from "lucide-react"
@@ -560,9 +561,7 @@ export function NebulaSurvivorGame() {
         <div className="flex w-24 items-center sm:w-28">
           {isMobile ? null : <GameBackButton variant="header" label="大厅" />}
         </div>
-        <div className="font-display text-[11px] font-semibold uppercase tracking-[0.32em] text-white sm:text-sm">
-          Nebula Survivor
-        </div>
+        <BrandMark slug="nebula-survivor" className="sm:[&_span]:text-[12px]" />
         <div className="flex w-24 items-center justify-end gap-1.5 sm:w-28">
           {!isMobile ? (
             <>
@@ -741,8 +740,8 @@ export function NebulaSurvivorGame() {
                 </span>
               </div>
             ) : null}
-            <h2 id="nebula-rules-title" className="mt-2 text-center font-display text-2xl font-bold uppercase tracking-[0.18em] text-white [text-shadow:0_0_28px_rgba(56,189,248,0.4)] sm:text-3xl">
-              Nebula Survivor
+            <h2 id="nebula-rules-title" className="mt-2 flex justify-center">
+              <BrandMark slug="nebula-survivor" variant="title" />
             </h2>
             <p className="mt-1 text-center text-[12px] text-white/50">
               {rulesModalKind === "briefing"

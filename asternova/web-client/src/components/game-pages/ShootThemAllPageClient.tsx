@@ -2,6 +2,8 @@
 
 import dynamic from "next/dynamic"
 
+import { arcadeDisplayName } from "@/src/components/arcade/brand"
+
 import { GlobalRuntimeErrorProbe } from "@/src/components/game-shell/GlobalRuntimeErrorProbe"
 import { GameRuntimeErrorBoundary } from "@/src/components/game-shell/GameRuntimeErrorBoundary"
 import { GameLoadingScreen } from "@/src/components/ui/GameLoadingScreen"
@@ -14,7 +16,7 @@ const StaRoot = dynamic(() => import("@/src/components/shoot-them-all/StaRoot").
 export function ShootThemAllPageClient() {
   return (
     <>
-      <h1 className="sr-only">射击大战</h1>
+      <h1 className="sr-only">{arcadeDisplayName("shoot-them-all")}</h1>
       <GlobalRuntimeErrorProbe />
       <GameRuntimeErrorBoundary>
         <StaRoot />
@@ -22,4 +24,3 @@ export function ShootThemAllPageClient() {
     </>
   )
 }
-

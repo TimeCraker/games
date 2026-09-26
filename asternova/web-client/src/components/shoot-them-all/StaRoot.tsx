@@ -2,6 +2,7 @@
 
 import * as React from "react"
 
+import { BrandMark } from "@/src/components/arcade/BrandMark"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
 import { HEIGHT, WIDTH } from "./constants"
 import { StaGameShell } from "./StaGameShell"
@@ -109,9 +110,7 @@ export function StaRoot() {
         {/* 品牌字随画布缩放（装饰）；返回钮必须保持真实 44px+ 命中区，
             故移出缩放容器用 floating 变体固定在安全区左上角 */}
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-end p-3">
-          <span className="font-mono-data text-[10px] uppercase tracking-[0.22em] text-white/50">
-            Shoot Them All · v2
-          </span>
+          <BrandMark slug="shoot-them-all" />
         </div>
 
         {error ? (

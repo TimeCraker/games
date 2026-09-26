@@ -34,7 +34,8 @@ export function StaGameShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="relative overflow-hidden"
+      // gutter 原为蓝紫双渐变（AI 味来源，2026-09-27 收口），改走品牌 letterbox 底纹
+      className="arcade-letterbox relative overflow-hidden"
       style={{
         width: "100vw",
         height: "100dvh",
@@ -43,10 +44,6 @@ export function StaGameShell({ children }: { children: React.ReactNode }) {
         WebkitUserSelect: "none",
         WebkitTouchCallout: "none",
         overscrollBehavior: "none",
-        background:
-          "radial-gradient(ellipse 60% 50% at 50% 25%, rgba(56,107,255,0.12), transparent 70%)," +
-          "radial-gradient(ellipse 45% 45% at 50% 85%, rgba(168,85,247,0.10), transparent 70%)," +
-          "#04050c",
       }}
     >
       <div

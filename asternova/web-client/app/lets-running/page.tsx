@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from "next"
 import { LetsRunningPageClient } from "@/src/components/game-pages/LetsRunningPageClient"
+import { ARCADE_BRAND, arcadeMetadataTitle } from "@/src/components/arcade/brand"
+
+const brand = ARCADE_BRAND["lets-running"]
 
 export const metadata: Metadata = {
-  title: "星际酷跑",
-  description: "奔跑躲避障碍的太空跑酷",
+  title: arcadeMetadataTitle("lets-running"),
+  description: brand.tagline,
 }
 
 export const viewport: Viewport = {

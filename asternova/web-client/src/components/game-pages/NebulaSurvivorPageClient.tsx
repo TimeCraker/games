@@ -2,6 +2,8 @@
 
 import dynamic from "next/dynamic"
 
+import { arcadeDisplayName } from "@/src/components/arcade/brand"
+
 import { GameRuntimeErrorBoundary } from "@/src/components/game-shell/GameRuntimeErrorBoundary"
 import { GameLoadingScreen } from "@/src/components/ui/GameLoadingScreen"
 
@@ -16,11 +18,10 @@ const NebulaSurvivorGame = dynamic(
 export function NebulaSurvivorPageClient() {
   return (
     <>
-      <h1 className="sr-only">星云求生</h1>
+      <h1 className="sr-only">{arcadeDisplayName("nebula-survivor")}</h1>
     <GameRuntimeErrorBoundary>
       <NebulaSurvivorGame />
     </GameRuntimeErrorBoundary>
     </>
   )
 }
-

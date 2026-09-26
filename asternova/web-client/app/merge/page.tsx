@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from "next"
 import { MergePageClient } from "@/src/components/game-pages/MergePageClient"
+import { ARCADE_BRAND, arcadeMetadataTitle } from "@/src/components/arcade/brand"
+
+const brand = ARCADE_BRAND["merge"]
 
 export const metadata: Metadata = {
-  title: "AsterNova Merge",
-  description: "立体三消闯关",
+  title: arcadeMetadataTitle("merge"),
+  description: brand.tagline,
 }
 
 export const viewport: Viewport = {

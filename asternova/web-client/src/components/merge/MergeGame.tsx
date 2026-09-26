@@ -8,6 +8,7 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Bodies, Body, Composite, Engine, Events, Render, Runner, World } from "matter-js"
 import { AnimatePresence, motion } from "framer-motion"
+import { BrandMark } from "@/src/components/arcade/BrandMark"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
 import { useDialogA11y } from "@/src/hooks/useDialogA11y"
@@ -606,10 +607,7 @@ const confirmMergeRules = React.useCallback(() => {
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col items-center gap-2 text-center sm:gap-2.5"
         >
-          <p className="font-display text-[10px] font-medium uppercase tracking-[0.26em] text-white/50 min-[400px]:text-[11px] min-[400px]:tracking-[0.28em]">
-            AsterNova
-          </p>
-          <h2 className="font-display text-[clamp(1.25rem,4.5vw,1.65rem)] font-semibold tracking-tight text-white/95">Merge</h2>
+          <BrandMark slug="merge" variant="title" as="h2" />
           <p className="max-w-md px-1 text-center text-[12px] font-normal leading-relaxed text-white/50 sm:text-[13px]">
             同级相撞合成升级 · 越红线 3 秒结束 · 点击 / E / 空格下落
           </p>
@@ -762,7 +760,9 @@ const confirmMergeRules = React.useCallback(() => {
             >
               怎么玩
             </h2>
-            <p className="mt-1 text-center text-[13px] text-white/50">AsterNova · Merge · 星球合成</p>
+            <p className="mt-1 flex items-center justify-center">
+              <BrandMark slug="merge" variant="inline" className="text-[13px]" />
+            </p>
 
             <ul className="mt-5 space-y-4 text-[14px] leading-relaxed text-white/80">
               <li className="flex gap-3 rounded-2xl bg-white/[0.05] p-3">

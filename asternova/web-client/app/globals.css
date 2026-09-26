@@ -57,6 +57,25 @@
   /* Primitive：语义信号色（低饱和） */
   --signal-red: #C0503A;
   --signal-green: #4F8D6B;
+
+  /* ===== 2026-09-27 街机副强调色（Arcade accents）=====
+     5 个小游戏各一个副色，在「冷黑 + 琥珀」统一底盘上做辨识度。
+     硬约束：全部锁在 OKLCH 同一亮度带（L≈0.74–0.78）与低饱和带（C 0.08–0.11），
+     因此不会出现被否掉的「AI 紫 / 电蓝 / 荧光粉」那类高饱和霓虹。
+     --arcade-accent 由 ArcadeShell 按游戏作用域覆盖，默认回落琥珀。 */
+  --arcade-nebula: oklch(0.74 0.1 132); /* 青柠苔绿 · 星域突围 */
+  --arcade-shoot: oklch(0.75 0.08 205); /* 钢青 · 弹珠风暴 */
+  --arcade-running: oklch(0.78 0.09 250); /* 冰蓝 · 星轨疾驰 */
+  --arcade-merge: oklch(0.74 0.11 35); /* 珊瑚 · 星核进化 */
+  --arcade-matrix: oklch(0.75 0.09 165); /* 翠玉 · 星阵消消乐 */
+  --arcade-accent: var(--amber-500);
+
+  /* 等比缩放游戏的 letterbox 底纹（替代两侧纯黑大边） */
+  --arcade-letterbox: radial-gradient(
+    ellipse 70% 60% at 50% 40%,
+    rgb(216 163 60 / 0.05),
+    transparent 70%
+  );
   --chart-1: oklch(0.809 0.105 251.813);
   --chart-2: oklch(0.623 0.214 259.815);
   --chart-3: oklch(0.546 0.245 262.881);
@@ -192,6 +211,14 @@
   --color-hud-paper: var(--paper);
   --color-hud-red: var(--signal-red);
   --color-hud-green: var(--signal-green);
+
+  /* 街机副强调色 → text-arcade-nebula / border-arcade-* 等工具类 */
+  --color-arcade-nebula: var(--arcade-nebula);
+  --color-arcade-shoot: var(--arcade-shoot);
+  --color-arcade-running: var(--arcade-running);
+  --color-arcade-merge: var(--arcade-merge);
+  --color-arcade-matrix: var(--arcade-matrix);
+  --color-arcade-accent: var(--arcade-accent);
 
   /* 覆盖 Tailwind 默认阴影，统一为中性 elevation + 单一琥珀 glow */
   --shadow-sm: var(--elev-sm);
@@ -480,6 +507,17 @@ body {
   animation: lobby-enter-sheen var(--duration-slow) ease-out forwards;
 }
 
+/* ===== 2026-09-27 街机壳：等比缩放的 gutter / letterbox =====
+   竖版 720×1280（弹珠风暴）与横版 960×540（星轨疾驰）在宽屏/竖屏下都会留大边，
+   旧的实现直接铺蓝紫渐变（AI 味来源）。此处统一为「冷黑 + 琥珀星图底纹」。 */
+.arcade-letterbox {
+  background-color: var(--ink-1000);
+  background-image: var(--arcade-letterbox),
+    linear-gradient(to right, rgb(140 148 158 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(140 148 158 / 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 72px 72px, 72px 72px;
+}
+
 /* ===== 星象观测台:星图坐标网格 + 赤道仪刻度 + 引力扫描(committed 视觉决策) ===== */
 /* 2026-09-26：紫/青双色网格 → 单一中性雾灰（去 AI 味） */
 .star-chart-grid {
@@ -528,31 +566,11 @@ body {
   background-size: 32px 32px;
 }
 
-/* ===== Stage A：nova-ball 迁移保留 @utility（复杂复合背景/阴影，工具类化会过臃肿）===== */
-@utility nova-shell-wash {
-  background:
-    radial-gradient(circle at 20% 18%, rgba(96, 165, 250, 0.15), transparent 38%),
-    radial-gradient(circle at 78% 14%, rgba(168, 85, 247, 0.14), transparent 42%),
-    radial-gradient(circle at 56% 80%, rgba(236, 72, 153, 0.08), transparent 48%);
-}
+/* ===== 2026-09-27：nova-ball / core-defense 死组件已删除 =====
+   随之移除只服务于它们的 3 个 @utility（nova-shell-wash / nova-stars / nova-canvas-shell），
+   其中 nova-shell-wash 的三段径向渐变是最后的蓝紫「AI 味」色源之一。 */
 
-@utility nova-stars {
-  background-image:
-    radial-gradient(rgba(255, 255, 255, 0.65) 0.8px, transparent 1px),
-    radial-gradient(rgba(255, 255, 255, 0.35) 0.9px, transparent 1px);
-  background-size: 150px 150px, 210px 210px;
-  background-position: 0 0, 78px 42px;
-}
-
-@utility nova-canvas-shell {
-  background: linear-gradient(180deg, rgb(24 27 31 / 0.84), rgb(10 11 13 / 0.92));
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-    var(--elev-lg),
-    var(--glow-violet);
-}
-
-/* 满/达标态脉冲（nova-ball 过关进度条反馈，LiquidBar.success 使用） */
+/* 满/达标态脉冲（LiquidBar.success 使用） */
 @keyframes pulseSuccess {
   0%,
   100% {

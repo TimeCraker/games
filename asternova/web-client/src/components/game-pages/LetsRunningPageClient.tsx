@@ -2,6 +2,8 @@
 
 import dynamic from "next/dynamic"
 
+import { arcadeDisplayName } from "@/src/components/arcade/brand"
+
 import { GameRuntimeErrorBoundary } from "@/src/components/game-shell/GameRuntimeErrorBoundary"
 import { GameLoadingScreen } from "@/src/components/ui/GameLoadingScreen"
 
@@ -13,11 +15,10 @@ const StarDashGame = dynamic(() => import("@/src/components/star-dash/StarDashGa
 export function LetsRunningPageClient() {
   return (
     <>
-      <h1 className="sr-only">星际酷跑</h1>
+      <h1 className="sr-only">{arcadeDisplayName("lets-running")}</h1>
       <GameRuntimeErrorBoundary>
       <StarDashGame />
     </GameRuntimeErrorBoundary>
     </>
   )
 }
-

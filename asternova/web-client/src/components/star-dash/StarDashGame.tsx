@@ -7,6 +7,7 @@
  */
 
 import * as React from "react"
+import { BrandMark } from "@/src/components/arcade/BrandMark"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
 import { useDialogA11y } from "@/src/hooks/useDialogA11y"
@@ -857,23 +858,25 @@ export function StarDashGame() {
       if (s.mode === "start") {
         ctx.textAlign = "center"
         ctx.font = "700 26px system-ui, sans-serif"
+        // 2026-09-27 收色：原粉→品红→紫三色渐变标题是本页最刺眼的「AI 紫」，
+        // 改为一档琥珀渐变；英文主名上提为主标题，中文标注作琥珀副行。
         const tg = ctx.createLinearGradient(w / 2 - 160, 0, w / 2 + 160, 0)
-        tg.addColorStop(0, "#fda4c6")
-        tg.addColorStop(0.5, "#e879f9")
-        tg.addColorStop(1, "#8b5cf6")
+        tg.addColorStop(0, "#F2D79B")
+        tg.addColorStop(0.5, "#D8A33C")
+        tg.addColorStop(1, "#A87C24")
         ctx.fillStyle = tg
-        ctx.shadowColor = "rgba(232, 121, 249, 0.55)"
+        ctx.shadowColor = "rgba(216, 163, 60, 0.5)"
         ctx.shadowBlur = 28
-        ctx.fillText("AsterNova - Star Dash", w / 2, h * 0.34)
+        ctx.fillText("Let's Running", w / 2, h * 0.34)
         ctx.shadowBlur = 0
         ctx.font = "13px system-ui, sans-serif"
-        ctx.fillStyle = "rgba(255,255,255,0.5)"
-        ctx.fillText("Let's Running", w / 2, h * 0.34 + 28)
+        ctx.fillStyle = "rgba(216, 163, 60, 0.85)"
+        ctx.fillText("星轨疾驰", w / 2, h * 0.34 + 28)
 
         const pulse = 0.55 + 0.45 * Math.sin(s.tapPulse)
         ctx.globalAlpha = pulse
         ctx.font = "600 15px system-ui, sans-serif"
-        ctx.fillStyle = "#f9a8d4"
+        ctx.fillStyle = "#E9BE69"
         ctx.fillText("点击 / 空格 · Tap to Start", w / 2, h * 0.55)
         ctx.globalAlpha = 1
         ctx.font = "12px system-ui, sans-serif"
@@ -940,9 +943,11 @@ export function StarDashGame() {
     <div className="relative flex h-full min-h-0 min-h-full flex-col bg-space-black text-white">
       <div className="relative z-20 grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-white/[0.08] px-4 py-3 backdrop-blur-xl">
         {isMobile ? <span aria-hidden="true" /> : <GameBackButton variant="header" className="justify-self-start" />}
-        <span className="justify-self-center font-display text-sm font-semibold tracking-tight text-white">
-          AsterNova · Star Dash
-        </span>
+        <BrandMark
+          slug="lets-running"
+          variant="inline"
+          className="justify-self-center text-sm font-semibold"
+        />
         <span className="hidden max-w-[10rem] justify-self-end text-right text-[11px] leading-tight text-white/50 sm:block">
           Space 跳 · E 星爆 · ↓ 铲
         </span>
@@ -965,7 +970,9 @@ export function StarDashGame() {
             >
               怎么玩
             </h2>
-            <p className="mt-1 text-center text-[13px] text-white/50">AsterNova · Star Dash · Let&apos;s Running</p>
+            <p className="mt-1 flex items-center justify-center">
+              <BrandMark slug="lets-running" variant="inline" className="text-[13px]" />
+            </p>
 
             <ul className="mt-5 space-y-4 text-[14px] leading-relaxed text-white/80">
               <li className="flex gap-3 rounded-2xl bg-white/[0.05] p-3">
