@@ -45,6 +45,18 @@ export const NEBULA = {
   healCore: 0xd9fff0,
 } as const
 
+/** 赛璐璐三色调 + 深描边（终末地式：平涂 base + 阴影调 shadow + 亮面 hi + 描边 outline） */
+export const TONES = {
+  player: { base: 0xbfe6ff, shadow: 0x8fc8ee, hi: 0xf4fcff, outline: 0x1d4a6b },
+  enemy1: { base: 0xff8a5c, shadow: 0xd55f38, hi: 0xffc9a8, outline: 0x45170c },
+  enemy2: { base: 0xc465ff, shadow: 0x8f3bd6, hi: 0xecc6ff, outline: 0x360f50 },
+  enemy3: { base: 0xff5fc3, shadow: 0xcf359a, hi: 0xffc9e9, outline: 0x4a0e3a },
+  crystal: { base: 0xff9ae8, shadow: 0xd45fc8, hi: 0xffffff, outline: 0x5b1c66 },
+  heal: { base: 0x34d399, shadow: 0x1c9d6f, hi: 0xc9ffe9, outline: 0x0c4a36 },
+  bullet: { base: 0xfff3fb, shadow: 0xff9ed0, hi: 0xffffff, outline: 0x8a2460 },
+  orb: { base: 0xffffff, shadow: 0xd4ecff, hi: 0xffffff, outline: 0x2f6a9a },
+} as const
+
 /** mulberry32 确定性 PRNG —— 背景星点/星云布局稳定 */
 export function mulberry32(seed: number): () => number {
   let a = seed >>> 0

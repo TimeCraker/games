@@ -1,7 +1,7 @@
 import { Container, Graphics } from "pixi.js"
 
 import { NebulaEngine, type EnemyTier, type NebulaEvent } from "../nebulaEngine"
-import { NEBULA as C, TAU } from "./palette"
+import { NEBULA as C, TONES, TAU } from "./palette"
 
 /** 屏震冲击波（击杀/升级/受击等事件驱动的径向环） */
 interface Shockwave {
@@ -17,94 +17,120 @@ interface Shockwave {
 
 // ============ 静态矢量美术（庞家，均以 (0,0) 为中心、朝 +X 方向） ============
 
-/** 主角飞船：赛璐璐平涂 + 深色描边（冷青白机身，机头朝 +X） */
+/** 主角飞船：赛璐璐三色调（平涂 base + 翼下暗面 + 脊线高光 + 深描边），机头朝 +X */
 function paintPlayerShip(g: Graphics, r: number): void {
-  const hull = 0xbfe6ff
-  const rim = 0x2f7fa8
-  const dark = 0x8fd4f5
-  g.poly([
-    r * 1.18, 0,          // 机头
-    r * 0.12, r * 0.52,    // 前胴体右
-    -r * 0.06, r * 1.08,   // 右翼尖
-    -r * 0.42, r * 0.44,   // 右翼根
-    -r * 0.52, r * 0.3,    // 右引擎
-    -r * 1.06, 0,          // 机尾中点
-    -r * 0.52, -r * 0.3,
+  const t = TONES.player
+  const hull = [
+    r * 1.16, 0,
+    r * 0.12, r * 0.5,
+    -r * 0.06, r * 1.06,
+    -r * 0.42, r * 0.44,
+    -r * 0.52, r * 0.28,
+    -r * 1.08, 0,
+    -r * 0.52, -r * 0.28,
     -r * 0.42, -r * 0.44,
-    -r * 0.06, -r * 1.08,
-    r * 0.12, -r * 0.52,
-  ])
-    .fill({ color: hull, alpha: 1 })
-    .stroke({ color: rim, width: 1.4, alpha: 1 })
-  // 机身中线（暗色，增强结构）
-  g.moveTo(r * 0.95, 0).lineTo(-r * 1.0, 0).stroke({ color: dark, width: r * 0.18, alpha: 0.8 })
-  // 驾驶舱圆顶
-  g.circle(r * 0.34, 0, r * 0.34).fill({ color: 0xeaf6ff, alpha: 1 }).stroke({ color: rim, width: 1, alpha: 0.9 })
-  g.circle(r * 0.4, -r * 0.08, r * 0.12).fill({ color: 0xffffff, alpha: 0.9 })
+    -r * 0.06, -r * 1.06,
+    r * 0.12, -r * 0.5,
+  ]
+  g.poly(hull).fill({ color: t.base, alpha: 1 })
+  g.poly(hull).stroke({ color: t.outline, width: 1.4, alpha: 1 })
+  // 右翼暗面
+  g.poly([r * 0.12, r * 0.5, -r * 0.06, r * 1.06, -r * 0.42, r * 0.44]).fill({ color: t.shadow, alpha: 0.85 })
+  // 脊线高光
+  g.moveTo(r * 0.9, 0).lineTo(-r * 0.5, 0).stroke({ color: t.hi, width: r * 0.16, alpha: 0.55 })
+  // 驾驶舱圆顶 + 反光点
+  g.circle(r * 0.34, 0, r * 0.32).fill({ color: t.hi, alpha: 1 }).stroke({ color: t.outline, width: 1, alpha: 0.9 })
+  g.circle(r * 0.4, -r * 0.08, r * 0.12).fill({ color: 0xffffff, alpha: 0.95 })
 }
 
-/** 一档「探测箭镞」：锐三角 + 核心（保留暖色外圈描边提示） */
+/** 一档「探测箭镞」：锐三角赛璐璐 + 眼核（暖色外圈描边提示保留在 FX 层） */
 function paintEnemyT1(g: Graphics, r: number): void {
+  const t = TONES.enemy1
   const L = r * 1.9
   const W = r * 1.05
-  g.poly([L, 0, -L * 0.55, -W, -L * 0.55, W]).fill({ color: C.enemy1, alpha: 0.97 })
-  g.poly([L, 0, -L * 0.55, -W, -L * 0.55, W]).stroke({ color: C.enemy1rim, width: 1, alpha: 0.9 })
-  g.circle(0, 0, r * 0.32).fill({ color: 0xfff0e2, alpha: 0.92 })
+  g.poly([L, 0, -L * 0.55, -W, -L * 0.55, W]).fill({ color: t.base, alpha: 0.98 })
+  g.poly([L, 0, -L * 0.55, -W, -L * 0.55, W]).stroke({ color: t.outline, width: 1.3, alpha: 0.95 })
+  // 下三角暗面
+  g.poly([L, 0, 0, W * 0.4, -L * 0.55, W]).fill({ color: t.shadow, alpha: 0.8 })
+  // 前缘高光
+  g.moveTo(L, 0).lineTo(0, -W * 0.2).stroke({ color: t.hi, width: W * 0.3, alpha: 0.5 })
+  // 眼核
+  g.circle(0, 0, r * 0.34).fill({ color: 0xfff3e6, alpha: 0.95 }).stroke({ color: t.outline, width: 0.8, alpha: 0.9 })
 }
 
-/** 二档「虚空碟」：六边形 + 内环 + 核心 */
+/** 二档「虚空碟」：六边形赛璐璐 + 内暗面六边形 + 高光环 + 核心 */
 function paintEnemyT2(g: Graphics, r: number): void {
+  const t = TONES.enemy2
   const R = r * 1.18
-  const pts: number[] = []
-  for (let i = 0; i < 6; i++) {
-    const a = Math.PI / 6 + (i / 6) * TAU
-    pts.push(Math.cos(a) * R, Math.sin(a) * R)
+  const hex = (rad: number) => {
+    const p: number[] = []
+    for (let i = 0; i < 6; i++) {
+      const a = Math.PI / 6 + (i / 6) * TAU
+      p.push(Math.cos(a) * rad, Math.sin(a) * rad)
+    }
+    return p
   }
-  g.poly(pts).fill({ color: C.enemy2, alpha: 0.96 })
-  g.poly(pts).stroke({ color: C.enemy2rim, width: 1.4, alpha: 0.85 })
-  g.circle(0, 0, R * 0.5).stroke({ color: C.enemy2rim, width: 1.1, alpha: 0.7 })
-  g.circle(0, 0, R * 0.22).fill({ color: 0xffffff, alpha: 0.9 })
+  g.poly(hex(R)).fill({ color: t.base, alpha: 0.97 })
+  g.poly(hex(R)).stroke({ color: t.outline, width: 1.4, alpha: 0.95 })
+  g.poly(hex(R * 0.62)).fill({ color: t.shadow, alpha: 0.5 })
+  g.circle(0, 0, R * 0.5).stroke({ color: t.hi, width: 1.1, alpha: 0.7 })
+  g.circle(0, 0, R * 0.22).fill({ color: 0xffffff, alpha: 0.95 })
 }
 
-/** 三档「巨舰」：四臂尖刺星 + 核心 */
+/** 三档「巨舰」：四臂尖刺星赛璐璐 + 内暗面星 + 核心 */
 function paintEnemyT3(g: Graphics, r: number): void {
-  const pts: number[] = []
+  const t = TONES.enemy3
   const arms = 4
-  for (let i = 0; i < arms * 2; i++) {
-    const a = (i / (arms * 2)) * TAU - Math.PI / 2
-    const rr = i % 2 === 0 ? r * 1.55 : r * 0.6
-    pts.push(Math.cos(a) * rr, Math.sin(a) * rr)
+  const star = (outer: number, inner: number) => {
+    const p: number[] = []
+    for (let i = 0; i < arms * 2; i++) {
+      const a = (i / (arms * 2)) * TAU - Math.PI / 2
+      p.push(Math.cos(a) * (i % 2 === 0 ? outer : inner), Math.sin(a) * (i % 2 === 0 ? outer : inner))
+    }
+    return p
   }
-  g.poly(pts).fill({ color: C.enemy3, alpha: 0.97 })
-  g.poly(pts).stroke({ color: C.enemy3rim, width: 1.6, alpha: 0.92 })
-  g.circle(0, 0, r * 0.34).fill({ color: 0xffffff, alpha: 0.94 })
+  g.poly(star(r * 1.55, r * 0.6)).fill({ color: t.base, alpha: 0.98 })
+  g.poly(star(r * 1.55, r * 0.6)).stroke({ color: t.outline, width: 1.6, alpha: 0.95 })
+  g.poly(star(r * 0.95, r * 0.42)).fill({ color: t.shadow, alpha: 0.5 })
+  g.circle(0, 0, r * 0.34).fill({ color: 0xffffff, alpha: 0.95 }).stroke({ color: t.outline, width: 1, alpha: 0.9 })
 }
 
-/** 激光弹：白热泪滴（机头朝 +X） */
+/** 激光弹：白热泪滴 + 粉描边 + 内核（机头朝 +X） */
 function paintBullet(g: Graphics, r: number): void {
+  const t = TONES.bullet
   const L = r * 2.3
-  g.poly([L, 0, -L * 0.4, r * 0.6, -L * 0.8, 0, -L * 0.4, -r * 0.6])
-    .fill({ color: C.laserCore, alpha: 0.98 })
+  g.poly([L, 0, -L * 0.4, r * 0.6, -L * 0.8, 0, -L * 0.4, -r * 0.6]).fill({ color: t.base, alpha: 0.98 })
+  g.poly([L, 0, -L * 0.4, r * 0.6, -L * 0.8, 0, -L * 0.4, -r * 0.6]).stroke({ color: t.outline, width: 0.7, alpha: 0.7 })
+  g.circle(0, 0, r * 0.34).fill({ color: 0xffffff, alpha: 1 })
 }
 
-/** XP 结晶：菱形晶体 + 高光 */
+/** XP 结晶：菱形赛璐璐 + 右下暗面 + 高光切面 */
 function paintCrystal(g: Graphics, r: number): void {
-  g.poly([0, -r * 1.25, r * 0.85, 0, 0, r * 1.25, -r * 0.85, 0]).fill({ color: C.crystalMid, alpha: 0.96 })
-  g.poly([0, -r * 1.25, r * 0.85, 0, 0, r * 1.25, -r * 0.85, 0]).stroke({ color: 0xffffff, width: 1, alpha: 0.85 })
-  g.circle(0, -r * 0.18, r * 0.26).fill({ color: 0xffffff, alpha: 0.85 })
+  const t = TONES.crystal
+  const pts = [0, -r * 1.25, r * 0.85, 0, 0, r * 1.25, -r * 0.85, 0]
+  g.poly(pts).fill({ color: t.base, alpha: 0.96 })
+  g.poly(pts).stroke({ color: t.outline, width: 0.9, alpha: 0.92 })
+  g.poly([0, 0, r * 0.85, 0, 0, r * 1.25]).fill({ color: t.shadow, alpha: 0.7 })
+  g.poly([0, -r * 1.25, r * 0.3, -r * 0.4, -r * 0.3, -r * 0.4]).fill({ color: t.hi, alpha: 0.55 })
 }
 
-/** 急救包：青绿胶囊 + 白十字 */
+/** 急救包：青绿胶囊赛璐璐 + 白十字（暗面/高光） */
 function paintHealth(g: Graphics, r: number): void {
-  g.circle(0, 0, r).fill({ color: C.heal, alpha: 0.88 })
-  g.circle(0, 0, r).stroke({ color: C.healCore, width: 1.3, alpha: 0.9 })
+  const t = TONES.heal
+  g.circle(0, 0, r).fill({ color: t.base, alpha: 0.9 })
+  g.circle(0, 0, r).stroke({ color: t.outline, width: 1.2, alpha: 0.92 })
+  g.circle(0, r * 0.35, r * 0.72).fill({ color: t.shadow, alpha: 0.4 })
+  g.circle(-r * 0.3, -r * 0.35, r * 0.3).fill({ color: t.hi, alpha: 0.5 })
   const cr = r * 0.56
   g.moveTo(-cr, 0).lineTo(cr, 0).moveTo(0, -cr).lineTo(0, cr).stroke({ color: 0xffffff, width: 1.8, alpha: 0.95 })
 }
 
-/** 星环粒子：冰白核心 */
+/** 星环粒子：冰白核心 + 高光点 */
 function paintOrb(g: Graphics, r: number): void {
-  g.circle(0, 0, r * 1.15).fill({ color: 0xffffff, alpha: 0.96 })
+  const t = TONES.orb
+  g.circle(0, 0, r * 1.15).fill({ color: t.base, alpha: 0.98 })
+  g.circle(0, 0, r * 1.15).stroke({ color: t.outline, width: 0.8, alpha: 0.7 })
+  g.circle(-r * 0.3, -r * 0.3, r * 0.4).fill({ color: 0xffffff, alpha: 0.9 })
 }
 
 // ============ 场景渲染层 ============
