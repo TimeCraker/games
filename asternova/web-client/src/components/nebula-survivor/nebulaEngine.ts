@@ -117,6 +117,7 @@ export type NebulaEvent =
   | { type: "level-up"; level: number }
   | { type: "player-healed"; x: number; y: number }
   | { type: "player-died" }
+  | { type: "damage"; x: number; y: number; amount: number; tier: EnemyTier }
 
 const MAX_ENEMIES = 3000
 /** reset 后预充能，首帧即刷出一批敌人，避免开局空场 */
@@ -795,6 +796,7 @@ export class NebulaEngine {
             e.hp -= dmg
             e.ringHitCd = 0.14
             this.pushParticles(o.ox, o.oy, 3, 0.35)
+            this.onEvent?.({ type: "damage", x: e.x, y: e.y, amount: dmg, tier: e.tier })
             if (e.hp <= 0) {
               this.killEnemy(e, 2 + Math.floor(wt * 0.6), 3, 5)
             }
@@ -875,6 +877,7 @@ export class NebulaEngine {
           e.hp -= b.dmg
           b.alive = false
           this.pushParticles(b.x, b.y, 5, 0.5)
+          this.onEvent?.({ type: "damage", x: e.x, y: e.y, amount: b.dmg, tier: e.tier })
           if (e.hp <= 0) {
             this.killEnemy(e, 2 + Math.floor(wt * 0.5), 3, 6)
           }

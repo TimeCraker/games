@@ -1,7 +1,8 @@
-import { Container, Graphics } from "pixi.js"
+import { BlurFilter, Container, Graphics } from "pixi.js"
 
 import { NebulaEngine, type EnemyTier, type NebulaEvent } from "../nebulaEngine"
 import { NEBULA as C, TONES, TAU } from "./palette"
+import { DamageNumbers } from "./DamageNumbers"
 
 /** 屏震冲击波（击杀/升级/受击等事件驱动的径向环） */
 interface Shockwave {
@@ -146,11 +147,17 @@ export class NebulaScene {
 
   private grid = new Graphics()
   private world = new Container()
+  private glow = new Graphics()
   private fx = new Graphics()
   private screenFx = new Graphics()
+  private damageNumbers = new DamageNumbers()
+  private bloomFilters = [new BlurFilter({ strength: 4, quality: 2, kernelSize: 7 })]
+  private bloomOn = true
 
   viewW = 800
   viewH = 600
+  /** 命中减速（hit-stop）剩余秒：三档巨舰击杀冻结模拟约 45ms，仍持续渲染 */
+  hitStop = 0
 
   private enemySprites = new Map<number, Graphics>()
   private bulletSprites = new Map<number, Graphics>()
@@ -169,13 +176,18 @@ export class NebulaScene {
 
     this.grid = new Graphics()
     this.world = new Container()
+    this.glow = new Graphics()
     this.fx = new Graphics()
+    this.glow.blendMode = "add"
     this.fx.blendMode = "add"
     this.screenFx.blendMode = "add"
+    this.glow.filters = this.bloomFilters
 
     this.camera.addChild(this.grid)
     this.camera.addChild(this.world)
+    this.camera.addChild(this.glow)
     this.camera.addChild(this.fx)
+    this.camera.addChild(this.damageNumbers.container)
 
     this.playerSprite = new Graphics()
     paintPlayerShip(this.playerSprite, this.engine.player.r)
@@ -194,10 +206,17 @@ export class NebulaScene {
   }
 
   private handleEvent(e: NebulaEvent): void {
+    if (e.type === "damage") {
+      this.damageNumbers.spawn(e.x, e.y, e.amount, this.engine.gameTime)
+      return
+    }
     if (e.type === "enemy-killed") {
       const color = e.tier === 1 ? C.enemy1 : e.tier === 2 ? C.enemy2 : C.enemy3
       this.pushShockwave(e.x, e.y, e.tier >= 2 ? 20 : 14, e.tier >= 2 ? 46 : 32, color)
-      if (e.tier === 3) this.pushShockwave(e.x, e.y, 12, 68, 0xffffff)
+      if (e.tier === 3) {
+        this.pushShockwave(e.x, e.y, 12, 68, 0xffffff)
+        this.hitStop = Math.max(this.hitStop, 0.045)
+      }
     } else if (e.type === "level-up") {
       this.levelUpFlash = 1
       this.pushShockwave(this.engine.player.x, this.engine.player.y, 20, 96, C.azurite)
@@ -229,12 +248,20 @@ export class NebulaScene {
     }
     this.camera.position.set(this.viewW / 2 - g.player.x + sx, this.viewH / 2 - g.player.y + sy)
 
+    // bloom 性能护栏：同屏敌人过载时回退为无滤波 additive 柔光
+    const highLoad = g.em.enemies.length > 420
+    if (highLoad !== this.bloomOn) {
+      this.bloomOn = highLoad
+      this.glow.filters = highLoad ? [] : this.bloomFilters
+    }
+
     this.syncGrid()
     this.syncEnemies()
     this.syncBullets()
     this.syncPickups()
     this.syncOrbs()
     this.syncPlayer(dtSec)
+    this.syncGlow()
     this.syncFx(dtSec)
   }
 
@@ -406,93 +433,92 @@ export class NebulaScene {
     }
   }
 
-  private syncFx(dtSec: number): void {
+  /** 柔光层（additive + 高斯模糊 → 近似 bloom）：只画大面积软光斑，交给 blur 发亮光晕 */
+  private syncGlow(): void {
     const g = this.engine
-    const fx = this.fx
-    fx.clear()
+    const glow = this.glow
+    glow.clear()
 
     const px = g.player.x
     const py = g.player.y
 
-    // ---- 敌人柔光（additive 底色，制造霓虹 bloom）----
     for (const e of g.em.enemies) {
       if (!e.alive) continue
       const color = e.tier === 1 ? C.enemy1 : e.tier === 2 ? C.enemy2 : C.enemy3
-      fx.circle(e.x, e.y, e.r * 2.6).fill({ color, alpha: 0.13 })
-      fx.circle(e.x, e.y, e.r * 1.4).fill({ color, alpha: 0.1 })
-      // 一档暖色外圈描边（玩法提示，脉冲呼吸）
-      if (e.tier === 1) {
-        const pulse = 0.5 + 0.5 * Math.sin(g.gameTime * 4.2 + e.id * 0.7)
-        fx.circle(e.x, e.y, e.r + 6 + pulse * 2.5).stroke({ color: C.enemy1rim, width: 1.4, alpha: 0.4 + pulse * 0.3 })
-      }
+      glow.circle(e.x, e.y, e.r * 2.6).fill({ color, alpha: 0.18 })
+      glow.circle(e.x, e.y, e.r * 1.3).fill({ color, alpha: 0.13 })
     }
 
-    // ---- 激光弹尾焰辉光 ----
     for (const b of g.bullets) {
       if (!b.alive) continue
       const ang = Math.atan2(b.vy, b.vx)
       const tx = b.x - Math.cos(ang) * b.r * 2
       const ty = b.y - Math.sin(ang) * b.r * 2
-      fx.circle(b.x, b.y, b.r * 1.9).fill({ color: C.laserMid, alpha: 0.5 })
-      fx.circle(tx, ty, b.r * 2.6).fill({ color: C.laserOuter, alpha: 0.22 })
+      glow.circle(b.x, b.y, b.r * 2).fill({ color: C.laserMid, alpha: 0.55 })
+      glow.circle(tx, ty, b.r * 2.8).fill({ color: C.laserOuter, alpha: 0.26 })
     }
 
-    // ---- 星环粒子辉光 ----
     if (g.getRingOrbPositions().length > 0 && !g.pausedUpgrade && !g.gameOver) {
-      const orbs = g.getRingOrbPositions()
-      for (const o of orbs) {
-        fx.circle(o.ox, o.oy, 9).fill({ color: C.orbFrost, alpha: 0.3 })
-        fx.circle(o.ox, o.oy, 4.2).fill({ color: 0xffffff, alpha: 0.55 })
+      for (const o of g.getRingOrbPositions()) {
+        glow.circle(o.ox, o.oy, 10).fill({ color: C.orbFrost, alpha: 0.34 })
       }
     }
 
-    // ---- 掉落物辉光 ----
     for (const c of g.crystals) {
       if (!c.alive) continue
-      fx.circle(c.x, c.y, c.r * 2.6).fill({ color: C.crystalOuter, alpha: 0.34 })
-      fx.circle(c.x, c.y, c.r * 1.2).fill({ color: C.crystalMid, alpha: 0.4 })
+      glow.circle(c.x, c.y, c.r * 2.6).fill({ color: C.crystalOuter, alpha: 0.38 })
+      glow.circle(c.x, c.y, c.r * 1.2).fill({ color: C.crystalMid, alpha: 0.44 })
     }
     for (const h of g.healthPacks) {
       if (!h.alive) continue
-      fx.circle(h.x, h.y, h.r * 2.4).fill({ color: C.heal, alpha: 0.4 })
+      glow.circle(h.x, h.y, h.r * 2.4).fill({ color: C.heal, alpha: 0.44 })
     }
 
-    // ---- 主角辉光 + 引擎尾焰 ----
-    fx.circle(px, py, g.player.r * 2.1).fill({ color: C.azurite, alpha: 0.16 })
+    glow.circle(px, py, g.player.r * 2.1).fill({ color: C.azurite, alpha: 0.2 })
     if (Math.hypot(g.moveX, g.moveY) > 0.12 && !g.gameOver) {
       const ang = this.playerAngle
       const backX = px - Math.cos(ang) * g.player.r * 1.15
       const backY = py - Math.sin(ang) * g.player.r * 1.15
-      fx.circle(backX, backY, 7 + Math.random() * 3).fill({ color: C.azurite, alpha: 0.5 })
-      fx.circle(backX, backY, 12).fill({ color: C.laserMid, alpha: 0.16 })
+      glow.circle(backX, backY, 9).fill({ color: C.azurite, alpha: 0.6 })
+      glow.circle(backX, backY, 15).fill({ color: C.laserMid, alpha: 0.2 })
+    }
+  }
+
+  /** 锐利 FX 层（additive，无模糊）：描边环 / 粒子 / 尾迹 / 碎块 / 冲击波 / 全屏闪 + 飘字更新 */
+  private syncFx(dtSec: number): void {
+    const g = this.engine
+    const fx = this.fx
+    fx.clear()
+
+    // 一档暖色外圈描边（玩法提示，脉冲呼吸）
+    for (const e of g.em.enemies) {
+      if (!e.alive || e.tier !== 1) continue
+      const pulse = 0.5 + 0.5 * Math.sin(g.gameTime * 4.2 + e.id * 0.7)
+      fx.circle(e.x, e.y, e.r + 6 + pulse * 2.5).stroke({ color: C.enemy1rim, width: 1.4, alpha: 0.4 + pulse * 0.3 })
     }
 
-    // ---- 粒子 ----
     for (const q of g.particles) {
       const a = Math.max(0, q.life / 0.55)
       let color = 0xff8cdc
       if (q.kind === "violet") color = 0xbe78ff
       if (q.kind === "white") color = 0xfffaff
-      fx.circle(q.x, q.y, q.size * (0.5 + a * 0.5)).fill({ color, alpha: (0.35 + a * 0.5) * 0.9 })
+      fx.circle(q.x, q.y, q.size * (0.5 + a * 0.5)).fill({ color, alpha: (0.4 + a * 0.5) * 0.9 })
     }
 
-    // ---- 追踪尾迹 ----
     for (const t of g.trails) {
       const a = 1 - t.life / t.maxLife
       const s = t.size * (0.4 + 0.6 * (1 - a))
-      fx.circle(t.x, t.y, s).fill({ color: 0xffc8f5, alpha: 0.4 * (1 - a) })
+      fx.circle(t.x, t.y, s).fill({ color: 0xffc8f5, alpha: 0.45 * (1 - a) })
     }
 
-    // ---- 死亡碎块 ----
     for (const s of g.shards) {
       const a = 1 - s.life / s.maxLife
       let color = 0xff5fc3
       if (s.tier === 1) color = 0xff8a5c
       if (s.tier === 2) color = 0xc465ff
-      fx.circle(s.x, s.y, s.size).fill({ color, alpha: (0.15 + a * 0.85) })
+      fx.circle(s.x, s.y, s.size).fill({ color, alpha: (0.2 + a * 0.8) })
     }
 
-    // ---- 冲击波 ----
     for (let i = this.shockwaves.length - 1; i >= 0; i--) {
       const sw = this.shockwaves[i]
       sw.t += dtSec
@@ -504,6 +530,8 @@ export class NebulaScene {
       const rr = sw.fromR + (sw.toR - sw.fromR) * p
       fx.circle(sw.x, sw.y, rr).stroke({ color: sw.color, width: sw.width * (1 - p) + 0.5, alpha: (1 - p) * 0.9 })
     }
+
+    this.damageNumbers.update(dtSec)
 
     // ---- 全屏闪焦（screenFx）----
     const sf = this.screenFx

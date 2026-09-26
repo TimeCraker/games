@@ -75,7 +75,12 @@ export class NebulaPixiHost {
     app.ticker.add((ticker) => {
       const dt = Math.min(0.05, Math.max(1 / 240, ticker.deltaMS / 1000))
       this.bg.update(dt)
-      this.engine.update(dt)
+      // 命中减速（hit-stop）：冻结模拟但仍推进场景渲染，产生短促「顿一下」的打击感
+      if (this.scene.hitStop > 0) {
+        this.scene.hitStop = Math.max(0, this.scene.hitStop - dt)
+      } else {
+        this.engine.update(dt)
+      }
       this.scene.sync(dt)
     })
   }
