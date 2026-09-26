@@ -6,7 +6,8 @@
 
 import * as React from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { NebulaEngine, type UpgradeOffer } from "./nebulaEngine"
+import { NebulaPixiHost } from "./render/NebulaPixiHost"
+import type { NebulaEngine, UpgradeOffer } from "./nebulaEngine"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { LiquidBar } from "@/src/components/ui/LiquidBar"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
@@ -245,10 +246,9 @@ function UpgradeCard({
 
 export function NebulaSurvivorGame() {
   const { isMobile } = useMobileGameViewport()
-  const canvasRef = React.useRef<HTMLCanvasElement>(null)
+  const containerRef = React.useRef<HTMLDivElement>(null)
   const engineRef = React.useRef<NebulaEngine | null>(null)
   const rafRef = React.useRef<number>(0)
-  const lastRef = React.useRef<number>(0)
 
   const joyRef = React.useRef({ x: 0, y: 0 })
   const joyMove = React.useCallback((x: number, y: number) => {
@@ -325,69 +325,57 @@ export function NebulaSurvivorGame() {
   }, [])
 
   React.useLayoutEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const g = new NebulaEngine()
-    engineRef.current = g
+    const container = containerRef.current
+    if (!container) return
+    const host = new NebulaPixiHost()
+    const engine = host.engine
+    engineRef.current = engine
 
-    const resize = () => {
-      const dpr = Math.min(2, window.devicePixelRatio || 1)
-      const rect = canvas.getBoundingClientRect()
-      const lw = Math.max(280, Math.floor(rect.width))
-      const lh = Math.max(360, Math.floor(rect.height))
-      canvas.width = Math.floor(lw * dpr)
-      canvas.height = Math.floor(lh * dpr)
-      canvas.style.width = `${lw}px`
-      canvas.style.height = `${lh}px`
-      g.w = canvas.width
-      g.h = canvas.height
-      g.dpr = dpr
-    }
-
-    resize()
-    const ro = new ResizeObserver(resize)
-    ro.observe(canvas.parentElement ?? canvas)
-
-    let uiAcc = 0
-    const loop = (t: number) => {
-      const g = engineRef.current
-      if (!g) return
-      const prev = lastRef.current
-      lastRef.current = t
-      const raw = prev ? (t - prev) / 1000 : 1 / 60
-      const dt = Math.min(0.05, Math.max(1 / 240, raw))
-
-      let mx = keyRef.current.x + joyRef.current.x
-      let my = keyRef.current.y + joyRef.current.y
-      const m = Math.hypot(mx, my)
-      if (m > 1) {
-        mx /= m
-        my /= m
+    let disposed = false
+    void host.mount(container).then(() => {
+      if (disposed) {
+        host.destroy()
+        return
       }
-      g.moveX = mx
-      g.moveY = my
+      let uiAcc = 0
+      let lastUi = performance.now()
+      let lastPause = engine.pausedUpgrade
+      let lastOver = engine.gameOver
+      const loop = () => {
+        const g = engineRef.current
+        if (g) {
+          let mx = keyRef.current.x + joyRef.current.x
+          let my = keyRef.current.y + joyRef.current.y
+          const m = Math.hypot(mx, my)
+          if (m > 1) {
+            mx /= m
+            my /= m
+          }
+          g.moveX = mx
+          g.moveY = my
 
-      const prevPause = g.pausedUpgrade
-      const prevOver = g.gameOver
-      g.update(dt)
-      const ctx = canvas.getContext("2d")
-      if (ctx) g.render(ctx)
-
-      uiAcc += dt
-      if (uiAcc >= 0.1 || g.pausedUpgrade !== prevPause || g.gameOver !== prevOver) {
-        uiAcc = 0
-        syncUi()
+          const now = performance.now()
+          uiAcc += (now - lastUi) / 1000
+          lastUi = now
+          const changed = g.pausedUpgrade !== lastPause || g.gameOver !== lastOver
+          lastPause = g.pausedUpgrade
+          lastOver = g.gameOver
+          if (uiAcc >= 0.1 || changed) {
+            uiAcc = 0
+            syncUi()
+          }
+        }
+        rafRef.current = requestAnimationFrame(loop)
       }
       rafRef.current = requestAnimationFrame(loop)
-    }
-    rafRef.current = requestAnimationFrame(loop)
-    syncUi()
+      syncUi()
+    })
 
     return () => {
+      disposed = true
       cancelAnimationFrame(rafRef.current)
-      ro.disconnect()
+      host.destroy()
       engineRef.current = null
-      lastRef.current = 0
     }
   }, [syncUi])
 
@@ -430,9 +418,9 @@ export function NebulaSurvivorGame() {
   }, [])
 
   const onCanvasMove = React.useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
+    (e: React.PointerEvent<HTMLDivElement>) => {
       const g = engineRef.current
-      const c = canvasRef.current
+      const c = containerRef.current
       if (!g || !c) return
       const r = c.getBoundingClientRect()
       const lx = e.clientX - r.left
@@ -447,14 +435,13 @@ export function NebulaSurvivorGame() {
     const g = engineRef.current
     if (!g) return
     g.reset()
-    lastRef.current = 0
     syncUi()
   }, [syncUi])
 
   const blocked = rulesModalOpen || ui.pausedUpgrade || ui.gameOver
 
   return (
-    <div className="relative flex h-full min-h-0 min-h-full flex-col overflow-hidden bg-space-black text-white">
+    <div className="relative flex h-dvh min-h-0 flex-col overflow-hidden bg-space-black text-white">
       <div className="relative z-10 flex shrink-0 items-center justify-between gap-2 border-b border-white/[0.07] px-3 py-2.5 backdrop-blur-xl sm:px-5 sm:py-3">
         {isMobile ? <span aria-hidden="true" /> : <GameBackButton variant="header" label="大厅" />}
         <div className="text-center">
@@ -558,9 +545,9 @@ export function NebulaSurvivorGame() {
           <p className="text-[9px] leading-tight text-emerald-200/40">青绿光球+十字为急救包（稀有）</p>
         </div>
 
-        <canvas
-          ref={canvasRef}
-          className={`block h-full w-full min-h-[240px] touch-none ${blocked ? "pointer-events-none" : ""}`}
+        <div
+          ref={containerRef}
+          className={`block h-full w-full touch-none ${blocked ? "pointer-events-none" : ""}`}
           onPointerMove={onCanvasMove}
           onPointerEnter={() => {
             const g = engineRef.current

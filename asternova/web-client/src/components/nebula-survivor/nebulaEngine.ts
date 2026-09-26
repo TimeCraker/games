@@ -111,6 +111,13 @@ export type UpgradeOffer = {
   badgeLabel: string
 }
 
+/** 引擎 → 渲染层的只读事件回调（纯 Juice，不改动任何模拟数值） */
+export type NebulaEvent =
+  | { type: "enemy-killed"; x: number; y: number; tier: EnemyTier }
+  | { type: "level-up"; level: number }
+  | { type: "player-healed"; x: number; y: number }
+  | { type: "player-died" }
+
 const MAX_ENEMIES = 3000
 /** reset 后预充能，首帧即刷出一批敌人，避免开局空场 */
 const SPAWN_ACC_INITIAL = 11
@@ -361,6 +368,9 @@ export class NebulaEngine {
 
   gameOver = false
 
+  /** 引擎 → 渲染层事件回调（纯视觉 Juice，可空，不影响模拟） */
+  onEvent?: (e: NebulaEvent) => void
+
   /** React 规则弹窗打开时为 true，暂停模拟 */
   rulesFrozen = false
 
@@ -508,6 +518,7 @@ export class NebulaEngine {
     const cv = crystalMin + Math.floor(Math.random() * (crystalMax - crystalMin + 1))
     this.spawnCrystal(e.x, e.y, cv)
     if (Math.random() < HEALTH_PACK_CHANCE) this.spawnHealthPack(e.x, e.y)
+    this.onEvent?.({ type: "enemy-killed", x: e.x, y: e.y, tier: e.tier })
   }
 
   tryLevelUp() {
@@ -521,6 +532,7 @@ export class NebulaEngine {
     p.hp = Math.min(p.maxHp, p.hp + 8)
     this.rollUpgradeChoices()
     this.pausedUpgrade = true
+    this.onEvent?.({ type: "level-up", level: p.level })
   }
 
   /** 打开升级界面时调用：三选一 + 赋予 1 次刷新 */
@@ -673,7 +685,7 @@ export class NebulaEngine {
     return 2.8 + c * 0.22 + n * 0.35 + spin * 0.42
   }
 
-  private getRingOrbPositions(): { ox: number; oy: number }[] {
+  getRingOrbPositions(): { ox: number; oy: number }[] {
     const n = this.ringOrbCount()
     if (n <= 0) return []
     const R = this.ringOrbitRadius()
@@ -840,6 +852,7 @@ export class NebulaEngine {
           if (p.hp <= 0) {
             p.hp = 0
             this.gameOver = true
+            this.onEvent?.({ type: "player-died" })
           }
         }
       }
@@ -898,6 +911,7 @@ export class NebulaEngine {
         p.hp += heal
         this.hitFlash = 0
         this.pushParticles(h.x, h.y, 14, 0.6)
+        this.onEvent?.({ type: "player-healed", x: h.x, y: h.y })
       }
     }
 
