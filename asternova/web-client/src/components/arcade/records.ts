@@ -33,6 +33,11 @@ export type ArcadeRecord = {
   plays: number
   /** 最近一次游玩时间戳（ms） */
   lastPlayedAt: number
+  /**
+   * 最近一次已结算的「局标识」。用于幂等：同一局重复提交（React StrictMode
+   * 双调用初始化器 / 结算组件被重挂载）不会把 plays 计两次、也不会重复弹破纪录。
+   */
+  lastRoundId: string
 }
 
 export type ArcadeRecords = {
@@ -99,7 +104,8 @@ function coerceRecord(v: unknown): ArcadeRecord | null {
   const lastPlayedAt =
     typeof o.lastPlayedAt === "number" && Number.isFinite(o.lastPlayedAt) ? o.lastPlayedAt : 0
   const bestMode = typeof o.bestMode === "string" ? o.bestMode : ""
-  return { best, bestMode, plays, lastPlayedAt }
+  const lastRoundId = typeof o.lastRoundId === "string" ? o.lastRoundId : ""
+  return { best, bestMode, plays, lastPlayedAt, lastRoundId }
 }
 
 /**
@@ -156,31 +162,57 @@ export type SubmitResult = {
   isNewBest: boolean
   /** 是否为首局（用于文案区分） */
   isFirstPlay: boolean
+  /** 本次调用是否为重复提交（同一 roundId 已经结算过，未产生写入） */
+  deduped: boolean
+}
+
+/** 生成一局的唯一标识；游戏在「本局开始」时生成一次即可 */
+export function newRoundId(): string {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
 }
 
 /**
  * 提交一局结果。分数为 0 也会累计 plays（用户确实玩了一局）。
+ * 带 roundId 时幂等：同一局重复提交不会重复计数。
  * 返回写入后的记录与「是否破纪录」，供结算卡即时展示。
  */
 export function submitRecord(
   slug: ArcadeSlug,
-  input: { score: number; mode?: string },
+  input: { score: number; mode?: string; roundId?: string },
 ): SubmitResult {
   const all = readRecords()
   const prev = all.games[slug] ?? null
   const score = Number.isFinite(input.score) ? Math.max(0, Math.floor(input.score)) : 0
-  const isNewBest = prev === null || score > prev.best
+  const roundId = input.roundId ?? ""
 
+  // 幂等分支：本局已结算过，原样返回（isNewBest 依据「本局分数是否等于当前最高」重算，
+  // 这样重复调用不会把 NEW RECORD 标记误吞掉）
+  if (roundId && prev && prev.lastRoundId === roundId) {
+    return {
+      record: prev,
+      isNewBest: score > 0 && score >= prev.best,
+      isFirstPlay: false,
+      deduped: true,
+    }
+  }
+
+  const isNewBest = prev === null || score > prev.best
   const next: ArcadeRecord = {
     best: prev ? Math.max(prev.best, score) : score,
     bestMode: isNewBest ? (input.mode ?? "") : (prev?.bestMode ?? ""),
     plays: (prev?.plays ?? 0) + 1,
     lastPlayedAt: Date.now(),
+    lastRoundId: roundId,
   }
   all.games[slug] = next
   rawSet(JSON.stringify(all))
   notify()
-  return { record: next, isNewBest: isNewBest && score > 0, isFirstPlay: prev === null }
+  return {
+    record: next,
+    isNewBest: isNewBest && score > 0,
+    isFirstPlay: prev === null,
+    deduped: false,
+  }
 }
 
 /** 清空全部街机记录（设置面板/调试用） */

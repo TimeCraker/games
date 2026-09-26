@@ -2,6 +2,8 @@
 
 import * as React from "react"
 
+import { arcadeAccentStyle } from "@/src/components/arcade/accent"
+
 import { HEIGHT, WIDTH } from "./constants"
 
 /**
@@ -37,6 +39,7 @@ export function StaGameShell({ children }: { children: React.ReactNode }) {
       // gutter 原为蓝紫双渐变（AI 味来源，2026-09-27 收口），改走品牌 letterbox 底纹
       className="arcade-letterbox relative overflow-hidden"
       style={{
+        ...arcadeAccentStyle("shoot-them-all"),
         width: "100vw",
         height: "100dvh",
         touchAction: "none",

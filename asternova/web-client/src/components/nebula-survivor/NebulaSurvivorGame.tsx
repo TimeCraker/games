@@ -6,6 +6,8 @@
 
 import * as React from "react"
 import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from "framer-motion"
+import { ArcadeResult } from "@/src/components/arcade/ArcadeResult"
+import { arcadeAccentStyle } from "@/src/components/arcade/accent"
 import { BrandMark } from "@/src/components/arcade/BrandMark"
 import { NebulaPixiHost } from "./render/NebulaPixiHost"
 import { nebulaSfx } from "./render/NebulaSfx"
@@ -14,7 +16,6 @@ import type { NebulaEngine, UpgradeOffer, UpgradeTrackId } from "./nebulaEngine"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { LiquidBar } from "@/src/components/ui/LiquidBar"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
-import { ResultOverlay } from "@/src/components/ui/ResultOverlay"
 import { useDialogA11y } from "@/src/hooks/useDialogA11y"
 import { StagePortal } from "@/src/components/game-shell/StagePortal"
 import { useMobileGameViewport } from "@/src/hooks/useMobileGameViewport"
@@ -556,7 +557,10 @@ export function NebulaSurvivorGame() {
   const blocked = rulesModalOpen || ui.pausedUpgrade || ui.gameOver
 
   return (
-    <div className="relative flex h-dvh min-h-0 flex-col overflow-hidden bg-space-black text-white">
+    <div
+      className="relative flex h-dvh min-h-0 flex-col overflow-hidden bg-space-black text-white"
+      style={arcadeAccentStyle("nebula-survivor")}
+    >
       <div className="relative z-10 flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.07] bg-black/30 px-3 py-2 backdrop-blur-xl sm:px-5 sm:py-2.5">
         <div className="flex w-24 items-center sm:w-28">
           {isMobile ? null : <GameBackButton variant="header" label="大厅" />}
@@ -880,12 +884,12 @@ export function NebulaSurvivorGame() {
       <StagePortal>
       <AnimatePresence>
         {ui.gameOver ? (
-          <ResultOverlay
-            victory={false}
-            title="信号丢失"
-            subtitle="暗物质潮淹没宇航服护盾"
-            stats={[
-              { label: "得分", value: ui.score },
+          <ArcadeResult
+            slug="nebula-survivor"
+            score={ui.score}
+            title="SIGNAL LOST"
+            subtitle="信号丢失 · 暗物质潮淹没宇航服护盾"
+            extraStats={[
               { label: "击杀", value: ui.kills },
               { label: "存活", value: formatTime(ui.gameTime) },
               { label: "等级", value: ui.level },

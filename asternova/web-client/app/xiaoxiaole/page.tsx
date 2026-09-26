@@ -1,5 +1,6 @@
 "use client"
 
+import { arcadeAccentStyle } from "@/src/components/arcade/accent"
 import { arcadeDisplayName } from "@/src/components/arcade/brand"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
 
@@ -7,7 +8,12 @@ const TITLE = arcadeDisplayName("xiaoxiaole")
 
 export default function XiaoxiaolePage() {
   return (
-    <main id="main-content" tabIndex={-1} className="fixed inset-0 z-50 bg-space-black">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="fixed inset-0 z-50 bg-space-black"
+      style={arcadeAccentStyle("xiaoxiaole")}
+    >
       <h1 className="sr-only">{TITLE}</h1>
       <iframe
         src="/xiaoxiaole/index.html"

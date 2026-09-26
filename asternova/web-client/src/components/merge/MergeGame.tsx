@@ -5,10 +5,13 @@
  */
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
 import { Bodies, Body, Composite, Engine, Events, Render, Runner, World } from "matter-js"
 import { AnimatePresence, motion } from "framer-motion"
+import { arcadeAccentStyle } from "@/src/components/arcade/accent"
+import { ArcadeResult } from "@/src/components/arcade/ArcadeResult"
 import { BrandMark } from "@/src/components/arcade/BrandMark"
+import { formatScore } from "@/src/components/arcade/records"
+import { useArcadeBest } from "@/src/components/arcade/useArcadeRecords"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
 import { useDialogA11y } from "@/src/hooks/useDialogA11y"
@@ -206,7 +209,6 @@ function MergeIconNext({ className, iconClass }: { className?: string; iconClass
 }
 
 export function MergeGame() {
-  const router = useRouter()
   const shellRef = React.useRef<HTMLDivElement | null>(null)
   const stageRef = React.useRef<HTMLDivElement | null>(null)
   const engineRef = React.useRef<Engine | null>(null)
@@ -215,8 +217,9 @@ export function MergeGame() {
 
   const [mouseNorm, setMouseNorm] = React.useState({ x: 0.5, y: 0.5 })
   const [score, setScore] = React.useState(0)
+  // 历史最高改为读全街机记录总线（此前 only 存在组件 state 里，刷新即丢）
+  const best = useArcadeBest("merge")
   const scoreRef = React.useRef(0)
-  const [highScore, setHighScore] = React.useState(0)
   const [playing, setPlaying] = React.useState(true)
   const [ripples, setRipples] = React.useState<Ripple[]>([])
   const [ghostX, setGhostX] = React.useState(WORLD_W / 2)
@@ -258,7 +261,8 @@ const confirmMergeRules = React.useCallback(() => {
 
   // 弹层键盘可达性：Esc 关闭规则弹层；Game Over 无「关闭」语义仅做焦点陷阱
   const rulesDialogRef = useDialogA11y<HTMLDivElement>({ open: rulesModalOpen, onClose: confirmMergeRules })
-  const gameOverDialogRef = useDialogA11y<HTMLDivElement>({ open: !playing, onClose: () => {}, closeOnEsc: false })
+  // Game Over 的焦点陷阱/role 已移交给共享的 ResultOverlay（其内部自带 useDialogA11y，
+  // closeOnEsc:false 语义一致），故此处不再单独持有 dialog ref。
 
   React.useEffect(() => {
     scoreRef.current = score
@@ -423,12 +427,7 @@ const confirmMergeRules = React.useCallback(() => {
           Body.setVelocity(nb, { x: (a.velocity.x + b.velocity.x) * 0.35, y: (a.velocity.y + b.velocity.y) * 0.35 - 0.5 })
           Body.setAngularVelocity(nb, (a.angularVelocity + b.angularVelocity) * 0.25)
 
-          setScore((s) => {
-            const add = nl * nl * 10
-            const v = s + add
-            setHighScore((h) => Math.max(h, v))
-            return v
-          })
+          setScore((s) => s + nl * nl * 10)
           pushRipple(mx, my, nt.radius)
         }
       } finally {
@@ -553,6 +552,7 @@ const confirmMergeRules = React.useCallback(() => {
     <div
       ref={shellRef}
       className="relative flex h-full min-h-0 min-h-full flex-col overflow-hidden bg-space-black text-white"
+      style={arcadeAccentStyle("merge")}
       onMouseMove={(e) => {
         if (!shellRef.current) return
         const r = shellRef.current.getBoundingClientRect()
@@ -630,7 +630,7 @@ const confirmMergeRules = React.useCallback(() => {
               <span className="font-mono-data text-[13px] tabular-nums text-white/85 sm:text-[14px]">
                 <span className="text-white/90">{score}</span>
                 <span className="mx-1 text-white/50">/</span>
-                <span className="text-white/50">最高 {highScore}</span>
+                <span className="text-white/50">最高 {best !== null ? formatScore(best) : 0}</span>
               </span>
             </div>
 
@@ -832,57 +832,16 @@ const confirmMergeRules = React.useCallback(() => {
 
       <StagePortal>
         <AnimatePresence>
-        {!playing ? (
-          <motion.div
-            className="fixed inset-0 z-[60] flex items-end justify-center bg-black/55 backdrop-blur-md sm:items-center sm:p-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35 }}
-            style={{
-              paddingLeft: "max(1rem, env(safe-area-inset-left, 0px))",
-              paddingRight: "max(1rem, env(safe-area-inset-right, 0px))",
-              paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))",
-              paddingTop: "max(0.5rem, env(safe-area-inset-top, 0px))",
-            }}
-          >
-            <motion.div
-              ref={gameOverDialogRef}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="merge-gameover-title"
-              initial={{ opacity: 0, scale: 0.94, y: 12 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ type: "spring", stiffness: 380, damping: 28 }}
-              className="max-h-[min(88dvh,calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-1.5rem))] w-full max-w-sm overflow-y-auto overscroll-contain rounded-t-[1.5rem] border border-white/10 border-b-0 bg-white/[0.08] p-5 text-center shadow-[0_24px_80px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.05)_inset] backdrop-blur-[24px] sm:rounded-[26px] sm:border-b sm:p-7"
-              style={{ WebkitBackdropFilter: "blur(24px)" }}
-            >
-              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/50">Game Over</p>
-              <h2 id="merge-gameover-title" className="mt-2 text-xl font-semibold tracking-tight text-white">越界过久</h2>
-              <p className="mt-2 text-[13px] text-white/50">堆叠越过红线并持续 3 秒</p>
-              <p className="mt-4 text-3xl font-semibold tabular-nums text-white/95">{score}</p>
-              <p className="text-[12px] text-white/50">本局得分</p>
-              <div className="mt-6 flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={restart}
-                  className="w-full rounded-2xl border-0 bg-gradient-to-r from-rose-400 via-amber-400 to-teal-500 py-3 text-[15px] font-semibold text-gray-950 shadow-lg shadow-teal-500/15"
-                >
-                  重新开始
-                </button>
-                <button
-                  type="button"
-                  onClick={() => router.push("/lobby")}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 text-[14px] font-medium text-white/80"
-                >
-                  返回大厅
-                </button>
-              </div>
-              <p className="mt-5 text-[12px] italic text-teal-200/65">Reach Beyond the Stars</p>
-            </motion.div>
-          </motion.div>
-        ) : null}
+          {!playing ? (
+            <ArcadeResult
+              slug="merge"
+              score={score}
+              title="OVERFLOW"
+              subtitle="越界过久 · 堆叠越过红线并持续 3 秒"
+              actionLabel="重新开始"
+              onAction={restart}
+            />
+          ) : null}
         </AnimatePresence>
       </StagePortal>
       <LoopingBgmControl src="/audio/games/merge/Velvet_Resonance.mp3" storageKey="bgm-volume:merge" hidden={rulesModalOpen || !playing} />

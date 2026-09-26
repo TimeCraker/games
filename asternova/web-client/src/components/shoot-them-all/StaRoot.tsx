@@ -4,6 +4,7 @@ import * as React from "react"
 
 import { BrandMark } from "@/src/components/arcade/BrandMark"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
+import type { GameEngine } from "./engine/GameEngine"
 import { HEIGHT, WIDTH } from "./constants"
 import { StaGameShell } from "./StaGameShell"
 import { StaPixiApp } from "./render/StaPixiApp"
@@ -20,7 +21,9 @@ import { StaPixiApp } from "./render/StaPixiApp"
 export function StaRoot() {
   const hostRef = React.useRef<HTMLDivElement | null>(null)
   const pixiRef = React.useRef<StaPixiApp | null>(null)
-  const engineRef = React.useRef<ReturnType<StaPixiApp["gameEngine"]> | null>(null)
+  // 注：StaPixiApp.gameEngine 是 getter，其类型已是返回值本身，
+  // 套 ReturnType<> 会让 tsc 报「不是函数类型」，故直接标注类类型。
+  const engineRef = React.useRef<GameEngine | null>(null)
   const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {

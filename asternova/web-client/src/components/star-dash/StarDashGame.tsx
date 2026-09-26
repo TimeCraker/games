@@ -7,6 +7,9 @@
  */
 
 import * as React from "react"
+import { AnimatePresence } from "framer-motion"
+import { ArcadeResult } from "@/src/components/arcade/ArcadeResult"
+import { arcadeAccentStyle } from "@/src/components/arcade/accent"
 import { BrandMark } from "@/src/components/arcade/BrandMark"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
@@ -243,6 +246,9 @@ export function StarDashGame() {
   const lastTsRef = React.useRef<number>(0)
   const prevModeRef = React.useRef<GameMode>("start")
   const [isGameOver, setIsGameOver] = React.useState(false)
+  // 最终分数需要在 rAF 循环之外渲染结算卡，故单开一份 state 镜像
+  const [finalScore, setFinalScore] = React.useState(0)
+  const [finalStars, setFinalStars] = React.useState(0)
   const [screenMode, setScreenMode] = React.useState<GameMode>("start")
   const [rulesModalOpen, setRulesModalOpen] = React.useState(true)
   const [dontShowRulesAgain, setDontShowRulesAgain] = React.useState(false)
@@ -456,6 +462,10 @@ export function StarDashGame() {
         prevModeRef.current = s.mode
         setIsGameOver(s.mode === "over")
         setScreenMode(s.mode)
+        if (s.mode === "over") {
+          setFinalScore(Math.floor(s.distance + s.scoreStars * 12))
+          setFinalStars(s.scoreStars)
+        }
         if (s.mode !== "playing") {
           prevBoostReadyRef.current = false
           setBoostReadyUi(false)
@@ -884,28 +894,11 @@ export function StarDashGame() {
         ctx.fillText("二段跳 · 松手后下滑 / ↓ 滑铲", w / 2, h * 0.62)
       }
 
-      if (s.mode === "over") {
-        ctx.fillStyle = "rgba(0,0,0,0.55)"
-        ctx.fillRect(0, 0, w, h)
-        ctx.textAlign = "center"
-        ctx.font = "700 22px sans-serif"
-        ctx.fillStyle = "#fce7f3"
-        ctx.fillText("Game Over", w / 2, h * 0.38)
-        const finalScore = Math.floor(s.distance + s.scoreStars * 12)
-        ctx.font = "16px sans-serif"
-        ctx.fillStyle = "rgba(255,255,255,0.85)"
-        ctx.fillText(`最终距离 ${finalScore} m · 星尘 ${s.scoreStars}`, w / 2, h * 0.46)
-        ctx.font = "italic 15px sans-serif"
-        const sg = ctx.createLinearGradient(w / 2 - 140, 0, w / 2 + 140, 0)
-        sg.addColorStop(0, "#fbcfe8")
-        sg.addColorStop(1, "#c4b5fd")
-        ctx.fillStyle = sg
-        ctx.fillText("Reach Beyond the Stars", w / 2, h * 0.56)
-        ctx.font = "12px sans-serif"
-        ctx.fillStyle = "rgba(255,255,255,0.4)"
-        ctx.fillText("点击画面或空格 · Restart", w / 2, h * 0.66)
-      }
+      // 结算画面已移交 DOM 版 ArcadeResult（统一品牌 + 历史最高 + 落盘 asternova.arcade.v1），
+      // canvas 不再自绘 Game Over，避免与 DOM 结算卡文字重叠。
 
+      // ⚠️ 每帧泵：这一行必须在 loop 体内。effect 末尾那一次只是「初始点火」，
+      // 少了本行游戏会只画一帧后彻底静止（且 build/lint/tsc 全绿，静默失效）。
       rafRef.current = requestAnimationFrame(loop)
     }
 
@@ -940,7 +933,10 @@ export function StarDashGame() {
   }
 
   return (
-    <div className="relative flex h-full min-h-0 min-h-full flex-col bg-space-black text-white">
+    <div
+      className="relative flex h-full min-h-0 min-h-full flex-col bg-space-black text-white"
+      style={arcadeAccentStyle("lets-running")}
+    >
       <div className="relative z-20 grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-white/[0.08] px-4 py-3 backdrop-blur-xl">
         {isMobile ? <span aria-hidden="true" /> : <GameBackButton variant="header" className="justify-self-start" />}
         <BrandMark
@@ -1095,20 +1091,24 @@ export function StarDashGame() {
           ) : null}
         </div>
 
-        {isGameOver ? (
-          <div className="mt-4 flex justify-center">
-            <button
-              type="button"
-              onClick={() => {
-                const s = stateRef.current
-                if (s) resetPlayingState(s)
-              }}
-              className="rounded-full bg-white px-8 py-2.5 text-sm font-semibold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition hover:bg-white/90 active:scale-[0.98]"
-            >
-              Restart
-            </button>
-          </div>
-        ) : null}
+        <StagePortal>
+          <AnimatePresence>
+            {isGameOver ? (
+              <ArcadeResult
+                slug="lets-running"
+                score={finalScore}
+                extraStats={[{ label: "星尘", value: finalStars }]}
+                title="CRASH"
+                subtitle="撞击损毁 · 侧撞障碍物，本局结束"
+                actionLabel="再跑一次"
+                onAction={() => {
+                  const s = stateRef.current
+                  if (s) resetPlayingState(s)
+                }}
+              />
+            ) : null}
+          </AnimatePresence>
+        </StagePortal>
       </div>
       <LoopingBgmControl src="/audio/games/lets-running/Digital_Frenzy lets running.mp3" storageKey="bgm-volume:lets-running" hidden={rulesModalOpen} />
     </div>
