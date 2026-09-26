@@ -2,11 +2,13 @@
 
 import { arcadeAccentStyle } from "@/src/components/arcade/accent"
 import { arcadeDisplayName } from "@/src/components/arcade/brand"
+import { useArcadeAccent } from "@/src/components/arcade/useArcadeAccent"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
 
 const TITLE = arcadeDisplayName("xiaoxiaole")
 
 export default function XiaoxiaolePage() {
+  useArcadeAccent("xiaoxiaole")
   return (
     <main
       id="main-content"

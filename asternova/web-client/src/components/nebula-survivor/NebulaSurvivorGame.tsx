@@ -8,6 +8,7 @@ import * as React from "react"
 import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from "framer-motion"
 import { ArcadeResult } from "@/src/components/arcade/ArcadeResult"
 import { arcadeAccentStyle } from "@/src/components/arcade/accent"
+import { useArcadeAccent } from "@/src/components/arcade/useArcadeAccent"
 import { BrandMark } from "@/src/components/arcade/BrandMark"
 import { NebulaPixiHost } from "./render/NebulaPixiHost"
 import { nebulaSfx } from "./render/NebulaSfx"
@@ -345,6 +346,7 @@ function UpgradeCard({
 }
 
 export function NebulaSurvivorGame() {
+  useArcadeAccent("nebula-survivor")
   const { isMobile } = useMobileGameViewport()
   const containerRef = React.useRef<HTMLDivElement>(null)
   const engineRef = React.useRef<NebulaEngine | null>(null)

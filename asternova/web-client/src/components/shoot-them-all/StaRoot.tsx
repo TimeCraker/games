@@ -3,6 +3,7 @@
 import * as React from "react"
 
 import { BrandMark } from "@/src/components/arcade/BrandMark"
+import { useArcadeAccent } from "@/src/components/arcade/useArcadeAccent"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
 import type { GameEngine } from "./engine/GameEngine"
 import { HEIGHT, WIDTH } from "./constants"
@@ -19,6 +20,7 @@ import { StaPixiApp } from "./render/StaPixiApp"
  * 统一为 pointer 事件：move/down 更新瞄准，up 发射。
  */
 export function StaRoot() {
+  useArcadeAccent("shoot-them-all")
   const hostRef = React.useRef<HTMLDivElement | null>(null)
   const pixiRef = React.useRef<StaPixiApp | null>(null)
   // 注：StaPixiApp.gameEngine 是 getter，其类型已是返回值本身，

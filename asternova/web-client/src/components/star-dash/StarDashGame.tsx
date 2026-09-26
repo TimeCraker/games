@@ -10,6 +10,7 @@ import * as React from "react"
 import { AnimatePresence } from "framer-motion"
 import { ArcadeResult } from "@/src/components/arcade/ArcadeResult"
 import { arcadeAccentStyle } from "@/src/components/arcade/accent"
+import { useArcadeAccent } from "@/src/components/arcade/useArcadeAccent"
 import { BrandMark } from "@/src/components/arcade/BrandMark"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
@@ -238,6 +239,7 @@ function DashIconStarBurst({ className, iconClass }: { className?: string; iconC
 }
 
 export function StarDashGame() {
+  useArcadeAccent("lets-running")
   const { isMobile } = useMobileGameViewport()
   const wrapRef = React.useRef<HTMLDivElement | null>(null)
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)

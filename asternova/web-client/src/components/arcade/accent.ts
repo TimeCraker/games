@@ -11,6 +11,9 @@ import { ARCADE_BRAND, type ArcadeSlug } from "./brand"
  * 之所以用「作用域 CSS 变量」而不是 `text-arcade-merge` 这类动态类名：
  * Tailwind 无法为运行时拼接的类名生成样式，而品牌标记要能在 5 个游戏里复用同一个组件。
  * 未注入时 `--arcade-accent` 在 :root 回落为琥珀，因此漏注入只会退化成金色而非崩坏。
+ *
+ * ⚠️ 本函数只覆盖「该元素的子树」。走 StagePortal 挂到 document.body 的内容
+ * （规则弹层 / 结算卡 / 悬浮返回钮）不在子树内，必须**同时**接 useArcadeAccent()。
  */
 export function arcadeAccentStyle(slug: ArcadeSlug): CSSProperties {
   return { ["--arcade-accent"]: `var(${ARCADE_BRAND[slug].accentVar})` } as CSSProperties

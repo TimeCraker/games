@@ -8,6 +8,7 @@ import * as React from "react"
 import { Bodies, Body, Composite, Engine, Events, Render, Runner, World } from "matter-js"
 import { AnimatePresence, motion } from "framer-motion"
 import { arcadeAccentStyle } from "@/src/components/arcade/accent"
+import { useArcadeAccent } from "@/src/components/arcade/useArcadeAccent"
 import { ArcadeResult } from "@/src/components/arcade/ArcadeResult"
 import { BrandMark } from "@/src/components/arcade/BrandMark"
 import { formatScore } from "@/src/components/arcade/records"
@@ -209,6 +210,7 @@ function MergeIconNext({ className, iconClass }: { className?: string; iconClass
 }
 
 export function MergeGame() {
+  useArcadeAccent("merge")
   const shellRef = React.useRef<HTMLDivElement | null>(null)
   const stageRef = React.useRef<HTMLDivElement | null>(null)
   const engineRef = React.useRef<Engine | null>(null)
