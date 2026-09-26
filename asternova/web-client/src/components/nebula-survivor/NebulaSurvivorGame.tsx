@@ -5,7 +5,7 @@
  */
 
 import * as React from "react"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from "framer-motion"
 import { NebulaPixiHost } from "./render/NebulaPixiHost"
 import type { NebulaEngine, UpgradeOffer, UpgradeTrackId } from "./nebulaEngine"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
@@ -272,6 +272,11 @@ function UpgradeCard({
         ? { label: "已满级", cls: "border-amber-300/30 bg-amber-400/15 text-amber-200/90" }
         : { label: "进阶强化", cls: "border-cyan-300/25 bg-cyan-400/12 text-cyan-100/85" }
 
+  // 鼠标聚光边框（useMotionValue 非 useState，符合动效规范）
+  const mx = useMotionValue(-240)
+  const my = useMotionValue(-240)
+  const spotlight = useMotionTemplate`radial-gradient(300px at ${mx}px ${my}px, rgba(255,255,255,0.12), rgba(255,255,255,0) 70%)`
+
   return (
     <motion.button
       type="button"
@@ -279,11 +284,24 @@ function UpgradeCard({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 0.08 * index, type: "spring", stiffness: 320, damping: 26 }}
       onClick={onPick}
-      className="group relative w-full max-w-[280px] overflow-hidden rounded-2xl border border-white/[0.14] bg-surface-2/75 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl transition hover:border-white/25 hover:bg-surface-2/90 active:scale-[0.99] sm:max-w-none"
+      onMouseMove={(e: React.MouseEvent<HTMLButtonElement>) => {
+        const r = e.currentTarget.getBoundingClientRect()
+        mx.set(e.clientX - r.left)
+        my.set(e.clientY - r.top)
+      }}
+      onMouseLeave={() => {
+        mx.set(-240)
+        my.set(-240)
+      }}
+      className="group relative w-full max-w-[280px] overflow-hidden rounded-2xl border border-white/[0.14] bg-surface-2/75 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-surface-2/90 active:scale-[0.98] sm:max-w-none"
       style={{ WebkitBackdropFilter: "blur(28px) saturate(160%)" }}
     >
       <div className={`pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-gradient-to-br ${meta.bar} opacity-30 blur-2xl`} />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-40 transition group-hover:opacity-90" />
+      <motion.div className="pointer-events-none absolute inset-0" style={{ background: spotlight }} />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute inset-y-0 left-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent opacity-0 group-hover:animate-[nebula-sheen_0.8s_ease-out_forwards] group-hover:opacity-100" />
+      </div>
 
       <div className="relative p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
@@ -686,7 +704,8 @@ export function NebulaSurvivorGame() {
             paddingTop: "max(0.5rem, env(safe-area-inset-top, 0px))",
           }}
         >
-          <div className="max-h-[min(88dvh,calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-1.5rem))] w-full max-w-[420px] overflow-y-auto overscroll-contain rounded-t-[1.75rem] border border-glass-border border-b-0 bg-glass-bg p-4 shadow-lg backdrop-blur-glass-lg sm:rounded-[2rem] sm:border-b sm:p-6">
+          <div className="relative max-h-[min(88dvh,calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-1.5rem))] w-full max-w-[420px] overflow-y-auto overscroll-contain rounded-t-[1.75rem] border border-glass-border border-b-0 bg-glass-bg p-4 shadow-lg backdrop-blur-glass-lg sm:rounded-[2rem] sm:border-b sm:p-6">
+            <PanelCorners className="text-cyan-300/60" />
             <p className="text-center text-[10px] font-semibold uppercase tracking-[0.26em] text-white/50">Briefing</p>
             {rulesModalKind === "pause" ? (
               <div className="mt-2 flex justify-center">
@@ -788,9 +807,10 @@ export function NebulaSurvivorGame() {
             <motion.div
               initial={{ scale: 0.96, y: 16 }}
               animate={{ scale: 1, y: 0 }}
-              className="max-h-[92dvh] w-full max-w-[920px] overflow-y-auto rounded-[1.75rem] border-[0.5px] border-white/[0.12] bg-white/[0.06] p-4 shadow-[0_32px_100px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.06)] sm:rounded-[2rem] sm:p-8"
+              className="relative max-h-[92dvh] w-full max-w-[920px] overflow-y-auto rounded-[1.75rem] border-[0.5px] border-white/[0.12] bg-white/[0.06] p-4 shadow-[0_32px_100px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.06)] sm:rounded-[2rem] sm:p-8"
               style={{ WebkitBackdropFilter: "blur(32px) saturate(170%)" }}
             >
+              <PanelCorners className="text-cyan-300/60" />
               <p className="text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-white/50">Time Stop</p>
               <h2 className="mt-2 text-center text-xl font-semibold tracking-tight text-white sm:text-2xl">选择一项升级</h2>
               <p className="mx-auto mt-1 max-w-md text-center text-[13px] text-white/50">
