@@ -1,60 +1,61 @@
 /**
  * Nebula Survivor — Pixi 渲染层 · 色板与工具函数
- * 视觉方向：终末地 / 崩铁式（冷峻赛璐璐 + 深空玻璃 + 克制紫青点缀）
+ * 视觉方向：AsterNova 品牌色（冷中性黑底 + 单一琥珀主色 + 青柠苔绿副色 + 信号色）
+ * 硬约束：禁用紫 / 品红 / 紫罗兰与高饱和青蓝（AI 味来源）。
  * 功能色语义对齐 shoot-them-all/constants.ts 的 PALETTE。
  */
 
-/** 深空背景三段（冷蓝紫，非纯黑） */
+/** 深空背景三段（冷中性黑，无紫相） */
 export const NB_BG = {
-  top: 0x141130,
-  mid: 0x0c0a24,
-  bot: 0x050514,
+  top: 0x0b0d12,
+  mid: 0x08090d,
+  bot: 0x050608,
 } as const
 
 /** 游戏内物体功能色（hex int，供 Pixi Graphics.fill 使用） */
 export const NEBULA = {
-  // 友方 / 玩家 / 能量（冷青）
-  azurite: 0x5ac8f0,
-  iceWhite: 0xd7ecff,
-  hullDark: 0x10243a,
+  // 友方 / 玩家 / 能量（品牌主色 · 琥珀）
+  azurite: 0xd8a33c,
+  iceWhite: 0xf2d79b,
+  hullDark: 0x111316,
 
-  // 玩家激光弹（延续粉红弹幕身份）
-  laserCore: 0xfff3fb,
-  laserMid: 0xff6eb4,
-  laserOuter: 0xc05ae0,
+  // 玩家激光弹（琥珀金弹幕）
+  laserCore: 0xfff6e2,
+  laserMid: 0xe9be69,
+  laserOuter: 0x8a6519,
 
-  // 星环粒子（冰白 + 冷青）
+  // 星环粒子（暖白 + 琥珀）
   orbCore: 0xffffff,
-  orbFrost: 0xd4ecff,
+  orbFrost: 0xf2d79b,
 
-  // 敌人（危险色，分档）
-  enemy1: 0xff8a5c,
-  enemy1rim: 0xffd7ba,
-  enemy2: 0xc465ff,
-  enemy2rim: 0xecc8ff,
-  enemy3: 0xff5fc3,
-  enemy3rim: 0xffd9f4,
+  // 敌人（危险色，分档：珊瑚 / 翠玉 / 信号红）
+  enemy1: 0xc08069,
+  enemy1rim: 0xe8cbb8,
+  enemy2: 0x7fb39e,
+  enemy2rim: 0xcfe8de,
+  enemy3: 0xc0503a,
+  enemy3rim: 0xe0a99b,
 
-  // XP 结晶（粉紫，延续「掉落物」认知）
-  crystalCore: 0xfff0ff,
-  crystalMid: 0xff9ae8,
-  crystalOuter: 0xc461f0,
+  // XP 结晶（琥珀金，延续「掉落物」认知）
+  crystalCore: 0xfff6e2,
+  crystalMid: 0xd8a33c,
+  crystalOuter: 0x8a6519,
 
-  // 急救包（青绿 + 十字）
-  heal: 0x34d399,
-  healCore: 0xd9fff0,
+  // 急救包（品牌成功色 + 十字）
+  heal: 0x4f8d6b,
+  healCore: 0xcfe8de,
 } as const
 
 /** 赛璐璐三色调 + 深描边（终末地式：平涂 base + 阴影调 shadow + 亮面 hi + 描边 outline） */
 export const TONES = {
-  player: { base: 0xbfe6ff, shadow: 0x8fc8ee, hi: 0xf4fcff, outline: 0x1d4a6b },
-  enemy1: { base: 0xff8a5c, shadow: 0xd55f38, hi: 0xffc9a8, outline: 0x45170c },
-  enemy2: { base: 0xc465ff, shadow: 0x8f3bd6, hi: 0xecc6ff, outline: 0x360f50 },
-  enemy3: { base: 0xff5fc3, shadow: 0xcf359a, hi: 0xffc9e9, outline: 0x4a0e3a },
-  crystal: { base: 0xff9ae8, shadow: 0xd45fc8, hi: 0xffffff, outline: 0x5b1c66 },
-  heal: { base: 0x34d399, shadow: 0x1c9d6f, hi: 0xc9ffe9, outline: 0x0c4a36 },
-  bullet: { base: 0xfff3fb, shadow: 0xff9ed0, hi: 0xffffff, outline: 0x8a2460 },
-  orb: { base: 0xffffff, shadow: 0xd4ecff, hi: 0xffffff, outline: 0x2f6a9a },
+  player: { base: 0xd8a33c, shadow: 0x8a6519, hi: 0xfff6e2, outline: 0x3a2a08 },
+  enemy1: { base: 0xc08069, shadow: 0x7e4a38, hi: 0xe8cbb8, outline: 0x3a1a10 },
+  enemy2: { base: 0x7fb39e, shadow: 0x4e7d6a, hi: 0xcfe8de, outline: 0x1c3830 },
+  enemy3: { base: 0xc0503a, shadow: 0x8a3423, hi: 0xe0a99b, outline: 0x40140c },
+  crystal: { base: 0xd8a33c, shadow: 0x8a6519, hi: 0xfff6e2, outline: 0x3a2a08 },
+  heal: { base: 0x4f8d6b, shadow: 0x2f5c45, hi: 0xcfe8de, outline: 0x11291e },
+  bullet: { base: 0xfff6e2, shadow: 0xe9be69, hi: 0xffffff, outline: 0x6b4a10 },
+  orb: { base: 0xffffff, shadow: 0xf2d79b, hi: 0xffffff, outline: 0x6b4a10 },
 } as const
 
 /** mulberry32 确定性 PRNG —— 背景星点/星云布局稳定 */

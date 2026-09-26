@@ -28,7 +28,7 @@ type RulesModalKind = "briefing" | "pause" | "reference"
 function NebulaIconMove({ className }: { className?: string }) {
   return (
     <span
-      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-300/35 to-violet-500/28 ${className ?? ""}`}
+      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300/35 to-amber-600/28 ${className ?? ""}`}
       aria-hidden
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -47,7 +47,7 @@ function NebulaIconMove({ className }: { className?: string }) {
 function NebulaIconLaser({ className }: { className?: string }) {
   return (
     <span
-      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-300/38 to-fuchsia-600/28 ${className ?? ""}`}
+      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#C08069]/38 to-[#7E4A38]/28 ${className ?? ""}`}
       aria-hidden
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -61,7 +61,7 @@ function NebulaIconLaser({ className }: { className?: string }) {
 function NebulaIconEye({ className }: { className?: string }) {
   return (
     <span
-      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-300/35 to-indigo-700/25 ${className ?? ""}`}
+      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#8CBEAA]/35 to-[#3F6B58]/25 ${className ?? ""}`}
       aria-hidden
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -80,7 +80,7 @@ function NebulaIconEye({ className }: { className?: string }) {
 function NebulaIconHeart({ className }: { className?: string }) {
   return (
     <span
-      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-300/35 to-teal-600/25 ${className ?? ""}`}
+      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#A9C98F]/35 to-[#4F8D6B]/28 ${className ?? ""}`}
       aria-hidden
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
@@ -100,11 +100,11 @@ const TRACK_META: Record<
   UpgradeTrackId,
   { label: string; cap: number; bar: string; line: string; chip: string }
 > = {
-  fire_salvo: { label: "弹幕", cap: 6, bar: "from-pink-300 to-rose-500", line: "text-pink-200/80", chip: "bg-pink-400/12 text-pink-100/85" },
-  fire_rate: { label: "射速", cap: 6, bar: "from-rose-300 to-fuchsia-500", line: "text-rose-200/80", chip: "bg-rose-400/12 text-rose-100/85" },
-  ring_count: { label: "星环", cap: 12, bar: "from-violet-300 to-purple-500", line: "text-violet-200/80", chip: "bg-violet-400/12 text-violet-100/85" },
-  ring_spin: { label: "环速", cap: 6, bar: "from-indigo-300 to-violet-500", line: "text-indigo-200/80", chip: "bg-indigo-400/12 text-indigo-100/85" },
-  afterburner: { label: "推进", cap: 6, bar: "from-cyan-300 to-sky-500", line: "text-cyan-200/80", chip: "bg-cyan-400/12 text-cyan-100/85" },
+  fire_salvo: { label: "弹幕", cap: 6, bar: "from-amber-300 to-amber-600", line: "text-amber-200/80", chip: "bg-amber-400/12 text-amber-100/85" },
+  fire_rate: { label: "射速", cap: 6, bar: "from-[#A9C98F] to-[#5F7D42]", line: "text-[#C9E0B4]/80", chip: "bg-[#A9C98F]/12 text-[#DFEDD2]/85" },
+  ring_count: { label: "星环", cap: 12, bar: "from-[#8CBEAA] to-[#3F6B58]", line: "text-[#CFE8DE]/80", chip: "bg-[#8CBEAA]/12 text-[#CFE8DE]/85" },
+  ring_spin: { label: "环速", cap: 6, bar: "from-[#C08069] to-[#7E4A38]", line: "text-[#E8CBB8]/80", chip: "bg-[#C08069]/12 text-[#E8CBB8]/85" },
+  afterburner: { label: "推进", cap: 6, bar: "from-[#A8BED6] to-[#5E7994]", line: "text-[#C6D6E6]/80", chip: "bg-[#A8BED6]/12 text-[#D5E1EC]/85" },
 }
 
 function formatTime(sec: number): string {
@@ -132,10 +132,10 @@ function TrackGlyph({ id, className }: { id: UpgradeTrackId; className?: string 
 function PanelCorners({ className }: { className?: string }) {
   return (
     <>
-      <svg className={`pointer-events-none absolute left-1.5 top-1.5 h-3 w-3 ${className ?? "text-cyan-300/70"}`} viewBox="0 0 12 12" fill="none" aria-hidden>
+      <svg className={`pointer-events-none absolute left-1.5 top-1.5 h-3 w-3 ${className ?? "text-hud-accent/70"}`} viewBox="0 0 12 12" fill="none" aria-hidden>
         <path d="M1 11V3.5A2.5 2.5 0 0 1 3.5 1H11" stroke="currentColor" strokeWidth="1.4" />
       </svg>
-      <svg className={`pointer-events-none absolute bottom-1.5 right-1.5 h-3 w-3 ${className ?? "text-cyan-300/70"}`} viewBox="0 0 12 12" fill="none" aria-hidden>
+      <svg className={`pointer-events-none absolute bottom-1.5 right-1.5 h-3 w-3 ${className ?? "text-hud-accent/70"}`} viewBox="0 0 12 12" fill="none" aria-hidden>
         <path d="M11 1v7.5A2.5 2.5 0 0 1 8.5 11H1" stroke="currentColor" strokeWidth="1.4" />
       </svg>
     </>
@@ -247,10 +247,10 @@ function VirtualJoystick({
       onPointerUp={end}
       onPointerCancel={end}
     >
-      <div className="pointer-events-none absolute inset-2 rounded-full bg-gradient-to-br from-fuchsia-500/10 to-violet-600/5" />
+      <div className="pointer-events-none absolute inset-2 rounded-full bg-gradient-to-br from-amber-500/10 to-amber-700/5" />
       <div
         ref={stickRef}
-        className="pointer-events-none relative h-12 w-12 rounded-full border-[0.5px] border-white/25 bg-gradient-to-br from-pink-300/35 to-violet-500/30 shadow-[0_0_24px_rgba(236,72,153,0.25)]"
+        className="pointer-events-none relative h-12 w-12 rounded-full border-[0.5px] border-white/25 bg-gradient-to-br from-amber-300/35 to-amber-600/30 shadow-[0_0_24px_rgba(216,163,60,0.25)]"
       />
     </div>
   )
@@ -272,10 +272,10 @@ function UpgradeCard({
   const tier: "NEW" | "MAX" | "UPGRADE" = offer.isNew ? "NEW" : cur >= cap ? "MAX" : "UPGRADE"
   const tierChip =
     tier === "NEW"
-      ? { label: "首次解锁", cls: "border-violet-300/30 bg-violet-400/15 text-violet-100/90" }
+      ? { label: "首次解锁", cls: "border-amber-300/30 bg-amber-400/15 text-amber-100/90" }
       : tier === "MAX"
         ? { label: "已满级", cls: "border-amber-300/30 bg-amber-400/15 text-amber-200/90" }
-        : { label: "进阶强化", cls: "border-cyan-300/25 bg-cyan-400/12 text-cyan-100/85" }
+        : { label: "进阶强化", cls: "border-[#8CBEAA]/30 bg-[#8CBEAA]/12 text-[#CFE8DE]" }
 
   // 鼠标聚光边框（useMotionValue 非 useState，符合动效规范）
   const mx = useMotionValue(-240)
@@ -655,7 +655,7 @@ export function NebulaSurvivorGame() {
             <PanelCorners />
             <div className="flex items-baseline justify-between font-mono-data">
               <span className="text-[11px] font-semibold tracking-[0.14em] text-white/85">
-                WAVE <span className="text-cyan-200/90">{String(ui.worldTier).padStart(2, "0")}</span>
+                WAVE <span className="text-hud-accent-bright">{String(ui.worldTier).padStart(2, "0")}</span>
               </span>
               <span className="text-[10px] uppercase tracking-[0.18em] text-white/45">
                 LV <span className="text-white/80">{ui.level}</span>
@@ -669,7 +669,7 @@ export function NebulaSurvivorGame() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-6 shrink-0 text-right font-mono-data text-[10px] font-semibold tracking-wider text-emerald-200/60">XP</span>
+              <span className="w-6 shrink-0 text-right font-mono-data text-[10px] font-semibold tracking-wider text-hud-green/70">XP</span>
               <LiquidBar value={ui.xp} max={ui.xpToNext} variant="xp" className="flex-1 rounded-full" />
               <span className="w-11 shrink-0 text-right font-mono-data text-[10px] tabular-nums text-white/55">
                 {Math.floor(ui.xp)}/{ui.xpToNext}
@@ -678,9 +678,9 @@ export function NebulaSurvivorGame() {
             <div className="flex items-center justify-between border-t border-white/[0.07] pt-2 font-mono-data text-[10px] tabular-nums">
               <span className="text-white/45">击杀 <span className="text-white/85">{ui.kills}</span></span>
               <span className="h-3 w-px bg-white/10" />
-              <span className="text-white/45">得分 <span className="text-cyan-200/85">{ui.score}</span></span>
+              <span className="text-white/45">得分 <span className="text-hud-accent-bright">{ui.score}</span></span>
               <span className="h-3 w-px bg-white/10" />
-              <span className="text-white/45">威胁 <span className="text-rose-300/80">{ui.worldTier >= 5 ? "高" : ui.worldTier >= 3 ? "中" : "低"}</span></span>
+              <span className="text-white/45">威胁 <span className="text-[#D98A72]">{ui.worldTier >= 5 ? "高" : ui.worldTier >= 3 ? "中" : "低"}</span></span>
             </div>
             <div className="flex items-center justify-between border-t border-white/[0.07] pt-2">
               {(Object.keys(TRACK_META) as UpgradeTrackId[]).map((id) => {
@@ -737,7 +737,7 @@ export function NebulaSurvivorGame() {
           }}
         >
           <div className="relative max-h-[min(88dvh,calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-1.5rem))] w-full max-w-[420px] overflow-y-auto overscroll-contain rounded-t-[1.75rem] border border-glass-border border-b-0 bg-glass-bg p-4 shadow-lg backdrop-blur-glass-lg sm:rounded-[2rem] sm:border-b sm:p-6">
-            <PanelCorners className="text-cyan-300/60" />
+            <PanelCorners className="text-hud-accent/60" />
             <p className="text-center text-[10px] font-semibold uppercase tracking-[0.26em] text-white/50">Briefing</p>
             {rulesModalKind === "pause" ? (
               <div className="mt-2 flex justify-center">
@@ -763,7 +763,7 @@ export function NebulaSurvivorGame() {
                 <div>
                   <div className="font-medium text-white/95">移动</div>
                   <div className="mt-0.5 text-[12px] text-white/52">
-                    <span className="text-cyan-200/85">WASD / 方向键</span>，指针在画面上可向鼠标方向滑移；手机用左下摇杆。
+                    <span className="text-hud-accent-bright">WASD / 方向键</span>，指针在画面上可向鼠标方向滑移；手机用左下摇杆。
                   </div>
                 </div>
               </li>
@@ -772,7 +772,7 @@ export function NebulaSurvivorGame() {
                 <div>
                   <div className="font-medium text-white/95">火力覆盖</div>
                   <div className="mt-0.5 text-[12px] text-white/52">
-                    粉红弹幕仅在<span className="text-pink-200/85">视野相近范围</span>内锁定最近敌人；可分别强化<span className="text-pink-200/85">齐射发数</span>与<span className="text-pink-200/85">射速</span>。
+                    琥珀弹幕仅在<span className="text-hud-accent-bright">视野相近范围</span>内锁定最近敌人；可分别强化<span className="text-hud-accent-bright">齐射发数</span>与<span className="text-hud-accent-bright">射速</span>。
                   </div>
                 </div>
               </li>
@@ -781,7 +781,7 @@ export function NebulaSurvivorGame() {
                 <div>
                   <div className="font-medium text-white/95">敌人察觉</div>
                   <div className="mt-0.5 text-[12px] text-white/52">
-                    屏外敌人会先<span className="text-violet-200/85">短暂靠近再游荡</span>；一旦<span className="text-violet-200/85">出现在视野内</span>或<span className="text-violet-200/85">进入察觉范围</span>即持续追击。最小档有暖色外圈描边。
+                    屏外敌人会先<span className="text-[#8CBEAA]">短暂靠近再游荡</span>；一旦<span className="text-[#8CBEAA]">出现在视野内</span>或<span className="text-[#8CBEAA]">进入察觉范围</span>即持续追击。最小档有暖色外圈描边。
                   </div>
                 </div>
               </li>
@@ -790,7 +790,7 @@ export function NebulaSurvivorGame() {
                 <div>
                   <div className="font-medium text-white/95">升级与急救</div>
                   <div className="mt-0.5 text-[12px] text-white/52">
-                    五条强化（火力弹幕/射速、星环数量/转速、推进器）中<span className="text-violet-200/85">随机三选一</span>，每级可<span className="text-violet-200/85">免费刷新一次</span>。击杀<span className="text-emerald-200/85">极低概率</span>掉急救包。
+                    五条强化（火力弹幕/射速、星环数量/转速、推进器）中<span className="text-[#8CBEAA]">随机三选一</span>，每级可<span className="text-[#8CBEAA]">免费刷新一次</span>。击杀<span className="text-[#CFE8DE]">极低概率</span>掉急救包。
                   </div>
                 </div>
               </li>
@@ -802,7 +802,7 @@ export function NebulaSurvivorGame() {
                   type="checkbox"
                   checked={dontShowRulesAgain}
                   onChange={(e) => setDontShowRulesAgain(e.target.checked)}
-                  className="h-4 w-4 rounded-md border-white/30 bg-white/10 text-teal-500 focus:ring-teal-400/50"
+                  className="h-4 w-4 rounded-md border-white/30 bg-white/10 text-hud-accent focus:ring-hud-accent/50"
                 />
                 下次不再显示（本机记住）
               </label>
@@ -811,7 +811,7 @@ export function NebulaSurvivorGame() {
             <button
               type="button"
               onClick={closeRulesPrimary}
-              className="mt-4 w-full rounded-xl bg-gradient-to-r from-cyan-400/90 via-sky-400/85 to-violet-500/85 py-3.5 text-[15px] font-semibold text-gray-950 shadow-[0_10px_32px_-8px_rgba(56,189,248,0.55)] transition hover:brightness-110 active:scale-[0.99]"
+              className="mt-4 w-full rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 py-3.5 text-[15px] font-semibold text-gray-950 shadow-[0_10px_32px_-8px_rgba(216,163,60,0.55)] transition hover:brightness-110 active:scale-[0.99]"
             >
               {rulesModalKind === "briefing" ? "开始任务" : rulesModalKind === "pause" ? "继续游戏" : "返回游戏"}
             </button>
@@ -842,7 +842,7 @@ export function NebulaSurvivorGame() {
               className="relative max-h-[92dvh] w-full max-w-[920px] overflow-y-auto rounded-[1.75rem] border-[0.5px] border-white/[0.12] bg-white/[0.06] p-4 shadow-[0_32px_100px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.06)] sm:rounded-[2rem] sm:p-8"
               style={{ WebkitBackdropFilter: "blur(32px) saturate(170%)" }}
             >
-              <PanelCorners className="text-cyan-300/60" />
+              <PanelCorners className="text-hud-accent/60" />
               <p className="text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-white/50">Time Stop</p>
               <h2 className="mt-2 text-center text-xl font-semibold tracking-tight text-white sm:text-2xl">选择一项升级</h2>
               <p className="mx-auto mt-1 max-w-md text-center text-[13px] text-white/50">

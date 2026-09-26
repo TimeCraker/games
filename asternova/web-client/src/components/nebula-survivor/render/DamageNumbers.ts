@@ -39,8 +39,8 @@ export class DamageNumbers {
           fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif",
           fontSize: 15,
           fontWeight: "700",
-          fill: 0xf4f7ff,
-          stroke: { color: 0x0a0a18, width: 4 },
+          fill: 0xfff6e2,
+          stroke: { color: 0x050608, width: 4 },
           align: "center",
         },
       })

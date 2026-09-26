@@ -64,13 +64,13 @@ export class NebulaBackground {
     this.content.addChild(g)
   }
 
-  /** L1 星云团块：3 个大柔光径向斑（冷青/紫/品红，低饱和），缓慢漂移 */
+  /** L1 星云团块：3 个大柔光径向斑（琥珀 / 翠玉，低饱和），缓慢漂移 */
   private buildL1() {
     const rnd = mulberry32(20260830)
     const blobs = [
       { x: BASE_W * 0.2, y: BASE_H * 0.24, r: 340, color: NEBULA.azurite, a: 0.12 },
-      { x: BASE_W * 0.82, y: BASE_H * 0.32, r: 300, color: 0x8a6cff, a: 0.11 },
-      { x: BASE_W * 0.52, y: BASE_H * 0.82, r: 380, color: 0x5a4acf, a: 0.1 },
+      { x: BASE_W * 0.82, y: BASE_H * 0.32, r: 300, color: 0xd8a33c, a: 0.11 },
+      { x: BASE_W * 0.52, y: BASE_H * 0.82, r: 380, color: 0x7fb39e, a: 0.1 },
     ]
     for (const b of blobs) {
       const c = new Container()

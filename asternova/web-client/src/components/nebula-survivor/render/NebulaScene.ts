@@ -96,7 +96,7 @@ function paintEnemyT3(g: Graphics, r: number): void {
   g.circle(0, 0, r * 0.34).fill({ color: 0xffffff, alpha: 0.95 }).stroke({ color: t.outline, width: 1, alpha: 0.9 })
 }
 
-/** 激光弹：白热泪滴 + 粉描边 + 内核（机头朝 +X） */
+/** 激光弹：白热泪滴 + 琥珀描边 + 内核（机头朝 +X） */
 function paintBullet(g: Graphics, r: number): void {
   const t = TONES.bullet
   const L = r * 2.3
@@ -115,7 +115,7 @@ function paintCrystal(g: Graphics, r: number): void {
   g.poly([0, -r * 1.25, r * 0.3, -r * 0.4, -r * 0.3, -r * 0.4]).fill({ color: t.hi, alpha: 0.55 })
 }
 
-/** 急救包：青绿胶囊赛璐璐 + 白十字（暗面/高光） */
+/** 急救包：品牌绿胶囊赛璐璐 + 白十字（暗面/高光） */
 function paintHealth(g: Graphics, r: number): void {
   const t = TONES.heal
   g.circle(0, 0, r).fill({ color: t.base, alpha: 0.9 })
@@ -277,10 +277,10 @@ export class NebulaScene {
     const x1 = px + hw
     const y1 = py + hh
     for (let x = x0; x <= x1; x += grid) {
-      gr.moveTo(x, py - hh).lineTo(x, py + hh).stroke({ color: 0x8a75e0, width: 1, alpha: 0.06 })
+      gr.moveTo(x, py - hh).lineTo(x, py + hh).stroke({ color: 0x8c949e, width: 1, alpha: 0.06 })
     }
     for (let y = y0; y <= y1; y += grid) {
-      gr.moveTo(px - hw, y).lineTo(px + hw, y).stroke({ color: 0x8a75e0, width: 1, alpha: 0.06 })
+      gr.moveTo(px - hw, y).lineTo(px + hw, y).stroke({ color: 0x8c949e, width: 1, alpha: 0.06 })
     }
   }
 
@@ -497,23 +497,23 @@ export class NebulaScene {
 
     for (const q of g.particles) {
       const a = Math.max(0, q.life / 0.55)
-      let color = 0xff8cdc
-      if (q.kind === "violet") color = 0xbe78ff
-      if (q.kind === "white") color = 0xfffaff
+      let color = 0xe9be69
+      if (q.kind === "gold") color = 0xd8a33c
+      if (q.kind === "white") color = 0xfff6e2
       fx.circle(q.x, q.y, q.size * (0.5 + a * 0.5)).fill({ color, alpha: (0.4 + a * 0.5) * 0.9 })
     }
 
     for (const t of g.trails) {
       const a = 1 - t.life / t.maxLife
       const s = t.size * (0.4 + 0.6 * (1 - a))
-      fx.circle(t.x, t.y, s).fill({ color: 0xffc8f5, alpha: 0.45 * (1 - a) })
+      fx.circle(t.x, t.y, s).fill({ color: 0xf2d79b, alpha: 0.45 * (1 - a) })
     }
 
     for (const s of g.shards) {
       const a = 1 - s.life / s.maxLife
-      let color = 0xff5fc3
-      if (s.tier === 1) color = 0xff8a5c
-      if (s.tier === 2) color = 0xc465ff
+      let color = 0xd8a33c
+      if (s.tier === 1) color = 0xc08069
+      if (s.tier === 2) color = 0x7fb39e
       fx.circle(s.x, s.y, s.size).fill({ color, alpha: (0.2 + a * 0.8) })
     }
 

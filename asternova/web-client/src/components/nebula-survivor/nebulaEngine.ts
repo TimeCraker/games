@@ -77,7 +77,7 @@ export interface BurstParticle {
   life: number
   maxLife: number
   size: number
-  kind: "pink" | "violet" | "white"
+  kind: "amber" | "gold" | "white"
 }
 
 export interface TrailSpark {
@@ -159,7 +159,7 @@ const ALL_TRACKS: UpgradeTrackId[] = [
 const TRACK_COPY: Record<UpgradeTrackId, { title: string; desc: string }> = {
   fire_salvo: {
     title: "火力覆盖 · 弹幕数量",
-    desc: "每次齐射多发射 1 发粉红弹（初始 1，最高 6），共享同一锁定目标并带小幅扇形散布。",
+    desc: "每次齐射多发射 1 发琥珀弹（初始 1，最高 6），共享同一锁定目标并带小幅扇形散布。",
   },
   fire_rate: {
     title: "火力覆盖 · 射速",
@@ -474,7 +474,7 @@ export class NebulaEngine {
   }
 
   pushParticles(x: number, y: number, count: number, spread = 1.2) {
-    const kinds: BurstParticle["kind"][] = ["pink", "violet", "white"]
+    const kinds: BurstParticle["kind"][] = ["amber", "gold", "white"]
     for (let i = 0; i < count && this.particles.length < MAX_PARTICLES; i++) {
       const a = Math.random() * Math.PI * 2
       const sp = (80 + Math.random() * 220) * spread
@@ -972,9 +972,9 @@ export class NebulaEngine {
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     const sky = ctx.createLinearGradient(0, 0, 0, viewH)
-    sky.addColorStop(0, "#1a1732")
-    sky.addColorStop(0.55, "#121028")
-    sky.addColorStop(1, "#0a0816")
+    sky.addColorStop(0, "#0b0d12")
+    sky.addColorStop(0.55, "#08090d")
+    sky.addColorStop(1, "#050608")
     ctx.fillStyle = sky
     ctx.fillRect(0, 0, viewW, viewH)
 
@@ -984,7 +984,7 @@ export class NebulaEngine {
     ctx.save()
     ctx.translate(gx, gy)
 
-    ctx.strokeStyle = "rgba(150,110,220,0.085)"
+    ctx.strokeStyle = "rgba(140,148,158,0.085)"
     ctx.lineWidth = 1
     const grid = 64
     const startX = Math.floor((px - viewW / 2) / grid) * grid
@@ -1005,9 +1005,9 @@ export class NebulaEngine {
     for (const c of this.crystals) {
       if (!c.alive) continue
       const g = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r * 3)
-      g.addColorStop(0, "rgba(255,180,235,0.95)")
-      g.addColorStop(0.45, "rgba(196,120,255,0.55)")
-      g.addColorStop(1, "rgba(120,60,200,0)")
+      g.addColorStop(0, "rgba(242,215,155,0.95)")
+      g.addColorStop(0.45, "rgba(216,163,60,0.55)")
+      g.addColorStop(1, "rgba(138,101,25,0)")
       ctx.fillStyle = g
       ctx.beginPath()
       ctx.arc(c.x, c.y, c.r * 2.2, 0, Math.PI * 2)
@@ -1016,12 +1016,12 @@ export class NebulaEngine {
 
     for (const h of this.healthPacks) {
       if (!h.alive) continue
-      ctx.shadowColor = "rgba(110,255,200,0.55)"
+      ctx.shadowColor = "rgba(79,141,107,0.55)"
       ctx.shadowBlur = 14
       const g = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, h.r * 2.4)
-      g.addColorStop(0, "rgba(200,255,240,0.95)")
-      g.addColorStop(0.4, "rgba(80,220,180,0.45)")
-      g.addColorStop(1, "rgba(40,120,100,0)")
+      g.addColorStop(0, "rgba(207,232,222,0.95)")
+      g.addColorStop(0.4, "rgba(79,141,107,0.45)")
+      g.addColorStop(1, "rgba(17,41,30,0)")
       ctx.fillStyle = g
       ctx.beginPath()
       ctx.arc(h.x, h.y, h.r * 1.35, 0, Math.PI * 2)
@@ -1048,28 +1048,28 @@ export class NebulaEngine {
       if (!e.alive) continue
       if (e.tier === 1) {
         const pulse = 0.5 + 0.5 * Math.sin(this.gameTime * 4.2 + e.id * 0.7)
-        ctx.strokeStyle = `rgba(255,160,130,${0.35 + pulse * 0.28})`
+        ctx.strokeStyle = `rgba(192,128,105,${0.35 + pulse * 0.28})`
         ctx.lineWidth = 1.4
         ctx.setLineDash([4, 3])
         ctx.beginPath()
         ctx.arc(e.x, e.y, e.r + 6 + pulse * 2.5, 0, Math.PI * 2)
         ctx.stroke()
         ctx.setLineDash([])
-        ctx.strokeStyle = `rgba(255,210,180,${0.22 + pulse * 0.18})`
+        ctx.strokeStyle = `rgba(232,203,184,${0.22 + pulse * 0.18})`
         ctx.lineWidth = 2.2
         ctx.beginPath()
         ctx.arc(e.x, e.y, e.r + 3.5, 0, Math.PI * 2)
         ctx.stroke()
       }
       if (e.tier === 1) {
-        ctx.fillStyle = "rgba(255,115,95,0.94)"
-        ctx.strokeStyle = "rgba(255,210,185,0.82)"
+        ctx.fillStyle = "rgba(192,128,105,0.94)"
+        ctx.strokeStyle = "rgba(232,203,184,0.82)"
       } else if (e.tier === 2) {
-        ctx.fillStyle = "rgba(195,105,255,0.95)"
-        ctx.strokeStyle = "rgba(235,195,255,0.78)"
+        ctx.fillStyle = "rgba(127,179,158,0.95)"
+        ctx.strokeStyle = "rgba(207,232,222,0.78)"
       } else {
-        ctx.fillStyle = "rgba(255,95,195,0.96)"
-        ctx.strokeStyle = "rgba(255,215,245,0.88)"
+        ctx.fillStyle = "rgba(192,80,58,0.96)"
+        ctx.strokeStyle = "rgba(224,169,155,0.88)"
       }
       ctx.lineWidth = e.tier === 3 ? 1.6 : 1.2
       ctx.beginPath()
@@ -1080,12 +1080,12 @@ export class NebulaEngine {
 
     for (const b of this.bullets) {
       if (!b.alive) continue
-      ctx.shadowColor = "rgba(255,120,200,0.9)"
+      ctx.shadowColor = "rgba(233,190,105,0.9)"
       ctx.shadowBlur = 12
       const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r * 2.5)
-      g.addColorStop(0, "#fff0fb")
-      g.addColorStop(0.35, "#ff6eb4")
-      g.addColorStop(1, "rgba(180,60,200,0)")
+      g.addColorStop(0, "#fff6e2")
+      g.addColorStop(0.35, "#e9be69")
+      g.addColorStop(1, "rgba(138,101,25,0)")
       ctx.fillStyle = g
       ctx.beginPath()
       ctx.arc(b.x, b.y, b.r * 1.8, 0, Math.PI * 2)
@@ -1101,8 +1101,8 @@ export class NebulaEngine {
         ctx.shadowBlur = 10
         const g = ctx.createRadialGradient(o.ox, o.oy, 0, o.ox, o.oy, orbR * 2.8)
         g.addColorStop(0, "rgba(255,255,255,0.95)")
-        g.addColorStop(0.35, "rgba(240,248,255,0.45)")
-        g.addColorStop(1, "rgba(200,220,255,0)")
+        g.addColorStop(0.35, "rgba(242,215,155,0.45)")
+        g.addColorStop(1, "rgba(107,74,16,0)")
         ctx.fillStyle = g
         ctx.beginPath()
         ctx.arc(o.ox, o.oy, orbR, 0, Math.PI * 2)
@@ -1115,9 +1115,9 @@ export class NebulaEngine {
       const a = 1 - t.life / t.maxLife
       const s = t.size * (0.4 + 0.6 * (1 - a))
       const g = ctx.createRadialGradient(t.x, t.y, 0, t.x, t.y, s)
-      g.addColorStop(0, `rgba(255,200,245,${0.4 * (1 - a)})`)
-      g.addColorStop(0.55, `rgba(200,150,255,${0.22 * (1 - a)})`)
-      g.addColorStop(1, "rgba(120,80,200,0)")
+      g.addColorStop(0, `rgba(242,215,155,${0.4 * (1 - a)})`)
+      g.addColorStop(0.55, `rgba(216,163,60,${0.22 * (1 - a)})`)
+      g.addColorStop(1, "rgba(107,74,16,0)")
       ctx.fillStyle = g
       ctx.beginPath()
       ctx.arc(t.x, t.y, s, 0, Math.PI * 2)
@@ -1130,10 +1130,10 @@ export class NebulaEngine {
       ctx.translate(s.x, s.y)
       ctx.rotate(s.rot)
       ctx.globalAlpha = 0.15 + (1 - a) * 0.85
-      let fill = "rgba(255,95,195,0.92)"
-      if (s.tier === 1) fill = "rgba(255,115,95,0.9)"
-      if (s.tier === 2) fill = "rgba(195,105,255,0.92)"
-      if (s.tier === 3) fill = "rgba(255,95,195,0.95)"
+      let fill = "rgba(216,163,60,0.92)"
+      if (s.tier === 1) fill = "rgba(192,128,105,0.9)"
+      if (s.tier === 2) fill = "rgba(127,179,158,0.92)"
+      if (s.tier === 3) fill = "rgba(192,80,58,0.95)"
       ctx.fillStyle = fill
       ctx.strokeStyle = "rgba(255,255,255,0.35)"
       ctx.lineWidth = 0.6
@@ -1162,9 +1162,9 @@ export class NebulaEngine {
     ctx.shadowBlur = 18
     const pg = ctx.createRadialGradient(px, py, 0, px, py, pr * 2.2)
     pg.addColorStop(0, "rgba(255,255,255,0.98)")
-    pg.addColorStop(0.35, "rgba(245,248,255,0.55)")
-    pg.addColorStop(0.7, "rgba(220,230,255,0.2)")
-    pg.addColorStop(1, "rgba(180,200,255,0)")
+    pg.addColorStop(0.35, "rgba(242,215,155,0.55)")
+    pg.addColorStop(0.7, "rgba(233,190,105,0.2)")
+    pg.addColorStop(1, "rgba(107,74,16,0)")
     ctx.fillStyle = pg
     ctx.beginPath()
     ctx.arc(px, py, pr, 0, Math.PI * 2)
@@ -1178,9 +1178,9 @@ export class NebulaEngine {
 
     for (const q of this.particles) {
       const a = Math.max(0, q.life / 0.55)
-      let col = "rgba(255,140,220,"
-      if (q.kind === "violet") col = "rgba(190,120,255,"
-      if (q.kind === "white") col = "rgba(255,250,255,"
+      let col = "rgba(233,190,105,"
+      if (q.kind === "gold") col = "rgba(216,163,60,"
+      if (q.kind === "white") col = "rgba(255,246,226,"
       ctx.fillStyle = `${col}${0.35 + a * 0.5})`
       ctx.beginPath()
       ctx.arc(q.x, q.y, q.size * (0.5 + a * 0.5), 0, Math.PI * 2)

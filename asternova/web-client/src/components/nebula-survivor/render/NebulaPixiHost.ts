@@ -27,7 +27,7 @@ export class NebulaPixiHost {
       width: w,
       height: h,
       antialias: true,
-      background: 0x050514,
+      background: 0x050608,
       resolution: Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1),
       autoDensity: true,
       preference: "webgl",
