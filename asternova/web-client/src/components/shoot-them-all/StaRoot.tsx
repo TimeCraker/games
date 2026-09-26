@@ -2,6 +2,7 @@
 
 import * as React from "react"
 
+import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { BrandMark } from "@/src/components/arcade/BrandMark"
 import { useArcadeAccent } from "@/src/components/arcade/useArcadeAccent"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
@@ -134,6 +135,9 @@ export function StaRoot() {
         ) : null}
       </StaGameShell>
       <GameBackButton variant="floating" />
+      {/* 2026-09-27：此前 /shoot-them-all 是全站唯一没接 BGM 的游戏
+          （音频文件 public/audio/games/shoot-them-all/Untitled.mp3 一直在磁盘上，但零引用）。 */}
+      <LoopingBgmControl src="/audio/games/shoot-them-all/Untitled.mp3" storageKey="bgm-volume:shoot-them-all" />
     </>
   )
 }

@@ -312,7 +312,10 @@ export function LoopingBgmControl({
     }
   }
 
-  if (!available || hidden) return null
+  // 2026-09-27 修复：hidden 只收起「可见的表盘 / 音量面板」，不再一并卸载 <audio> 元素。
+  // 否则教程 / 规则弹层打开期间 audio 不在 DOM、preload 无从发生，玩家点「开始」时
+  // 音乐才开始下载 → 出现「游戏能玩了、音乐却还没加载出来」的别扭空窗（用户反馈）。
+  if (!available) return null
   const audible = volume > 0.001
 
   // 2026-09-27：旧版「点一下同时展开并静音」在新版里反直觉
@@ -440,13 +443,14 @@ export function LoopingBgmControl({
     </div>
   )
 
+  // <audio> 无条件挂载：preload="auto" 在教程 / 简报期间就预热音源，见上方注释。
   const audioEl = <audio ref={audioRef} src={resolvedSrc} loop preload="auto" onError={onAudioError} />
 
   if (variant === "inline") {
     return (
       <div className={className}>
         {audioEl}
-        {shell}
+        {hidden ? null : shell}
       </div>
     )
   }
@@ -454,15 +458,17 @@ export function LoopingBgmControl({
   return (
     <StagePortal>
       {audioEl}
-      <div
-        className={`fixed right-[max(0.85rem,env(safe-area-inset-right))] z-[120] ${
-          elevated
-            ? "bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))]"
-            : "bottom-[max(0.85rem,env(safe-area-inset-bottom))]"
-        } ${className}`}
-      >
-        {shell}
-      </div>
+      {hidden ? null : (
+        <div
+          className={`fixed right-[max(0.85rem,env(safe-area-inset-right))] z-[120] ${
+            elevated
+              ? "bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))]"
+              : "bottom-[max(0.85rem,env(safe-area-inset-bottom))]"
+          } ${className}`}
+        >
+          {shell}
+        </div>
+      )}
     </StagePortal>
   )
 }
