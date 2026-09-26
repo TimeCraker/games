@@ -1173,6 +1173,10 @@ svg{max-width:100%;}
   }
   .modal.show .modal-card{transform:none;}
   .modal-actions{gap:8px;position:sticky;bottom:calc(-16px - env(safe-area-inset-bottom));padding-top:8px;background:var(--surface);}
+.share-preview{display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:14px;}
+.share-preview canvas{border-radius:10px;border:1px solid var(--hairline-strong);box-shadow:0 10px 26px rgba(var(--shadow-tint),.28);transition:transform var(--dur-2) var(--ease-out);}
+.share-preview canvas:hover{transform:translateY(-2px);}
+.share-preview .sp-hint{font-size:10.5px;color:var(--text-mute);letter-spacing:.02em;}
   .modal-actions .menu-btn{min-height:48px;}
   .modal-close{top:10px;right:10px;}
   .skin-grid{grid-template-columns:repeat(2,1fr);gap:9px;}

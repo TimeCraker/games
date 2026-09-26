@@ -15,7 +15,7 @@ const DEFAULT_LIB = [1,2,0,3];   // 02剑姬 · 03星空 · 01Q版女仆 · 04�
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4, CROSS:5 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.47';
+const CACHE_VER = '2.48';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -637,6 +637,20 @@ function animateScoreTo(target){
   }
   scoreAnimRAF=requestAnimationFrame(step);
 }
+// 结算分数滚动（尊重 reduced-motion 与「动效」开关）
+function rollTo(el, target){
+  if(!el) return;
+  if(!settings.motion || matchMedia('(prefers-reduced-motion: reduce)').matches){ el.textContent=target; return; }
+  const from=0, dur=650;
+  const start=performance.now();
+  function step(now){
+    const t=Math.min(1,(now-start)/dur);
+    const eased=1-Math.pow(1-t,3);
+    el.textContent=Math.round(from+(target-from)*eased);
+    if(t<1) requestAnimationFrame(step); else el.textContent=target;
+  }
+  requestAnimationFrame(step);
+}
 function updateHUD(){
   if(score!==lastScore){ bumpEl(scoreEl); bumpEl(bigScoreEl); animateScoreTo(score); }
   if(mode===M_TIMED){
@@ -1035,11 +1049,11 @@ function winLevel(){
   unlockAchievement('beat1');
   if(currentLevel.id>=6) unlockAchievement('beat6');
   if(levelIdx+1>=LEVELS.length) unlockAchievement('beat12');
-  $('winScore').textContent=score;
+  rollTo($('winScore'), score);
   $('winStars').innerHTML=[0,1,2].map(i=>i<stars?ic('star','lg full'):ic('starO','lg empty')).join('');
   $('winStats').innerHTML=`消除方块 <b>${stats.clears}</b> · 最高连击 <b>×${stats.maxCombo}</b><br>生成炸弹 <b>${stats.bombs}</b> · 彩虹 <b>${stats.rainbows}</b> · 火箭 <b>${stats.rockets}</b> · 十字 <b>${stats.crosses}</b>`;
   $('nextLevelBtn').style.display=(levelIdx+1<LEVELS.length)?'':'none';
-  showModal('modalWin');
+  showModal('modalWin'); renderSharePreview('winSharePreview');
 }
 function loseLevel(){
   if(mode===M_DAILY){
@@ -1053,7 +1067,7 @@ function loseLevel(){
   state='lose'; stopBgMusic(); fpsStop(); sfx.lose();
   if(Q.shake){ appEl.classList.add('shake'); setTimeout(()=>appEl.classList.remove('shake'),350); }
   const gap=currentLevel.target-score;
-  $('loseScore').textContent=score;
+  rollTo($('loseScore'), score);
   $('loseSub').textContent=`差 ${gap} 分达成目标，再来一次！`;
   showModal('modalLose');
 }
@@ -1163,13 +1177,13 @@ function showModeResult(m, rank, win){
   if(win){ sfx.win(); confetti(); } else { sfx.lose(); }
   const titles={endless:'无尽模式结算',timed:'时间到！',daily:win?'今日挑战完成':'挑战未完成'};
   $('modeEndTitle').textContent=titles[m];
-  $('modeEndScore').textContent=score;
+  rollTo($('modeEndScore'), score);
   $('modeEndStats').innerHTML='最高连击 <b>×'+stats.maxCombo+'</b> · 消除 <b>'+stats.clears+'</b>'+(stats.rockets>0?' · 火箭 <b>'+stats.rockets+'</b>':'')+(stats.bombs>0?' · 炸弹 <b>'+stats.bombs+'</b>':'')+(stats.rainbows>0?' · 彩虹 <b>'+stats.rainbows+'</b>':'')+(stats.crosses>0?' · 十字 <b>'+stats.crosses+'</b>':'');
   const me=$('modeEndEmoji');
   if(me){ me.innerHTML = win?SVG.party:SVG.sad; me.classList.toggle('ok',!!win); me.classList.toggle('danger',!win); }
   $('modeEndRank').innerHTML=rank>0? ic('trophy','inline')+' 历史第 <b>'+rank+'</b> 名':'未进入 TOP10';
   $('modeEndRetry').textContent = m===M_DAILY? '再战一次（保留最佳）' : '再来一局';
-  showModal('modalModeEnd');
+  showModal('modalModeEnd'); renderSharePreview('modeEndSharePreview');
 }
 
 // ---------- 每日挑战弹窗 ----------
@@ -1350,6 +1364,19 @@ function shareScore(){
   } else { downloadCard(cv); }
 }
 
+function renderSharePreview(id){
+  const wrap=$(id); if(!wrap) return;
+  wrap.innerHTML='<span class="sp-hint">成绩卡片预览 · 点击可分享</span>';
+  try{
+    const src=shareCard();
+    const thumb=document.createElement('canvas');
+    thumb.width=150; thumb.height=240;
+    thumb.getContext('2d').drawImage(src,0,0,thumb.width,thumb.height);
+    thumb.title='点击分享成绩'; thumb.style.cursor='pointer';
+    thumb.onclick=()=>shareScore();
+    wrap.appendChild(thumb);
+  }catch(e){}
+}
 document.getElementById('menuStats').onclick=()=>{ openStats(); };
 document.getElementById('settingsStats').onclick=()=>{ openStats(); };
 document.getElementById('statsClose').onclick=()=>{ backModal(); };
