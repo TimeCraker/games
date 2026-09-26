@@ -15,7 +15,7 @@ const DEFAULT_LIB = [1,2,0,3];   // 02剑姬 · 03星空 · 01Q版女仆 · 04�
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4, CROSS:5 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.45';
+const CACHE_VER = '2.46';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -1562,14 +1562,14 @@ document.addEventListener('keydown',e=>{
 
 // ---------- 自定义皮肤（传图 + 1:1 裁剪 + IndexedDB 持久化） ----------
 const SkinDB = (() => {
-  const DB='xxl-skin-db', STORE='skins', KEY='custom', LS='xxl-skin';
+  const DB='xxl-skin-db', STORE='skins', KEY='custom', LS='xxl-skin', SETS='sets', SETS_KEY='sets';
   let dbp=null;
   function open(){
     if(dbp) return dbp;
     dbp=new Promise((res,rej)=>{
       if(!('indexedDB' in window)){ rej(new Error('no-idb')); return; }
-      let req; try{ req=indexedDB.open(DB,1); }catch(e){ rej(e); return; }
-      req.onupgradeneeded=()=>{ const db=req.result; if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE); };
+      let req; try{ req=indexedDB.open(DB,2); }catch(e){ rej(e); return; }
+      req.onupgradeneeded=()=>{ const db=req.result; if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE); if(!db.objectStoreNames.contains(SETS)) db.createObjectStore(SETS); };
       req.onsuccess=()=>res(req.result);
       req.onerror=()=>rej(req.error||new Error('idb-open-fail'));
       req.onblocked=()=>rej(new Error('idb-blocked'));
@@ -1617,7 +1617,45 @@ const SkinDB = (() => {
   }
   function lsGet(){ return loadJSON(LS, null); }
   function lsSet(v){ return saveJSON(LS, v); }
-  return { get:get, set:set, clear:clear };
+  async function getSets(){
+    try{
+      const db=await open();
+      const v=await new Promise((res,rej)=>{
+        const tx=db.transaction(SETS,'readonly');
+        const rq=tx.objectStore(SETS).get(SETS_KEY);
+        rq.onsuccess=()=>res(rq.result||null);
+        rq.onerror=()=>rej(rq.error);
+      });
+      if(v && v.list && Array.isArray(v.list)) return v.list.slice();
+      return [];
+    }catch(e){ return []; }
+  }
+  async function saveSets(list){
+    try{
+      const db=await open();
+      await new Promise((res,rej)=>{
+        const tx=db.transaction(SETS,'readwrite');
+        tx.objectStore(SETS).put({list:list}, SETS_KEY);
+        tx.oncomplete=()=>res(null);
+        tx.onerror=()=>rej(tx.error);
+        tx.onabort=()=>rej(tx.error);
+      });
+      return true;
+    }catch(e){ return false; }
+  }
+  async function migrateSets(){
+    try{
+      const legacy = await get();
+      if(legacy && legacy.imgs && Array.isArray(legacy.imgs) && legacy.imgs.filter(Boolean).length===TYPES){
+        const list = await getSets();
+        if(list.length===0){
+          list.push({ name:'我的套装', imgs:legacy.imgs.slice(), ts:legacy.ts||Date.now() });
+          await saveSets(list);
+        }
+      }
+    }catch(e){}
+  }
+  return { get:get, set:set, clear:clear, getSets:getSets, saveSets:saveSets, migrateSets:migrateSets };
 })();
 
 let skinSet=null;
@@ -1628,6 +1666,7 @@ function faceSrcOf(i){ return skinActive()? skinSet.imgs[i] : FACE_IMG[i]; }
 function predecodeFaces(){ for(let i=0;i<TYPES;i++){ const im=new Image(); im.src=faceSrcOf(i); if(im.decode) im.decode().catch(()=>{}); } }
 async function loadSkin(){
   skinSet=await SkinDB.get();
+  SkinDB.migrateSets();
   predecodeFaces();
 }
 function applySkinToBoard(){
@@ -1815,7 +1854,10 @@ function openSkinModal(){
   }
   renderSkinGrid();
   renderLibGrid();
+  renameTarget=-1; syncSetSaveBtn();
+  if($('setName')) $('setName').value='';
   showModal('modalSkin');
+  loadSavedSets();
   sfx.btn();
 }
 function pickSkinFile(i){
@@ -1883,6 +1925,70 @@ function resetSkin(){
   showToast('已恢复默认头像');
 }
 
+// ---------- 套装配方（命名收藏 + IDB v2 迁移） ----------
+let savedSets=[], renameTarget=-1;
+function escHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function syncSetSaveBtn(){ const b=$('setSaveBtn'); if(b) b.textContent = renameTarget>=0 ? '保存改名' : '存为配方'; }
+async function loadSavedSets(){
+  await SkinDB.migrateSets();
+  savedSets = await SkinDB.getSets();
+  renameTarget=-1; syncSetSaveBtn(); renderSetsList();
+}
+function renderSetsList(){
+  const box=$('setsList'); if(!box) return;
+  box.innerHTML='';
+  if(!savedSets.length){ box.innerHTML='<p class="sets-empty">还没有收藏的套装配方</p>'; return; }
+  savedSets.forEach((s,i)=>{
+    const row=document.createElement('div'); row.className='set-row';
+    row.innerHTML='<span class="set-thumb">'+s.imgs.slice(0,4).map(u=>'<img src="'+u+'" alt="">').join('')+'</span>'
+      +'<span class="set-name-text">'+escHtml(s.name)+'</span>'
+      +'<span class="set-acts">'
+      +'<button class="mini-btn" data-setact="apply" data-i="'+i+'">应用</button>'
+      +'<button class="mini-btn" data-setact="rename" data-i="'+i+'">改名</button>'
+      +'<button class="mini-btn" data-setact="del" data-i="'+i+'">删除</button>'
+      +'</span>';
+    box.appendChild(row);
+  });
+}
+async function saveSetAction(){
+  const raw=($('setName')||{}).value||'';
+  if(renameTarget>=0){
+    const s=savedSets[renameTarget]; if(!s) return;
+    s.name=(raw.trim()||('套装 '+(renameTarget+1))).slice(0,12);
+    await SkinDB.saveSets(savedSets);
+    renameTarget=-1; if($('setName')) $('setName').value='';
+    syncSetSaveBtn(); renderSetsList(); sfx.btn(); showToast('套装配方已改名');
+    return;
+  }
+  if(cropDraft.filter(Boolean).length<TYPES){ showToast('请先裁剪完 4 张照片再收藏'); return; }
+  const name=(raw.trim()||('套装 '+(savedSets.length+1))).slice(0,12);
+  savedSets.push({ name:name, imgs:cropDraft.slice(), ts:Date.now() });
+  const ok=await SkinDB.saveSets(savedSets);
+  if($('setName')) $('setName').value='';
+  syncSetSaveBtn(); renderSetsList(); sfx.btn();
+  showToast(ok ? ('套装配方已收藏：'+name) : '存储失败，配方仅本次生效');
+}
+function applySavedSet(i){
+  const s=savedSets[i]; if(!s) return;
+  for(let k=0;k<TYPES;k++){
+    cropDraft[k]=s.imgs[k]||null; pendingSrc[k]=null;
+    const lib=cropDraft[k]?LIB_FACES.indexOf(cropDraft[k]):-1;
+    libSel[k]=(cropDraft[k]&&lib>=0)?lib:-1; slotFromFile[k]=(cropDraft[k]?lib<0:false);
+  }
+  renderSkinGrid(); renderLibGrid(); sfx.btn(); applySkin();
+}
+function startRenameSet(i){
+  const s=savedSets[i]; if(!s) return;
+  renameTarget=i; if($('setName')) $('setName').value=s.name; syncSetSaveBtn(); sfx.btn();
+}
+async function deleteSet(i){
+  if(renameTarget===i){ renameTarget=-1; if($('setName')) $('setName').value=''; }
+  else if(renameTarget>i) renameTarget--;
+  savedSets.splice(i,1);
+  await SkinDB.saveSets(savedSets);
+  syncSetSaveBtn(); renderSetsList(); sfx.btn(); showToast('已删除套装配方');
+}
+
 document.getElementById('menuSkin').onclick=()=>{ openSkinModal(); };
 document.getElementById('settingsSkin').onclick=()=>{ openSkinModal(); };
 document.getElementById('skinApply').onclick=()=>{ applySkin(); };
@@ -1902,6 +2008,14 @@ document.getElementById('skinGrid').addEventListener('click',e=>{
 document.getElementById('libGrid').addEventListener('click',e=>{
   const b=e.target.closest('.lib-thumb'); if(!b) return;
   libPick(+b.dataset.k);
+});
+document.getElementById('setSaveBtn').addEventListener('click',()=>{ saveSetAction(); });
+document.getElementById('setsList').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-setact]'); if(!b) return;
+  const i=+b.dataset.i, act=b.dataset.setact;
+  if(act==='apply') applySavedSet(i);
+  else if(act==='rename') startRenameSet(i);
+  else if(act==='del') deleteSet(i);
 });
 document.getElementById('cropOut').innerHTML=ic('zoomOut');
 document.getElementById('cropIn').innerHTML=ic('zoomIn');
