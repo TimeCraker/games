@@ -366,6 +366,8 @@ export function NebulaSurvivorGame() {
   const [rulesModalOpen, setRulesModalOpen] = React.useState(true)
   const [rulesModalKind, setRulesModalKind] = React.useState<RulesModalKind>("briefing")
   const [dontShowRulesAgain, setDontShowRulesAgain] = React.useState(false)
+  // 背景音乐就绪门：音乐未加载完时压住「开始任务」按钮
+  const [bgmReady, setBgmReady] = React.useState(false)
   const [sfxOn, setSfxOn] = React.useState(() => nebulaSfx.volume > 0.001)
 
   const rulesOpenRef = React.useRef(rulesModalOpen)
@@ -773,6 +775,7 @@ export function NebulaSurvivorGame() {
           safeArea
           label={rulesModalKind === "briefing" ? "开始任务" : rulesModalKind === "pause" ? "继续游戏" : "返回游戏"}
           onConfirm={closeRulesPrimary}
+          confirmPending={!bgmReady}
           onRequestClose={rulesModalKind === "briefing" ? undefined : () => setRulesModalOpen(false)}
           confirmClassName="mt-4 w-full rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 py-3.5 text-[15px] font-semibold text-gray-950 shadow-[0_10px_32px_-8px_rgba(216,163,60,0.55)] transition hover:brightness-110 active:scale-[0.99]"
           skipRules={
@@ -912,7 +915,7 @@ export function NebulaSurvivorGame() {
         ) : null}
       </AnimatePresence>
       </StagePortal>
-      <LoopingBgmControl src="/audio/games/nebula-survivor/Untitled.mp3" storageKey="bgm-volume:nebula-survivor" hidden={rulesModalOpen || ui.pausedUpgrade || ui.gameOver} />
+      <LoopingBgmControl src="/audio/games/nebula-survivor/Untitled.mp3" storageKey="bgm-volume:nebula-survivor" hidden={rulesModalOpen || ui.pausedUpgrade || ui.gameOver} onReady={() => setBgmReady(true)} />
     </div>
   )
 }

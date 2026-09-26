@@ -255,6 +255,8 @@ export function StarDashGame() {
   const [screenMode, setScreenMode] = React.useState<GameMode>("start")
   const [rulesModalOpen, setRulesModalOpen] = React.useState(true)
   const [dontShowRulesAgain, setDontShowRulesAgain] = React.useState(false)
+  // 背景音乐就绪门：音乐未加载完时压住「知道了」按钮
+  const [bgmReady, setBgmReady] = React.useState(false)
   const [boostReadyUi, setBoostReadyUi] = React.useState(false)
   const prevBoostReadyRef = React.useRef(false)
 
@@ -969,6 +971,7 @@ export function StarDashGame() {
           titleId="star-dash-rules-title"
           label="知道了"
           onConfirm={confirmRules}
+          confirmPending={!bgmReady}
           onRequestClose={confirmRules}
           confirmClassName="mt-5 w-full rounded-2xl bg-white py-3.5 text-[15px] font-semibold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition hover:bg-white/90 active:scale-[0.99]"
           skipRules={{
@@ -1096,7 +1099,7 @@ export function StarDashGame() {
           </AnimatePresence>
         </StagePortal>
       </div>
-      <LoopingBgmControl src="/audio/games/lets-running/Digital_Frenzy lets running.mp3" storageKey="bgm-volume:lets-running" hidden={rulesModalOpen} />
+      <LoopingBgmControl src="/audio/games/lets-running/Digital_Frenzy lets running.mp3" storageKey="bgm-volume:lets-running" hidden={rulesModalOpen} onReady={() => setBgmReady(true)} />
     </div>
   )
 }

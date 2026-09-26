@@ -264,6 +264,8 @@ export function MergeGame() {
   const [nextLevel, setNextLevel] = React.useState(1)
   const [rulesModalOpen, setRulesModalOpen] = React.useState(true)
   const [dontShowRulesAgain, setDontShowRulesAgain] = React.useState(false)
+  // 背景音乐就绪门：音乐未加载完时压住「知道了」按钮
+  const [bgmReady, setBgmReady] = React.useState(false)
   const nextLevelRef = React.useRef(1)
   const ghostXRef = React.useRef(WORLD_W / 2)
   const playingRef = React.useRef(true)
@@ -784,6 +786,7 @@ const confirmMergeRules = React.useCallback(() => {
           titleId="merge-rules-title"
           label="知道了"
           onConfirm={confirmMergeRules}
+          confirmPending={!bgmReady}
           onRequestClose={confirmMergeRules}
           overlayZClassName="z-[55]"
           safeArea
@@ -852,7 +855,7 @@ const confirmMergeRules = React.useCallback(() => {
           ) : null}
         </AnimatePresence>
       </StagePortal>
-      <LoopingBgmControl src="/audio/games/merge/Velvet_Resonance.mp3" storageKey="bgm-volume:merge" hidden={rulesModalOpen || !playing} />
+      <LoopingBgmControl src="/audio/games/merge/Velvet_Resonance.mp3" storageKey="bgm-volume:merge" hidden={rulesModalOpen || !playing} onReady={() => setBgmReady(true)} />
     </div>
   )
 }

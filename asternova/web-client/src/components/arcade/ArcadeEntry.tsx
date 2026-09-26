@@ -101,6 +101,7 @@ export function ArcadeEntry({
   panelClassName,
   confirmClassName,
   footer,
+  confirmPending = false,
 }: {
   /** 品牌行取名的单一真源 */
   slug: ArcadeSlug
@@ -137,6 +138,8 @@ export function ArcadeEntry({
    */
   confirmClassName?: string
   footer?: React.ReactNode
+  /** 置 true 时确认按钮进入「准备中」态（禁用 + 转圈），用于压住开始直到背景音乐就绪 */
+  confirmPending?: boolean
 }) {
   const closeFromKeyboard = React.useCallback(() => {
     onRequestClose?.()
@@ -198,8 +201,23 @@ export function ArcadeEntry({
               {skipRules.label ?? SKIP_LABEL_DEFAULT}
             </label>
           ) : null}
-          <button type="button" onClick={onConfirm} className={confirmClassName ?? CONFIRM_DEFAULT}>
-            {label}
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={confirmPending}
+            className={cn(confirmClassName ?? CONFIRM_DEFAULT, confirmPending && "cursor-wait opacity-80")}
+          >
+            {confirmPending ? (
+              <span className="inline-flex items-center justify-center gap-2">
+                <span
+                  className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                  aria-hidden
+                />
+                准备音乐中…
+              </span>
+            ) : (
+              label
+            )}
           </button>
           {footer}
         </div>

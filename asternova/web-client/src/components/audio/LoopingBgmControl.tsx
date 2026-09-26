@@ -37,6 +37,11 @@ type Props = {
   hidden?: boolean
   /** floating=游戏页悬浮（默认）｜inline=顶栏内联（大厅，避免遮挡内容） */
   variant?: "floating" | "inline"
+  /**
+   * 音频就绪（canplay，可开始播放）或确认不可用（error / 无源）或超时后，回调一次。
+   * 用于「压住开始按钮直到音乐加载出来」。用 ref 保证只触发一次，重复调用幂等。
+   */
+  onReady?: () => void
 }
 
 const FILE_CANDIDATES = [
@@ -70,6 +75,7 @@ export function LoopingBgmControl({
   elevated = false,
   hidden = false,
   variant = "floating",
+  onReady,
 }: Props) {
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const barRefs = React.useRef<Array<HTMLSpanElement | null>>([])
@@ -77,6 +83,9 @@ export function LoopingBgmControl({
   const rafRef = React.useRef<number | null>(null)
   const smoothedRef = React.useRef<number[]>(new Array(BARS).fill(0))
   const lastNonZeroRef = React.useRef(0.6)
+  // 就绪回调（压住「开始」按钮）：保证只触发一次
+  const readyFiredRef = React.useRef(false)
+  const onReadyRef = React.useRef<(() => void) | undefined>(undefined)
 
   const [open, setOpen] = React.useState(false)
   const [volume, setVolume] = React.useState(0.6)
@@ -121,6 +130,45 @@ export function LoopingBgmControl({
   React.useEffect(() => {
     if (volume > 0.001) lastNonZeroRef.current = volume
   }, [volume])
+
+  /* ---------- 就绪回调（压住「开始」按钮直到音乐可播放） ---------- */
+  React.useEffect(() => {
+    onReadyRef.current = onReady
+  }, [onReady])
+
+  React.useEffect(() => {
+    const el = audioRef.current
+    const fire = () => {
+      if (readyFiredRef.current) return
+      readyFiredRef.current = true
+      onReadyRef.current?.()
+    }
+    // 无音频源 / 元素尚未挂载：无需等待，直接放行
+    if (!resolvedSrc || !el) {
+      fire()
+      return
+    }
+    // 已可播放（缓存命中 / 先一步加载完）：立即放行
+    if (el.readyState >= 3) {
+      fire()
+      return
+    }
+    const onCan = () => {
+      if (el.readyState >= 3) fire()
+    }
+    const onErr = () => fire() // 加载失败也别卡住游戏
+    el.addEventListener("canplay", onCan)
+    el.addEventListener("canplaythrough", onCan)
+    el.addEventListener("error", onErr)
+    // 网络卡死兜底：10s 后无论如何放行
+    const timer = window.setTimeout(fire, 10000)
+    return () => {
+      el.removeEventListener("canplay", onCan)
+      el.removeEventListener("canplaythrough", onCan)
+      el.removeEventListener("error", onErr)
+      window.clearTimeout(timer)
+    }
+  }, [resolvedSrc])
 
   React.useEffect(() => {
     if (typeof window === "undefined") return
