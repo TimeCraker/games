@@ -6,18 +6,18 @@
 
 import * as React from "react"
 import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from "framer-motion"
+import { ArcadeEntry } from "@/src/components/arcade/ArcadeEntry"
 import { ArcadeResult } from "@/src/components/arcade/ArcadeResult"
 import { arcadeAccentStyle } from "@/src/components/arcade/accent"
 import { useArcadeAccent } from "@/src/components/arcade/useArcadeAccent"
 import { BrandMark } from "@/src/components/arcade/BrandMark"
+import { HudMeter, HudStat, HudTopBar } from "@/src/components/arcade/HudKit"
 import { NebulaPixiHost } from "./render/NebulaPixiHost"
 import { nebulaSfx } from "./render/NebulaSfx"
 import { Volume2, VolumeX } from "lucide-react"
 import type { NebulaEngine, UpgradeOffer, UpgradeTrackId } from "./nebulaEngine"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
-import { LiquidBar } from "@/src/components/ui/LiquidBar"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
-import { useDialogA11y } from "@/src/hooks/useDialogA11y"
 import { StagePortal } from "@/src/components/game-shell/StagePortal"
 import { useMobileGameViewport } from "@/src/hooks/useMobileGameViewport"
 
@@ -371,14 +371,9 @@ export function NebulaSurvivorGame() {
   const rulesOpenRef = React.useRef(rulesModalOpen)
   const rulesKindRef = React.useRef(rulesModalKind)
 
-  // 弹层焦点陷阱 + Esc（briefing 须显式确认，Esc 不关闭，与既有 Esc/P 语义一致）
-  const rulesDialogRef = useDialogA11y<HTMLDivElement>({
-    open: rulesModalOpen,
-    onClose: () => {
-      const k = rulesKindRef.current
-      if (k === "pause" || k === "reference") setRulesModalOpen(false)
-    },
-  })
+  // 弹层焦点陷阱 + Esc 已移交共享的 ArcadeEntry：briefing 不传 onRequestClose
+  // → closeOnEsc=false（必须显式点「开始任务」）；pause / reference 传 onRequestClose 才可 Esc 关闭。
+  // 与既有 Esc/P 语义保持一致。
 
   React.useLayoutEffect(() => {
     rulesOpenRef.current = rulesModalOpen
@@ -563,12 +558,17 @@ export function NebulaSurvivorGame() {
       className="relative flex h-dvh min-h-0 flex-col overflow-hidden bg-space-black text-white"
       style={arcadeAccentStyle("nebula-survivor")}
     >
-      <div className="relative z-10 flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.07] bg-black/30 px-3 py-2 backdrop-blur-xl sm:px-5 sm:py-2.5">
-        <div className="flex w-24 items-center sm:w-28">
-          {isMobile ? null : <GameBackButton variant="header" label="大厅" />}
-        </div>
-        <BrandMark slug="nebula-survivor" className="sm:[&_span]:text-[12px]" />
-        <div className="flex w-24 items-center justify-end gap-1.5 sm:w-28">
+      <HudTopBar
+        layout="spread"
+        className="z-10 shrink-0 border-b border-white/[0.07] bg-black/30 px-3 py-2 backdrop-blur-xl sm:px-5 sm:py-2.5"
+        left={
+          <div className="flex w-24 items-center sm:w-28">
+            {isMobile ? null : <GameBackButton variant="header" label="大厅" />}
+          </div>
+        }
+        center={<BrandMark slug="nebula-survivor" className="sm:[&_span]:text-[12px]" />}
+        right={
+          <div className="flex w-24 items-center justify-end gap-1.5 sm:w-28">
           {!isMobile ? (
             <>
               <button
@@ -609,8 +609,9 @@ export function NebulaSurvivorGame() {
               </button>
             </>
           ) : null}
-        </div>
-      </div>
+          </div>
+        }
+      />
 
       {isMobile && !rulesModalOpen && !ui.pausedUpgrade && !ui.gameOver ? (
         <StagePortal>
@@ -661,26 +662,42 @@ export function NebulaSurvivorGame() {
                 LV <span className="text-white/80">{ui.level}</span>
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="w-6 shrink-0 text-right font-mono-data text-[10px] font-semibold tracking-wider text-white/60">HP</span>
-              <LiquidBar value={ui.hp} max={ui.maxHp} variant="hp" skew={false} className="h-2 flex-1 rounded-full" />
-              <span className="w-11 shrink-0 text-right font-mono-data text-[10px] tabular-nums text-white/55">
-                {Math.round(ui.hp)}/{ui.maxHp}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-6 shrink-0 text-right font-mono-data text-[10px] font-semibold tracking-wider text-hud-green/70">XP</span>
-              <LiquidBar value={ui.xp} max={ui.xpToNext} variant="xp" className="flex-1 rounded-full" />
-              <span className="w-11 shrink-0 text-right font-mono-data text-[10px] tabular-nums text-white/55">
-                {Math.floor(ui.xp)}/{ui.xpToNext}
-              </span>
-            </div>
+            <HudMeter
+              label="HP"
+              labelClassName="w-6 shrink-0 text-right text-[10px] font-semibold tracking-wider text-white/60"
+              value={ui.hp}
+              max={ui.maxHp}
+              variant="hp"
+              skew={false}
+              barClassName="h-2"
+              text={`${Math.round(ui.hp)}/${ui.maxHp}`}
+              valueClassName="w-11 shrink-0 text-right text-[10px] tabular-nums text-white/55"
+            />
+            <HudMeter
+              label="XP"
+              labelClassName="w-6 shrink-0 text-right text-[10px] font-semibold tracking-wider text-hud-green/70"
+              value={ui.xp}
+              max={ui.xpToNext}
+              variant="xp"
+              text={`${Math.floor(ui.xp)}/${ui.xpToNext}`}
+              valueClassName="w-11 shrink-0 text-right text-[10px] tabular-nums text-white/55"
+            />
             <div className="flex items-center justify-between border-t border-white/[0.07] pt-2 font-mono-data text-[10px] tabular-nums">
-              <span className="text-white/45">击杀 <span className="text-white/85">{ui.kills}</span></span>
+              <HudStat label="击杀" className="text-white/45" value={ui.kills} valueClassName="text-white/85" />
               <span className="h-3 w-px bg-white/10" />
-              <span className="text-white/45">得分 <span className="text-hud-accent-bright">{ui.score}</span></span>
+              <HudStat
+                label="得分"
+                className="text-white/45"
+                value={ui.score}
+                valueClassName="text-hud-accent-bright"
+              />
               <span className="h-3 w-px bg-white/10" />
-              <span className="text-white/45">威胁 <span className="text-[#D98A72]">{ui.worldTier >= 5 ? "高" : ui.worldTier >= 3 ? "中" : "低"}</span></span>
+              <HudStat
+                label="威胁"
+                className="text-white/45"
+                value={ui.worldTier >= 5 ? "高" : ui.worldTier >= 3 ? "中" : "低"}
+                valueClassName="text-[#D98A72]"
+              />
             </div>
             <div className="flex items-center justify-between border-t border-white/[0.07] pt-2">
               {(Object.keys(TRACK_META) as UpgradeTrackId[]).map((id) => {
@@ -721,42 +738,59 @@ export function NebulaSurvivorGame() {
         </p>
       </div>
 
-      <StagePortal>
       {rulesModalOpen ? (
-        <div
-          ref={rulesDialogRef}
-          className="fixed inset-0 z-40 flex items-end justify-center bg-black/58 backdrop-blur-md sm:items-center sm:p-5"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="nebula-rules-title"
-          style={{
-            paddingLeft: "max(0.75rem, env(safe-area-inset-left, 0px))",
-            paddingRight: "max(0.75rem, env(safe-area-inset-right, 0px))",
-            paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))",
-            paddingTop: "max(0.5rem, env(safe-area-inset-top, 0px))",
-          }}
-        >
-          <div className="relative max-h-[min(88dvh,calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-1.5rem))] w-full max-w-[420px] overflow-y-auto overscroll-contain rounded-t-[1.75rem] border border-glass-border border-b-0 bg-glass-bg p-4 shadow-lg backdrop-blur-glass-lg sm:rounded-[2rem] sm:border-b sm:p-6">
-            <PanelCorners className="text-hud-accent/60" />
-            <p className="text-center text-[10px] font-semibold uppercase tracking-[0.26em] text-white/50">Briefing</p>
-            {rulesModalKind === "pause" ? (
-              <div className="mt-2 flex justify-center">
-                <span className="rounded-full border border-amber-200/25 bg-amber-400/15 px-3 py-1 text-[11px] font-semibold tracking-wide text-amber-100/95">
-                  已暂停
-                </span>
-              </div>
-            ) : null}
-            <h2 id="nebula-rules-title" className="mt-2 flex justify-center">
-              <BrandMark slug="nebula-survivor" variant="title" />
-            </h2>
-            <p className="mt-1 text-center text-[12px] text-white/50">
-              {rulesModalKind === "briefing"
-                ? "读完后点击「开始任务」进入战场"
-                : rulesModalKind === "pause"
-                  ? "游戏已暂停 · 可复习下方规则，关闭后继续战斗（Esc / P 亦可关闭）"
-                  : "查阅完毕后点击下方按钮返回游戏"}
+        <ArcadeEntry
+          slug="nebula-survivor"
+          titleId="nebula-rules-title"
+          brandInline={false}
+          title={<BrandMark slug="nebula-survivor" variant="title" />}
+          titleClassName="mt-2 flex justify-center"
+          subtitle={
+            rulesModalKind === "briefing"
+              ? "读完后点击「开始任务」进入战场"
+              : rulesModalKind === "pause"
+                ? "游戏已暂停 · 可复习下方规则，关闭后继续战斗（Esc / P 亦可关闭）"
+                : "查阅完毕后点击下方按钮返回游戏"
+          }
+          subtitleClassName="mt-1 text-center text-[12px] text-white/50"
+          eyebrow={
+            <>
+              <p className="text-center text-[10px] font-semibold uppercase tracking-[0.26em] text-white/50">Briefing</p>
+              {rulesModalKind === "pause" ? (
+                <div className="mt-2 flex justify-center">
+                  <span className="rounded-full border border-amber-200/25 bg-amber-400/15 px-3 py-1 text-[11px] font-semibold tracking-wide text-amber-100/95">
+                    已暂停
+                  </span>
+                </div>
+              ) : null}
+            </>
+          }
+          panelOverlay={<PanelCorners className="text-hud-accent/60" />}
+          panelClassName="relative"
+          overlayZClassName="z-40"
+          overlayTint="bg-black/58"
+          overlayPadding="sm:p-5"
+          safeArea
+          label={rulesModalKind === "briefing" ? "开始任务" : rulesModalKind === "pause" ? "继续游戏" : "返回游戏"}
+          onConfirm={closeRulesPrimary}
+          onRequestClose={rulesModalKind === "briefing" ? undefined : () => setRulesModalOpen(false)}
+          confirmClassName="mt-4 w-full rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 py-3.5 text-[15px] font-semibold text-gray-950 shadow-[0_10px_32px_-8px_rgba(216,163,60,0.55)] transition hover:brightness-110 active:scale-[0.99]"
+          skipRules={
+            rulesModalKind === "briefing"
+              ? {
+                  checked: dontShowRulesAgain,
+                  onChange: setDontShowRulesAgain,
+                  label: "下次不再显示（本机记住）",
+                  className: "mt-4 px-3 py-2.5 text-[12px] text-white/68",
+                }
+              : undefined
+          }
+          footer={
+            <p className="mt-3 text-center font-display text-[10px] uppercase tracking-[0.3em] text-white/30">
+              AsterNova · Arcade
             </p>
-
+          }
+        >
             <ul className="mt-5 space-y-3.5 text-[13px] leading-relaxed text-white/78">
               <li className="flex gap-3 rounded-2xl bg-white/[0.05] p-3">
                 <NebulaIconMove />
@@ -795,33 +829,8 @@ export function NebulaSurvivorGame() {
                 </div>
               </li>
             </ul>
-
-            {rulesModalKind === "briefing" ? (
-              <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-3 py-2.5 text-[12px] text-white/68">
-                <input
-                  type="checkbox"
-                  checked={dontShowRulesAgain}
-                  onChange={(e) => setDontShowRulesAgain(e.target.checked)}
-                  className="h-4 w-4 rounded-md border-white/30 bg-white/10 text-hud-accent focus:ring-hud-accent/50"
-                />
-                下次不再显示（本机记住）
-              </label>
-            ) : null}
-
-            <button
-              type="button"
-              onClick={closeRulesPrimary}
-              className="mt-4 w-full rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 py-3.5 text-[15px] font-semibold text-gray-950 shadow-[0_10px_32px_-8px_rgba(216,163,60,0.55)] transition hover:brightness-110 active:scale-[0.99]"
-            >
-              {rulesModalKind === "briefing" ? "开始任务" : rulesModalKind === "pause" ? "继续游戏" : "返回游戏"}
-            </button>
-            <p className="mt-3 text-center font-display text-[10px] uppercase tracking-[0.3em] text-white/30">
-              AsterNova · Arcade
-            </p>
-          </div>
-        </div>
+        </ArcadeEntry>
       ) : null}
-      </StagePortal>
 
       <StagePortal>
       <AnimatePresence>

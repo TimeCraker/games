@@ -9,13 +9,14 @@ import { Bodies, Body, Composite, Engine, Events, Render, Runner, World } from "
 import { AnimatePresence, motion } from "framer-motion"
 import { arcadeAccentStyle } from "@/src/components/arcade/accent"
 import { useArcadeAccent } from "@/src/components/arcade/useArcadeAccent"
+import { ArcadeEntry } from "@/src/components/arcade/ArcadeEntry"
 import { ArcadeResult } from "@/src/components/arcade/ArcadeResult"
 import { BrandMark } from "@/src/components/arcade/BrandMark"
+import { HudStat } from "@/src/components/arcade/HudKit"
 import { formatScore } from "@/src/components/arcade/records"
 import { useArcadeBest } from "@/src/components/arcade/useArcadeRecords"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
-import { useDialogA11y } from "@/src/hooks/useDialogA11y"
 import { StagePortal } from "@/src/components/game-shell/StagePortal"
 import { useMobileGameViewport } from "@/src/hooks/useMobileGameViewport"
 
@@ -295,8 +296,7 @@ const confirmMergeRules = React.useCallback(() => {
     setRulesModalOpen(false)
   }, [dontShowRulesAgain])
 
-  // 弹层键盘可达性：Esc 关闭规则弹层；Game Over 无「关闭」语义仅做焦点陷阱
-  const rulesDialogRef = useDialogA11y<HTMLDivElement>({ open: rulesModalOpen, onClose: confirmMergeRules })
+  // 规则弹层的键盘可达性（焦点陷阱 / Esc = 等同点确认按钮）已移交共享的 ArcadeEntry。
   // Game Over 的焦点陷阱/role 已移交给共享的 ResultOverlay（其内部自带 useDialogA11y，
   // closeOnEsc:false 语义一致），故此处不再单独持有 dialog ref。
 
@@ -659,18 +659,22 @@ const confirmMergeRules = React.useCallback(() => {
             className="relative overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] p-2.5 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_24px_80px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.03),0_40px_100px_rgba(192,128,105,0.06)] backdrop-blur-[22px] backdrop-saturate-150 sm:rounded-[28px] sm:p-3"
             style={{ WebkitBackdropFilter: "blur(22px) saturate(150%)" }}
           >
-            <div className="mb-2 flex items-baseline justify-between gap-3 px-0.5 sm:mb-3">
-              <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/50 sm:text-[11px]">
-                得分
-              </span>
-              <span className="font-mono-data text-[13px] tabular-nums text-white/85 sm:text-[14px]">
-                <span className="text-white/90">{score}</span>
-                <span className="mx-1 text-white/50">/</span>
-                {/* 历史最高来自记录总线（局末才写入），故局中取 max(历史最高, 本局分数)，
-                    避免本局已破纪录时显示成「1960 / 最高 960」这种自相矛盾的读数 */}
-                <span className="text-white/50">最高 {formatScore(Math.max(best ?? 0, score))}</span>
-              </span>
-            </div>
+            <HudStat
+              layout="split"
+              className="mb-2 gap-3 px-0.5 sm:mb-3"
+              label="得分"
+              labelClassName="text-[10px] font-medium uppercase tracking-[0.22em] text-white/50 sm:text-[11px]"
+              valueClassName="font-mono-data text-[13px] tabular-nums text-white/85 sm:text-[14px]"
+              value={
+                <>
+                  <span className="text-white/90">{score}</span>
+                  <span className="mx-1 text-white/50">/</span>
+                  {/* 历史最高来自记录总线（局末才写入），故局中取 max(历史最高, 本局分数)，
+                      避免本局已破纪录时显示成「1960 / 最高 960」这种自相矛盾的读数 */}
+                  <span className="text-white/50">最高 {formatScore(Math.max(best ?? 0, score))}</span>
+                </>
+              }
+            />
 
             <div className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-4">
               <div className="flex min-w-0 flex-1 justify-center">
@@ -774,34 +778,20 @@ const confirmMergeRules = React.useCallback(() => {
         ) : null}
       </div>
 
-      <StagePortal>
-        {rulesModalOpen ? (
-        <div
-          ref={rulesDialogRef}
-          className="fixed inset-0 z-[55] flex items-end justify-center bg-black/55 backdrop-blur-md sm:items-center sm:p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="merge-rules-title"
-          style={{
-            paddingLeft: "max(0.75rem, env(safe-area-inset-left, 0px))",
-            paddingRight: "max(0.75rem, env(safe-area-inset-right, 0px))",
-            paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))",
-            paddingTop: "max(0.5rem, env(safe-area-inset-top, 0px))",
+      {rulesModalOpen ? (
+        <ArcadeEntry
+          slug="merge"
+          titleId="merge-rules-title"
+          label="知道了"
+          onConfirm={confirmMergeRules}
+          onRequestClose={confirmMergeRules}
+          overlayZClassName="z-[55]"
+          safeArea
+          skipRules={{
+            checked: dontShowRulesAgain,
+            onChange: setDontShowRulesAgain,
           }}
         >
-          <div
-            className="max-h-[min(88dvh,calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-1.5rem))] w-full max-w-[420px] overflow-y-auto overscroll-contain rounded-t-[1.75rem] border border-glass-border border-b-0 bg-glass-bg p-4 shadow-lg backdrop-blur-glass-lg sm:rounded-[2rem] sm:border-b sm:p-6"
-          >
-            <h2
-              id="merge-rules-title"
-              className="text-center text-xl font-semibold tracking-tight text-white"
-            >
-              怎么玩
-            </h2>
-            <p className="mt-1 flex items-center justify-center">
-              <BrandMark slug="merge" variant="inline" className="text-[13px]" />
-            </p>
-
             <ul className="mt-5 space-y-4 text-[14px] leading-relaxed text-white/80">
               <li className="flex gap-3 rounded-2xl bg-white/[0.05] p-3">
                 <MergeIconDrop />
@@ -845,28 +835,8 @@ const confirmMergeRules = React.useCallback(() => {
                 </div>
               </li>
             </ul>
-
-            <label className="mt-5 flex cursor-pointer items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-[13px] text-white/70 transition hover:bg-white/[0.06]">
-              <input
-                type="checkbox"
-                checked={dontShowRulesAgain}
-                onChange={(e) => setDontShowRulesAgain(e.target.checked)}
-                className="h-4 w-4 rounded-md border-white/30 bg-white/10 text-hud-accent focus:ring-hud-accent/50"
-              />
-              下次不再显示规则（本机记住）
-            </label>
-
-            <button
-              type="button"
-              onClick={confirmMergeRules}
-              className="mt-5 w-full rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 py-3.5 text-[15px] font-semibold text-gray-950 shadow-lg shadow-amber-500/20 transition hover:brightness-105 active:scale-[0.99]"
-            >
-              知道了
-            </button>
-          </div>
-        </div>
-        ) : null}
-      </StagePortal>
+        </ArcadeEntry>
+      ) : null}
 
       <StagePortal>
         <AnimatePresence>

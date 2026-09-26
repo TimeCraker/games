@@ -8,13 +8,14 @@
 
 import * as React from "react"
 import { AnimatePresence } from "framer-motion"
+import { ArcadeEntry } from "@/src/components/arcade/ArcadeEntry"
 import { ArcadeResult } from "@/src/components/arcade/ArcadeResult"
 import { arcadeAccentStyle } from "@/src/components/arcade/accent"
 import { useArcadeAccent } from "@/src/components/arcade/useArcadeAccent"
 import { BrandMark } from "@/src/components/arcade/BrandMark"
+import { HudTopBar } from "@/src/components/arcade/HudKit"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { GameBackButton } from "@/src/components/ui/GameBackButton"
-import { useDialogA11y } from "@/src/hooks/useDialogA11y"
 import { StagePortal } from "@/src/components/game-shell/StagePortal"
 import { useMobileGameViewport } from "@/src/hooks/useMobileGameViewport"
 import { cn } from "@/lib/utils"
@@ -358,8 +359,7 @@ export function StarDashGame() {
     setRulesModalOpen(false)
   }, [dontShowRulesAgain])
 
-  // 规则弹层键盘可达性：Esc = 确认并关闭，焦点锁定弹层内
-  const rulesDialogRef = useDialogA11y<HTMLDivElement>({ open: rulesModalOpen, onClose: confirmRules })
+  // 规则弹层键盘可达性（Esc = 确认并关闭，焦点锁定弹层内）已移交共享的 ArcadeEntry。
 
   React.useLayoutEffect(() => {
     try {
@@ -939,39 +939,43 @@ export function StarDashGame() {
       className="relative flex h-full min-h-0 min-h-full flex-col bg-space-black text-white"
       style={arcadeAccentStyle("lets-running")}
     >
-      <div className="relative z-20 grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-white/[0.08] px-4 py-3 backdrop-blur-xl">
-        {isMobile ? <span aria-hidden="true" /> : <GameBackButton variant="header" className="justify-self-start" />}
-        <BrandMark
-          slug="lets-running"
-          variant="inline"
-          className="justify-self-center text-sm font-semibold"
-        />
-        <span className="hidden max-w-[10rem] justify-self-end text-right text-[11px] leading-tight text-white/50 sm:block">
-          Space 跳 · E 星爆 · ↓ 铲
-        </span>
-      </div>
+      <HudTopBar
+        className="z-20 border-b border-white/[0.08] px-4 py-3 backdrop-blur-xl"
+        left={
+          isMobile ? <span aria-hidden="true" /> : <GameBackButton variant="header" className="justify-self-start" />
+        }
+        center={
+          <BrandMark
+            slug="lets-running"
+            variant="inline"
+            className="justify-self-center text-sm font-semibold"
+          />
+        }
+        right={
+          <span className="hidden max-w-[10rem] justify-self-end text-right text-[11px] leading-tight text-white/50 sm:block">
+            Space 跳 · E 星爆 · ↓ 铲
+          </span>
+        }
+      />
 
       <StagePortal>
         {isMobile && !rulesModalOpen ? <GameBackButton variant="floating" /> : null}
-        {rulesModalOpen ? (
-        <div
-          ref={rulesDialogRef}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-md"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="star-dash-rules-title"
-        >
-          <div className="w-full max-w-[420px] rounded-[2rem] border border-glass-border bg-glass-bg p-6 shadow-lg backdrop-blur-glass-lg">
-            <h2
-              id="star-dash-rules-title"
-              className="text-center text-xl font-semibold tracking-tight text-white"
-            >
-              怎么玩
-            </h2>
-            <p className="mt-1 flex items-center justify-center">
-              <BrandMark slug="lets-running" variant="inline" className="text-[13px]" />
-            </p>
+      </StagePortal>
 
+      {rulesModalOpen ? (
+        <ArcadeEntry
+          slug="lets-running"
+          variant="centered"
+          titleId="star-dash-rules-title"
+          label="知道了"
+          onConfirm={confirmRules}
+          onRequestClose={confirmRules}
+          confirmClassName="mt-5 w-full rounded-2xl bg-white py-3.5 text-[15px] font-semibold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition hover:bg-white/90 active:scale-[0.99]"
+          skipRules={{
+            checked: dontShowRulesAgain,
+            onChange: setDontShowRulesAgain,
+          }}
+        >
             <ul className="mt-5 space-y-4 text-[14px] leading-relaxed text-white/80">
               <li className="flex gap-3 rounded-2xl bg-white/[0.05] p-3">
                 <DashIconJump />
@@ -1009,28 +1013,8 @@ export function StarDashGame() {
                 </div>
               </li>
             </ul>
-
-            <label className="mt-5 flex cursor-pointer items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-[13px] text-white/70 transition hover:bg-white/[0.06]">
-              <input
-                type="checkbox"
-                checked={dontShowRulesAgain}
-                onChange={(e) => setDontShowRulesAgain(e.target.checked)}
-                className="h-4 w-4 rounded-md border-white/30 bg-white/10 text-hud-accent focus:ring-hud-accent/50"
-              />
-              下次不再显示规则（本机记住）
-            </label>
-
-            <button
-              type="button"
-              onClick={confirmRules}
-              className="mt-5 w-full rounded-2xl bg-white py-3.5 text-[15px] font-semibold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition hover:bg-white/90 active:scale-[0.99]"
-            >
-              知道了
-            </button>
-          </div>
-        </div>
+        </ArcadeEntry>
       ) : null}
-      </StagePortal>
 
       <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 min-[480px]:px-4">
         <div
