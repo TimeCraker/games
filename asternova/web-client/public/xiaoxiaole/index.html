@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b0e18">
-<meta name="description" content="消消乐 · 立体三消闯关 — 12 关闯关、无尽爬升、限时冲刺、每日挑战，支持自定义方块皮肤。">
+<meta name="description" content="消消乐 · 立体三消闯关 — 闯关、无尽爬升、限时冲刺、每日挑战，支持自定义方块皮肤。">
 <title>消消乐</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
-<link rel="stylesheet" href="./styles.css?v=2.44">
+<link rel="stylesheet" href="./styles.css?v=2.45">
 </head>
 <body>
 
@@ -62,6 +62,7 @@
           <div class="legend-row"><span class="legend-badge rocket"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h18"/><path d="M15 8l4 4-4 4M9 8l-4 4 4 4"/></svg></span></span><span>直线连 4 · 火箭清整行 / 整列</span></div>
           <div class="legend-row"><span class="legend-badge bomb"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="15" r="6.5"/><path d="M16 9l2-2"/><path d="M18 7l1.5-1.5"/><circle cx="20" cy="5" r="1.2" fill="currentColor" stroke="none"/><path d="M14.5 9.5l1.5-1.5"/></svg></span></span><span>T / L 形 5 连 · 爆炸清除周围</span></div>
           <div class="legend-row"><span class="legend-badge rainbow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 19a9 9 0 0118 0"/><path d="M6.5 19a5.5 5.5 0 0111 0"/><path d="M10 19a2 2 0 014 0"/></svg></span></span><span>直线连 5 · 清除全场同款</span></div>
+          <div class="legend-row"><span class="legend-badge cross"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5V3M12 19v2M5 12H3M19 12h2"/><path d="M9 8l3 4 3-4M9 16l3-4 3 4M8 9l4 3-4 3M16 9l-4 3 4 3"/></svg></span></span><span>2×2 正方形 · 十字炮清整行整列</span></div>
         </div>
       </div>
     </aside>
@@ -125,7 +126,7 @@
     <div class="menu-content">
       <div class="menu-eyebrow"><span></span>MATCH-3 PUZZLE</div>
       <h1 class="menu-title">消消乐</h1>
-      <p class="menu-sub">交换、连击、清场 — 12 关闯关、无尽爬升、60 秒冲刺与每日挑战，都在同一块棋盘上。</p>
+      <p class="menu-sub">交换、连击、清场 — 闯关、无尽爬升、60 秒冲刺与每日挑战，都在同一块棋盘上。</p>
       <div class="menu-progress">
         <span class="menu-chip"><span class="ic" id="menuStarIcon"></span><span id="menuStars">0 / 36 星</span></span>
         <span class="menu-chip"><span class="ic" id="menuBestIcon"></span><span id="menuBest">最高分 0</span></span>
@@ -357,6 +358,10 @@
         <div><b>直线 5 连 → 彩虹</b><small>交换后清除场上全部同款方块；与特殊方块组合有额外效果。</small></div>
       </div>
       <div class="help-item">
+        <span class="legend-badge cross"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5V3M12 19v2M5 12H3M19 12h2"/><path d="M9 8l3 4 3-4M9 16l3-4 3 4M8 9l4 3-4 3M16 9l-4 3 4 3"/></svg></span></span>
+        <div><b>2×2 正方形 → 十字炮</b><small>四连成正方形时生成；触发后清除其所在整行 + 整列。</small></div>
+      </div>
+      <div class="help-item">
         <span class="legend-badge"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span></span>
         <div><b>限时模式加时</b><small>高连击会奖励额外时间，单局最多累计 +10 秒。</small></div>
       </div>
@@ -528,6 +533,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<script src="./game.js?v=2.44"></script>
+<script src="./game.js?v=2.45"></script>
 </body>
 </html>

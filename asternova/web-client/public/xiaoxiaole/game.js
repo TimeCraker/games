@@ -15,7 +15,7 @@ const DEFAULT_LIB = [1,2,0,3];   // 02剑姬 · 03星空 · 01Q版女仆 · 04�
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4, CROSS:5 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.44';
+const CACHE_VER = '2.45';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -90,12 +90,14 @@ const LEVELS = [
   { id:10, name:'彩虹盛宴',   target:6000, moves:22, goals:[{t:'score',v:6000},{t:'rainbow',v:2}] },
   { id:11, name:'极限连击',   target:7000, moves:20, goals:[{t:'score',v:7000},{t:'combo',v:5}] },
   { id:12, name:'消消乐大师',   target:8000, moves:18, goals:[{t:'score',v:8000},{t:'combo',v:5},{t:'rainbow',v:2}] },
+  { id:13, name:'十字阵地',   target:6000, moves:22, goals:[{t:'score',v:6000},{t:'cross',v:2}] },
 ];
 const GOAL_META = {
   score:  { icon:'star',     label:'达到分数' },
   combo:  { icon:'fire',     label:'达成连击' },
   bomb:   { icon:'bomb',     label:'生成炸弹' },
   rainbow:{ icon:'rainbow',  label:'生成彩虹' },
+  cross:  { icon:'cross',    label:'生成十字炮' },
 };
 
 // ---------- DOM ----------
@@ -247,6 +249,7 @@ const ACHIEVEMENTS = [
   { id:'beat6', name:'彩虹猎手', desc:'通关第 6 关', icon:'trophy' },
   { id:'beat12', name:'消消乐大师', desc:'通关全部关卡', icon:'trophy' },
   { id:'total500', name:'消消达人', desc:'累计消除 500 个方块', icon:'chart' },
+  { id:'make_cross', name:'十字炮手', desc:'首次生成十字炮', icon:'cross' },
   { id:'daily_win', name:'每日一题', desc:'完成一次每日挑战', icon:'calendarDay' },
 ];
 const achState = loadJSONObj('xxl-ach');
@@ -524,7 +527,7 @@ function planSpecials(runs, squares=[]){
     if(planned.has(k)) continue;
     planned.add(k);
     out.push({r:sq.r,c:sq.c,type:sq.type,special:SPECIAL.CROSS});
-    stats.crosses++; goalProgress.cross=(goalProgress.cross||0)+1;
+    stats.crosses++; goalProgress.cross=(goalProgress.cross||0)+1; unlockAchievement('make_cross');
   }
   if(combo>=2) goalProgress.combo=Math.max(goalProgress.combo||0,combo);
   return out;
@@ -1034,7 +1037,7 @@ function winLevel(){
   if(levelIdx+1>=LEVELS.length) unlockAchievement('beat12');
   $('winScore').textContent=score;
   $('winStars').innerHTML=[0,1,2].map(i=>i<stars?ic('star','lg full'):ic('starO','lg empty')).join('');
-  $('winStats').innerHTML=`消除方块 <b>${stats.clears}</b> · 最高连击 <b>×${stats.maxCombo}</b><br>生成炸弹 <b>${stats.bombs}</b> · 彩虹 <b>${stats.rainbows}</b> · 火箭 <b>${stats.rockets}</b>`;
+  $('winStats').innerHTML=`消除方块 <b>${stats.clears}</b> · 最高连击 <b>×${stats.maxCombo}</b><br>生成炸弹 <b>${stats.bombs}</b> · 彩虹 <b>${stats.rainbows}</b> · 火箭 <b>${stats.rockets}</b> · 十字 <b>${stats.crosses}</b>`;
   $('nextLevelBtn').style.display=(levelIdx+1<LEVELS.length)?'':'none';
   showModal('modalWin');
 }
@@ -1161,7 +1164,7 @@ function showModeResult(m, rank, win){
   const titles={endless:'无尽模式结算',timed:'时间到！',daily:win?'今日挑战完成':'挑战未完成'};
   $('modeEndTitle').textContent=titles[m];
   $('modeEndScore').textContent=score;
-  $('modeEndStats').innerHTML='最高连击 <b>×'+stats.maxCombo+'</b> · 消除 <b>'+stats.clears+'</b>'+(stats.rockets>0?' · 火箭 <b>'+stats.rockets+'</b>':'')+(stats.bombs>0?' · 炸弹 <b>'+stats.bombs+'</b>':'')+(stats.rainbows>0?' · 彩虹 <b>'+stats.rainbows+'</b>':'');
+  $('modeEndStats').innerHTML='最高连击 <b>×'+stats.maxCombo+'</b> · 消除 <b>'+stats.clears+'</b>'+(stats.rockets>0?' · 火箭 <b>'+stats.rockets+'</b>':'')+(stats.bombs>0?' · 炸弹 <b>'+stats.bombs+'</b>':'')+(stats.rainbows>0?' · 彩虹 <b>'+stats.rainbows+'</b>':'')+(stats.crosses>0?' · 十字 <b>'+stats.crosses+'</b>':'');
   const me=$('modeEndEmoji');
   if(me){ me.innerHTML = win?SVG.party:SVG.sad; me.classList.toggle('ok',!!win); me.classList.toggle('danger',!win); }
   $('modeEndRank').innerHTML=rank>0? ic('trophy','inline')+' 历史第 <b>'+rank+'</b> 名':'未进入 TOP10';

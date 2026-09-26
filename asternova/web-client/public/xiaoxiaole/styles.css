@@ -310,6 +310,7 @@ svg{max-width:100%;}
 .legend-badge.rocket{color:var(--tile-1);}
 .legend-badge.bomb{color:var(--danger);}
 .legend-badge.rainbow{color:var(--tile-3);}
+.legend-badge.cross{color:#d666c0;}
 
 /* ------------------------------------------------------------
    7. 棋盘区 / HUD
