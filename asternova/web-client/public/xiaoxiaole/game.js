@@ -15,7 +15,7 @@ const DEFAULT_LIB = [1,2,0,3];   // 02剑姬 · 03星空 · 01Q版女仆 · 04�
 const ACCENT = ['#ff6b6b','#4ecdc4','#ffd93d','#a78bfa'];
 const SPECIAL = { NONE:0, ROCKET_H:1, ROCKET_V:2, BOMB:3, RAINBOW:4 };
 // 资源版本号（部署时同步更新，强制刷新缓存）
-const CACHE_VER = '2.41';
+const CACHE_VER = '2.42';
 // 移动端关闭 3D（性能）：z 偏移为 0，纯 2D 合成
 const IS_MOBILE = matchMedia('(max-width:960px)').matches;
 const Z_TILE = IS_MOBILE ? 0 : 8;
@@ -909,6 +909,9 @@ function renderLevelsGrid(){
     const card=document.createElement('button'); card.type='button';
     card.className='level-card'+(unlocked?'':' locked')+(isCurrent?' current':'');
     card.style.setProperty('--accent-c',ACCENT[i%4]);
+    card.tabIndex = (unlocked && isCurrent) ? 0 : -1;
+    card.setAttribute('aria-label', '第 '+lv.id+' 关 · '+lv.name+(unlocked?'':'（未解锁）'));
+    if(isCurrent) card.setAttribute('aria-current','true');
     const starHtml=[0,1,2].map(k=>k<stars?ic('star','sm'):ic('starO','sm')).join('');
     card.innerHTML='<div class="lc-num">'+String(lv.id).padStart(2,'0')+'</div>'
       +'<div class="lc-name">'+lv.name+'</div>'
@@ -1136,7 +1139,7 @@ function openLeaderboard(){ renderLb(); showModal('modalLeaderboard'); sfx.btn()
 function renderLb(){
   const box=$('lbSections'); if(!box) return;
   const meta={endless:['无尽','infinity'],timed:['限时','clock'],daily:['每日','calendarDay']};
-  const tabs=Object.keys(meta).map(m=>'<button class="lb-tab'+(m===lbTab?' on':'')+'" data-lb="'+m+'" role="tab" aria-selected="'+(m===lbTab)+'">'+ic(meta[m][1],'sm')+meta[m][0]+'</button>').join('');
+  const tabs=Object.keys(meta).map(m=>'<button class="lb-tab'+(m===lbTab?' on':'')+'" data-lb="'+m+'" role="tab" aria-selected="'+(m===lbTab)+'" tabindex="'+(m===lbTab?0:-1)+'">'+ic(meta[m][1],'sm')+meta[m][0]+'</button>').join('');
   const list=lbGet(lbTab);
   let body;
   if(list.length===0){
@@ -1144,8 +1147,21 @@ function renderLb(){
   } else {
     body='<div class="lb-list">'+list.map((e,i)=>'<div class="lb-row'+(i<3?' top'+(i+1):'')+'"><span class="lb-rank">'+(i+1)+'</span><span class="lb-score">'+e.score+'</span><span class="lb-meta">连击 ×'+(e.combo||0)+' · '+fmtTs(e.ts)+'</span></div>').join('')+'</div>';
   }
-  box.innerHTML='<div class="lb-tabs" role="tablist">'+tabs+'</div>'+body;
+  box.innerHTML='<div class="lb-tabs" role="tablist" aria-label="排行榜模式">'+tabs+'</div>'+body;
+  const tabBtns=Array.from(box.querySelectorAll('[data-lb]'));
   box.querySelectorAll('[data-lb]').forEach(b=>{ b.onclick=()=>{ lbTab=b.dataset.lb; sfx.btn(); renderLb(); }; });
+  box.querySelector('.lb-tabs').addEventListener('keydown', e=>{
+    if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key)) return;
+    e.preventDefault();
+    const idx=tabBtns.findIndex(t=>t.dataset.lb===lbTab);
+    let nxt=0;
+    if(e.key==='ArrowRight') nxt=(idx+1)%tabBtns.length;
+    else if(e.key==='ArrowLeft') nxt=(idx-1+tabBtns.length)%tabBtns.length;
+    else if(e.key==='Home') nxt=0;
+    else if(e.key==='End') nxt=tabBtns.length-1;
+    lbTab=tabBtns[nxt].dataset.lb; sfx.btn(); renderLb();
+    const nt=box.querySelector('[data-lb="'+lbTab+'"]'); if(nt) nt.focus();
+  });
   const go=box.querySelector('[data-lbgo]');
   if(go) go.onclick=()=>{ hideAllModal(); sfx.init(); sfx.btn(); startMode(lbTab); };
 }
@@ -1398,6 +1414,19 @@ const SCRIM_CLOSE=['modalLeaderboard','modalStats','modalDaily','modalHelp','mod
 document.querySelectorAll('.modal').forEach(m=>{ m.addEventListener('pointerdown',e=>{ if(e.target===m && SCRIM_CLOSE.indexOf(m.id)>=0) backModal(); }); });
 $('menuSound').onclick=()=>toggleSound();
 $('levelsBack').onclick=()=>{ sfx.btn(); gotoMenu(); };
+// 关卡选择网格：方向键 / Home / End 键盘导航（roving focus 由 tabIndex 0/-1 控制）
+$('levelsGrid').addEventListener('keydown', e=>{
+  if(!['ArrowRight','ArrowDown','ArrowLeft','ArrowUp','Home','End'].includes(e.key)) return;
+  const btns=Array.from($('levelsGrid').querySelectorAll('button.level-card:not(.locked)'));
+  if(!btns.length) return;
+  const cur=btns.indexOf(document.activeElement);
+  let next=null;
+  if(e.key==='Home') next=0;
+  else if(e.key==='End') next=btns.length-1;
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp') next=cur<=0?0:cur-1;
+  else if(e.key==='ArrowRight'||e.key==='ArrowDown') next=cur<0?0:Math.min(btns.length-1,cur+1);
+  if(next!=null){ e.preventDefault(); btns[next].focus(); }
+});
 $('resumeBtn').onclick=()=>resumeGame();
 $('restartBtn2').onclick=()=>{ hideAllModal(); startLevel(levelIdx); };
 $('pauseMenuBtn').onclick=()=>{ hideAllModal(); gotoMenu(); };

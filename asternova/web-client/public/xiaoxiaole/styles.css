@@ -859,6 +859,20 @@ svg{max-width:100%;}
   font-size:13px;font-weight:700;color:var(--text);background:var(--surface-3);
   border:1px solid var(--hairline);border-radius:var(--r-xs);padding:7px 10px;cursor:pointer;outline:none;
 }
+/* range / select / switch 细节态：hover + disabled（强调色由两主题令牌驱动） */
+.range:hover{border-color:var(--hairline-strong);}
+.range:hover::-webkit-slider-thumb{transform:scale(1.12);}
+.range:hover::-moz-range-thumb{transform:scale(1.12);}
+.range:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+.range:disabled{opacity:.45;cursor:not-allowed;}
+.select:hover{border-color:var(--hairline-strong);background:var(--surface);}
+.select:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.select:disabled{opacity:.45;cursor:not-allowed;}
+.switch input:disabled + .slider{opacity:.45;cursor:not-allowed;}
+/* 键盘焦点环强化：交互卡/标签页双层环，两主题一致对比 */
+.level-card:focus-visible,.lb-tab:focus-visible,.lib-thumb:focus-visible,.mini-btn:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;box-shadow:0 0 0 4px var(--accent-soft);
+}
 .music-picker{display:flex;align-items:center;gap:8px;min-width:0;}
 .music-btn{
   width:32px;height:32px;flex-shrink:0;border-radius:var(--r-xs);cursor:pointer;
