@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark" data-bg="cloud">
+<html lang="zh-CN" data-theme="asternova" data-bg="cloud">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#0b0e18">
-<meta name="description" content="消消乐 · 立体三消闯关 — 闯关、无尽爬升、限时冲刺、每日挑战，支持自定义方块皮肤。">
-<title>消消乐</title>
+<meta name="theme-color" content="#050608">
+<meta name="description" content="StarMatrix · 星阵消消乐 — 立体三消闯关：闯关、无尽爬升、限时冲刺、每日挑战，支持自定义方块皮肤。">
+<title>StarMatrix · 星阵消消乐</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/faces/face0.jpg">
 <link rel="apple-touch-icon" href="./assets/faces/face0.jpg">
-<link rel="stylesheet" href="./styles.css?v=2.48">
+<link rel="stylesheet" href="./styles.css?v=2.49">
 </head>
 <body>
 
@@ -33,7 +33,7 @@
   <header class="topbar">
     <div class="brand" id="brandBtn" role="button" tabindex="0" aria-label="返回主菜单">
       <span class="brand-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1.5l2.6 7.9L22.5 12l-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z"/></svg></span>
-      <span class="brand-title">消消乐</span>
+      <span class="brand-title">StarMatrix</span><span class="brand-sub">星阵消消乐</span>
     </div>
     <div class="level-pill" id="levelPill">Level 1</div>
     <div class="actions">
@@ -125,8 +125,8 @@
 
     <div class="menu-content">
       <div class="menu-eyebrow"><span></span>MATCH-3 PUZZLE</div>
-      <h1 class="menu-title">消消乐</h1>
-      <p class="menu-sub">交换、连击、清场 — 闯关、无尽爬升、60 秒冲刺与每日挑战，都在同一块棋盘上。</p>
+      <h1 class="menu-title">StarMatrix</h1>
+      <p class="menu-sub">星阵消消乐 · 交换、连击、清场 — 闯关、无尽爬升、60 秒冲刺与每日挑战，都在同一块棋盘上。</p>
       <div class="menu-progress">
         <span class="menu-chip"><span class="ic" id="menuStarIcon"></span><span id="menuStars">0 / 36 星</span></span>
         <span class="menu-chip"><span class="ic" id="menuBestIcon"></span><span id="menuBest">最高分 0</span></span>
@@ -482,6 +482,7 @@
         <div class="setting-row">
           <label for="setTheme">主题</label>
           <select id="setTheme" class="select">
+            <option value="asternova">星阵</option>
             <option value="dark">深夜</option>
             <option value="light">暖纸</option>
           </select>
@@ -547,6 +548,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-<script src="./game.js?v=2.48"></script>
+<script src="./game.js?v=2.49"></script>
 </body>
 </html>

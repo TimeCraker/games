@@ -39,6 +39,8 @@
   --accent-soft:rgba(233,166,95,.14);
   --accent-line:rgba(233,166,95,.38);
   --accent-glow:rgba(233,166,95,.28);
+  /* 次级强调色（装饰/次要高亮）：默认跟随主强调色，星阵主题下为翠玉 */
+  --accent-2:var(--accent);
 
   /* 语义状态色 */
   --ok:#5cb8a4;
@@ -105,6 +107,55 @@
   --cell-bg:rgba(24,20,12,.05);
   --tile-shadow:0 5px 12px rgba(74,62,40,.20), 0 1px 2px rgba(74,62,40,.14);
   --backdrop:rgba(46,38,24,.44);
+}
+
+/* 星阵主题（Default）：冷中性黑 + 琥珀金主色 · StarMatrix / 星阵消消乐 */
+[data-theme="asternova"]{
+  /* 中性色阶（冷中性黑，无蓝紫倾向） */
+  --ink-1000:#050608;
+  --ink-950: #0a0b0d;
+  --ink-900: #111316;
+  --ink-850: #181b1f;
+  --ink-800: #1d2025;
+  --ink-700: #292d33;
+  --ink-600: #3a3f47;
+
+  /* 语义令牌 */
+  --bg-base:var(--ink-950);
+  --bg-deep:var(--ink-1000);
+  --surface:var(--ink-900);
+  --surface-2:var(--ink-850);
+  --surface-3:var(--ink-800);
+  --text:#e2e5e8;
+  --text-soft:#8c949e;
+  --text-mute:#6b7480;
+  --hairline:rgba(255,255,255,.10);
+  --hairline-strong:rgba(255,255,255,.18);
+  --glass:rgba(17,19,22,.66);
+  --glass-strong:rgba(17,19,22,.86);
+  --shadow-tint:0,0,0;
+
+  /* 主强调色：琥珀金 */
+  --accent:#d8a33c;
+  --accent-strong:#8a6519;
+  --accent-ink:#191307;
+  --accent-text:#e9be69;
+  --accent-soft:rgba(216,163,60,.14);
+  --accent-line:rgba(216,163,60,.38);
+  --accent-glow:rgba(216,163,60,.28);
+  /* 次级强调色：翠玉 */
+  --accent-2:oklch(0.75 0.09 165);
+
+  /* 语义状态色 */
+  --ok:#4f8d6b;
+  --danger:#c0503a;
+
+  /* 棋盘 */
+  --board-bg:#111316;
+  --board-frame:rgba(216,163,60,.16);
+  --cell-bg:rgba(255,255,255,.045);
+  --tile-shadow:0 6px 14px rgba(0,0,0,.48), 0 1px 2px rgba(0,0,0,.34);
+  --backdrop:rgba(3,4,6,.68);
 }
 
 /* ------------------------------------------------------------
@@ -194,6 +245,28 @@ svg{max-width:100%;}
 [data-theme="light"][data-bg="photo"] .bg-photo{filter:blur(24px) brightness(.92) saturate(.92);}
 .bg-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(11,14,24,.62),rgba(7,9,15,.72));}
 [data-theme="light"][data-bg="photo"] .bg-photo::after{background:linear-gradient(160deg,rgba(244,241,233,.68),rgba(234,229,218,.78));}
+
+/* 星阵主题背景层：冷中性黑（替换蓝色夜城 / 紫色星云），仅保留琥珀金与翠玉点缀 */
+[data-theme="asternova"][data-bg="cloud"] .bg-cloud{
+  background:
+    radial-gradient(900px 620px at 18% 8%, rgba(255,255,255,.05) 0%, transparent 62%),
+    radial-gradient(820px 700px at 86% 18%, rgba(216,163,60,.10) 0%, transparent 58%),
+    radial-gradient(1100px 820px at 50% 104%, oklch(0.75 0.09 165 / .07) 0%, transparent 64%),
+    linear-gradient(158deg,#050608 0%,#0a0b0d 100%);
+}
+[data-theme="asternova"][data-bg="cloud"] .bg-cloud::after{
+  background:radial-gradient(620px 320px at 32% 82%,rgba(216,163,60,.07),transparent 62%);
+}
+[data-theme="asternova"] .bg-neon{
+  background:
+    radial-gradient(700px 520px at 14% 12%, oklch(0.75 0.09 165 / .10), transparent 56%),
+    radial-gradient(720px 520px at 86% 22%, rgba(216,163,60,.10), transparent 56%),
+    radial-gradient(900px 700px at 50% 92%, oklch(0.75 0.09 165 / .06), transparent 62%),
+    linear-gradient(158deg,#050608 0%,#0a0b0d 100%);
+}
+[data-theme="asternova"] .bg-photo::after{
+  background:linear-gradient(160deg,rgba(5,6,8,.66),rgba(5,6,8,.78));
+}
 .bg-particles{position:fixed;inset:0;z-index:-2;pointer-events:none;}
 
 /* ------------------------------------------------------------
@@ -242,13 +315,15 @@ svg{max-width:100%;}
 .brand-icon{display:inline-flex;width:20px;height:20px;color:var(--accent);}
 .brand-icon svg{width:100%;height:100%;filter:drop-shadow(0 2px 6px var(--accent-glow));}
 .brand-title{font-weight:800;font-size:17px;letter-spacing:.06em;}
+.brand-sub{font-size:11px;font-weight:600;letter-spacing:.10em;color:var(--text-mute);padding-left:2px;white-space:nowrap;}
+@media (max-width:560px){ .brand-sub{display:none;} }
 .level-pill{
   display:inline-flex;align-items:center;gap:6px;
   font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--text);
   background:var(--glass);border:1px solid var(--hairline);border-radius:var(--r-pill);
   padding:7px 16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
 }
-.level-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+.level-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 8px var(--accent-glow);}
 .actions{display:flex;gap:var(--sp-2);align-items:center;margin-left:auto;}
 .back-menu-btn{
   display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 15px;cursor:pointer;
@@ -1276,3 +1351,22 @@ svg{max-width:100%;}
   *{animation-duration:.01ms !important;transition-duration:60ms !important;}
   .bg-cloud::after,.bg-neon::after{animation:none !important;}
 }
+
+/* ------------------------------------------------------------
+   星阵主题（Default）覆盖：全屏菜单底与玻璃卡片改冷中性黑
+   ------------------------------------------------------------ */
+[data-theme="asternova"] .screen-menu{background:#050608;}
+[data-theme="asternova"] .screen-menu::after{
+  background:
+    linear-gradient(90deg,rgba(5,6,8,.88) 0%,rgba(5,6,8,.6) 42%,rgba(5,6,8,.2) 72%,rgba(5,6,8,.42) 100%),
+    linear-gradient(0deg,rgba(5,6,8,.92) 0%,rgba(5,6,8,.15) 52%,rgba(5,6,8,.5) 100%);
+}
+[data-theme="asternova"] .menu-chip,
+[data-theme="asternova"] .menu-levels-btn,
+[data-theme="asternova"] .mode-chip,
+[data-theme="asternova"] .feat-card,
+[data-theme="asternova"] .util-btn{background:rgba(10,11,13,.50);}
+[data-theme="asternova"] .menu-levels-btn:hover,
+[data-theme="asternova"] .mode-chip:hover,
+[data-theme="asternova"] .feat-card:hover,
+[data-theme="asternova"] .util-btn:hover{background:rgba(10,11,13,.70);}

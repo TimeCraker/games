@@ -1,5 +1,5 @@
 /* ============================================================
-   消消乐 v2.1 - 完整游戏版
+   StarMatrix · 星阵消消乐 v2.1 - 完整游戏版
    关卡系统 · 界面状态机 · 背景系统 · SVG图标 · 增强动效音效
    ============================================================ */
 (() => {
@@ -173,7 +173,7 @@ const SAVE = {
   saveStars(lvl,s){ this.stars[lvl]=Math.max(this.stars[lvl]||0,s); saveJSON('xxl-stars', this.stars); },
   saveBest(lvl,s){ this.best[lvl]=Math.max(this.best[lvl]||0,s); saveJSON('xxl-best', this.best); },
 };
-const themePref = store.get('xxl-theme')||'dark';
+const themePref = store.get('xxl-theme')||'asternova';
 const bgPref = store.get('xxl-bg')||'cloud';
 const soundPref = store.get('xxl-sound'); soundOn = soundPref===null?true:soundPref==='1';
 
@@ -883,10 +883,10 @@ function setTheme(t){
   document.documentElement.dataset.theme=t;
   $('themeBtn').innerHTML = ic(t==='light'?'moon':'sun');
   const st=$('setTheme'); if(st) st.value=t;
-  const mtl=$('menuThemeLabel'); if(mtl) mtl.innerHTML='主题 <span class="util-sub">· '+(t==='light'?'暖纸':'深夜')+'</span>';
+  const mtl=$('menuThemeLabel'); if(mtl) mtl.innerHTML='主题 <span class="util-sub">· '+(t==='light'?'暖纸':(t==='asternova'?'星阵':'深夜'))+'</span>';
   const mti=$('menuThemeIcon'); if(mti) mti.innerHTML=ic(t==='light'?'moon':'sun');
   const meta=document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute('content', t==='light'?'#f4f1e9':'#0b0e18');
+  if(meta) meta.setAttribute('content', t==='light'?'#f4f1e9':(t==='asternova'?'#050608':'#0b0e18'));
   store.set('xxl-theme',t);
 }
 function setBg(key){
@@ -1313,7 +1313,7 @@ function shareCard(){
   c.fillStyle='rgba(255,255,255,.6)'; c.font='600 26px "PingFang SC","Microsoft YaHei",sans-serif';
   c.fillText('MATCH-3 PUZZLE', W/2, 90);
   c.fillStyle='#ffffff'; c.font='900 62px "PingFang SC","Microsoft YaHei",sans-serif';
-  c.fillText('消消乐', W/2, 162);
+  c.fillText('StarMatrix', W/2, 162);
   const modeTxt={campaign:(currentLevel&&currentLevel.name)||'闯关模式',endless:'无尽模式',timed:'限时模式',daily:'每日挑战'}[mode]||'闯关模式';
   c.fillStyle='rgba(255,255,255,.78)'; c.font='600 30px "PingFang SC","Microsoft YaHei",sans-serif';
   c.fillText(modeTxt, W/2, 232);
@@ -1358,7 +1358,7 @@ function shareScore(){
       if(!blob){ downloadCard(cv); return; }
       const file=new File([blob],'xiaoxiaole-score.png',{type:'image/png'});
       if(navigator.canShare({files:[file]})){
-        navigator.share({files:[file], title:'消消乐成绩'}).catch(()=>downloadCard(cv));
+        navigator.share({files:[file], title:'StarMatrix 成绩'}).catch(()=>downloadCard(cv));
       } else downloadCard(cv);
     },'image/png');
   } else { downloadCard(cv); }
@@ -1541,7 +1541,7 @@ function syncSettingsUI(){
   $('setSfx').checked=settings.sfx; $('setMusic').checked=settings.music; $('setVol').value=settings.volume;
   $('setMotion').checked=settings.motion; $('setHaptic').checked=settings.haptic; $('setQuality').value=settings.quality;
   const tv=$('setVolVal'); if(tv) tv.textContent=settings.volume;
-  const st=$('setTheme'); if(st) st.value=document.documentElement.dataset.theme||'dark';
+  const st=$('setTheme'); if(st) st.value=document.documentElement.dataset.theme||'asternova';
   updateMusicLabel();
 }
 function applySettings(){

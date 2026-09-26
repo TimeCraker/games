@@ -1,13 +1,13 @@
 {
-  "name": "消消乐",
-  "short_name": "消消乐",
-  "description": "消消乐 - 立体三消游戏",
+  "name": "StarMatrix 星阵消消乐",
+  "short_name": "StarMatrix",
+  "description": "StarMatrix 星阵消消乐 - 立体三消游戏",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0b0e18",
-  "theme_color": "#0b0e18",
+  "background_color": "#050608",
+  "theme_color": "#050608",
   "icons": [
     { "src": "./assets/faces/face0.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any" }
   ]
