@@ -26,8 +26,6 @@ const CinematicBlackHole = dynamic(
 )
 
 const easeOut = cinematicEase
-const CJK = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/
-const hasCJK = (s: string) => CJK.test(s)
 
 /* ============================ 数据 ============================ */
 
@@ -37,6 +35,8 @@ type ArcadeTile = {
   index: string
   category: string
   title: string
+  /** 中文名标注（直观易懂的玩法/主题简称） */
+  titleZh: string
   blurb: string
   Icon: React.ComponentType<Hud.HudIconProps>
   featured?: boolean
@@ -49,6 +49,7 @@ const ARCADE: ArcadeTile[] = [
     index: "01",
     category: "Survivor",
     title: "Nebula Survivor",
+    titleZh: "星域突围",
     blurb: "俯视角肉鸽 · 三选一构筑 · 五条强化轨道",
     Icon: Hud.HudRadar,
     featured: true,
@@ -59,6 +60,7 @@ const ARCADE: ArcadeTile[] = [
     index: "02",
     category: "Physics",
     title: "Shoot Them All",
+    titleZh: "弹珠风暴",
     blurb: "物理弹射 · 连锁清场",
     Icon: Hud.HudTarget,
   },
@@ -68,6 +70,7 @@ const ARCADE: ArcadeTile[] = [
     index: "03",
     category: "Runner",
     title: "Let's Running",
+    titleZh: "星轨疾驰",
     blurb: "跑酷滑铲 · 极限冲刺",
     Icon: Hud.HudRunner,
   },
@@ -77,6 +80,7 @@ const ARCADE: ArcadeTile[] = [
     index: "04",
     category: "Merge",
     title: "AsterNova Merge",
+    titleZh: "星核进化",
     blurb: "合成星球 · 十级进化",
     Icon: Hud.HudMerge,
   },
@@ -85,7 +89,8 @@ const ARCADE: ArcadeTile[] = [
     href: "/xiaoxiaole",
     index: "05",
     category: "Match-3",
-    title: "恒睿消消乐",
+    title: "StarMatrix",
+    titleZh: "星阵消消乐",
     blurb: "立体三消 · 12 关闯关",
     Icon: Hud.HudHexGem,
   },
@@ -198,7 +203,6 @@ function ArcadeCard({
 }) {
   const { Icon, featured } = tile
   const art = KEY_ART[tile.slug]
-  const cjk = hasCJK(tile.title)
 
   return (
     <motion.button
@@ -267,10 +271,7 @@ function ArcadeCard({
         <div>
           <h3
             className={[
-              "font-bold leading-[1.05] text-hud-paper",
-              cjk
-                ? "font-sans tracking-[-0.03em]"
-                : "font-display tracking-[-0.01em]",
+              "font-display font-bold leading-[1.05] tracking-[-0.01em] text-hud-paper",
               featured ? "text-[1.35rem] sm:text-[1.9rem]" : "text-[1.05rem] sm:text-[1.15rem]",
             ].join(" ")}
           >
@@ -278,7 +279,15 @@ function ArcadeCard({
           </h3>
           <p
             className={[
-              "mt-1.5 leading-snug text-hud-text",
+              "mt-0.5 font-medium text-hud-accent",
+              featured ? "text-[13px] sm:text-[14px]" : "text-[11.5px] sm:text-[12px]",
+            ].join(" ")}
+          >
+            {tile.titleZh}
+          </p>
+          <p
+            className={[
+              "mt-1 leading-snug text-hud-text",
               featured ? "max-w-[34rem] text-[13px] sm:text-[14px]" : "hidden text-[12px] sm:block",
             ].join(" ")}
           >
