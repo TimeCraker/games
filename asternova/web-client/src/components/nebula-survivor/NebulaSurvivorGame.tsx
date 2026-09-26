@@ -7,6 +7,8 @@
 import * as React from "react"
 import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from "framer-motion"
 import { NebulaPixiHost } from "./render/NebulaPixiHost"
+import { nebulaSfx } from "./render/NebulaSfx"
+import { Volume2, VolumeX } from "lucide-react"
 import type { NebulaEngine, UpgradeOffer, UpgradeTrackId } from "./nebulaEngine"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { LiquidBar } from "@/src/components/ui/LiquidBar"
@@ -360,6 +362,7 @@ export function NebulaSurvivorGame() {
   const [rulesModalOpen, setRulesModalOpen] = React.useState(true)
   const [rulesModalKind, setRulesModalKind] = React.useState<RulesModalKind>("briefing")
   const [dontShowRulesAgain, setDontShowRulesAgain] = React.useState(false)
+  const [sfxOn, setSfxOn] = React.useState(() => nebulaSfx.volume > 0.001)
 
   const rulesOpenRef = React.useRef(rulesModalOpen)
   const rulesKindRef = React.useRef(rulesModalKind)
@@ -421,6 +424,17 @@ export function NebulaSurvivorGame() {
       if (localStorage.getItem(NEBULA_STORAGE_SKIP_RULES) === "1") setRulesModalOpen(false)
     } catch {
       /* ignore */
+    }
+  }, [])
+
+  // 首次手势恢复 AudioContext（autoplay 合规：手势前静默）
+  React.useEffect(() => {
+    const resume = () => nebulaSfx.ensure()
+    window.addEventListener("pointerdown", resume, { once: true })
+    window.addEventListener("keydown", resume, { once: true })
+    return () => {
+      window.removeEventListener("pointerdown", resume)
+      window.removeEventListener("keydown", resume)
     }
   }, [])
 
@@ -552,6 +566,19 @@ export function NebulaSurvivorGame() {
         <div className="flex w-24 items-center justify-end gap-1.5 sm:w-28">
           {!isMobile ? (
             <>
+              <button
+                type="button"
+                title={sfxOn ? "音效：开" : "音效：关"}
+                aria-label={sfxOn ? "关闭音效" : "开启音效"}
+                onClick={() => {
+                  const next = !sfxOn
+                  setSfxOn(next)
+                  nebulaSfx.volume = next ? 0.6 : 0
+                }}
+                className="flex min-h-[32px] w-8 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-white/80 backdrop-blur-md transition hover:bg-white/[0.11] active:scale-[0.97]"
+              >
+                {sfxOn ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+              </button>
               <button
                 type="button"
                 title="暂停（战斗中按 P 亦可）"

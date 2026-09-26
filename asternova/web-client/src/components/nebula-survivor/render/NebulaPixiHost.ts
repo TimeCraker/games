@@ -3,6 +3,7 @@ import { Application } from "pixi.js"
 import { NebulaEngine } from "../nebulaEngine"
 import { NebulaBackground } from "./NebulaBackground"
 import { NebulaScene } from "./NebulaScene"
+import { nebulaSfx } from "./NebulaSfx"
 
 /**
  * Pixi 渲染主机（对齐 StaPixiApp 模式）。
@@ -58,6 +59,12 @@ export class NebulaPixiHost {
 
     app.stage.addChild(this.bg.container)
     app.stage.addChild(this.scene.stage)
+
+    // 事件分派：渲染 Juice（场景）+ 音效（SFX）
+    this.engine.onEvent = (e) => {
+      this.scene.handleEvent(e)
+      nebulaSfx.handleEvent(e)
+    }
 
     this.ro = new ResizeObserver(() => {
       const cw = Math.max(280, Math.floor(container.clientWidth || w))

@@ -118,6 +118,7 @@ export type NebulaEvent =
   | { type: "player-healed"; x: number; y: number }
   | { type: "player-died" }
   | { type: "damage"; x: number; y: number; amount: number; tier: EnemyTier }
+  | { type: "shoot" }
 
 const MAX_ENEMIES = 3000
 /** reset 后预充能，首帧即刷出一批敌人，避免开局空场 */
@@ -663,6 +664,7 @@ export class NebulaEngine {
       })
       fired = true
     }
+    if (fired) this.onEvent?.({ type: "shoot" })
     return fired
   }
 

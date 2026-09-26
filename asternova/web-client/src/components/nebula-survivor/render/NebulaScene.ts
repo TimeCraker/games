@@ -201,11 +201,9 @@ export class NebulaScene {
       this.orbSprites.push(o)
     }
 
-    // 订阅引擎事件（引擎层零 Pixi，靠回调触发 Juice）
-    this.engine.onEvent = (e) => this.handleEvent(e)
   }
 
-  private handleEvent(e: NebulaEvent): void {
+  handleEvent(e: NebulaEvent): void {
     if (e.type === "damage") {
       this.damageNumbers.spawn(e.x, e.y, e.amount, this.engine.gameTime)
       return
