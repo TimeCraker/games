@@ -1,4 +1,7 @@
-import type { NebulaEvent } from "../nebulaEngine"
+import type { EnemyKind, SimEvent } from "../sim/types"
+
+/** 敌方档位 → 爆炸音色的档位编号 */
+const KILL_TIER: Record<EnemyKind, number> = { scout: 1, drone: 2, heavy: 3, boss: 4 }
 
 const STORAGE_VOLUME = "nebula-sfx-volume"
 
@@ -139,28 +142,47 @@ export class NebulaSfx {
     this.tone(80, 0.6, "triangle", 0.36, 28)
   }
 
-  /** 引擎事件 → 音效（纯反馈，不改模拟） */
-  handleEvent(e: NebulaEvent): void {
+  /** 三合一升星：本作唯一的高光时刻，给一段上行琶音 + 金属噪 */
+  private merge(stars: number): void {
+    const base = [660, 880, 1100, 1320]
+    const n = Math.min(4, 1 + Math.floor(stars / 2))
+    for (let i = 0; i < n; i++) {
+      window.setTimeout(() => this.tone(base[i], 0.16, "triangle", 0.20, base[i] * 1.5), i * 55)
+    }
+    this.noise(0.22, 0.24, 4200)
+  }
+
+  /** E 技：短促上扬的气流 */
+  private eskill(): void {
+    this.noise(0.16, 0.18, 1600)
+    this.tone(240, 0.2, "sine", 0.14, 900)
+  }
+
+  /** 波次推进 / Boss 登场 */
+  private bossWave(): void {
+    this.tone(110, 0.7, "sawtooth", 0.22, 55)
+    this.noise(0.5, 0.3, 600)
+  }
+
+  /** 模拟事件 → 音效（纯反馈，绝不回流进模拟） */
+  handleEvent(e: SimEvent): void {
     if (!this.ctx) return
     switch (e.type) {
-      case "shoot":
-        this.shoot()
+      case "shoot": this.shoot(); break
+      case "hit": this.hit(); break
+      case "kill":
+        if (e.kind === "boss") { this.explode(4); this.bossWave() } else this.explode(KILL_TIER[e.kind])
         break
-      case "damage":
-        this.hit()
+      case "levelup": this.levelUp(); break
+      case "pickup":
+        if (e.kind === "health") this.pickup()
+        else if (e.kind === "weapon") this.merge(1)
         break
-      case "enemy-killed":
-        this.explode(e.tier)
-        break
-      case "level-up":
-        this.levelUp()
-        break
-      case "player-healed":
-        this.pickup()
-        break
-      case "player-died":
-        this.died()
-        break
+      case "merge": this.merge(e.stars); break
+      case "hurt": this.hurt(); break
+      case "death": this.died(); break
+      case "eskill": this.eskill(); break
+      case "wave": if (e.wave % 5 === 0) this.bossWave(); break
     }
   }
 }

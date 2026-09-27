@@ -499,6 +499,15 @@ body {
   animation: lobby-enter-sheen var(--duration-slow) ease-out forwards;
 }
 
+/* ===== 2026-09-27 星域突围：雷达扫描（HUD 遥测语言，与主站同源） ===== */
+@keyframes nebula-sweep {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nebula-sweep-static { animation: none !important; }
+}
+
 /* ===== 2026-09-27 街机壳：等比缩放的 gutter / letterbox =====
    竖版 720×1280（弹珠风暴）与横版 960×540（星轨疾驰）在宽屏/竖屏下都会留大边，
    旧的实现直接铺蓝紫渐变（AI 味来源）。此处统一为「冷黑 + 琥珀星图底纹」。 */
