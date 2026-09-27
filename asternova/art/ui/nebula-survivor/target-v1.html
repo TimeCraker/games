@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Nebula Survivor · 视觉目标 v1</title>
 <style>
   :root{
@@ -17,7 +18,7 @@
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;background:var(--ink-1000);color:var(--fog-100);
     font-family:"Segoe UI",system-ui,-apple-system,"Noto Sans SC",sans-serif;overflow:hidden}
-  #stage{position:fixed;inset:0;overflow:hidden}
+  #stage{position:fixed;left:0;top:0;width:100vw;max-width:100vw;height:100dvh;overflow:hidden}
   canvas#space{position:absolute;inset:0;width:100%;height:100%}
 
   /* ---------- 底板层：网格 + 暗角 ---------- */
@@ -27,27 +28,22 @@
       linear-gradient(to bottom, rgba(140,148,158,.04) 1px, transparent 1px);
     background-size:72px 72px, 72px 72px; opacity:.9}
   #vignette{position:absolute;inset:0;
-    background:radial-gradient(ellipse 78% 70% at 50% 46%, transparent 42%, rgba(0,0,0,.72) 100%)}
+    background:radial-gradient(ellipse 82% 74% at 50% 46%, transparent 52%, rgba(0,0,0,.66) 100%)}
+  #hurt{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 76% 66% at 50% 48%, transparent 46%, rgba(192,80,58,.30) 100%)}
 
   /* ---------- 竞技场：有限边界 + 地形 ---------- */
   #arena{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
     width:1180px;height:820px;border:1px solid rgba(216,163,60,.18);border-radius:26px;
-    background:radial-gradient(ellipse 62% 58% at 50% 48%, rgba(216,163,60,.055), rgba(5,6,7,.30) 72%);
-    box-shadow:inset 0 0 140px rgba(216,163,60,.05), 0 0 0 1px rgba(0,0,0,.6)}
+    background:
+      radial-gradient(ellipse 58% 54% at 50% 48%, rgba(216,163,60,.085), rgba(5,6,7,.34) 74%),
+      linear-gradient(to right, rgba(140,148,158,.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(140,148,158,.05) 1px, transparent 1px);
+    background-size:100% 100%, 40px 40px, 40px 40px;
+    box-shadow:inset 0 0 140px rgba(216,163,60,.07), 0 0 0 1px rgba(0,0,0,.6)}
   #arena::before,#arena::after{content:"";position:absolute;width:26px;height:26px;border:2px solid rgba(216,163,60,.5)}
   #arena::before{left:-1px;top:-1px;border-right:0;border-bottom:0;border-radius:26px 0 0 0}
   #arena::after{right:-1px;bottom:-1px;border-left:0;border-top:0;border-radius:0 0 26px 0}
-  .terrain{position:absolute;background:linear-gradient(160deg,#171C22,#0D1116);
-    border:1px solid rgba(140,148,158,.16);border-radius:10px;
-    box-shadow:0 18px 34px -12px rgba(0,0,0,.85), inset 0 1px 0 rgba(233,190,105,.16)}
-  .terrain::after{content:"";position:absolute;inset:8px;border-radius:6px;
-    background:repeating-linear-gradient(115deg, rgba(255,255,255,.035) 0 2px, transparent 2px 11px)}
-  .terrain.big{width:210px;height:104px;left:118px;top:96px;transform:rotate(-4deg)}
-  .terrain.b2{width:150px;height:210px;right:132px;top:172px;transform:rotate(6deg)}
-  .terrain.b3{width:250px;height:74px;left:392px;bottom:104px;transform:rotate(2deg)}
-  .terrain.b4{width:96px;height:96px;left:246px;top:452px;border-radius:50%;transform:none}
-  .lamp{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--amber-400);
-    box-shadow:0 0 10px 2px rgba(233,190,105,.55)}
 
   /* ---------- 世界层 ---------- */
   #world{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
@@ -86,6 +82,7 @@
   .btn{height:30px;padding:0 12px;display:flex;align-items:center;gap:6px;border-radius:99px;
     border:1px solid rgba(255,255,255,.13);background:rgba(10,11,13,.55);backdrop-filter:blur(10px);
     font:500 11px/1 sans-serif;color:rgba(255,255,255,.82);white-space:nowrap}
+  .btn .ico{font-size:11px;line-height:1;opacity:.9}
 
   /* 雷达（游玩区内侧） */
   #radar{right:26px;top:74px;width:120px;height:120px;border-radius:50%;
@@ -138,15 +135,14 @@
   /* 窄屏：HUD 自适应（真实 px，不缩放） */
   @media (max-width: 700px){
     #arena{width:900px;height:1180px}
-    .terrain.big{left:80px;top:150px;width:170px;height:88px}
-    .terrain.b2{right:60px;top:300px;width:130px;height:180px}
-    .terrain.b3{left:150px;bottom:300px;width:210px;height:64px}
-    .terrain.b4{left:120px;top:640px}
     #stats{width:198px;left:12px;top:58px;padding:9px 10px}
-    #brand{top:12px}
-    #brand .n{font-size:10px}
+    #brand{top:11px}
+    #brand .n{font-size:9.5px;letter-spacing:.12em}
+    #brand .z{font-size:8px}
     #sys{right:12px;top:12px;gap:6px}
-    .btn{padding:0 10px;font-size:10px;height:28px}
+    .btn{padding:0 9px;font-size:10px;height:28px;gap:0}
+    .btn .lbl{display:none}
+    .btn .ico{font-size:12px;line-height:1}
     #radar{right:12px;top:60px;width:92px;height:92px;opacity:.9}
     #loadout{bottom:16px;gap:7px}
     .slot{width:74px;padding:6px 7px}
@@ -164,13 +160,10 @@
   <canvas id="space"></canvas>
   <div id="grid"></div>
   <div id="vignette"></div>
+  <!-- 受击红晕（低血量/挨打时的屏幕反馈，用品牌信号红而非高饱和大红） -->
+  <div id="hurt"></div>
 
-  <div id="arena">
-    <div class="terrain big"><span class="lamp" style="right:14px;bottom:12px"></span><span class="lamp" style="right:30px;bottom:12px;opacity:.5"></span></div>
-    <div class="terrain b2"><span class="lamp" style="left:12px;top:14px"></span></div>
-    <div class="terrain b3"><span class="lamp" style="left:18px;top:12px"></span><span class="lamp" style="left:36px;top:12px;opacity:.5"></span><span class="lamp" style="right:18px;top:12px"></span></div>
-    <div class="terrain b4"><span class="lamp" style="left:50%;top:50%;margin:-3px"></span></div>
-  </div>
+  <div id="arena"></div>
 
   <svg id="world" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
     <defs>
@@ -178,9 +171,83 @@
         <feGaussianBlur stdDeviation="7"/>
       </filter>
       <radialGradient id="engineGlow"><stop offset="0" stop-color="#FFF6E2" stop-opacity=".95"/><stop offset=".45" stop-color="#E9BE69" stop-opacity=".5"/><stop offset="1" stop-color="#8A6519" stop-opacity="0"/></radialGradient>
-      <linearGradient id="trail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6E2" stop-opacity=".75"/><stop offset=".45" stop-color="#E9BE69" stop-opacity=".30"/><stop offset="1" stop-color="#8A6519" stop-opacity="0"/></linearGradient>
+      <linearGradient id="flame" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6E2" stop-opacity=".95"/><stop offset=".38" stop-color="#E9BE69" stop-opacity=".55"/><stop offset="1" stop-color="#8A6519" stop-opacity="0"/></linearGradient>
+      <linearGradient id="hullLit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A545E"/><stop offset="1" stop-color="#2A3138"/></linearGradient>
+      <linearGradient id="plate" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#2A323B"/><stop offset=".5" stop-color="#171D24"/><stop offset="1" stop-color="#0C1015"/></linearGradient>
+      <linearGradient id="pipeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A444E"/><stop offset=".55" stop-color="#1B2128"/><stop offset="1" stop-color="#0A0E12"/></linearGradient>
+      <filter id="cast" x="-40%" y="-40%" width="200%" height="220%">
+        <feDropShadow dx="13" dy="19" stdDeviation="15" flood-color="#000" flood-opacity="0.82"/>
+      </filter>
       <radialGradient id="crystalGlow"><stop offset="0" stop-color="#FFF6E2" stop-opacity=".9"/><stop offset="1" stop-color="#D8A33C" stop-opacity="0"/></radialGradient>
     </defs>
+
+    <!-- ===== 地形：空间站舱段（投影 / 受光顶边 / 面板缝 / 泛光条 / 细节件 / 管线） ===== -->
+    <g id="terrain">
+      <!-- 管线（先画，压在地形下） -->
+      <g stroke-linecap="round" fill="none">
+        <path d="M600 742 L1010 566 L1104 470" stroke="url(#pipeG)" stroke-width="9"/>
+        <path d="M600 742 L1010 566 L1104 470" stroke="#05070A" stroke-width="11" opacity=".45"/>
+        <path d="M412 250 L470 404 L600 702" stroke="url(#pipeG)" stroke-width="7"/>
+      </g>
+
+      <!-- A：左上大型舱段 -->
+      <g transform="rotate(-4 311 191)" filter="url(#cast)">
+        <rect x="196" y="132" width="230" height="118" rx="6" fill="url(#plate)" stroke="#05070A" stroke-width="2"/>
+        <line x1="202" y1="136" x2="420" y2="136" stroke="#E9BE69" stroke-width="2.2" opacity=".30"/>
+        <line x1="288" y1="132" x2="288" y2="250" stroke="#05070A" stroke-width="1.4" opacity=".7"/>
+        <line x1="196" y1="180" x2="426" y2="180" stroke="#05070A" stroke-width="1.4" opacity=".55"/>
+        <rect x="206" y="146" width="66" height="22" rx="2" fill="#0E1319" stroke="#2E3339" stroke-width="1"/>
+        <rect x="304" y="150" width="98" height="12" rx="2" fill="#121820" stroke="#2E3339" stroke-width="1"/>
+        <rect x="212" y="196" width="58" height="4" rx="2" fill="#D8A33C" opacity=".85"/>
+        <circle cx="300" cy="198" r="5" fill="#0B0E12" stroke="#3A4249" stroke-width="1.2"/>
+        <circle cx="300" cy="198" r="1.8" fill="#E9BE69"/>
+        <circle cx="322" cy="198" r="5" fill="#0B0E12" stroke="#3A4249" stroke-width="1.2"/>
+        <circle cx="322" cy="198" r="1.8" fill="#E9BE69" opacity=".5"/>
+        <rect x="372" y="192" width="18" height="12" rx="2" fill="#0E1319" stroke="#2E3339" stroke-width="1"/>
+        <rect x="396" y="192" width="10" height="12" rx="2" fill="#0E1319" stroke="#2E3339" stroke-width="1"/>
+        <circle cx="392" cy="222" r="7" fill="#0B0E12" stroke="#3A4249" stroke-width="1.3"/>
+        <circle cx="392" cy="222" r="2.4" fill="#E9BE69"/>
+      </g>
+
+      <!-- B：右侧纵向舱段 -->
+      <g transform="rotate(6 1179 330)" filter="url(#cast)">
+        <rect x="1104" y="212" width="150" height="236" rx="6" fill="url(#plate)" stroke="#05070A" stroke-width="2"/>
+        <line x1="1110" y1="216" x2="1248" y2="216" stroke="#E9BE69" stroke-width="2.2" opacity=".26"/>
+        <line x1="1104" y1="300" x2="1254" y2="300" stroke="#05070A" stroke-width="1.4" opacity=".6"/>
+        <line x1="1104" y1="318" x2="1254" y2="318" stroke="#05070A" stroke-width="1.4" opacity=".45"/>
+        <line x1="1179" y1="212" x2="1179" y2="448" stroke="#05070A" stroke-width="1.4" opacity=".5"/>
+        <rect x="1118" y="232" width="122" height="26" rx="2" fill="#121820" stroke="#2E3339" stroke-width="1"/>
+        <rect x="1118" y="340" width="122" height="14" rx="2" fill="#0E1319" stroke="#2E3339" stroke-width="1"/>
+        <rect x="1118" y="364" width="122" height="14" rx="2" fill="#0E1319" stroke="#2E3339" stroke-width="1"/>
+        <rect x="1118" y="404" width="44" height="4" rx="2" fill="#D8A33C" opacity=".8"/>
+        <circle cx="1216" cy="406" r="5" fill="#0B0E12" stroke="#3A4249" stroke-width="1.2"/>
+        <circle cx="1216" cy="406" r="1.8" fill="#E9BE69"/>
+      </g>
+
+      <!-- C：底部横向长舱 -->
+      <g transform="rotate(2 602 742)" filter="url(#cast)">
+        <rect x="468" y="702" width="268" height="80" rx="6" fill="url(#plate)" stroke="#05070A" stroke-width="2"/>
+        <line x1="474" y1="706" x2="730" y2="706" stroke="#E9BE69" stroke-width="2.2" opacity=".28"/>
+        <line x1="602" y1="702" x2="602" y2="782" stroke="#05070A" stroke-width="1.4" opacity=".55"/>
+        <rect x="484" y="722" width="86" height="16" rx="2" fill="#0E1319" stroke="#2E3339" stroke-width="1"/>
+        <rect x="624" y="722" width="96" height="16" rx="2" fill="#0E1319" stroke="#2E3339" stroke-width="1"/>
+        <rect x="484" y="752" width="58" height="4" rx="2" fill="#D8A33C" opacity=".8"/>
+        <circle cx="620" cy="756" r="5" fill="#0B0E12" stroke="#3A4249" stroke-width="1.2"/>
+        <circle cx="620" cy="756" r="1.8" fill="#E9BE69"/>
+        <circle cx="700" cy="756" r="5" fill="#0B0E12" stroke="#3A4249" stroke-width="1.2"/>
+        <circle cx="700" cy="756" r="1.8" fill="#E9BE69" opacity=".45"/>
+      </g>
+
+      <!-- D：圆形储罐 -->
+      <g filter="url(#cast)">
+        <circle cx="378" cy="516" r="54" fill="url(#plate)" stroke="#05070A" stroke-width="2"/>
+        <circle cx="378" cy="516" r="42" fill="none" stroke="#05070A" stroke-width="1.3" opacity=".6"/>
+        <circle cx="378" cy="516" r="26" fill="#0E1319" stroke="#2E3339" stroke-width="1.2"/>
+        <path d="M340 480 A54 54 0 0 1 400 464" fill="none" stroke="#E9BE69" stroke-width="2.6" opacity=".30"/>
+        <circle cx="378" cy="516" r="5" fill="#E9BE69"/>
+        <circle cx="378" cy="516" r="12" fill="#D8A33C" opacity=".18"/>
+      </g>
+    </g>
 
     <!-- 弹幕 -->
     <g stroke-linecap="round">
@@ -235,6 +302,22 @@
       <path d="M470 700 l22 -15 l22 15 l-8 26 l-28 0 z" fill="#7FB39E" stroke="#1C3830" stroke-width="2" stroke-linejoin="round"/>
       <path d="M470 700 l22 -15 l22 15" fill="none" stroke="#CFE8DE" stroke-width="1.8"/>
     </g>
+    <!-- 击杀爆炸：核心闪光 + 冲击环 + 迸溅碎块 -->
+    <g transform="translate(1038,478)">
+      <circle class="glow" r="30" fill="#C08069" opacity=".22"/>
+      <circle class="glow" r="11" fill="#FFF6E2" opacity=".9"/>
+      <circle r="34" fill="none" stroke="#FFF6E2" stroke-width="2.5" opacity=".55"/>
+      <circle r="52" fill="none" stroke="#E9BE69" stroke-width="1.6" opacity=".35"/>
+      <circle r="72" fill="none" stroke="#E9BE69" stroke-width="1" opacity=".14"/>
+      <g fill="#E8CBB8">
+        <rect x="-58" y="-14" width="7" height="3" rx="1" transform="rotate(-22)"/>
+        <rect x="46" y="-22" width="6" height="3" rx="1" transform="rotate(34)"/>
+        <rect x="18" y="50" width="7" height="3" rx="1" transform="rotate(72)"/>
+        <rect x="-38" y="38" width="6" height="3" rx="1" transform="rotate(118)"/>
+        <rect x="-12" y="-52" width="6" height="3" rx="1" transform="rotate(-64)"/>
+      </g>
+    </g>
+
     <!-- 炮口闪光 -->
     <g class="glow" opacity=".9">
       <circle cx="700" cy="392" r="9" fill="#FFF6E2" opacity=".9"/>
@@ -248,31 +331,55 @@
       <path d="M756 630 l11 16 l-11 4 z" fill="#F2D79B"/>
     </g>
 
-    <!-- 玩家舰：多层矢量（船体/机翼/座舱/引擎）+ 尾迹 -->
-    <g transform="translate(700,436)">
-      <ellipse cx="0" cy="44" rx="13" ry="34" fill="url(#trail)" opacity=".75"/>
-      <circle class="glow" cx="-7" cy="26" r="13" fill="url(#engineGlow)"/>
-      <circle class="glow" cx="7" cy="26" r="13" fill="url(#engineGlow)"/>
-      <!-- 机翼 -->
-      <path d="M-9 4 L-34 22 L-32 30 L-9 18 Z" fill="#171C22" stroke="#05070A" stroke-width="2" stroke-linejoin="round"/>
-      <path d="M9 4 L34 22 L32 30 L9 18 Z" fill="#171C22" stroke="#05070A" stroke-width="2" stroke-linejoin="round"/>
-      <path d="M-9 4 L-34 22 L-32 30 L-9 18 Z" fill="none" stroke="#E9BE69" stroke-width="1.2" opacity=".35"/>
-      <path d="M9 4 L34 22 L32 30 L9 18 Z" fill="none" stroke="#E9BE69" stroke-width="1.2" opacity=".2"/>
-      <!-- 船体 -->
-      <path d="M0 -30 L11 -4 L10 20 L6 30 L-6 30 L-10 20 L-11 -4 Z" fill="#2A3138" stroke="#05070A" stroke-width="2.4" stroke-linejoin="round"/>
-      <path d="M0 -30 L11 -4 L0 -8 L-11 -4 Z" fill="#4A545E"/>
-      <path d="M0 -30 L11 -4 L10 20 L6 30 L0 30 Z" fill="#10141A" opacity=".55"/>
-      <!-- 座舱 -->
-      <path d="M0 -14 L5 -3 L0 6 L-5 -3 Z" fill="#D8A33C" stroke="#8A6519" stroke-width="1.2"/>
-      <path d="M0 -14 L5 -3 L0 -3 Z" fill="#FFF6E2"/>
-      <!-- 炮口 -->
-      <path d="M0 -30 L0 -40" stroke="#E9BE69" stroke-width="2.6" stroke-linecap="round"/>
+    <!-- 玩家舰：俯视角战舰（宽体船身 / 后掠翼 / 翼尖灯舱 / 双引擎喷口）
+         上一版画成了又细又长 + 长拖尾 = 看着像一把剑，这里按"俯视战舰"重画 -->
+    <g transform="translate(700,424)">
+      <!-- 引擎焰：短促外扩 -->
+      <ellipse cx="-8" cy="46" rx="7" ry="18" fill="url(#flame)"/>
+      <ellipse cx="8" cy="46" rx="7" ry="18" fill="url(#flame)"/>
+      <circle class="glow" cx="-8" cy="31" r="12" fill="url(#engineGlow)"/>
+      <circle class="glow" cx="8" cy="31" r="12" fill="url(#engineGlow)"/>
+
+      <!-- 后掠机翼 -->
+      <path d="M-12 -3 L-34 12 L-31 26 L-11 17 Z" fill="#171C22" stroke="#05070A" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M12 -3 L34 12 L31 26 L11 17 Z" fill="#171C22" stroke="#05070A" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M-12 -3 L-34 12" stroke="#7C8794" stroke-width="1.5" opacity=".55"/>
+      <path d="M12 -3 L34 12" stroke="#7C8794" stroke-width="1.5" opacity=".22"/>
+      <!-- 翼尖灯舱 -->
+      <rect x="-39" y="7" width="8" height="15" rx="2" fill="#22262B" stroke="#05070A" stroke-width="1.6"/>
+      <rect x="31" y="7" width="8" height="15" rx="2" fill="#22262B" stroke="#05070A" stroke-width="1.6"/>
+      <circle cx="-35" cy="10" r="1.9" fill="#E9BE69"/>
+      <circle cx="35" cy="10" r="1.9" fill="#E9BE69" opacity=".75"/>
+      <!-- 翼上武器硬点 -->
+      <rect x="-27" y="3" width="11" height="4" rx="1" fill="#D8A33C" opacity=".9"/>
+      <rect x="16" y="3" width="11" height="4" rx="1" fill="#D8A33C" opacity=".9"/>
+
+      <!-- 船体：前尖后宽，宽高比 ≈ 1:1.25 -->
+      <path d="M0 -33 C6 -24 11 -14 11 -2 L13 26 L-13 26 L-11 -2 C-11 -14 -6 -24 0 -33 Z"
+            fill="url(#hullLit)" stroke="#05070A" stroke-width="2.6" stroke-linejoin="round"/>
+      <path d="M0 -33 C6 -24 11 -14 11 -2 L13 26 L0 26 Z" fill="#0F1318" opacity=".72"/>
+      <path d="M0 -33 C-6 -24 -11 -14 -11 -2 L-13 26 L0 26 Z" fill="#3C464F" opacity=".38"/>
+      <!-- 背部结构线 -->
+      <path d="M-9 7 L9 7" stroke="#05070A" stroke-width="1.3" opacity=".75"/>
+      <path d="M-10 15 L10 15" stroke="#05070A" stroke-width="1.3" opacity=".6"/>
+      <!-- 座舱（靠前狭长水滴） -->
+      <path d="M0 -25 C4.5 -20 6 -12 5 -4 L-5 -4 C-6 -12 -4.5 -20 0 -25 Z" fill="#D8A33C" stroke="#8A6519" stroke-width="1.3"/>
+      <path d="M0 -25 C3 -21 4 -16 4 -12 L0 -12 Z" fill="#FFF6E2"/>
+      <!-- 双引擎喷口 -->
+      <rect x="-12" y="24" width="9" height="9" rx="2" fill="#0B0E12" stroke="#4A545E" stroke-width="1.4"/>
+      <rect x="3" y="24" width="9" height="9" rx="2" fill="#0B0E12" stroke="#4A545E" stroke-width="1.4"/>
+      <!-- 舰首炮口 -->
+      <path d="M0 -33 L0 -42" stroke="#E9BE69" stroke-width="2.8" stroke-linecap="round"/>
     </g>
   </svg>
 
   <!-- HUD -->
   <div id="brand"><div class="n">NEBULA SURVIVOR</div><div class="z">星 域 突 围</div></div>
-  <div id="sys"><div class="btn">◔ 音效</div><div class="btn">暂停</div><div class="btn">规则</div></div>
+  <div id="sys">
+    <div class="btn" aria-label="音效"><span class="ico">◔</span><span class="lbl">音效</span></div>
+    <div class="btn" aria-label="暂停"><span class="ico">❙❙</span><span class="lbl">暂停</span></div>
+    <div class="btn" aria-label="规则"><span class="ico">?</span><span class="lbl">规则</span></div>
+  </div>
 
   <div id="stats" class="panel corners">
     <div class="row"><span class="wave">WAVE <b>03</b></span><span class="eyebrow">LV <b class="data" style="color:var(--fog-100)">07</b></span></div>
@@ -333,25 +440,48 @@
     const g = ctx.createLinearGradient(0,0,0,h);
     g.addColorStop(0,'#0b0d12'); g.addColorStop(.55,'#08090d'); g.addColorStop(1,'#050608');
     ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-    // 星云带（品牌琥珀，极低 alpha，营造纵深）
-    const clouds = [[.28,.30,.62,.10],[.74,.62,.55,.085],[.52,.20,.40,.06]];
-    for (const [cx,cy,r,a] of clouds){
+    // —— 星云带：品牌琥珀为主 + 青柠苔绿副色（副色只做极小面积点缀，守住"单一主色"红线） ——
+    const clouds = [
+      [.26,.28,.62,.115,'216,163,60'], [.76,.60,.56,.09,'216,163,60'],
+      [.50,.16,.44,.07,'216,163,60'],  [.86,.24,.34,.05,'156,184,106'],
+      [.12,.74,.30,.045,'156,184,106']
+    ];
+    for (const [cx,cy,r,a,rgb] of clouds){
       const rg = ctx.createRadialGradient(w*cx,h*cy,0,w*cx,h*cy,Math.max(w,h)*r);
-      rg.addColorStop(0,'rgba(216,163,60,'+a+')'); rg.addColorStop(1,'rgba(216,163,60,0)');
+      rg.addColorStop(0,'rgba('+rgb+','+a+')'); rg.addColorStop(1,'rgba('+rgb+',0)');
       ctx.fillStyle = rg; ctx.fillRect(0,0,w,h);
     }
-    // 远景行星弧光（极低 alpha 的巨物感，提供纵深与"我在某颗星球轨道上"的叙事）
+    // —— 远景行星：本体 + 大气辉光 + 受光侧轮廓光（巨物感与纵深） ——
     (function(){
-      const cx = w*0.10, cy = h*1.06, R = h*0.78;
-      const pg = ctx.createRadialGradient(cx,cy,R*0.92,cx,cy,R*1.04);
-      pg.addColorStop(0,'rgba(216,163,60,0)'); pg.addColorStop(.55,'rgba(216,163,60,.10)'); pg.addColorStop(1,'rgba(216,163,60,0)');
-      ctx.fillStyle = pg; ctx.beginPath(); ctx.arc(cx,cy,R*1.04,0,6.2832); ctx.fill();
-      const body = ctx.createRadialGradient(cx-R*0.3,cy-R*0.5,R*0.1,cx,cy,R);
-      body.addColorStop(0,'rgba(20,24,30,.92)'); body.addColorStop(1,'rgba(5,6,7,.98)');
+      const cx = w*0.08, cy = h*1.10, R = h*0.82;
+      // 大气层
+      const atmo = ctx.createRadialGradient(cx,cy,R*0.94,cx,cy,R*1.10);
+      atmo.addColorStop(0,'rgba(216,163,60,.16)'); atmo.addColorStop(.5,'rgba(216,163,60,.05)'); atmo.addColorStop(1,'rgba(216,163,60,0)');
+      ctx.fillStyle = atmo; ctx.beginPath(); ctx.arc(cx,cy,R*1.10,0,6.2832); ctx.fill();
+      // 星球本体（左上有微弱受光）
+      const body = ctx.createRadialGradient(cx-R*0.42,cy-R*0.46,R*0.05,cx,cy,R);
+      body.addColorStop(0,'rgba(38,44,54,.95)'); body.addColorStop(.45,'rgba(18,22,28,.96)'); body.addColorStop(1,'rgba(4,5,6,1)');
       ctx.fillStyle = body; ctx.beginPath(); ctx.arc(cx,cy,R,0,6.2832); ctx.fill();
+      // 受光侧轮廓光
+      ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,R,0,6.2832); ctx.clip();
+      const rim = ctx.createLinearGradient(cx-R*0.8,cy-R*0.9,cx+R*0.2,cy-R*0.2);
+      rim.addColorStop(0,'rgba(233,190,105,.28)'); rim.addColorStop(1,'rgba(233,190,105,0)');
+      ctx.strokeStyle = rim; ctx.lineWidth = R*0.035; ctx.beginPath(); ctx.arc(cx,cy,R*0.99,0,6.2832); ctx.stroke();
+      ctx.restore();
     })();
-    // 星点三层（大小/alpha 分层 = 视差暗示）
-    const layers = [[260,0.55,1.0],[420,0.30,1.6],[180,0.75,2.4]];
+    // —— 尘埃带：一层低 alpha 的粒子斜带，把星空与战场连起来 ——
+    (function(){
+      const rnd = mulberry32(77001);
+      ctx.save(); ctx.translate(w*0.5,h*0.46); ctx.rotate(-0.28);
+      for (let i=0;i<90;i++){
+        const x=(rnd()-0.5)*w*1.5, y=(rnd()-0.5)*h*0.26, s=(0.3+rnd()*0.7)*dpr;
+        ctx.globalAlpha=0.03+rnd()*0.05; ctx.fillStyle='#E9BE69';
+        ctx.beginPath(); ctx.arc(x,y,s,0,6.2832); ctx.fill();
+      }
+      ctx.restore(); ctx.globalAlpha=1;
+    })();
+    // 星点四层（大小/alpha 分层 = 视差暗示）
+    const layers = [[300,0.50,0.9],[460,0.28,1.5],[200,0.70,2.2],[70,0.95,3.4]];
     let seed = 20260927;
     for (const [n,alpha,size] of layers){
       const rnd = mulberry32(seed++);
@@ -363,6 +493,18 @@
       }
     }
     ctx.globalAlpha = 1;
+    // 主星：少量带十字星芒的亮星，制造"焦距"与视觉锚点
+    (function(){
+      const rnd = mulberry32(4242);
+      for (let i=0;i<7;i++){
+        const x=rnd()*w, y=rnd()*h, r=(1.6+rnd()*1.4)*dpr, L=(16+rnd()*22)*dpr;
+        const gg=ctx.createRadialGradient(x,y,0,x,y,r*5);
+        gg.addColorStop(0,'rgba(255,246,226,.95)'); gg.addColorStop(.35,'rgba(242,215,155,.28)'); gg.addColorStop(1,'rgba(242,215,155,0)');
+        ctx.fillStyle=gg; ctx.beginPath(); ctx.arc(x,y,r*5,0,6.2832); ctx.fill();
+        ctx.strokeStyle='rgba(255,246,226,.34)'; ctx.lineWidth=Math.max(1,dpr*0.6);
+        ctx.beginPath(); ctx.moveTo(x-L,y); ctx.lineTo(x+L,y); ctx.moveTo(x,y-L); ctx.lineTo(x,y+L); ctx.stroke();
+      }
+    })();
   }
   addEventListener('resize', resize); resize();
 })();
