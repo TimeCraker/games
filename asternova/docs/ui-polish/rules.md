@@ -127,6 +127,14 @@
   实为**后端服务已随子代理会话结束被回收**，探针打在浏览器错误页上；而**错误页的 rAF 照样跑**，
   于是 `rafFrames=75` 成了彻头彻尾的假阳性。戳破它的是 `localStorage: Access is denied`（错误页是 opaque origin）。
 - 视觉验收**必须亲眼看图**，不要用「我改完了」代替；改动涉及图片时记得**注销 Service Worker + 清 CacheStorage** 再截图，否则会读到旧图。
+- ⚠️ **换了图片素材仍看到旧图时，先查 Next 16 的服务端图片缓存，而不是怀疑自己没改对**（2026-09-27 实测 30 分钟）：
+  - 缓存路径是 **`.next/dev/cache/images/`**（不是旧版本的 `.next/cache/images`，后者是升级残留，删了没用）；
+  - 缓存**按输出格式分别存**（同一 URL 的 webp 变体与 jpeg 变体是两条独立缓存），
+    所以会出现「我直接 curl 看到的是新图、浏览器看到的还是旧图」这种极难自证的假象 ——
+    因为浏览器的 `Accept: image/avif,image/webp,...` 命中的是另一条缓存；
+  - 取证时**必须用浏览器同款 Accept 头**复现：`Invoke-WebRequest -Headers @{Accept="image/avif,image/webp,*/*;q=0.8"}`；
+  - 正确处置：删 `.next/dev/cache/images` **并重启 dev server**（只删目录不重启仍有内存态）；
+  - 反过来，判断「我到底改对没有」的最快手段是**直接比对 `public/` 下源文件的字节数/哈希**，而不是看图。
 - 需要渲染状态但无法从 DOM 观察时，挂**只读调试钩子**（先例：`window.__staEngine`）。它是定位上面那个 NaN 的唯一手段。
 
 ## 15. 缩放容器禁令（2026-09-27 取证，比 §11 更硬的一条）

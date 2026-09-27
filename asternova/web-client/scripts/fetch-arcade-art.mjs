@@ -26,7 +26,9 @@ const PICKS = [
   { slug: "shoot-them-all",  id: "PIA03606",                      pos: "attention", w: 900,  h: 600,  label: "蟹状星云（超新星爆发遗迹）",       grade: { saturation: 1.08, brightness: 0.97, contrast: 1.06 } },
   { slug: "lets-running",    id: "PIA21778",                      pos: "attention", w: 900,  h: 600,  label: "木星边缘与大红斑（沿弧线的疾驰感）", grade: { saturation: 1.10, brightness: 0.98, contrast: 1.05 } },
   { slug: "merge",           id: "GSFC_20171208_Archive_e001327", pos: "attention", w: 900,  h: 600,  label: "触须星系（两星系合并）",           grade: { saturation: 1.06, brightness: 0.97, contrast: 1.06 } },
-  { slug: "nebula-survivor", id: "PIA25434",                      pos: "attention", w: 1600, h: 1000, label: "猎户座星云",                       grade: { saturation: 1.05, brightness: 0.96, contrast: 1.04 } },
+  // 2026-09-27：原色（猎户座星云）呈紫/品红，违反品牌禁紫红线且代码 grep 抓不到图片层；
+  // 本作是大厅精选位，改走脚本已有的 duotone 通道（与 xiaoxiaole 同管线）收敛到品牌琥珀。
+  { slug: "nebula-survivor", id: "PIA25434",                      pos: "attention", w: 1600, h: 1000, label: "猎户座星云",                       grade: { duotone: "#D8A33C", brightness: 1.06, contrast: 1.10 } },
   { slug: "xiaoxiaole",      id: "PIA21327",                      pos: "attention", w: 900,  h: 600,  label: "土星极地六边形与环（Hail the Hexagon）", grade: { duotone: "#D8A33C", brightness: 1.14, contrast: 1.08 } },
   // 大厅背景氛围层（强模糊 + 低透明度使用，故单独宽幅）
   { slug: "bg-nebula",       query: "Carina Nebula",              pos: "attention", w: 1920, h: 1080, label: "船底座星云（大厅背景氛围）",        grade: { saturation: 0.92, brightness: 0.86, contrast: 1.0 }, isBackground: true },
