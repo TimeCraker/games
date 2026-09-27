@@ -229,8 +229,8 @@ export function NebulaGame() {
           titleId="nebula-briefing-title"
           eyebrow={<p className={`mb-1 text-center text-[10px] uppercase tracking-[0.32em] text-white/45 ${MONO}`}>Briefing</p>}
           title="星域突围"
-          subtitle={<span className="text-[13px] text-white/55">读完点击「进入船坞」开始</span>}
-          label="进入船坞"
+          subtitle={<span className="text-[13px] text-white/55">读完点击「进入机库」开始</span>}
+          label="进入机库"
           onConfirm={onBriefingConfirm}
           skipRules={{ checked: dontShow, onChange: setDontShow, label: "下次不再显示（本机记住）" }}
         >
@@ -290,7 +290,7 @@ export function NebulaGame() {
               { label: "波次", value: String(ui.wave) },
               { label: "等级", value: String(ui.level) },
             ]}
-            actionLabel="返回船坞"
+            actionLabel="返回机库"
             onAction={() => setPhase("hangar")}
           />
         ) : null}
@@ -332,7 +332,7 @@ function HangarPanel({ classId, onPick, onLaunch }: { classId: ClassId; onPick: 
     >
       <div className="mx-auto w-full max-w-[880px]">
         <p className={`text-[10px] uppercase tracking-[0.32em] text-white/45 ${MONO}`}>Hangar</p>
-        <h2 id="nebula-hangar-title" className="mt-1 text-xl font-semibold tracking-tight text-white">船坞 · 选择舰船</h2>
+        <h2 id="nebula-hangar-title" className="mt-1 text-xl font-semibold tracking-tight text-white">机库 · 选择机型</h2>
         <p className="mt-1 text-[12px] text-white/50">
           金币 <b className="text-hud-accent-bright">{save.coins}</b> · 经验 <b className="text-hud-accent-bright">{save.xp}</b>
         </p>

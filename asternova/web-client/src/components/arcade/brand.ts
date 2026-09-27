@@ -74,7 +74,7 @@ export const ARCADE_BRAND: Record<ArcadeSlug, ArcadeBrand> = {
     category: "Survivor",
     titleEn: "Nebula Survivor",
     titleZh: "星域突围",
-    tagline: "俯视角肉鸽 · 武器三合一升星 · 五舰种构筑",
+    tagline: "俯视角肉鸽 · 武器三合一升星 · 五机型舰装",
     accentVar: "--arcade-nebula",
     featured: true,
   },

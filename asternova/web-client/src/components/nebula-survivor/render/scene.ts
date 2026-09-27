@@ -3,7 +3,7 @@ import { Container, Graphics, Sprite, Text, Texture, type Renderer } from "pixi.
 import type { Sim } from "../sim/Sim"
 import type { EnemyKind, SimEvent, WeaponId } from "../sim/types"
 import { buildArena } from "./arena"
-import { C, drawBullet, drawDrop, drawEnemy, drawEnemyShot, drawField, drawShip, tierColor } from "./art"
+import { C, drawBullet, drawDrop, drawEnemy, drawEnemyShot, drawField, drawPilot, tierColor } from "./art"
 import { NebulaBackground } from "./bg"
 import { whitePixel } from "./textures"
 
@@ -104,7 +104,7 @@ export class NebulaScene {
     }
 
     this.tex = {
-      ship: bakeAt(drawShip),
+      ship: bakeAt(drawPilot),
       enemy: enemyTex,
       bullet: bakeAt(drawBullet),
       eshot: bakeAt(drawEnemyShot),

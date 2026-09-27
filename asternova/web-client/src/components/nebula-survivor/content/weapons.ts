@@ -34,7 +34,7 @@ export type WeaponDef = {
 
 export const WEAPONS: Record<WeaponId, WeaponDef> = {
   // ── 近战：船头撞角 / 回旋刃 / 牵引钩 / 快刀 ──
-  ram:     { id: "ram",     name: "撞角",     kind: "melee", blurb: "船头硬撞，击退并造成高额单次伤害", dmg: 26, starScale: 0.45, cd: 0.95, range: 92,  rangePerStar: 10, speed: 1.4,  pierce: 99 },
+  ram:     { id: "ram",     name: "冲角",     kind: "melee", blurb: "舰装前突硬撞，击退并造成高额单次伤害", dmg: 26, starScale: 0.45, cd: 0.95, range: 92,  rangePerStar: 10, speed: 1.4,  pierce: 99 },
   blade:   { id: "blade",   name: "回旋刃",   kind: "melee", blurb: "绕船环绕的旋转刃，持续切割近身敌人", dmg: 9,  starScale: 0.40, cd: 0.30, range: 78,  rangePerStar: 8,  speed: 3.1,  pierce: 99 },
   hook:    { id: "hook",    name: "牵引钩",   kind: "melee", blurb: "勾住并把敌人拽向自己，打断冲锋节奏",   dmg: 15, starScale: 0.42, cd: 1.15, range: 148, rangePerStar: 14, speed: 0.9,  pierce: 3 },
   edge:    { id: "edge",    name: "快刀",     kind: "melee", blurb: "极短间隔的贴身快斩，吃走位与贴脸",   dmg: 7,  starScale: 0.38, cd: 0.16, range: 56,  rangePerStar: 5,  speed: 3.6,  pierce: 99 },
