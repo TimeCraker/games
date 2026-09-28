@@ -1,15 +1,18 @@
 import type Matter from "matter-js"
 
+/**
+ * 实体种类 = matter body label 的语义化视图。
+ *
+ * 与旧版（肉鸽 7 类钉 + 敌人 + 涡流）切割：白皮书定稿后只剩
+ * 3 类钉（bomb 预留）+ 2 类障碍 + 球。
+ */
 export type EntityKind =
   | "ball"
   | "peg-crystal"
   | "peg-resonance"
-  | "peg-life"
-  | "peg-pulsar"
-  | "peg-magnetar"
-  | "peg-supernova"
-  | "well"
-  | "enemy"
+  | "peg-bomb"
+  | "obstacle-stone"
+  | "obstacle-ice"
 
 export interface Entity {
   /** matter body.id，唯一 */
@@ -18,13 +21,13 @@ export interface Entity {
   body: Matter.Body
   hp: number
   alive: boolean
-  /** 游戏状态附加（如敌人充能、钉子倍率档），不持 sprite（渲染层自管） */
+  /** 游戏状态附加（障碍的 w/h、球种等），不持 sprite（渲染层自管） */
   meta?: Record<string, unknown>
 }
 
 /**
- * Entity 注册表（Stage Spec §8.4）。
- * 引擎层零 Pixi 依赖：只存 body + 游戏状态；渲染层另持 bodyId→sprite 映射。
+ * Entity 注册表（引擎层零 Pixi 依赖）。
+ * 只存 body + 游戏状态；渲染层另持 bodyId→sprite 映射。
  * 按类型分桶 O(1) 查询，替代每帧 Composite.allBodies().filter() 全表扫。
  */
 export class EntityRegistry {
@@ -61,7 +64,7 @@ export class EntityRegistry {
     return [...(this.byKind.get(kind) ?? [])]
   }
 
-  /** 所有存活实体（含静态钉子） */
+  /** 所有存活实体（含静态钉子/障碍） */
   all(): Entity[] {
     return [...this.byId.values()]
   }
@@ -73,5 +76,6 @@ export class EntityRegistry {
   clear(): void {
     this.byId.clear()
     this.byKind.clear()
+    this.version++
   }
 }

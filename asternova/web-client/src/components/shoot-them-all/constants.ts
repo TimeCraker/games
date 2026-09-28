@@ -44,6 +44,31 @@ export const BG_GRADIENT = {
 } as const
 
 /**
+ * 玩法规则数值（白皮书 §4/§5/§7）。
+ * 都是「首发放个像样的数」，实测后再调 —— 集中放这里避免散落各处。
+ */
+export const RULES = {
+  /** 钉基础分：晶体 100 / 共鸣 150 / 炸弹钉（预留） */
+  pegScore: { crystal: 100, resonance: 150, bomb: 200 },
+  /** 障碍击碎奖励（少量分） */
+  obstacleScore: 80,
+  /**
+   * 连击加成：同一次出手内第 n 颗钉 ×(1 + 0.1*(n-1))，封顶 2×。
+   * 例：第 1 颗 ×1.0、第 2 颗 ×1.1 … 第 11 颗起恒 ×2.0。
+   */
+  comboStep: 0.1,
+  comboCap: 2,
+  /** 爆裂弹清场半径（px，白皮书「~90px」） */
+  blastRadius: 90,
+  /** 每次命中对钉的伤害（heavy 高伤，可秒大钉 hp=2） */
+  pegDamage: { standard: 1, blast: 1, pierce: 1, heavy: 2 },
+  /** 仅 heavy 对障碍造成伤害（其他球碰障碍只弹开） */
+  heavyObstacleDamage: 2,
+  /** 球落定/出界后到下一球的短暂停顿（ms，留给 UI 播反馈） */
+  resolveMs: 400,
+} as const
+
+/**
  * 物理参数（Stage Spec §3.2/§3.3/§3.5/§3.7/§3.10）。
  * 引擎层与渲染层共享；引擎层零 React/Pixi 依赖。
  */

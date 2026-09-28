@@ -80,7 +80,10 @@ export class StaPixiApp {
 
   destroy(): void {
     if (typeof window !== "undefined") {
-      delete (window as unknown as { __staEngine?: GameEngine }).__staEngine
+      // 只摘自己的钩子：StrictMode 双挂载下旧实例的 destroy 可能晚于新实例 mount 到达，
+      // 无条件 delete 会把新实例刚挂上的 __staEngine 一并抹掉（自动化探针就瞎了）。
+      const w = window as unknown as { __staEngine?: GameEngine }
+      if (w.__staEngine === this.engine) delete w.__staEngine
     }
     this.engine?.destroy()
     this.engine = null

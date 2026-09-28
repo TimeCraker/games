@@ -18,6 +18,13 @@ export class PhysicsWorld {
   private customForces: CustomForceFn[] = []
   private accumulator = 0
 
+  /**
+   * 非静态体速度上限（px/步），每固定子步后钳制；null = 不钳制。
+   * 必须逐子步钳（而不是每帧钳一次）：GhostPredictor.predict 的幽灵球就是逐子步钳的，
+   * 两边节奏不一致会在加速段逐帧漂移，轨迹预测误差直接超 2px 验收线。
+   */
+  maxSpeed: number | null = null
+
   constructor() {
     this.engine = Matter.Engine.create({
       gravity: { x: 0, y: PHYS.gravityY, scale: 0.001 },
@@ -75,6 +82,17 @@ export class PhysicsWorld {
     while (this.accumulator >= PHYS.fixedDelta && steps < 5) {
       this.applyCustomForces(PHYS.fixedDelta)
       Matter.Engine.update(this.engine, PHYS.fixedDelta)
+      // 逐子步钳速：与 GhostPredictor.predict 同节奏，保证预测与实弹同轨
+      if (this.maxSpeed !== null) {
+        for (const b of Matter.Composite.allBodies(this.world)) {
+          if (b.isStatic) continue
+          const sp = Math.hypot(b.velocity.x, b.velocity.y)
+          if (sp > this.maxSpeed) {
+            const k = this.maxSpeed / sp
+            Matter.Body.setVelocity(b, { x: b.velocity.x * k, y: b.velocity.y * k })
+          }
+        }
+      }
       this.accumulator -= PHYS.fixedDelta
       steps++
     }

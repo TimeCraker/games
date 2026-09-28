@@ -2,14 +2,13 @@
 
 import * as React from "react"
 
-import { NODE_CLEAR_RATIO, type GameEngine, type StaHudState } from "./engine/GameEngine"
+import type { GameEngine, StaHudState } from "./engine/GameEngine"
 
 /**
- * 弹珠风暴 HUD。
+ * 弹珠风暴 HUD（关卡制白皮书 §5 版，最小适配）。
  *
- * 在此之前这个游戏**画面上没有任何 HUD** —— 实测只是一片空画布 + 24 颗小六边形，
- * 既不知道得分、也不知道还剩几颗、更不知道打多少算过关（是 5 个游戏里最不像游戏的）。
- * 本 HUD 的全部数值都取自 GameEngine 的真实状态，没有一个是装饰性假数字。
+ * 全部数值取自 GameEngine.hudSnapshot() 的真实状态，没有装饰性假数字。
+ * 视觉精雕是下一波美术/UI agent 的事，这里只保证信息完整可读。
  *
  * ⚠️ 尺寸单位是「逻辑画布像素」：HUD 位于 StaGameShell 的等比缩放容器内（720×1280），
  * 手机竖屏下 scale ≈ 0.5，所以这里必须按 2 倍余量给字号（24–40）才能落到真实 12–20px。
@@ -32,20 +31,27 @@ export function StaHud({ engine }: { engine: GameEngine | null }) {
 
   if (!hud) return null
 
-  const pct = Math.min(100, Math.round(hud.clearRatio * 100))
-  const targetPct = Math.round(NODE_CLEAR_RATIO * 100)
-  const cleared = hud.pegsTotal - hud.pegsLeft
+  const pct = Math.min(100, Math.round(hud.progress * 100))
+  const ballLabel: Record<string, string> = {
+    standard: "标",
+    blast: "爆",
+    pierce: "穿",
+    heavy: "重",
+  }
 
   return (
     <div className="pointer-events-none absolute inset-0 z-10 select-none">
-      {/* 左上：节点 + 得分 */}
+      {/* 左上：关卡 + 得分/目标 */}
       <div className="absolute left-5 top-5 flex flex-col gap-2">
         <div className="flex items-baseline gap-3 border border-hud-line bg-ink-1000/70 px-4 py-1.5 backdrop-blur-sm">
           <span className="font-mono-data text-[16px] uppercase tracking-[0.24em] text-hud-text-faint">
-            NODE
+            LV
           </span>
           <span className="font-mono-data text-[30px] font-bold leading-none tabular-nums text-hud-paper">
-            {String(hud.node).padStart(2, "0")}
+            {String(hud.levelId).padStart(2, "0")}
+          </span>
+          <span className="font-mono-data text-[18px] tracking-[0.12em] text-hud-text-dim">
+            {hud.levelName}
           </span>
         </div>
         <div className="flex items-baseline gap-3 border border-hud-line bg-ink-1000/70 px-4 py-1.5 backdrop-blur-sm">
@@ -55,14 +61,43 @@ export function StaHud({ engine }: { engine: GameEngine | null }) {
           <span className="font-mono-data text-[34px] font-bold leading-none tabular-nums text-hud-accent-bright">
             {hud.score.toLocaleString("en-US")}
           </span>
+          <span className="font-mono-data text-[18px] tabular-nums text-hud-text-faint">
+            / {hud.targetScore.toLocaleString("en-US")}
+          </span>
         </div>
         <div className="flex items-center gap-4 pl-1">
           <span className="font-mono-data text-[17px] tracking-[0.12em] text-hud-text-faint">
-            出手 <span className="text-hud-text-dim">{hud.shots}</span>
+            球 <span className="text-hud-text-dim">{hud.ballsLeft}</span>
           </span>
           {hud.bestCombo > 1 ? (
             <span className="font-mono-data text-[17px] tracking-[0.12em] text-hud-text-faint">
               最佳连击 <span className="text-hud-text-dim">{hud.bestCombo}</span>
+            </span>
+          ) : null}
+        </div>
+      </div>
+
+      {/* 右上：球组队列（按打出顺序，当前球高亮） */}
+      <div className="absolute right-5 top-5 flex flex-col items-end gap-2">
+        <span className="font-mono-data text-[15px] uppercase tracking-[0.22em] text-hud-text-faint">
+          BALLS
+        </span>
+        <div className="flex gap-1.5">
+          {hud.ballQueue.map((k, i) => (
+            <span
+              key={`${k}-${i}`}
+              className={
+                i === 0
+                  ? "flex h-11 w-11 items-center justify-center border border-hud-accent bg-hud-accent/25 font-display text-[19px] font-bold text-hud-accent-bright"
+                  : "flex h-11 w-11 items-center justify-center border border-hud-line bg-ink-1000/70 font-display text-[19px] text-hud-text-dim"
+              }
+            >
+              {ballLabel[k] ?? "?"}
+            </span>
+          ))}
+          {hud.ballQueue.length === 0 ? (
+            <span className="flex h-11 items-center px-2 font-mono-data text-[16px] text-hud-text-faint">
+              —
             </span>
           ) : null}
         </div>
@@ -80,15 +115,38 @@ export function StaHud({ engine }: { engine: GameEngine | null }) {
         </div>
       ) : null}
 
-      {/* 底部：清除进度 + 75% 过关刻度 */}
+      {/* 终态角标：过关星级 / 未达标 */}
+      {hud.phase === "level-clear" ? (
+        <div className="absolute left-1/2 top-[30%] flex -translate-x-1/2 flex-col items-center gap-2 border border-hud-accent/60 bg-hud-accent/15 px-8 py-4 backdrop-blur-sm">
+          <span className="font-display text-[40px] leading-none tracking-wide text-hud-accent-bright">
+            {"★".repeat(hud.stars)}
+            {"☆".repeat(3 - hud.stars)}
+          </span>
+          <span className="font-mono-data text-[18px] uppercase tracking-[0.28em] text-hud-paper">
+            LEVEL CLEAR
+          </span>
+        </div>
+      ) : null}
+      {hud.phase === "level-fail" ? (
+        <div className="absolute left-1/2 top-[30%] flex -translate-x-1/2 flex-col items-center gap-2 border border-hud-line bg-ink-1000/80 px-8 py-4 backdrop-blur-sm">
+          <span className="font-display text-[32px] leading-none tracking-wide text-hud-text-dim">
+            未达标
+          </span>
+          <span className="font-mono-data text-[18px] uppercase tracking-[0.28em] text-hud-text-faint">
+            {hud.score.toLocaleString("en-US")} / {hud.targetScore.toLocaleString("en-US")}
+          </span>
+        </div>
+      ) : null}
+
+      {/* 底部：得分进度条 */}
       <div className="absolute inset-x-7 bottom-7">
         <div className="mb-2 flex items-end justify-between">
           <span className="font-mono-data text-[17px] tracking-[0.16em] text-hud-text-faint">
-            清除 <span className="text-hud-text-dim">{cleared}</span>
+            钉 <span className="text-hud-text-dim">{hud.pegsTotal - hud.pegsLeft}</span>
             <span className="text-hud-text-faint">/{hud.pegsTotal}</span>
           </span>
           <span className="font-mono-data text-[17px] tabular-nums text-hud-text-faint">
-            过关线 {targetPct}% · {pct}%
+            目标进度 {pct}%
           </span>
         </div>
         <div className="relative h-3 overflow-hidden border border-hud-line bg-ink-1000/75">
@@ -96,7 +154,6 @@ export function StaHud({ engine }: { engine: GameEngine | null }) {
             className="h-full bg-hud-accent transition-[width] duration-200 ease-out"
             style={{ width: `${pct}%` }}
           />
-          <div className="absolute inset-y-0 w-[2px] bg-hud-paper/80" style={{ left: `${targetPct}%` }} />
         </div>
       </div>
     </div>

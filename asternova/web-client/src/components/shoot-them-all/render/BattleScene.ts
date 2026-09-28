@@ -4,13 +4,26 @@ import { HEIGHT, PALETTE, PHYS, WIDTH } from "../constants"
 import type { EngineEvent, GameEngine } from "../engine/GameEngine"
 import { ParticleSystem } from "./ParticleSystem"
 
-/** 画一颗普通晶体（Azurite 六边形，半透 + 高光内核）。 */
-function paintCrystal(g: Graphics): void {
+/** 画一颗钉（晶体=翠玉六边形 / 共鸣=琥珀六边形+内核更亮）。 */
+function paintCrystal(g: Graphics, resonance = false): void {
   const r = PHYS.pegRadius
   const pts = [0, -r * 1.15, r, -r * 0.55, r, r * 0.55, 0, r * 1.15, -r, r * 0.55, -r, -r * 0.55]
-  g.poly(pts).fill({ color: PALETTE.jade, alpha: 0.5 })
-  g.poly(pts).stroke({ width: 1.3, color: PALETTE.jadeLight, alpha: 0.85 })
-  g.circle(0, -r * 0.2, r * 0.32).fill({ color: 0xffffff, alpha: 0.5 })
+  const base = resonance ? PALETTE.amberBright : PALETTE.jade
+  const line = resonance ? PALETTE.amberPale : PALETTE.jadeLight
+  g.poly(pts).fill({ color: base, alpha: 0.5 })
+  g.poly(pts).stroke({ width: 1.3, color: line, alpha: 0.85 })
+  g.circle(0, -r * 0.2, r * 0.32).fill({ color: 0xffffff, alpha: resonance ? 0.7 : 0.5 })
+}
+
+/** 画一块障碍（stone=冷灰石板 / ice=半透冰板）。最小适配版，美术细节留给后续波次。 */
+function paintObstacle(g: Graphics, w: number, h: number, ice: boolean): void {
+  g.rect(-w / 2, -h / 2, w, h)
+  g.fill({ color: ice ? PALETTE.jadeLight : PALETTE.line, alpha: ice ? 0.28 : 0.45 })
+  g.rect(-w / 2, -h / 2, w, h).stroke({
+    width: 1.6,
+    color: ice ? PALETTE.jadeLight : PALETTE.line,
+    alpha: 0.9,
+  })
 }
 
 /** 画陨星（Azurite 球 + 外辉光 + 高光）。 */
@@ -80,18 +93,29 @@ export class BattleScene {
     if (e.type === "peg-broken") {
       this.particles.burst(e.x, e.y, this.colorForKind(e.kind), 7)
       this.shake(1.6)
-    } else if (e.type === "node-clear") {
-      this.particles.burst(e.x, e.y, PALETTE.amber, 22, 1.6)
-      this.particles.burst(WIDTH / 2, HEIGHT * 0.55, PALETTE.jade, 18, 1.4)
+    } else if (e.type === "level-clear") {
+      this.particles.burst(WIDTH / 2, HEIGHT * 0.55, PALETTE.amber, 22, 1.6)
+      this.particles.burst(WIDTH / 2, HEIGHT * 0.45, PALETTE.jade, 18, 1.4)
       this.shake(6)
-      this.showToast("节点清空 · NODE CLEAR")
+      this.showToast(`过关 · ${"★".repeat(e.stars)}${"☆".repeat(3 - e.stars)}`)
+    } else if (e.type === "level-fail") {
+      this.shake(4)
+      this.showToast("未达标 · LEVEL FAIL")
+    } else if (e.type === "skill") {
+      // 球种技能闪光：爆裂/穿透/重击的共同反馈锚点
+      const color = e.skill === "blast" ? PALETTE.danger : e.skill === "pierce" ? PALETTE.jadeLight : PALETTE.amberBright
+      this.particles.burst(e.x, e.y, color, 16, 1.5)
+      this.shake(3)
+    } else if (e.type === "obstacle-hit" && e.destroyed) {
+      this.particles.burst(e.x, e.y, PALETTE.line, 12, 1.2)
+      this.shake(2.4)
     } else if (e.type === "launch") {
       this.shake(0.8)
     }
   }
 
   private colorForKind(kind: string): number {
-    return kind === "peg-crystal" ? PALETTE.jade : PALETTE.amber
+    return kind === "crystal" ? PALETTE.jade : kind === "resonance" ? PALETTE.amberBright : PALETTE.danger
   }
 
   private showToast(text: string): void {
@@ -156,15 +180,20 @@ export class BattleScene {
 
   private syncPegs(): void {
     const live = new Set<number>()
-    for (const e of this.engine.registry.ofKind("peg-crystal")) {
-      if (!e.alive) continue
-      live.add(e.id)
-      if (!this.pegSprites.has(e.id)) {
-        const g = new Graphics()
-        paintCrystal(g)
-        g.position.set(e.body.position.x, e.body.position.y)
-        this.pegLayer.addChild(g)
-        this.pegSprites.set(e.id, g)
+    // 关卡制板面上有 crystal/resonance 钉 + stone/ice 障碍，全部同步（最小适配版：
+    // 每种一个静态画法，视觉精雕留给后续美术波次）
+    for (const kind of ["peg-crystal", "peg-resonance", "obstacle-stone", "obstacle-ice"] as const) {
+      for (const e of this.engine.registry.ofKind(kind)) {
+        if (!e.alive) continue
+        live.add(e.id)
+        if (!this.pegSprites.has(e.id)) {
+          const g = new Graphics()
+          if (kind.startsWith("obstacle-")) paintObstacle(g, e.meta?.w as number, e.meta?.h as number, kind === "obstacle-ice")
+          else paintCrystal(g, kind === "peg-resonance")
+          g.position.set(e.body.position.x, e.body.position.y)
+          this.pegLayer.addChild(g)
+          this.pegSprites.set(e.id, g)
+        }
       }
     }
     for (const [id, g] of this.pegSprites) {
