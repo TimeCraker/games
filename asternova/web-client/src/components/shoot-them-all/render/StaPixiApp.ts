@@ -70,12 +70,32 @@ export class StaPixiApp {
     this.battle = battle
     engine.onEvent = battle.handleEngineEvent
     app.stage.addChild(battle.container)
+    // 全屏覆盖层（闪白/变暗/星级）钉在 stage 顶层，不随屏震平移
+    app.stage.addChild(battle.overlay)
 
     app.ticker.add((ticker) => {
-      starField.update(ticker.deltaMS / 1000)
-      engine.update(ticker.deltaMS)
-      battle.sync(ticker.deltaMS / 1000)
+      const dtMs = ticker.deltaMS
+      // 取证冻结：画布保留最后一帧（截图「特效瞬间」用；不影响引擎契约）
+      if (battle.frozen) return
+      // hit-stop（命中停顿）：重弹/爆裂大命中后 50ms 冻结世界时钟（art bible §5）。
+      // 引擎 tick 与渲染 sync 同时跳过 = 物理与视觉一起停，引擎零改动。
+      if (battle.consumeHitStop(dtMs)) return
+      starField.update(dtMs / 1000)
+      engine.update(dtMs)
+      battle.sync(dtMs / 1000)
     })
+
+    // 只读调试钩子（与 __staEngine 同性质）：截图取证用的时钟冻结开关
+    if (typeof window !== "undefined") {
+      ;(window as unknown as { __staFx?: { freeze: () => void; unfreeze: () => void } }).__staFx = {
+        freeze: () => {
+          battle.frozen = true
+        },
+        unfreeze: () => {
+          battle.frozen = false
+        },
+      }
+    }
   }
 
   destroy(): void {
