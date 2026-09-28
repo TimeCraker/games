@@ -26,3 +26,4 @@ __pycache__/
 .ui-polish/
 anim_list_out.txt
 shot.png
+.playwright-mcp/
