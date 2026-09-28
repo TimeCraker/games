@@ -21,3 +21,8 @@ __pycache__/
 # 编辑器 / IDE 配置（各端工程会重新生成）
 .idea/
 .vscode/
+
+# 调试 / 浏览器本地垃圾（不提交）
+.ui-polish/
+anim_list_out.txt
+shot.png
