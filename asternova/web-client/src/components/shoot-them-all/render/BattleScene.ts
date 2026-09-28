@@ -45,6 +45,12 @@ export class BattleScene {
 
   private pegSprites = new Map<number, Sprite>()
   private pegFlashG = new Graphics() // 击钉闪白/裂纹/共鸣呼吸环叠加（逐帧重绘）
+  private pegLinks = new Graphics() // 钉间能量连线（仅钉集变化时重建，判决 2）
+  private lastPegSig = ""
+  private lightField = new Container() // 全局光照叙事（判决 4：暖主光/翠反弹光）
+  private keyLight!: Sprite
+  private jadeBounce!: Sprite
+  private markerGlow!: Sprite // 首碰标记光环（判决 5）
   private obstacleSprites = new Map<number, Container>()
   private obstacleHp = new Map<number, number>()
   private obstacleTremble = new Map<number, number>()
@@ -78,7 +84,9 @@ export class BattleScene {
     this.reducedMotion = this.fx.reducedMotion
     this.overlay = this.fx.overlay
 
+    this.container.addChild(this.lightField)
     this.container.addChild(this.obstacleLayer)
+    this.container.addChild(this.pegLinks)
     this.container.addChild(this.pegLayer)
     this.container.addChild(this.pegFlashG)
     this.container.addChild(this.trajectory)
@@ -88,6 +96,7 @@ export class BattleScene {
     this.container.addChild(this.launcher)
     this.container.addChild(this.fx.container)
 
+    this.buildLightField()
     this.launcher.position.set(PHYS.launchAnchor.x, PHYS.launchAnchor.y)
     this.buildLauncher()
 
@@ -99,6 +108,14 @@ export class BattleScene {
     this.ballSprite.anchor.set(0.5)
     this.ballSprite.scale.set(0.5)
     this.ballLayer.addChild(this.ballGlow, this.ballSprite)
+
+    this.markerGlow = new Sprite({ texture: glowTexture(18, "marker") })
+    this.markerGlow.anchor.set(0.5)
+    this.markerGlow.blendMode = "add"
+    this.markerGlow.tint = PALETTE.amberBright
+    this.markerGlow.alpha = 0
+    this.markerGlow.visible = false
+    this.container.addChild(this.markerGlow)
 
     this.clearBanner = new Text({
       text: "CLEAR",
@@ -117,39 +134,84 @@ export class BattleScene {
     this.container.addChild(this.clearBanner)
   }
 
-  // ---- 星象仪（art bible §3.5 五件套） ----
+  // ---- 全局光照叙事（判决 4：暖琥珀主光 + 翠玉反弹光 + 冷暗角） ----
+  // 两个静态大柔光 sprite（预烘焙径向，add 混合），位置固定 —— 零每帧重绘。
+  private buildLightField(): void {
+    this.keyLight = new Sprite({ texture: glowTexture(320, "keyLight") })
+    this.keyLight.anchor.set(0.5)
+    this.keyLight.position.set(WIDTH * 0.5, HEIGHT * 0.06)
+    this.keyLight.scale.set(1.35, 0.9)
+    this.keyLight.tint = PALETTE.amber
+    this.keyLight.alpha = 0.16
+    this.keyLight.blendMode = "add"
+    this.lightField.addChild(this.keyLight)
+
+    this.jadeBounce = new Sprite({ texture: glowTexture(360, "jadeBounce") })
+    this.jadeBounce.anchor.set(0.5)
+    this.jadeBounce.position.set(WIDTH * 0.5, HEIGHT * 0.62)
+    this.jadeBounce.scale.set(1.25, 1)
+    this.jadeBounce.tint = PALETTE.jade
+    this.jadeBounce.alpha = 0.11
+    this.jadeBounce.blendMode = "add"
+    this.lightField.addChild(this.jadeBounce)
+  }
+
+  // ---- 星象仪（art bible §3.5 五件套；本轮加厚到「观星台主炮」体量） ----
 
   private buildLauncher(): void {
-    // 1) 黄铜梯形接口（上宽 48 下宽 36，自胶囊底部探出 12px）
+    // 1) 黄铜梯形接口：加宽加厚（上宽 72 下宽 52，高 18），双层倒角
     const base = new Graphics()
     base
-      .poly([-24, 24, 24, 24, 18, 36, -18, 36])
+      .poly([-36, 22, 36, 22, 26, 42, -26, 42])
       .fill({ color: ART.brass, alpha: 1 })
-      .stroke({ width: 1, color: ART.ink500, alpha: 0.9 })
+      .stroke({ width: 1.5, color: ART.ink500, alpha: 0.95 })
+    // 接口上缘 amber-400 倒角高光
+    base
+      .moveTo(-32, 23.5)
+      .lineTo(32, 23.5)
+      .stroke({ width: 2, color: PALETTE.amberBright, alpha: 0.8 })
+    // 两侧铆钉
+    for (const rx of [-26, 26]) {
+      base.circle(rx, 30, 3).fill({ color: ART.ink500, alpha: 0.9 })
+      base.circle(rx, 30, 3).stroke({ width: 1, color: PALETTE.amberBright, alpha: 0.5 })
+    }
     this.launcher.addChild(base)
 
-    // 2) 炮管：圆角矩形 22×64 + 槽线 + 炮口倒角边
+    // 2) 炮管：加厚圆角矩形 34×86（原 22×64）+ 双槽线 + 蓄能节环 + 炮口制退器
     const barrel = new Graphics()
-    barrel.roundRect(-11, 8, 22, 64, 8).fill({ color: ART.brass, alpha: 1 })
-    barrel.roundRect(-11, 8, 22, 64, 8).stroke({ width: 1, color: ART.ink500, alpha: 0.9 })
+    barrel.roundRect(-17, 6, 34, 86, 10).fill({ color: ART.brass, alpha: 1 })
+    barrel.roundRect(-17, 6, 34, 86, 10).stroke({ width: 1.5, color: ART.ink500, alpha: 0.95 })
+    // 纵向槽线（赤道仪语言）
     barrel
-      .moveTo(-8, 16)
-      .lineTo(-8, 64)
-      .moveTo(8, 16)
-      .lineTo(8, 64)
+      .moveTo(-12, 16)
+      .lineTo(-12, 82)
+      .moveTo(12, 16)
+      .lineTo(12, 82)
       .stroke({ width: 1, color: ART.ink500, alpha: 0.85 })
-    // 炮口 6px amber-400 倒角边
-    barrel.roundRect(-11, 66, 22, 6, 3).fill({ color: PALETTE.amberBright, alpha: 0.95 })
+    // 蓄能节环 ×3（暗面横向环，体块感）
+    for (const ry of [26, 48, 70]) {
+      barrel
+        .roundRect(-17, ry, 34, 6, 2)
+        .fill({ color: ART.ink500, alpha: 0.55 })
+      barrel
+        .moveTo(-17, ry + 1)
+        .lineTo(17, ry + 1)
+        .stroke({ width: 1, color: PALETTE.amberBright, alpha: 0.35 })
+    }
+    // 炮口制退器：更宽的端块 + 8px amber-400 倒角边
+    barrel.roundRect(-20, 86, 40, 12, 4).fill({ color: ART.brass, alpha: 1 })
+    barrel.roundRect(-20, 86, 40, 12, 4).stroke({ width: 1.5, color: ART.ink500, alpha: 0.95 })
+    barrel.roundRect(-20, 92, 40, 6, 2).fill({ color: PALETTE.amberBright, alpha: 0.95 })
     this.barrelGroup.addChild(barrel)
 
-    // 3) 炮口晶石：菱形 10×14（amber，描边 amberBright）
+    // 3) 炮口晶石：放大菱形 14×20（amber，描边 amberBright）
     const gem = new Graphics()
-    gem.poly([0, -7, 5, 0, 0, 7, -5, 0]).fill({ color: PALETTE.amber, alpha: 1 })
-    gem.poly([0, -7, 5, 0, 0, 7, -5, 0]).stroke({ width: 1, color: PALETTE.amberBright, alpha: 1 })
+    gem.poly([0, -10, 7, 0, 0, 10, -7, 0]).fill({ color: PALETTE.amber, alpha: 1 })
+    gem.poly([0, -10, 7, 0, 0, 10, -7, 0]).stroke({ width: 1.5, color: PALETTE.amberBright, alpha: 1 })
     const gemHolder = new Container()
-    gemHolder.position.set(0, 82)
+    gemHolder.position.set(0, 112)
     gemHolder.addChild(gem)
-    this.gemCore = new Sprite({ texture: glowTexture(10, "gem") })
+    this.gemCore = new Sprite({ texture: glowTexture(14, "gem") })
     this.gemCore.anchor.set(0.5)
     this.gemCore.tint = PALETTE.amberPale
     this.gemCore.alpha = 0
@@ -158,23 +220,23 @@ export class BattleScene {
     this.barrelGroup.addChild(gemHolder)
     this.launcher.addChild(this.barrelGroup)
 
-    // 4) 蓄力光环：r36 / r46 各 120° 弧，反向缓转（12s/圈）
+    // 4) 蓄力光环：r46 / r58 各 120° 弧，反向缓转（12s/圈），更亮
     this.chargeRings = new Graphics()
     this.launcher.addChild(this.chargeRings)
 
-    // 5) 刻度弧：r56 细弧 + 每 10° 4px 刻度 / 每 30° 7px 主刻度
+    // 5) 刻度弧：r72 细弧 + 每 10° 5px 刻度 / 每 30° 9px 主刻度
     this.scaleArc = new Graphics()
-    const R = 56
+    const R = 72
     this.scaleArc
       .arc(0, 0, R, -Math.PI / 2 - (78 * Math.PI) / 180, -Math.PI / 2 + (78 * Math.PI) / 180)
-      .stroke({ width: 1, color: ART.fog400, alpha: 0.3 })
+      .stroke({ width: 1, color: ART.fog400, alpha: 0.35 })
     for (let deg = -78; deg <= 78; deg += 10) {
       const a = -Math.PI / 2 + (deg * Math.PI) / 180
-      const len = deg % 30 === 0 ? 7 : 4
+      const len = deg % 30 === 0 ? 9 : 5
       this.scaleArc
         .moveTo(Math.cos(a) * R, Math.sin(a) * R)
         .lineTo(Math.cos(a) * (R + len), Math.sin(a) * (R + len))
-        .stroke({ width: 1, color: ART.fog400, alpha: deg % 30 === 0 ? 0.45 : 0.3 })
+        .stroke({ width: 1, color: ART.fog400, alpha: deg % 30 === 0 ? 0.55 : 0.35 })
     }
     this.launcher.addChild(this.scaleArc)
   }
@@ -185,18 +247,28 @@ export class BattleScene {
       this.flyingKind = e.ball
       this.ballKind = e.ball
       this.applyBallSkin(e.ball)
-      // 动效 1：后坐 90ms + 炮口白环 r8→22 + 蓄力环增亮消散 180ms
+      // ���效 1：后坐 90ms + 炮口白环 r8→22 + 蓄力环增亮消散 180ms
       this.barrelRecoil = 1
       this.chargeFlash = 1
       const aim = this.engine.aimAngle
-      const mx = PHYS.launchAnchor.x + Math.sin(aim) * 82
-      const my = PHYS.launchAnchor.y + Math.cos(aim) * 82
+      const mx = PHYS.launchAnchor.x + Math.sin(aim) * 118
+      const my = PHYS.launchAnchor.y + Math.cos(aim) * 118
       this.fx.muzzleRing(mx, my)
-      this.fx.ring(mx, my, 4, 14, { width: 2, color: PALETTE.amberBright, alpha0: 0.7, maxLife: 0.12 })
+      this.fx.ring(mx, my, 6, 30, { width: 3, color: PALETTE.amberBright, alpha0: 0.9, maxLife: 0.22 })
+      // 口焰更猛（判决 3）：假光照爆发照亮炮口周围 + 沿轴向的锥形焰光
+      this.fx.lightBurst(mx, my, PALETTE.amberPale, { r0: 12, r1: 78, alpha0: 0.55, maxLife: 0.2 })
+      this.fx.lightBurst(mx, my, PALETTE.amber, { r0: 20, r1: 120, alpha0: 0.3, maxLife: 0.28 })
     } else if (e.type === "peg-broken") {
       const resonance = e.kind === "resonance"
       this.fx.pegHitRing(e.x, e.y)
       this.fx.scorePopup(e.x, e.y, e.score, resonance)
+      // 判决 4：命中瞬间照亮周围（fake lighting）
+      this.fx.lightBurst(e.x, e.y, resonance ? PALETTE.amberPale : PALETTE.jadeLight, {
+        r0: 10,
+        r1: 46,
+        alpha0: 0.4,
+        maxLife: 0.22,
+      })
       const color = resonance ? PALETTE.amberBright : PALETTE.jade
       if (this.flyingKind === "pierce") {
         // 穿透残影线：钉上淡金残痕 0.8s（art bible §3.7）
@@ -286,6 +358,8 @@ export class BattleScene {
           sizeMax: 4,
           gravity: 120,
         })
+        // 判决 4：爆闪照亮周围（大半径假光照）
+        this.fx.lightBurst(e.x, e.y, PALETTE.amberPale, { r0: 26, r1: 130, alpha0: 0.6, maxLife: 0.3 })
         this.fx.flash(0.1, 0.12)
         this.fx.shake(6)
         this.fx.triggerHitStop()
@@ -503,10 +577,15 @@ export class BattleScene {
         const inDash = cyclePos < DASH
         const stepTo = Math.min(segLen - d, inDash ? DASH - cyclePos : CYCLE - cyclePos)
         if (inDash && stepTo > 0.2) {
+          // 判决 5：虚线加发光 —— 先画宽半透明衬底，再画亮芯
           this.trajectory
             .moveTo(x0 + ux * d, y0 + uy * d)
             .lineTo(x0 + ux * (d + stepTo), y0 + uy * (d + stepTo))
-            .stroke({ width: 2, color: PALETTE.amber, alpha })
+            .stroke({ width: 5, color: PALETTE.amber, alpha: alpha * 0.28 })
+          this.trajectory
+            .moveTo(x0 + ux * d, y0 + uy * d)
+            .lineTo(x0 + ux * (d + stepTo), y0 + uy * (d + stepTo))
+            .stroke({ width: 2, color: PALETTE.amberPale, alpha: alpha * 1.15 })
         }
         d += stepTo
       }
@@ -514,7 +593,15 @@ export class BattleScene {
       leftover = 0
     }
 
-    // 首碰标记圈：r14 空心 + 4 刻度齿，pop 120ms scale 0.6→1
+    // 发光头（判决 5）：虚线起点一颗柔光彗星头，随呼吸轻脉动
+    const head = points[0]
+    const headPulse = this.reducedMotion ? 0.75 : 0.62 + 0.18 * Math.sin(this.elapsed * 6)
+    this.trajectory.circle(head.x, head.y, 4.5).fill({ color: PALETTE.amberPale, alpha: 0.9 })
+    this.markerGlow.position.set(head.x, head.y)
+    this.markerGlow.scale.set(0.7 + headPulse * 0.35)
+    // 光头与首碰光环共用一个柔光 sprite：无首碰时贴在起点，有首碰时贴在标记处（见下）
+
+    // 首碰标记：十字刻度 + 光环（判决 5 加强：双圈 + 长十字 + 中心点）
     if (firstHit >= 0 && firstHit < points.length) {
       const p = points[firstHit]
       if (Math.abs(p.x - this.lastMarkerX) > 2) {
@@ -523,15 +610,34 @@ export class BattleScene {
       }
       this.markerPop = Math.min(1, this.markerPop + dtSec / 0.12)
       const s = 0.6 + 0.4 * easeOut(this.markerPop)
-      const r = 14 * s
-      this.trajectory.circle(p.x, p.y, r).stroke({ width: 1.5, color: PALETTE.amberBright, alpha: 0.95 })
+      const r = 16 * s
+      // 外环 + 内环（赤道仪双圈语言）
+      this.trajectory.circle(p.x, p.y, r).stroke({ width: 2, color: PALETTE.amberBright, alpha: 0.95 })
+      this.trajectory.circle(p.x, p.y, r * 0.55).stroke({ width: 1, color: PALETTE.amberBright, alpha: 0.55 })
+      // 十字刻度：四向长刻度（伸出环外 8px）+ 四角短齿
+      for (let k = 0; k < 4; k++) {
+        const a = (k * Math.PI) / 2
+        this.trajectory
+          .moveTo(p.x + Math.cos(a) * (r * 0.35), p.y + Math.sin(a) * (r * 0.35))
+          .lineTo(p.x + Math.cos(a) * (r + 8), p.y + Math.sin(a) * (r + 8))
+          .stroke({ width: 2, color: PALETTE.amberBright, alpha: 0.9 })
+      }
       for (let k = 0; k < 4; k++) {
         const a = (k * Math.PI) / 2 + Math.PI / 4
         this.trajectory
           .moveTo(p.x + Math.cos(a) * (r - 3), p.y + Math.sin(a) * (r - 3))
-          .lineTo(p.x + Math.cos(a) * r, p.y + Math.sin(a) * r)
-          .stroke({ width: 1.5, color: PALETTE.amberBright, alpha: 0.9 })
+          .lineTo(p.x + Math.cos(a) * (r + 3), p.y + Math.sin(a) * (r + 3))
+          .stroke({ width: 1.5, color: PALETTE.amberBright, alpha: 0.75 })
       }
+      // 中心点
+      this.trajectory.circle(p.x, p.y, 2.5 * s).fill({ color: PALETTE.amberPale, alpha: 0.95 })
+      // 光环（预烘焙柔光，pop 时更亮）
+      this.markerGlow.position.set(p.x, p.y)
+      this.markerGlow.scale.set((1.1 + s * 0.5) * (this.reducedMotion ? 0.8 : 1))
+      this.markerGlow.alpha = 0.28 + 0.3 * s
+      this.markerGlow.visible = true
+    } else {
+      this.markerGlow.visible = false
     }
   }
 
@@ -571,7 +677,50 @@ export class BattleScene {
         this.maxHpCache.delete(id)
       }
     }
+    this.rebuildPegLinks()
     this.redrawPegFx()
+  }
+
+  /**
+   * 钉间能量连线（判决 2：「钉与钉之间有隐约能量连线」）——
+   * 相邻钉（<96px）之间画极淡的琥珀/翠玉连线，形成「钉板」光场而非零散六边形。
+   * 仅在钉集变化时重建一次（Graphics 静态保留），零每帧成本。物理坐标零改动。
+   */
+  private rebuildPegLinks(): void {
+    const alive: Entity[] = []
+    for (const e of this.engine.registry.all()) {
+      if (e.kind.startsWith("peg-") && e.alive) alive.push(e)
+    }
+    // 签名：id 排序拼接，未变则跳过重建
+    const sig = alive
+      .map((e) => e.id)
+      .sort((a, b) => a - b)
+      .join(",")
+    if (sig === this.lastPegSig) return
+    this.lastPegSig = sig
+
+    this.pegLinks.clear()
+    const R = PHYS.pegRadius
+    const LINK_DIST = R * 9.6 // ≈96px
+    for (let i = 0; i < alive.length; i++) {
+      for (let j = i + 1; j < alive.length; j++) {
+        const a = alive[i]
+        const b = alive[j]
+        const dx = b.body.position.x - a.body.position.x
+        const dy = b.body.position.y - a.body.position.y
+        const d = Math.hypot(dx, dy)
+        if (d > LINK_DIST) continue
+        // 近距更亮、远距更淡；共鸣钉参与的连线偏琥珀，其余偏翠玉
+        const k = 1 - d / LINK_DIST
+        const res = a.kind === "peg-resonance" || b.kind === "peg-resonance"
+        const color = res ? PALETTE.amber : PALETTE.jade
+        const alpha = (res ? 0.16 : 0.11) * (0.35 + k * 0.65)
+        this.pegLinks
+          .moveTo(a.body.position.x, a.body.position.y)
+          .lineTo(b.body.position.x, b.body.position.y)
+          .stroke({ width: 1, color, alpha })
+      }
+    }
   }
 
   private maxHpCache = new Map<number, number>()
@@ -906,23 +1055,23 @@ export class BattleScene {
       this.barrelGroup.position.set(0, off)
     }
 
-    // 蓄力环：r36/r46 各 120° 弧反向缓转；发射瞬间增亮 180ms 消散
+    // 蓄力环：r46/r58 各 120° 弧反向缓转；发射瞬间增亮 180ms 消散（判决 3：更亮）
     this.chargeRings.clear()
     const aiming = this.engine.phase === "aiming"
     const rot = this.reducedMotion ? 0 : this.elapsed * ((Math.PI * 2) / 12)
     const flash = this.chargeFlash
     if (flash > 0) this.chargeFlash = Math.max(0, flash - dtSec / 0.18)
-    const baseAlpha = aiming ? 0.55 : 0.25
-    const color = flash > 0.05 ? PALETTE.amberBright : PALETTE.amber
-    const arcAlpha = baseAlpha + flash * 0.45
+    const baseAlpha = aiming ? 0.72 : 0.32
+    const color = flash > 0.05 ? PALETTE.amberPale : PALETTE.amberBright
+    const arcAlpha = baseAlpha + flash * 0.28
     for (const [r, dir] of [
-      [36, 1],
-      [46, -1],
+      [46, 1],
+      [58, -1],
     ] as const) {
       const start = rot * dir
       this.chargeRings
         .arc(0, 0, r, start, start + (Math.PI * 2) / 3)
-        .stroke({ width: 2, color, alpha: arcAlpha })
+        .stroke({ width: 3, color, alpha: arcAlpha })
     }
 
     // 炮口晶石：蓄力（瞄准）时内芯变 amberPale
@@ -932,6 +1081,11 @@ export class BattleScene {
   destroy(): void {
     this.container.destroy({ children: true })
     this.overlay.destroy({ children: true })
+  }
+
+  /** 只读测量钩子：当前活跃粒子数（性能报告用）。 */
+  get particleCount(): number {
+    return this.particles.activeCount
   }
 
   /**

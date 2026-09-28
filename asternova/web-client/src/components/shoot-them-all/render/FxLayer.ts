@@ -1,7 +1,7 @@
 import { Container, Graphics, Sprite, Text } from "pixi.js"
 
 import { HEIGHT, PALETTE, WIDTH } from "../constants"
-import { ART, starTexture } from "./artAssets"
+import { ART, glowTexture, starTexture } from "./artAssets"
 
 /**
  * 瞬时特效层（art bible §3.7/§3.8/§5）：
@@ -75,6 +75,19 @@ interface StarFx {
   t: number
 }
 
+/** 假光照爆发（判决 4：命中闪光照亮周围）——预烘焙柔光 sprite 放大淡出，零 blur。 */
+interface LightFx {
+  alive: boolean
+  sprite: Sprite
+  x: number
+  y: number
+  r0: number
+  r1: number
+  life: number
+  maxLife: number
+  alpha0: number
+}
+
 /** hit-stop：短冻结（画布层自主时钟，引擎 tick 由 StaPixiApp 按剩余量跳过）。 */
 const HIT_STOP_MS = 50
 
@@ -88,6 +101,7 @@ export class FxLayer {
   private rings: RingFx[] = []
   private popups: PopupFx[] = []
   private stars: StarFx[] = []
+  private lights: LightFx[] = []
 
   private flashG: Graphics // 全屏闪白（白）
   private dimG: Graphics // 收束变暗（冷黑）
@@ -122,6 +136,15 @@ export class FxLayer {
     }
     for (let i = 0; i < 10; i++) {
       this.popups.push(this.blankPopup())
+    }
+    for (let i = 0; i < 8; i++) {
+      const sprite = new Sprite({ texture: glowTexture(48, "light") })
+      sprite.anchor.set(0.5)
+      sprite.blendMode = "add"
+      sprite.alpha = 0
+      sprite.visible = false
+      this.container.addChild(sprite)
+      this.lights.push({ alive: false, sprite, x: 0, y: 0, r0: 20, r1: 60, life: 0, maxLife: 0.28, alpha0: 0.5 })
     }
     this.buildStars()
   }
@@ -214,6 +237,36 @@ export class FxLayer {
   /** 击钉白环（r 10→18，200ms）。 */
   pegHitRing(x: number, y: number): void {
     this.ring(x, y, 10, 18, { width: 1, color: ART.sparkWhite, alpha0: 0.85, maxLife: 0.2 })
+  }
+
+  /**
+   * 假光照爆发（判决 4：命中瞬间照亮周围）——柔光 sprite 从 r0 扩到 r1 并淡出。
+   * reduced-motion 退化为强度减半的亮度轻闪（不放大光晕）。
+   */
+  lightBurst(
+    x: number,
+    y: number,
+    color: number,
+    opts: { r0?: number; r1?: number; alpha0?: number; maxLife?: number } = {},
+  ): void {
+    let slot: LightFx | undefined
+    for (const l of this.lights) if (!l.alive) {
+      slot = l
+      break
+    }
+    if (!slot) return
+    slot.alive = true
+    slot.x = x
+    slot.y = y
+    slot.r0 = opts.r0 ?? 18
+    slot.r1 = opts.r1 ?? 56
+    slot.alpha0 = this.reducedMotion ? (opts.alpha0 ?? 0.4) * 0.5 : (opts.alpha0 ?? 0.4)
+    slot.maxLife = this.reducedMotion ? 0.12 : (opts.maxLife ?? 0.28)
+    slot.life = slot.maxLife
+    slot.sprite.tint = color
+    slot.sprite.position.set(x, y)
+    slot.sprite.visible = true
+    slot.sprite.alpha = slot.alpha0
   }
 
   /** 炮口焰光环（r 8→22，180ms）。 */
@@ -393,6 +446,24 @@ export class FxLayer {
         this.ringG.circle(r.x, r.y, r.core.r).fill({ color: r.core.color, alpha: r.core.alpha * (1 - t / 0.25) })
       }
       this.ringG.circle(r.x, r.y, rad).stroke({ width: r.width, color: r.color, alpha: a })
+    }
+
+    // 假光照爆发：柔光 sprite 放大淡出（判决 4：爆闪照亮周围）
+    for (const l of this.lights) {
+      if (!l.alive) continue
+      l.life -= dtSec
+      if (l.life <= 0) {
+        l.alive = false
+        l.sprite.visible = false
+        l.sprite.alpha = 0
+        continue
+      }
+      const t = 1 - l.life / l.maxLife
+      const e = easeOutCubic(t)
+      const rad = l.r0 + (l.r1 - l.r0) * e
+      // glowTexture(48) 半径 48px，scale = rad/48
+      l.sprite.scale.set(rad / 48)
+      l.sprite.alpha = l.alpha0 * (1 - t) * (1 - t * 0.5)
     }
 
     // 跳字

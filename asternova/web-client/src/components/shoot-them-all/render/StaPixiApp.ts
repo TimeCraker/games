@@ -2,6 +2,7 @@ import { Application } from "pixi.js"
 
 import { HEIGHT, WIDTH } from "../constants"
 import { GameEngine } from "../engine/GameEngine"
+import { bakedTextureCount } from "./artAssets"
 import { BattleScene } from "./BattleScene"
 import { StarFieldBg } from "./StarFieldBg"
 
@@ -85,15 +86,26 @@ export class StaPixiApp {
       battle.sync(dtMs / 1000)
     })
 
-    // 只读调试钩子（与 __staEngine 同性质）：截图取证用的时钟冻结开关
+    // 只读调试钩子（与 __staEngine 同性质）：截图取证用的时钟冻结开关 + 性能读数
     if (typeof window !== "undefined") {
-      ;(window as unknown as { __staFx?: { freeze: () => void; unfreeze: () => void } }).__staFx = {
+      ;(window as unknown as {
+        __staFx?: {
+          freeze: () => void
+          unfreeze: () => void
+          stats: () => { particles: number; bakedTextures: number; frozen: boolean }
+        }
+      }).__staFx = {
         freeze: () => {
           battle.frozen = true
         },
         unfreeze: () => {
           battle.frozen = false
         },
+        stats: () => ({
+          particles: battle.particleCount,
+          bakedTextures: bakedTextureCount(),
+          frozen: battle.frozen,
+        }),
       }
     }
   }

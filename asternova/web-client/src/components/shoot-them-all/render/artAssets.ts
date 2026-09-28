@@ -86,19 +86,109 @@ export function nebulaTexture(radius: number): Texture {
   })
 }
 
-// ---- 暗角（art bible §8-4：中心到四角变暗 35%） ----
+/** mulberry32 确定性 PRNG（贴图内形状稳定，不随刷新抖动）。 */
+function texRandom(seed: number): () => number {
+  let a = seed >>> 0
+  return () => {
+    a |= 0
+    a = (a + 0x6d2b79f5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+/**
+ * 星云云带贴图（本轮制作人判决：背景要有「形状明确的云带」，不是两团模糊）。
+ * 沿正弦走廊堆叠椭圆软块 + 丝缕曲线，端部自然收束成带状。
+ * 色彩纪律：只用 ink 提亮的冷灰 + jade/amber 极低 alpha 缘光（§2.2 派生明度，不漂色相）。
+ */
+export function nebulaBandTexture(w: number, h: number, seed: number): Texture {
+  return cached(`nebulaBand:${w}x${h}:${seed}`, () => {
+    const c = makeCanvas(w, h)
+    const ctx = c.getContext("2d")!
+    const rnd = texRandom(seed)
+    const midY = h * 0.5
+    const phase = rnd() * Math.PI * 2
+    const amp = h * 0.2
+
+    // 1) 主云带：34 个椭圆软块沿 sin 走廊，端部 sin(πt)^0.5 收束
+    for (let i = 0; i < 34; i++) {
+      const t = i / 33
+      const x = t * w
+      const y = midY + Math.sin(t * Math.PI * 1.35 + phase) * amp
+      const taper = Math.pow(Math.sin(Math.PI * Math.min(1, Math.max(0, t))), 0.45)
+      const r = (h * 0.16 + rnd() * h * 0.14) * (0.55 + taper * 0.8)
+      const core = 0.05 + rnd() * 0.075
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r)
+      g.addColorStop(0, `rgba(44,52,61,${core * taper})`)
+      g.addColorStop(0.5, `rgba(36,43,51,${core * 0.45 * taper})`)
+      g.addColorStop(1, "rgba(30,36,43,0)")
+      ctx.fillStyle = g
+      ctx.fillRect(x - r, y - r, r * 2, r * 2)
+    }
+
+    // 2) 缘光：上缘极淡琥珀（光污染呼应）、下缘极淡翠玉（晶体反光呼应）
+    for (let i = 0; i < 12; i++) {
+      const t = (i + 0.5) / 12
+      const x = t * w
+      const y = midY + Math.sin(t * Math.PI * 1.35 + phase) * amp
+      const taper = Math.pow(Math.sin(Math.PI * t), 0.5)
+      const up = h * 0.11
+      const r = h * (0.09 + rnd() * 0.06)
+      const gA = ctx.createRadialGradient(x, y - up, 0, x, y - up, r)
+      gA.addColorStop(0, `rgba(84,68,40,${0.035 * taper})`)
+      gA.addColorStop(1, "rgba(84,68,40,0)")
+      ctx.fillStyle = gA
+      ctx.fillRect(x - r, y - up - r, r * 2, r * 2)
+      const gB = ctx.createRadialGradient(x, y + up, 0, x, y + up, r)
+      gB.addColorStop(0, `rgba(52,72,66,${0.032 * taper})`)
+      gB.addColorStop(1, "rgba(52,72,66,0)")
+      ctx.fillStyle = gB
+      ctx.fillRect(x - r, y + up - r, r * 2, r * 2)
+    }
+
+    // 3) 丝缕：5 条低 alpha 贝塞尔沿带向，给云带「结构感」而非一团糊
+    for (let i = 0; i < 5; i++) {
+      const yOff = (rnd() - 0.5) * h * 0.34
+      const a = 0.028 + rnd() * 0.03
+      ctx.beginPath()
+      ctx.moveTo(w * 0.04, midY + yOff + Math.sin(phase) * amp * 0.6)
+      ctx.bezierCurveTo(
+        w * 0.32,
+        midY + yOff - amp * (0.7 + rnd() * 0.5),
+        w * 0.68,
+        midY + yOff + amp * (0.7 + rnd() * 0.5),
+        w * 0.96,
+        midY + yOff + Math.sin(phase + 1.2) * amp * 0.6,
+      )
+      ctx.lineWidth = 7 + rnd() * 12
+      ctx.strokeStyle = `rgba(48,56,66,${a})`
+      ctx.stroke()
+    }
+    return Texture.from(c)
+  })
+}
+
+// ---- 暗角（art bible §8-4：中心到四角变暗 35%；本轮判决：下缘减淡防死黑） ----
 
 export function vignetteTexture(w: number, h: number): Texture {
-  return cached(`vignette:${w}x${h}`, () => {
+  return cached(`vignette2:${w}x${h}`, () => {
     const c = makeCanvas(w, h)
     const ctx = c.getContext("2d")!
     const r = Math.hypot(w, h) / 2
-    const g = ctx.createRadialGradient(w / 2, h / 2, r * 0.42, w / 2, h / 2, r)
+    const g = ctx.createRadialGradient(w / 2, h * 0.44, r * 0.42, w / 2, h * 0.44, r)
     g.addColorStop(0, "rgba(0,0,0,0)")
-    g.addColorStop(0.65, "rgba(0,0,0,0.16)")
-    g.addColorStop(1, "rgba(0,0,0,0.35)")
+    g.addColorStop(0.65, "rgba(0,0,0,0.14)")
+    g.addColorStop(1, "rgba(0,0,0,0.32)")
     ctx.fillStyle = g
     ctx.fillRect(0, 0, w, h)
+    // 下缘额外减淡：竖直方向 55% 以下压暗上限降到 10%（保住底部星尘/结构的可见度）
+    const vg = ctx.createLinearGradient(0, h * 0.55, 0, h)
+    vg.addColorStop(0, "rgba(0,0,0,0)")
+    vg.addColorStop(1, "rgba(0,0,0,0.10)")
+    ctx.fillStyle = vg
+    ctx.fillRect(0, h * 0.55, w, h * 0.45)
     return Texture.from(c)
   })
 }
@@ -285,11 +375,25 @@ function pathHex(ctx: CanvasRenderingContext2D, r: number): void {
 }
 
 export function pegTexture(resonance: boolean): Texture {
-  return cached(`peg:${resonance ? "res" : "cry"}`, () => {
+  return cached(`peg2:${resonance ? "res" : "cry"}`, () => {
     const c = makeCanvas(64, 64)
     const ctx = c.getContext("2d")!
     ctx.translate(32, 32)
     const R = 22
+
+    // 底光托底（本轮判决 2：每颗钉加辉光底座形成光场）——下半圆偏心的暖/翠柔光
+    const pedestal = ctx.createRadialGradient(0, R * 0.42, 0, 0, R * 0.42, R * 1.35)
+    if (resonance) {
+      pedestal.addColorStop(0, "rgba(216,163,60,0.30)")
+      pedestal.addColorStop(0.55, "rgba(216,163,60,0.10)")
+      pedestal.addColorStop(1, "rgba(216,163,60,0)")
+    } else {
+      pedestal.addColorStop(0, "rgba(127,179,158,0.26)")
+      pedestal.addColorStop(0.55, "rgba(127,179,158,0.09)")
+      pedestal.addColorStop(1, "rgba(127,179,158,0)")
+    }
+    ctx.fillStyle = pedestal
+    ctx.fillRect(-R * 1.4, -R * 0.9, R * 2.8, R * 2.4)
 
     // 外扩翠玉/琥珀柔光（4px @18% 语义，烘焙进贴图）
     const glow = ctx.createRadialGradient(0, 0, R * 0.4, 0, 0, R + 8)
@@ -302,6 +406,19 @@ export function pegTexture(resonance: boolean): Texture {
     }
     ctx.fillStyle = glow
     ctx.fillRect(-R - 8, -R - 8, (R + 8) * 2, (R + 8) * 2)
+
+    // 晶簇底座暗示：外接圆下方两片小晶簇三角（钉与钉之间靠 BattleScene 的能量连线续上）
+    const cluster = (dx: number, s: number, alpha: number) => {
+      ctx.beginPath()
+      ctx.moveTo(dx, R * 0.62)
+      ctx.lineTo(dx + s * 0.55, R * 1.18)
+      ctx.lineTo(dx - s * 0.55, R * 1.12)
+      ctx.closePath()
+      ctx.fillStyle = resonance ? `rgba(168,124,36,${alpha})` : `rgba(127,179,158,${alpha})`
+      ctx.fill()
+    }
+    cluster(-R * 0.72, R * 0.5, 0.5)
+    cluster(R * 0.78, R * 0.42, 0.4)
 
     // 六边形主体 + 3 菱形切面
     pathHex(ctx, R)
@@ -433,4 +550,9 @@ export function dotTexture(): Texture {
     ctx.fillRect(0, 0, s, s)
     return Texture.from(c)
   })
+}
+
+/** 只读测量钩子：当前缓存的预烘焙贴图数（性能报告用，不参与渲染）。 */
+export function bakedTextureCount(): number {
+  return cache.size
 }
