@@ -41,67 +41,90 @@ function fillStroke(g: Graphics, fill: number, alpha: number, strokeW = 0, strok
  */
 export function drawPilot(g: Graphics): void {
   const HAIR = 0xf0f2fa
-  const HAIR_SHADE = 0xb8c2e0
-  const SUIT = 0x1b2027
-  const SUIT_LIT = 0x2f3742
+  const HAIR_DEEP = 0x9aa6c8
+  const SUIT = 0x1d232b
+  const SUIT_LIT = 0x333c48
   const RIGGING = 0x232a32
   const RIGGING_LIT = 0x3d4650
 
-  // ── 舰装推进焰（先画，压在挂架后下方）──
-  g.ellipse(-16, 26, 5, 15).fill({ color: C.amberMid, alpha: 0.40 })
-  g.ellipse(16, 26, 5, 15).fill({ color: C.amberMid, alpha: 0.40 })
-  g.ellipse(-16, 22, 3.2, 9).fill({ color: C.amberHi, alpha: 0.9 })
-  g.ellipse(16, 22, 3.2, 9).fill({ color: C.amberHi, alpha: 0.9 })
+  // ══ 俯视可读性原则 ══
+  // 正俯视看人只剩「头顶 + 肩」，若两侧再横向展开装备就必然读成飞行器。
+  // 因此：① 人形剪影占绝对主导 ② 靠**长发 + 钟形裙摆**给出径向可读的少女轮廓
+  // ③ 舰装挂架收进肩侧、纵向摆放，绝不做成机翼。
 
-  // ── 舰装挂架：肩侧的小型装备舱（可换装 / 可收集的载体）──
+  // ── 舰装推进焰（肩侧挂架后方，短促）──
+  g.ellipse(-12, 17, 3.6, 11).fill({ color: C.amberMid, alpha: 0.38 })
+  g.ellipse(12, 17, 3.6, 11).fill({ color: C.amberMid, alpha: 0.38 })
+  g.ellipse(-12, 14, 2.2, 6).fill({ color: C.amberHi, alpha: 0.9 })
+  g.ellipse(12, 14, 2.2, 6).fill({ color: C.amberHi, alpha: 0.9 })
+
+  // ── 舰装挂架：肩侧纵向小型装备舱（换装/收集的载体，绝不横向展开）──
   for (const s of [-1, 1]) {
-    const x = s * 16
-    g.roundRect(x - 5.5, -11, 11, 22, 4).fill({ color: RIGGING }).stroke({ width: 1.8, color: C.ink })
-    g.roundRect(x - 5.5, -11, 11, 7, 3).fill({ color: RIGGING_LIT, alpha: 0.9 })
-    g.roundRect(x - 5.5, -4, 11, 3, 1).fill({ color: C.amber, alpha: 0.9 })
-    g.roundRect(x - 3.6, 11, 7.2, 5, 1.5).fill({ color: 0x0b0e12 }).stroke({ width: 1.1, color: RIGGING_LIT })
-    g.circle(x - s * 2.2, 5, 1.5).fill({ color: C.amberMid })
-    // 与肩部的连接架
-    g.moveTo(x - s * 5, -6).lineTo(s * 9, -7).stroke({ width: 3.2, color: C.hullDark })
-    g.moveTo(x - s * 5, -6).lineTo(s * 9, -7).stroke({ width: 1.1, color: C.ink })
+    const x = s * 12
+    g.roundRect(x - 4.4, -13, 8.8, 17, 4).fill({ color: RIGGING }).stroke({ width: 1.5, color: C.ink })
+    g.roundRect(x - 4.4, -13, 8.8, 5.5, 3).fill({ color: RIGGING_LIT, alpha: 0.9 })
+    g.roundRect(x - 4.4, -6.5, 8.8, 2.4, 1).fill({ color: C.amber, alpha: 0.92 })
+    g.roundRect(x - 2.8, 3, 5.6, 4, 1.4).fill({ color: 0x0b0e12 }).stroke({ width: 1, color: RIGGING_LIT })
+    g.circle(x - s * 1.6, -1, 1.3).fill({ color: C.amberMid })
+    // 与肩部的短连接架（贴合身体，不外张）
+    g.moveTo(x - s * 4.4, -8).lineTo(s * 7, -9).stroke({ width: 2.6, color: C.hullDark })
   }
 
-  // ── 长发（俯视最可读的特征：从头顶向后拖的泪滴）──
-  g.moveTo(-8.6, -16).bezierCurveTo(-11.5, -4, -10, 8, -4.5, 17)
-  g.lineTo(4.5, 17).bezierCurveTo(10, 8, 11.5, -4, 8.6, -16).closePath()
-  g.fill({ color: HAIR_SHADE, alpha: 0.75 })
+  // ── 长发（俯视第一可读特征：从头顶向外后方铺开的大形态）──
+  g.moveTo(-9.5, -15)
+  g.bezierCurveTo(-17, -4, -18.5, 9, -11, 19)
+  g.lineTo(11, 19)
+  g.bezierCurveTo(18.5, 9, 17, -4, 9.5, -15)
+  g.closePath().fill({ color: HAIR_DEEP, alpha: 0.85 })
+  g.moveTo(-6.5, -14)
+  g.bezierCurveTo(-12, -4, -13, 8, -8, 17)
+  g.lineTo(8, 17)
+  g.bezierCurveTo(13, 8, 12, -4, 6.5, -14)
+  g.closePath().fill({ color: HAIR, alpha: 0.55 })
 
-  // ── 腿（俯视能看到两截，站位感）──
-  g.roundRect(-6.4, 5, 4.6, 15, 2).fill({ color: SUIT }).stroke({ width: 1.3, color: C.ink })
-  g.roundRect(1.8, 5, 4.6, 15, 2).fill({ color: SUIT }).stroke({ width: 1.3, color: C.ink })
+  // ── 钟形裙摆（俯视读作圆，任何旋转角度都成立）──
+  g.moveTo(-9, -1)
+  g.bezierCurveTo(-14.5, 4, -16.5, 11, -16, 17)
+  g.lineTo(16, 17)
+  g.bezierCurveTo(16.5, 11, 14.5, 4, 9, -1)
+  g.closePath().fill({ color: SUIT }).stroke({ width: 2, color: C.ink })
+  // 裙摆受光面
+  g.moveTo(-9, -1).bezierCurveTo(-14.5, 4, -16.5, 11, -16, 17).lineTo(-3, 17).lineTo(-3, -1).closePath()
+  g.fill({ color: SUIT_LIT, alpha: 0.45 })
+  // 裙摆琥珀滚边
+  g.moveTo(-16, 16.6).lineTo(16, 16.6).stroke({ width: 1.6, color: C.amberDim, alpha: 0.8 })
 
-  // ── 手臂 ──
-  g.roundRect(-11.2, -9, 4.6, 14, 2).fill({ color: SUIT }).stroke({ width: 1.3, color: C.ink })
-  g.roundRect(6.6, -9, 4.6, 14, 2).fill({ color: SUIT }).stroke({ width: 1.3, color: C.ink })
+  // ── 手臂（贴身，不横向伸展）──
+  g.roundRect(-11.4, -12, 4.4, 14, 2).fill({ color: SUIT }).stroke({ width: 1.2, color: C.ink })
+  g.roundRect(7, -12, 4.4, 14, 2).fill({ color: SUIT }).stroke({ width: 1.2, color: C.ink })
 
-  // ── 躯干（束腰飞行服）──
-  g.roundRect(-7.6, -12, 15.2, 19, 5).fill({ color: SUIT }).stroke({ width: 2, color: C.ink })
-  g.roundRect(-7.6, -12, 15.2, 7, 4).fill({ color: SUIT_LIT, alpha: 0.9 })
-  g.rect(-6.8, 3.5, 13.6, 2).fill({ color: C.amberDim, alpha: 0.85 })
+  // ── 躯干（束腰，肩窄腰细）──
+  g.moveTo(-7, -14)
+  g.bezierCurveTo(-8.6, -8, -6.4, -2, -5.4, 1)
+  g.lineTo(5.4, 1)
+  g.bezierCurveTo(6.4, -2, 8.6, -8, 7, -14)
+  g.closePath().fill({ color: SUIT }).stroke({ width: 1.8, color: C.ink })
+  g.moveTo(-7, -14).bezierCurveTo(-8.6, -8, -6.4, -2, -5.4, 1).lineTo(-5, -14).closePath()
+  g.fill({ color: SUIT_LIT, alpha: 0.75 })
   // 胸前琥珀电源核心
-  g.circle(0, -6, 2.4).fill({ color: C.amber })
-  g.circle(0, -6, 4.6).stroke({ width: 1.1, color: C.amber, alpha: 0.35 })
+  g.circle(0, -7, 2.2).fill({ color: C.amber })
+  g.circle(0, -7, 4.2).stroke({ width: 1, color: C.amber, alpha: 0.4 })
 
-  // ── 肩甲 ──
-  g.roundRect(-11.6, -13.5, 7.4, 6.4, 3).fill({ color: RIGGING }).stroke({ width: 1.5, color: C.ink })
-  g.roundRect(4.2, -13.5, 7.4, 6.4, 3).fill({ color: RIGGING }).stroke({ width: 1.5, color: C.ink })
+  // ── 肩甲（小巧，不外扩）──
+  g.roundRect(-10, -15.5, 6.4, 5.6, 2.6).fill({ color: RIGGING }).stroke({ width: 1.3, color: C.ink })
+  g.roundRect(3.6, -15.5, 6.4, 5.6, 2.6).fill({ color: RIGGING }).stroke({ width: 1.3, color: C.ink })
 
-  // ── 头（俯视看到的是发顶）──
-  g.circle(0, -19, 8).fill({ color: HAIR_SHADE }).stroke({ width: 1.7, color: C.ink })
-  g.circle(-1, -20, 6.3).fill({ color: HAIR })
-  g.moveTo(0, -27).lineTo(0, -14).stroke({ width: 1, color: HAIR_SHADE, alpha: 0.9 })
+  // ── 头（俯视看到的是发顶；大而明确）──
+  g.circle(0, -21, 9).fill({ color: HAIR_DEEP }).stroke({ width: 1.6, color: C.ink })
+  g.circle(-1, -22, 7.2).fill({ color: HAIR })
+  g.moveTo(0, -30).lineTo(0, -14).stroke({ width: 1, color: HAIR_DEEP, alpha: 0.85 })
   // 前额琥珀传感片（俯视唯一能看见的「脸」）
-  g.roundRect(-3.2, -25, 6.4, 2.8, 1.3).fill({ color: C.amber })
-  g.roundRect(-3.2, -25, 3, 2.8, 1.3).fill({ color: C.amberHi })
+  g.roundRect(-3.4, -27.5, 6.8, 3, 1.4).fill({ color: C.amber })
+  g.roundRect(-3.4, -27.5, 3.2, 3, 1.4).fill({ color: C.amberHi })
 
-  // ── 手持武器（给出朝向读点，位于右手前方）──
-  g.moveTo(4, -22).lineTo(4, -34).stroke({ width: 2.8, color: C.amberMid, cap: "round" })
-  g.circle(4, -34, 2).fill({ color: C.amberHi })
+  // ── 手持武器（右手前方，给出朝向读点）──
+  g.moveTo(6, -24).lineTo(6, -37).stroke({ width: 2.6, color: C.amberMid, cap: "round" })
+  g.circle(6, -37, 1.9).fill({ color: C.amberHi })
 }
 
 /** 敌群：三档 + Boss，各自的剪影与 rim light 都不同，暗底可辨 */

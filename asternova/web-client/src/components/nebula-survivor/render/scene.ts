@@ -284,7 +284,7 @@ export class NebulaScene {
     const ship = this.shipLayer.take(this.tex.ship)
     ship.position.set(p.x, p.y)
     ship.rotation = p.facing + Math.PI / 2
-    ship.scale.set(1)
+    ship.scale.set(1.18)
     if (sim.afterburn > 0) { ship.tint = 0xfff2d0 }
     if (p.invuln > 0 && Math.floor(sim.tick / 4) % 2 === 0) ship.alpha = 0.45
     this.shipLayer.end()
