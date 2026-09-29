@@ -303,21 +303,25 @@ export function StaRoot() {
           onPointerCancel={onPointerUp}
         />
 
-        {/* 对局 HUD 只在对局态渲染：选关屏下不留隐形 Tab 落点（暂停钮 / 球托槽） */}
-        {screen === "game" ? (
-          <StaHud
-            engine={engine}
-            totalBalls={totalBalls}
-            clearBanner={clearBanner}
-            onPause={openPause}
-            onBallSelect={(kind: BallKind) => engineRef.current?.selectBall(kind)}
-            hints={hints}
-            hintAdvanceSignal={hintSignal}
-            onHintDismiss={() => setHintDismissed(true)}
-            seenHintIds={progress.hintsSeen}
-            interactive={inputLive}
-          />
-        ) : null}
+        {/* 对局 HUD 只在对局态渲染：选关屏下不留隐形 Tab 落点（暂停钮 / 球托槽）。
+            R6：包 AnimatePresence 让 HUD 随屏切换淡入淡出（250ms instrument）。 */}
+        <AnimatePresence initial={false}>
+          {screen === "game" ? (
+            <StaHud
+              key="hud"
+              engine={engine}
+              totalBalls={totalBalls}
+              clearBanner={clearBanner}
+              onPause={openPause}
+              onBallSelect={(kind: BallKind) => engineRef.current?.selectBall(kind)}
+              hints={hints}
+              hintAdvanceSignal={hintSignal}
+              onHintDismiss={() => setHintDismissed(true)}
+              seenHintIds={progress.hintsSeen}
+              interactive={inputLive}
+            />
+          ) : null}
+        </AnimatePresence>
 
         {/* 品牌字随画布缩放（装饰）；返回钮保持真实命中区，移出缩放容器 */}
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-end p-3">

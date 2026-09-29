@@ -1,6 +1,9 @@
 "use client"
 
 import * as React from "react"
+import { motion } from "framer-motion"
+
+import { easeInstrument } from "@/src/lib/motion"
 
 import type { GameEngine, StaHudState } from "./engine/GameEngine"
 import { StaBallDock } from "./ui/StaBallDock"
@@ -62,7 +65,13 @@ export function StaHud({
   if (!hud) return null
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-10 select-none">
+    <motion.div
+      className="pointer-events-none absolute inset-0 z-10 select-none"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25, ease: easeInstrument }}
+    >
       <StaDynamicIsland hud={hud} totalBalls={totalBalls} clearBanner={clearBanner} onPause={onPause} />
 
       {/* 教学条只在首关出（§4.6「首关三条」）。关号门控在这里收紧：
@@ -83,7 +92,7 @@ export function StaHud({
         onSelect={onBallSelect}
         disabled={!interactive || clearBanner || hud.phase === "level-clear" || hud.phase === "level-fail"}
       />
-    </div>
+    </motion.div>
   )
 }
 

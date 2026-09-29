@@ -1,9 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { motion, useReducedMotion } from "framer-motion"
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
+import { easeInstrument, staggerDelay } from "@/src/lib/motion"
 
 import { LEVELS } from "../engine/content/levels"
 import { LockGlyph, StarGlyph } from "./BallGlyph"
@@ -13,7 +14,7 @@ import { totalStars } from "./staProgress"
 /**
  * 选关 · Bento Grid + Spotlight Border（art bible §4.2）。
  *
- * 独立全屏页，真实 CSS px（不在 720×1280 缩放容��内，§4 开头标注）。
+ * 独立全屏页，真实 CSS px（不在 720×1280 缩放容器内，§4 开头标注）。
  * 四态：锁定 / 已解锁 / 通关 / 当前（featured，跨 2 列）。
  *
  * Spotlight Border 严格按 §4.2 规格：
@@ -23,6 +24,13 @@ import { totalStars } from "./staProgress"
  *
  * 触屏（无 hover）退化为卡片中心 2.6s 呼吸柔光，transform-only（scale 呼吸），
  * 尊重 prefers-reduced-motion。
+ *
+ * R6 动效轮新增：
+ * - 卡片群 stagger 入场（opacity+y14，500ms --ease-cinematic，每项 +30ms）；
+ * - select↔game 真转场：根节点接入 StaRoot 的 AnimatePresence（exit fade+y 上行）；
+ * - CURRENT 卡呼吸描边（.hud-breathe-ring，--duration-ambient 2.6s，opacity-only）；
+ * - 锁定卡：可聚焦可点击（aria-disabled），点击 WAAPI shake ±3px + 底部提示浮层；
+ * - 星星 check-pop（.hud-check-pop，随卡片入场逐星 +60ms 交错）。
  */
 
 const MAX_LEVELS = LEVELS.length
@@ -30,9 +38,29 @@ const MAX_LEVELS = LEVELS.length
 /** 渐变半径 120px → 元素 240×240，中心即光斑心 */
 const SPOT = 240
 
+/** 锁定提示浮层自动消失时长 */
+const LOCK_TIP_MS = 1600
+
+/** WAAPI shake：±3px 水平抖动，160ms（rules.md §6 微交互 150–300ms 区间取下限） */
+function shakeEl(el: HTMLElement | null): void {
+  if (!el || typeof el.animate !== "function") return
+  el.animate(
+    [
+      { transform: "translateX(0)" },
+      { transform: "translateX(-3px)" },
+      { transform: "translateX(3px)" },
+      { transform: "translateX(-3px)" },
+      { transform: "translateX(3px)" },
+      { transform: "translateX(0)" },
+    ],
+    { duration: 160, easing: "cubic-bezier(0.32, 0.72, 0, 1)" },
+  )
+}
+
 export function StaLevelSelect({ onPick }: { onPick: (levelId: number) => void }) {
   const progress = useStaProgress()
   const stars = totalStars(progress, MAX_LEVELS)
+  const reduceMotion = useReducedMotion()
 
   // 当前关 = 首个已解锁但未通关的关；全通则落在最后一关
   const currentId = React.useMemo(() => {
@@ -46,11 +74,49 @@ export function StaLevelSelect({ onPick }: { onPick: (levelId: number) => void }
 
   const rest = LEVELS.filter((l) => l.id !== currentId)
 
+  // 锁定提示浮层（单实例，重复点击重置计时）
+  const [lockTip, setLockTip] = React.useState<{ key: number; levelId: number } | null>(null)
+  const lockTipTimer = React.useRef<number | null>(null)
+  const tipKey = React.useRef(0)
+  React.useEffect(() => {
+    return () => {
+      if (lockTipTimer.current !== null) window.clearTimeout(lockTipTimer.current)
+    }
+  }, [])
+  const onLockedClick = React.useCallback((levelId: number) => {
+    tipKey.current += 1
+    setLockTip({ key: tipKey.current, levelId })
+    if (lockTipTimer.current !== null) window.clearTimeout(lockTipTimer.current)
+    lockTipTimer.current = window.setTimeout(() => setLockTip(null), LOCK_TIP_MS)
+  }, [])
+
+  // 转场期间防误触：exit 动画进行中卡片仍挂载，拦截二次 pick
+  const pickedRef = React.useRef(false)
+  const handlePick = React.useCallback(
+    (levelId: number) => {
+      if (pickedRef.current) return
+      pickedRef.current = true
+      onPick(levelId)
+    },
+    [onPick],
+  )
+
   return (
-    <div className="absolute inset-0 z-40 overflow-y-auto overscroll-contain">
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={reduceMotion ? undefined : { opacity: 0, y: -12 }}
+      transition={{ duration: 0.3, ease: easeInstrument }}
+      className="absolute inset-0 z-40 overflow-y-auto overscroll-contain"
+    >
       <div className="star-chart-grid min-h-full bg-ink-1000">
         <div className="mx-auto w-full max-w-[420px] px-4 pb-16 pt-[max(1.25rem,env(safe-area-inset-top))]">
-          <header className="mb-5 flex items-end justify-between gap-3">
+          <motion.header
+            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: easeInstrument }}
+            className="mb-5 flex items-end justify-between gap-3"
+          >
             <div>
               <h1 className="font-display text-[22px] leading-none tracking-[0.08em] text-hud-text">
                 LEVEL SELECT
@@ -63,27 +129,57 @@ export function StaLevelSelect({ onPick }: { onPick: (levelId: number) => void }
                 {stars}/{MAX_LEVELS * 3}
               </span>
             </div>
-          </header>
+          </motion.header>
 
           <SpotlightCard
             levelId={currentId}
             state="current"
-            onPick={onPick}
+            onPick={handlePick}
+            onLockedClick={onLockedClick}
+            enterIndex={0}
             featured
           />
 
           <div className="mt-3 grid grid-cols-2 gap-3">
-            {rest.map((l) => {
+            {rest.map((l, i) => {
               const rec = progress.levels[String(l.id)]
               const unlocked = l.id === 1 || rec?.unlocked === true
               const cleared = rec?.cleared === true
               const state: CardState = !unlocked ? "locked" : cleared ? "cleared" : "unlocked"
-              return <SpotlightCard key={l.id} levelId={l.id} state={state} onPick={onPick} />
+              return (
+                <SpotlightCard
+                  key={l.id}
+                  levelId={l.id}
+                  state={state}
+                  onPick={handlePick}
+                  onLockedClick={onLockedClick}
+                  enterIndex={i + 1}
+                />
+              )
             })}
           </div>
         </div>
       </div>
-    </div>
+
+      {/* 锁定提示浮层：fade+slide 进出（200ms），不挡操作 */}
+      <AnimatePresence>
+        {lockTip ? (
+          <motion.div
+            key={lockTip.key}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: easeInstrument }}
+            className="pointer-events-none fixed inset-x-0 bottom-[max(1.5rem,env(safe-area-inset-bottom))] z-50 flex justify-center px-4"
+          >
+            <span className="hud-chamfer-sm flex items-center gap-2 border border-hud-line bg-ink-800/95 px-4 py-2.5 text-[13px] text-hud-text-dim">
+              <LockGlyph size={13} className="text-hud-text-faint" />
+              先通过第 {lockTip.levelId - 1} 关
+            </span>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </motion.div>
   )
 }
 
@@ -93,11 +189,17 @@ function SpotlightCard({
   levelId,
   state,
   onPick,
+  onLockedClick,
+  enterIndex,
   featured = false,
 }: {
   levelId: number
   state: CardState
   onPick: (id: number) => void
+  /** 锁定卡点击回调（shake 由卡片自理，提示浮层由父级统一挂） */
+  onLockedClick: (id: number) => void
+  /** stagger 入场次序（featured = 0，其余按网格序 +1） */
+  enterIndex: number
   featured?: boolean
 }) {
   const def = LEVELS.find((l) => l.id === levelId)
@@ -106,11 +208,11 @@ function SpotlightCard({
   const stars = rec?.stars ?? 0
   const best = rec?.bestScore ?? 0
   const ref = React.useRef<HTMLButtonElement | null>(null)
+  const reduceMotion = useReducedMotion()
 
   const [hovered, setHovered] = React.useState(false)
   const [origin, setOrigin] = React.useState<{ x: number; y: number } | null>(null)
   const [touchOnly, setTouchOnly] = React.useState(false)
-  const reduceMotion = useReducedMotion()
 
   React.useEffect(() => {
     if (typeof window === "undefined") return
@@ -138,7 +240,7 @@ function SpotlightCard({
     "group relative w-full overflow-hidden text-left",
     locked
       ? "cursor-not-allowed"
-      : "cursor-pointer transition-transform duration-150 hover:-translate-y-[2px] active:scale-[0.98]",
+      : "cursor-pointer transition-[translate,scale,border-color] duration-150 ease-[var(--ease-instrument)] hover:-translate-y-[2px] hover:border-hud-accent/60 active:scale-[0.98]",
     featured ? "p-4" : "p-3",
     state === "locked" && "border border-hud-line bg-ink-900",
     state === "unlocked" && "border border-hud-line bg-ink-800",
@@ -147,17 +249,23 @@ function SpotlightCard({
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60",
   )
 
+  const enterDelay = staggerDelay(enterIndex, 0.03)
+
   return (
-    <button
+    <motion.button
       ref={ref}
       type="button"
-      disabled={locked}
+      // 锁定卡保持可点击以给出 shake+提示反馈（R6）；语义态用 aria-disabled 表达
+      aria-disabled={locked || undefined}
       aria-label={
         locked
           ? `第 ${levelId} 关 ${def.name}，未解锁`
           : `第 ${levelId} 关 ${def.name}，目标 ${def.targetScore}，${stars} 星`
       }
       className={shell}
+      initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: enterDelay }}
       onPointerMove={onMove}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => {
@@ -166,7 +274,12 @@ function SpotlightCard({
       onFocus={() => setHovered(true)}
       onBlur={() => setHovered(false)}
       onClick={() => {
-        if (!locked) onPick(levelId)
+        if (locked) {
+          if (!reduceMotion) shakeEl(ref.current)
+          onLockedClick(levelId)
+          return
+        }
+        onPick(levelId)
       }}
     >
       {/* Spotlight Border：预烘焙径向渐变块，只有 transform 在动（禁 blur / 禁改渐变中心） */}
@@ -211,6 +324,15 @@ function SpotlightCard({
               ? { duration: 0 }
               : { duration: 2.6, repeat: Infinity, ease: "easeInOut" }
           }
+        />
+      ) : null}
+
+      {/* 当前关：呼吸描边（覆盖按钮自身边框像素，opacity 0.45↔1，2.6s ambient） */}
+      {state === "current" ? (
+        <span
+          aria-hidden
+          className="hud-breathe-ring pointer-events-none absolute border-[1.5px] border-hud-accent"
+          style={{ top: -1.5, right: -1.5, bottom: -1.5, left: -1.5 }}
         />
       ) : null}
 
@@ -260,15 +382,24 @@ function SpotlightCard({
         </div>
 
         <div className="mt-2 flex items-center gap-1">
-          {[0, 1, 2].map((i) => (
-            <StarGlyph
-              key={i}
-              filled={!locked && i < stars}
-              size={featured ? 15 : 13}
-              color={state === "cleared" ? "var(--hud-accent-bright)" : "var(--hud-accent)"}
-              hollowColor={locked ? "var(--ink-500)" : "var(--hud-line-strong)"}
-            />
-          ))}
+          {[0, 1, 2].map((i) => {
+            const filled = !locked && i < stars
+            // 星星随卡片入场逐星 pop（+60ms 交错）；空心星静态
+            return (
+              <span
+                key={i}
+                className={cn("inline-flex", filled && "hud-check-pop")}
+                style={filled ? { animationDelay: `${enterDelay + 0.35 + i * 0.06}s` } : undefined}
+              >
+                <StarGlyph
+                  filled={filled}
+                  size={featured ? 15 : 13}
+                  color={state === "cleared" ? "var(--hud-accent-bright)" : "var(--hud-accent)"}
+                  hollowColor={locked ? "var(--ink-500)" : "var(--hud-line-strong)"}
+                />
+              </span>
+            )
+          })}
           {state === "current" ? (
             <span className="ml-2 font-mono-data text-[11px] tracking-[0.22em] text-hud-accent">
               CURRENT
@@ -296,6 +427,6 @@ function SpotlightCard({
           )}
         </div>
       </div>
-    </button>
+    </motion.button>
   )
 }
