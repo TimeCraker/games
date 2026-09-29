@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { AnimatePresence, useReducedMotion } from "framer-motion"
+import { AnimatePresence, MotionConfig, useReducedMotion } from "framer-motion"
 
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 import { BrandMark } from "@/src/components/arcade/BrandMark"
@@ -290,7 +290,7 @@ export function StaRoot() {
   const lastLevel = result ? result.levelId >= MAX_LEVEL : false
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       {/* 游戏本体：等比缩放容器（画布 + HUD 层，逻辑 px） */}
       <StaGameShell>
         <div
@@ -362,7 +362,14 @@ export function StaRoot() {
         />
       </StaPausePanel>
 
-      <div className="fixed inset-0 z-[60]">
+      {/* 容器常驻挂载：z-60 只负责给结算浮层提供定位上下文。
+          空壳时必须 pointer-events-none，否则选关卡点击与画布瞄准被整层拦截
+          （真页面点击验收抓到的阻断级问题）；结算在场时恢复命中，让浮层自挡输入。 */}
+      <div
+        className={`fixed inset-0 z-[60] ${
+          overlay === "result" && result ? "" : "pointer-events-none"
+        }`}
+      >
         <AnimatePresence>
           {overlay === "result" && result ? (
             <StaResult
@@ -378,6 +385,6 @@ export function StaRoot() {
       </div>
 
       <GameBackButton variant="floating" />
-    </>
+    </MotionConfig>
   )
 }

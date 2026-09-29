@@ -68,24 +68,6 @@ export function glowTexture(radius: number, key: string): Texture {
   })
 }
 
-// ---- 星云霾（art bible §8-3：ink-700 @8% 径向，固定不滚动） ----
-
-export function nebulaTexture(radius: number): Texture {
-  return cached(`nebula:${radius}`, () => {
-    const size = radius * 2
-    const c = makeCanvas(size, size)
-    const ctx = c.getContext("2d")!
-    const g = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius)
-    // --ink-700 #181B1F @8% → 0
-    g.addColorStop(0, "rgba(24,27,31,0.08)")
-    g.addColorStop(0.55, "rgba(24,27,31,0.035)")
-    g.addColorStop(1, "rgba(24,27,31,0)")
-    ctx.fillStyle = g
-    ctx.fillRect(0, 0, size, size)
-    return Texture.from(c)
-  })
-}
-
 /** mulberry32 确定性 PRNG（贴图内形状稳定，不随刷新抖动）。 */
 function texRandom(seed: number): () => number {
   let a = seed >>> 0
@@ -99,71 +81,98 @@ function texRandom(seed: number): () => number {
 }
 
 /**
- * 星云云带贴图（本轮制作人判决：背景要有「形状明确的云带」，不是两团模糊）。
- * 沿正弦走廊堆叠椭圆软块 + 丝缕曲线，端部自然收束成带状。
+ * 星云云带贴图（2026-09-28 三轮抛光：对比度再提——形状要「一眼读出云带」）。
+ * 结构三件套：
+ *  ① 主云带沿 sin 走廊堆叠椭圆块，双层（暗体 + 亮脊）——亮脊是本轮加的对比度来源；
+ *  ② 带缘明暗割线（下缘压暗一线 + 上缘提亮一线）让带与深空「切开」，不再糊成雾；
+ *  ③ 丝缕曲线加粗提亮，给「云带走向」而非噪点感。
  * 色彩纪律：只用 ink 提亮的冷灰 + jade/amber 极低 alpha 缘光（§2.2 派生明度，不漂色相）。
  */
 export function nebulaBandTexture(w: number, h: number, seed: number): Texture {
-  return cached(`nebulaBand:${w}x${h}:${seed}`, () => {
+  return cached(`nebulaBand2:${w}x${h}:${seed}`, () => {
     const c = makeCanvas(w, h)
     const ctx = c.getContext("2d")!
     const rnd = texRandom(seed)
     const midY = h * 0.5
     const phase = rnd() * Math.PI * 2
     const amp = h * 0.2
+    const bandY = (t: number) => midY + Math.sin(t * Math.PI * 1.35 + phase) * amp
+    const taperAt = (t: number) => Math.pow(Math.sin(Math.PI * Math.min(1, Math.max(0, t))), 0.45)
 
-    // 1) 主云带：34 个椭圆软块沿 sin 走廊，端部 sin(πt)^0.5 收束
-    for (let i = 0; i < 34; i++) {
-      const t = i / 33
+    // 1a) 主云带暗体：38 个椭圆软块沿 sin 走廊（对比度基底：比背景亮一档的冷灰体）
+    for (let i = 0; i < 38; i++) {
+      const t = i / 37
       const x = t * w
-      const y = midY + Math.sin(t * Math.PI * 1.35 + phase) * amp
-      const taper = Math.pow(Math.sin(Math.PI * Math.min(1, Math.max(0, t))), 0.45)
-      const r = (h * 0.16 + rnd() * h * 0.14) * (0.55 + taper * 0.8)
-      const core = 0.05 + rnd() * 0.075
+      const y = bandY(t)
+      const taper = taperAt(t)
+      const r = (h * 0.17 + rnd() * h * 0.13) * (0.55 + taper * 0.8)
+      const core = 0.085 + rnd() * 0.09
       const g = ctx.createRadialGradient(x, y, 0, x, y, r)
-      g.addColorStop(0, `rgba(44,52,61,${core * taper})`)
-      g.addColorStop(0.5, `rgba(36,43,51,${core * 0.45 * taper})`)
-      g.addColorStop(1, "rgba(30,36,43,0)")
+      g.addColorStop(0, `rgba(58,68,80,${core * taper})`)
+      g.addColorStop(0.48, `rgba(46,55,66,${core * 0.42 * taper})`)
+      g.addColorStop(1, "rgba(34,41,50,0)")
       ctx.fillStyle = g
       ctx.fillRect(x - r, y - r, r * 2, r * 2)
     }
 
-    // 2) 缘光：上缘极淡琥珀（光污染呼应）、下缘极淡翠玉（晶体反光呼应）
-    for (let i = 0; i < 12; i++) {
-      const t = (i + 0.5) / 12
+    // 1b) 亮脊：沿走廊中心线一排更小更亮的椭圆，形成云带「脊」——形状可读性的主来源
+    for (let i = 0; i < 22; i++) {
+      const t = (i + 0.5) / 22
       const x = t * w
-      const y = midY + Math.sin(t * Math.PI * 1.35 + phase) * amp
-      const taper = Math.pow(Math.sin(Math.PI * t), 0.5)
+      const y = bandY(t) + (rnd() - 0.5) * h * 0.05
+      const taper = taperAt(t)
+      const r = h * (0.075 + rnd() * 0.055)
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r)
+      g.addColorStop(0, `rgba(92,104,118,${0.16 * taper})`)
+      g.addColorStop(0.55, `rgba(70,80,92,${0.07 * taper})`)
+      g.addColorStop(1, "rgba(52,60,70,0)")
+      ctx.fillStyle = g
+      ctx.fillRect(x - r, y - r, r * 2, r * 2)
+    }
+
+    // 2) 带缘割线：下缘压暗（负空间把带「托」出来）+ 上缘极淡琥珀 / 下缘极淡翠玉缘光
+    for (let i = 0; i < 16; i++) {
+      const t = (i + 0.5) / 16
+      const x = t * w
+      const y = bandY(t)
+      const taper = taperAt(t)
+      const r = h * (0.085 + rnd() * 0.05)
+      // 下缘暗割（ink-800 级，比带体暗，制造边缘对比）
+      const gD = ctx.createRadialGradient(x, y + h * 0.16, 0, x, y + h * 0.16, r)
+      gD.addColorStop(0, `rgba(10,12,16,${0.16 * taper})`)
+      gD.addColorStop(1, "rgba(10,12,16,0)")
+      ctx.fillStyle = gD
+      ctx.fillRect(x - r, y + h * 0.16 - r, r * 2, r * 2)
+      // 缘光：上缘极淡琥珀（光污染呼应）、下缘极淡翠玉（晶体反光呼应）
       const up = h * 0.11
-      const r = h * (0.09 + rnd() * 0.06)
-      const gA = ctx.createRadialGradient(x, y - up, 0, x, y - up, r)
-      gA.addColorStop(0, `rgba(84,68,40,${0.035 * taper})`)
-      gA.addColorStop(1, "rgba(84,68,40,0)")
+      const gA = ctx.createRadialGradient(x, y - up, 0, x, y - up, r * 0.85)
+      gA.addColorStop(0, `rgba(96,78,46,${0.055 * taper})`)
+      gA.addColorStop(1, "rgba(96,78,46,0)")
       ctx.fillStyle = gA
       ctx.fillRect(x - r, y - up - r, r * 2, r * 2)
-      const gB = ctx.createRadialGradient(x, y + up, 0, x, y + up, r)
-      gB.addColorStop(0, `rgba(52,72,66,${0.032 * taper})`)
-      gB.addColorStop(1, "rgba(52,72,66,0)")
+      const gB = ctx.createRadialGradient(x, y + up, 0, x, y + up, r * 0.85)
+      gB.addColorStop(0, `rgba(58,82,74,${0.05 * taper})`)
+      gB.addColorStop(1, "rgba(58,82,74,0)")
       ctx.fillStyle = gB
       ctx.fillRect(x - r, y + up - r, r * 2, r * 2)
     }
 
-    // 3) 丝缕：5 条低 alpha 贝塞尔沿带向，给云带「结构感」而非一团糊
-    for (let i = 0; i < 5; i++) {
-      const yOff = (rnd() - 0.5) * h * 0.34
-      const a = 0.028 + rnd() * 0.03
+    // 3) 丝缕：7 条贝塞尔沿带向，加粗提亮（结构感）
+    for (let i = 0; i < 7; i++) {
+      const yOff = (rnd() - 0.5) * h * 0.32
+      const a = 0.055 + rnd() * 0.05
       ctx.beginPath()
-      ctx.moveTo(w * 0.04, midY + yOff + Math.sin(phase) * amp * 0.6)
+      ctx.moveTo(w * 0.03, midY + yOff + Math.sin(phase) * amp * 0.6)
       ctx.bezierCurveTo(
         w * 0.32,
         midY + yOff - amp * (0.7 + rnd() * 0.5),
         w * 0.68,
         midY + yOff + amp * (0.7 + rnd() * 0.5),
-        w * 0.96,
+        w * 0.97,
         midY + yOff + Math.sin(phase + 1.2) * amp * 0.6,
       )
-      ctx.lineWidth = 7 + rnd() * 12
-      ctx.strokeStyle = `rgba(48,56,66,${a})`
+      ctx.lineWidth = 9 + rnd() * 14
+      ctx.strokeStyle = `rgba(62,72,84,${a})`
       ctx.stroke()
     }
     return Texture.from(c)
@@ -374,34 +383,40 @@ function pathHex(ctx: CanvasRenderingContext2D, r: number): void {
   ctx.closePath()
 }
 
-export function pegTexture(resonance: boolean): Texture {
-  return cached(`peg2:${resonance ? "res" : "cry"}`, () => {
+/**
+ * 钉贴图。compact=true 出「小屏可读」变体（375px 真机视口，画面缩到 ~0.52 倍）：
+ * 光晕强度砍到 ~45%（防相邻钉光晕糊成一片）、描边加粗到 3px（贴图内）、
+ * 切面对比拉满 —— 钉芯更实，缩小后仍能一眼读出六边宝石。
+ */
+export function pegTexture(resonance: boolean, compact = false): Texture {
+  return cached(`peg3:${resonance ? "res" : "cry"}:${compact ? "c" : "d"}`, () => {
     const c = makeCanvas(64, 64)
     const ctx = c.getContext("2d")!
     ctx.translate(32, 32)
     const R = 22
+    const glowK = compact ? 0.45 : 1 // 小屏光晕强度乘数
 
-    // 底光托底（本轮判决 2：每颗钉加辉光底座形成光场）——下半圆偏心的暖/翠柔光
+    // 底光托��（本轮判决 2：每颗钉加辉光底座形成光场）——下半圆偏心的暖/翠柔光
     const pedestal = ctx.createRadialGradient(0, R * 0.42, 0, 0, R * 0.42, R * 1.35)
     if (resonance) {
-      pedestal.addColorStop(0, "rgba(216,163,60,0.30)")
-      pedestal.addColorStop(0.55, "rgba(216,163,60,0.10)")
+      pedestal.addColorStop(0, `rgba(216,163,60,${0.3 * glowK})`)
+      pedestal.addColorStop(0.55, `rgba(216,163,60,${0.1 * glowK})`)
       pedestal.addColorStop(1, "rgba(216,163,60,0)")
     } else {
-      pedestal.addColorStop(0, "rgba(127,179,158,0.26)")
-      pedestal.addColorStop(0.55, "rgba(127,179,158,0.09)")
+      pedestal.addColorStop(0, `rgba(127,179,158,${0.26 * glowK})`)
+      pedestal.addColorStop(0.55, `rgba(127,179,158,${0.09 * glowK})`)
       pedestal.addColorStop(1, "rgba(127,179,158,0)")
     }
     ctx.fillStyle = pedestal
     ctx.fillRect(-R * 1.4, -R * 0.9, R * 2.8, R * 2.4)
 
-    // 外扩翠玉/琥珀柔光（4px @18% 语义，烘焙进贴图）
+    // 外扩翠玉/琥珀柔光（4px @18% 语义，烘焙进贴图；小屏按 glowK 收）
     const glow = ctx.createRadialGradient(0, 0, R * 0.4, 0, 0, R + 8)
     if (resonance) {
-      glow.addColorStop(0, "rgba(216,163,60,0.22)")
+      glow.addColorStop(0, `rgba(216,163,60,${0.22 * glowK})`)
       glow.addColorStop(1, "rgba(216,163,60,0)")
     } else {
-      glow.addColorStop(0, "rgba(127,179,158,0.18)")
+      glow.addColorStop(0, `rgba(127,179,158,${0.18 * glowK})`)
       glow.addColorStop(1, "rgba(127,179,158,0)")
     }
     ctx.fillStyle = glow
@@ -417,8 +432,8 @@ export function pegTexture(resonance: boolean): Texture {
       ctx.fillStyle = resonance ? `rgba(168,124,36,${alpha})` : `rgba(127,179,158,${alpha})`
       ctx.fill()
     }
-    cluster(-R * 0.72, R * 0.5, 0.5)
-    cluster(R * 0.78, R * 0.42, 0.4)
+    cluster(-R * 0.72, R * 0.5, compact ? 0.35 : 0.5)
+    cluster(R * 0.78, R * 0.42, compact ? 0.28 : 0.4)
 
     // 六边形主体 + 3 菱形切面
     pathHex(ctx, R)
@@ -475,9 +490,9 @@ export function pegTexture(resonance: boolean): Texture {
       ctx.fill()
     }
 
-    // 冷灰描边（line 1px）
+    // 冷灰描边（小屏加粗到 3px，缩放后仍是一根实线）
     pathHex(ctx, R)
-    ctx.lineWidth = 2
+    ctx.lineWidth = compact ? 3 : 2
     ctx.strokeStyle = resonance ? "rgba(168,124,36,1)" : "rgba(140,148,158,1)"
     ctx.stroke()
     return Texture.from(c)

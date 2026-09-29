@@ -1,6 +1,7 @@
 import Matter from "matter-js"
 
 import { HEIGHT, PHYS, RULES, WIDTH } from "../constants"
+import { applyBallPhys } from "./PhysicsWorld"
 import type { EntityRegistry } from "./EntityRegistry"
 import type { BallKind } from "./types"
 
@@ -225,7 +226,8 @@ export class GhostPredictor {
     // 与 GameEngine.launch 相同的球体正则化：25 边形近似圆的顶点相位若带着
     // 上一发的残余自转，SAT 选面会与实弹不同 → 归零对齐。
     Matter.Body.setAngle(this.ghostBall, 0)
-    this.ghostBall.frictionAir = ballKind === "pierce" ? 0 : PHYS.ballFrictionAir
+    // 球种手感（BALL_PHYS）与实弹同源施加，逐条镜像保 <2px 轨迹精度。
+    applyBallPhys(this.ghostBall, ballKind)
     Matter.Body.setPosition(this.ghostBall, { x: PHYS.launchAnchor.x, y: PHYS.launchAnchor.y })
     Matter.Body.setVelocity(this.ghostBall, {
       x: Math.sin(angle) * PHYS.v0,

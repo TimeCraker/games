@@ -79,10 +79,20 @@ export class BattleScene {
   private lastMarkerX = 0
   private markerPop = 0
   private reducedMotion = false
+  /** 小屏紧凑模式（375px 真机视口）：钉芯更实、光晕/连线降强度（补差 5） */
+  private compact = false
+  private viewportAcc = 0
 
   constructor(private readonly engine: GameEngine) {
     this.reducedMotion = this.fx.reducedMotion
     this.overlay = this.fx.overlay
+    // 紧凑模式初值同步判定：首帧创建的钉就用对贴图，不等 0.5s 轮询翻面
+    if (typeof window !== "undefined") {
+      const vw = window.visualViewport?.width ?? window.innerWidth
+      const vh = window.visualViewport?.height ?? window.innerHeight
+      const s = Math.min(vw / WIDTH, vh / HEIGHT)
+      this.compact = Number.isFinite(s) && s > 0 && s < 0.62
+    }
 
     this.container.addChild(this.lightField)
     this.container.addChild(this.obstacleLayer)
@@ -156,62 +166,63 @@ export class BattleScene {
     this.lightField.addChild(this.jadeBounce)
   }
 
-  // ---- 星象仪（art bible §3.5 五件套；本轮加厚到「观星台主炮」体量） ----
+  // ---- 星象仪（art bible §3.5 五件套；本轮补差 1：体块再放大 20%，几何重心沿弹道轴上移不压弹道） ----
 
   private buildLauncher(): void {
-    // 1) 黄铜梯形接口：加宽加厚（上宽 72 下宽 52，高 18），双层倒角
+    // 1) 黄铜梯形接口：上宽 86 下宽 62，高 22（×1.2），双层倒角
     const base = new Graphics()
     base
-      .poly([-36, 22, 36, 22, 26, 42, -26, 42])
+      .poly([-43, 18, 43, 18, 31, 40, -31, 40])
       .fill({ color: ART.brass, alpha: 1 })
       .stroke({ width: 1.5, color: ART.ink500, alpha: 0.95 })
     // 接口上缘 amber-400 倒角高光
     base
-      .moveTo(-32, 23.5)
-      .lineTo(32, 23.5)
+      .moveTo(-38, 19.5)
+      .lineTo(38, 19.5)
       .stroke({ width: 2, color: PALETTE.amberBright, alpha: 0.8 })
     // 两侧铆钉
-    for (const rx of [-26, 26]) {
-      base.circle(rx, 30, 3).fill({ color: ART.ink500, alpha: 0.9 })
-      base.circle(rx, 30, 3).stroke({ width: 1, color: PALETTE.amberBright, alpha: 0.5 })
+    for (const rx of [-31, 31]) {
+      base.circle(rx, 27, 3.5).fill({ color: ART.ink500, alpha: 0.9 })
+      base.circle(rx, 27, 3.5).stroke({ width: 1, color: PALETTE.amberBright, alpha: 0.5 })
     }
     this.launcher.addChild(base)
 
-    // 2) 炮管：加厚圆角矩形 34×86（原 22×64）+ 双槽线 + 蓄能节环 + 炮口制退器
+    // 2) 炮管：圆角矩形 41×86（宽 ×1.2、长不变——长度够体量、又不向弹道区多伸）
+    //    整体 y 上移 4px，让加宽后的炮管下缘与上一轮基本齐平
     const barrel = new Graphics()
-    barrel.roundRect(-17, 6, 34, 86, 10).fill({ color: ART.brass, alpha: 1 })
-    barrel.roundRect(-17, 6, 34, 86, 10).stroke({ width: 1.5, color: ART.ink500, alpha: 0.95 })
-    // 纵向槽线（赤道仪语言）
+    barrel.roundRect(-20.5, 2, 41, 86, 11).fill({ color: ART.brass, alpha: 1 })
+    barrel.roundRect(-20.5, 2, 41, 86, 11).stroke({ width: 1.5, color: ART.ink500, alpha: 0.95 })
+    // 纵向槽线（赤道仪语言，随加宽外移）
     barrel
-      .moveTo(-12, 16)
-      .lineTo(-12, 82)
-      .moveTo(12, 16)
-      .lineTo(12, 82)
+      .moveTo(-14.5, 12)
+      .lineTo(-14.5, 78)
+      .moveTo(14.5, 12)
+      .lineTo(14.5, 78)
       .stroke({ width: 1, color: ART.ink500, alpha: 0.85 })
     // 蓄能节环 ×3（暗面横向环，体块感）
-    for (const ry of [26, 48, 70]) {
+    for (const ry of [22, 44, 66]) {
       barrel
-        .roundRect(-17, ry, 34, 6, 2)
+        .roundRect(-20.5, ry, 41, 7, 2)
         .fill({ color: ART.ink500, alpha: 0.55 })
       barrel
-        .moveTo(-17, ry + 1)
-        .lineTo(17, ry + 1)
+        .moveTo(-20.5, ry + 1)
+        .lineTo(20.5, ry + 1)
         .stroke({ width: 1, color: PALETTE.amberBright, alpha: 0.35 })
     }
-    // 炮口制退器：更宽的端块 + 8px amber-400 倒角边
-    barrel.roundRect(-20, 86, 40, 12, 4).fill({ color: ART.brass, alpha: 1 })
-    barrel.roundRect(-20, 86, 40, 12, 4).stroke({ width: 1.5, color: ART.ink500, alpha: 0.95 })
-    barrel.roundRect(-20, 92, 40, 6, 2).fill({ color: PALETTE.amberBright, alpha: 0.95 })
+    // 炮口制退器：更宽的端块 48×13 + amber-400 倒角边
+    barrel.roundRect(-24, 88, 48, 13, 4).fill({ color: ART.brass, alpha: 1 })
+    barrel.roundRect(-24, 88, 48, 13, 4).stroke({ width: 1.5, color: ART.ink500, alpha: 0.95 })
+    barrel.roundRect(-24, 94, 48, 7, 2).fill({ color: PALETTE.amberBright, alpha: 0.95 })
     this.barrelGroup.addChild(barrel)
 
-    // 3) 炮口晶石：放大菱形 14×20（amber，描边 amberBright）
+    // 3) 炮口晶石：菱形 17×24（amber，描边 amberBright）——保持在原炮口延长线上
     const gem = new Graphics()
-    gem.poly([0, -10, 7, 0, 0, 10, -7, 0]).fill({ color: PALETTE.amber, alpha: 1 })
-    gem.poly([0, -10, 7, 0, 0, 10, -7, 0]).stroke({ width: 1.5, color: PALETTE.amberBright, alpha: 1 })
+    gem.poly([0, -12, 8.5, 0, 0, 12, -8.5, 0]).fill({ color: PALETTE.amber, alpha: 1 })
+    gem.poly([0, -12, 8.5, 0, 0, 12, -8.5, 0]).stroke({ width: 1.5, color: PALETTE.amberBright, alpha: 1 })
     const gemHolder = new Container()
-    gemHolder.position.set(0, 112)
+    gemHolder.position.set(0, 114)
     gemHolder.addChild(gem)
-    this.gemCore = new Sprite({ texture: glowTexture(14, "gem") })
+    this.gemCore = new Sprite({ texture: glowTexture(16, "gem") })
     this.gemCore.anchor.set(0.5)
     this.gemCore.tint = PALETTE.amberPale
     this.gemCore.alpha = 0
@@ -220,19 +231,19 @@ export class BattleScene {
     this.barrelGroup.addChild(gemHolder)
     this.launcher.addChild(this.barrelGroup)
 
-    // 4) 蓄力光环：r46 / r58 各 120° 弧，反向缓转（12s/圈），更亮
+    // 4) 蓄力光环：r55 / r70 各 120° 弧（×1.2），反向缓转（12s/圈）
     this.chargeRings = new Graphics()
     this.launcher.addChild(this.chargeRings)
 
-    // 5) 刻度弧：r72 细弧 + 每 10° 5px 刻度 / 每 30° 9px 主刻度
+    // 5) 刻度弧：r86 细弧 + 每 10° 6px 刻度 / 每 30° 11px 主刻度（×1.2）
     this.scaleArc = new Graphics()
-    const R = 72
+    const R = 86
     this.scaleArc
       .arc(0, 0, R, -Math.PI / 2 - (78 * Math.PI) / 180, -Math.PI / 2 + (78 * Math.PI) / 180)
       .stroke({ width: 1, color: ART.fog400, alpha: 0.35 })
     for (let deg = -78; deg <= 78; deg += 10) {
       const a = -Math.PI / 2 + (deg * Math.PI) / 180
-      const len = deg % 30 === 0 ? 9 : 5
+      const len = deg % 30 === 0 ? 11 : 6
       this.scaleArc
         .moveTo(Math.cos(a) * R, Math.sin(a) * R)
         .lineTo(Math.cos(a) * (R + len), Math.sin(a) * (R + len))
@@ -251,8 +262,8 @@ export class BattleScene {
       this.barrelRecoil = 1
       this.chargeFlash = 1
       const aim = this.engine.aimAngle
-      const mx = PHYS.launchAnchor.x + Math.sin(aim) * 118
-      const my = PHYS.launchAnchor.y + Math.cos(aim) * 118
+      const mx = PHYS.launchAnchor.x + Math.sin(aim) * 124
+      const my = PHYS.launchAnchor.y + Math.cos(aim) * 124
       this.fx.muzzleRing(mx, my)
       this.fx.ring(mx, my, 6, 30, { width: 3, color: PALETTE.amberBright, alpha0: 0.9, maxLife: 0.22 })
       // 口焰更猛（判决 3）：假光照爆发照亮炮口周围 + 沿轴向的锥形焰光
@@ -487,6 +498,7 @@ export class BattleScene {
   /** 每帧由 Pixi ticker 调用。dtSec 为秒（hit-stop 时传 0）。 */
   sync(dtSec: number): void {
     this.elapsed += dtSec
+    this.syncViewportMode()
 
     // 回关复位：level-clear/fail 是终态，UI 调 restartLevel()/nextLevel() 后 phase 回 aiming，
     // 此时清掉收束暗层/星级/横幅等残留（否则会盖到下一局）。
@@ -631,14 +643,42 @@ export class BattleScene {
       }
       // 中心点
       this.trajectory.circle(p.x, p.y, 2.5 * s).fill({ color: PALETTE.amberPale, alpha: 0.95 })
-      // 光环（预烘焙柔光，pop 时更亮）
+      // 光环（预烘焙柔光，pop 时更亮；小屏降强度防糊，补差 5）
       this.markerGlow.position.set(p.x, p.y)
       this.markerGlow.scale.set((1.1 + s * 0.5) * (this.reducedMotion ? 0.8 : 1))
-      this.markerGlow.alpha = 0.28 + 0.3 * s
+      this.markerGlow.alpha = (0.28 + 0.3 * s) * (this.compact ? 0.6 : 1)
       this.markerGlow.visible = true
     } else {
       this.markerGlow.visible = false
     }
+  }
+
+  /**
+   * 视口紧凑模式（补差 5：375px 真机视口钉子可读性）——
+   * 按壳层等比缩放（min(vw/720, vh/1280)，与 StaGameShell 同式）判定小屏，
+   * 切换紧凑钉贴图（钉芯更实、光晕收窄），能量连线/标记光晕按视口降强度。
+   * 每 0.5s 轮询一次（避免逐帧读布局），比例变化才动贴图 —— 零稳态成本。
+   */
+  private syncViewportMode(): void {
+    this.viewportAcc += 1
+    if (this.viewportAcc < 30) return
+    this.viewportAcc = 0
+    if (typeof window === "undefined") return
+    const vw = window.visualViewport?.width ?? window.innerWidth
+    const vh = window.visualViewport?.height ?? window.innerHeight
+    const scale = Math.min(vw / WIDTH, vh / HEIGHT) // <0.62 视为小屏（375/720≈0.52）
+    const compact = Number.isFinite(scale) && scale > 0 && scale < 0.62
+    if (compact === this.compact) return
+    this.compact = compact
+    // 已生成的钉换贴图（贴图内已含光晕收窄/钉芯加强）
+    for (const e of this.engine.registry.all()) {
+      if (!e.kind.startsWith("peg-")) continue
+      const spr = this.pegSprites.get(e.id)
+      if (spr) spr.texture = pegTexture(e.kind === "peg-resonance", compact)
+    }
+    // 钉集未变也会被签名校验短路 —— 清签名强制连线按新强度重绘
+    this.lastPegSig = ""
+    this.rebuildPegLinks()
   }
 
   // ---- 钉（art bible §3.2） ----
@@ -651,7 +691,7 @@ export class BattleScene {
         live.add(e.id)
         let spr = this.pegSprites.get(e.id)
         if (!spr) {
-          spr = new Sprite({ texture: pegTexture(kind === "peg-resonance") })
+          spr = new Sprite({ texture: pegTexture(kind === "peg-resonance", this.compact) })
           spr.anchor.set(0.5)
           const big = (e.hp ?? 1) >= 2
           const baseScale = PHYS.pegRadius / 22
@@ -714,7 +754,8 @@ export class BattleScene {
         const k = 1 - d / LINK_DIST
         const res = a.kind === "peg-resonance" || b.kind === "peg-resonance"
         const color = res ? PALETTE.amber : PALETTE.jade
-        const alpha = (res ? 0.16 : 0.11) * (0.35 + k * 0.65)
+        // 小屏连线降强度，防与钉光晕糊成一片（补差 5）
+        const alpha = (res ? 0.16 : 0.11) * (0.35 + k * 0.65) * (this.compact ? 0.55 : 1)
         this.pegLinks
           .moveTo(a.body.position.x, a.body.position.y)
           .lineTo(b.body.position.x, b.body.position.y)
@@ -1055,7 +1096,7 @@ export class BattleScene {
       this.barrelGroup.position.set(0, off)
     }
 
-    // 蓄力环：r46/r58 各 120° 弧反向缓转；发射瞬间增亮 180ms 消散（判决 3：更亮）
+    // 蓄力环：r55/r70 各 120° 弧反向缓转（×1.2）；发射瞬间增亮 180ms 消散
     this.chargeRings.clear()
     const aiming = this.engine.phase === "aiming"
     const rot = this.reducedMotion ? 0 : this.elapsed * ((Math.PI * 2) / 12)
@@ -1065,8 +1106,8 @@ export class BattleScene {
     const color = flash > 0.05 ? PALETTE.amberPale : PALETTE.amberBright
     const arcAlpha = baseAlpha + flash * 0.28
     for (const [r, dir] of [
-      [46, 1],
-      [58, -1],
+      [55, 1],
+      [70, -1],
     ] as const) {
       const start = rot * dir
       this.chargeRings

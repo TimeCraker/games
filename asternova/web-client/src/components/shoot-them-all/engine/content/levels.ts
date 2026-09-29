@@ -230,11 +230,13 @@ const L8_PEGS: PegSpec[] = [
   ...row(400, 480, 620, 3, "crystal"),
 ]
 
-/** L9 晶簇堡垒：三层石梁分割的横向钉层（共鸣/晶体交替），侧翼冰柱。 */
+/** L9 晶簇堡垒：三层石梁分割的横向钉层（共鸣/晶体交替），侧翼冰柱。
+ *  2026-09-28 实测：石梁 w=320 把左右通路封成 ~55px 窄缝，模拟过关率仅 6%（墙）。
+ *  收窄到 w=240（两侧通道拓宽到 ~95px，球径 18 可过）后回到「有挑战非墙」。 */
 const L9_OBSTACLES: ObstacleSpec[] = [
-  { x: 360, y: 480, w: 320, h: 34, kind: "stone", hp: 2 },
-  { x: 360, y: 720, w: 320, h: 34, kind: "stone", hp: 2 },
-  { x: 360, y: 960, w: 320, h: 34, kind: "stone", hp: 2 },
+  { x: 360, y: 480, w: 240, h: 34, kind: "stone", hp: 2 },
+  { x: 360, y: 720, w: 240, h: 34, kind: "stone", hp: 2 },
+  { x: 360, y: 960, w: 240, h: 34, kind: "stone", hp: 2 },
   { x: 160, y: 700, w: 30, h: 120, kind: "ice", hp: 1 },
   { x: 560, y: 700, w: 30, h: 120, kind: "ice", hp: 1 },
 ]
@@ -278,22 +280,22 @@ export const LEVELS: LevelDef[] = [
     id: 1,
     name: "星环序曲",
     targetScore: 800,
-    balls: ["standard", "standard", "standard", "standard", "standard", "standard"],
+    balls: ["standard", "standard", "standard", "standard", "standard"],
     pegs: L1_PEGS,
     obstacles: [],
   },
   {
     id: 2,
     name: "共鸣回廊",
-    targetScore: 1200,
-    balls: ["standard", "standard", "standard", "standard", "standard", "standard"],
+    targetScore: 1000,
+    balls: ["standard", "standard", "standard", "standard", "standard"],
     pegs: L2_PEGS,
     obstacles: [],
   },
   {
     id: 3,
     name: "爆裂星簇",
-    targetScore: 1600,
+    targetScore: 1400,
     balls: ["standard", "standard", "blast", "standard", "standard", "standard"],
     pegs: L3_PEGS,
     obstacles: [],
@@ -301,8 +303,8 @@ export const LEVELS: LevelDef[] = [
   {
     id: 4,
     name: "石阵门关",
-    targetScore: 2000,
-    balls: ["standard", "heavy", "standard", "standard", "standard"],
+    targetScore: 1500,
+    balls: ["standard", "heavy", "standard", "heavy", "standard", "standard"],
     pegs: L4_PEGS,
     obstacles: L4_OBSTACLES,
   },
@@ -317,7 +319,7 @@ export const LEVELS: LevelDef[] = [
   {
     id: 6,
     name: "冰环护盾",
-    targetScore: 2800,
+    targetScore: 2600,
     balls: ["standard", "blast", "standard", "heavy", "pierce", "standard"],
     pegs: L6_PEGS,
     obstacles: L6_OBSTACLES,
@@ -325,15 +327,15 @@ export const LEVELS: LevelDef[] = [
   {
     id: 7,
     name: "菱光矩阵",
-    targetScore: 3200,
-    balls: ["standard", "blast", "pierce", "heavy", "standard"],
+    targetScore: 2800,
+    balls: ["standard", "blast", "pierce", "heavy", "standard", "standard"],
     pegs: L7_PEGS,
     obstacles: L7_OBSTACLES,
   },
   {
     id: 8,
     name: "星瀑斜径",
-    targetScore: 3600,
+    targetScore: 2700,
     balls: ["standard", "pierce", "standard", "blast", "heavy", "standard"],
     pegs: L8_PEGS,
     obstacles: L8_OBSTACLES,
@@ -341,15 +343,15 @@ export const LEVELS: LevelDef[] = [
   {
     id: 9,
     name: "晶簇堡垒",
-    targetScore: 4000,
-    balls: ["heavy", "standard", "pierce", "blast", "standard", "standard"],
+    targetScore: 3100,
+    balls: ["heavy", "standard", "heavy", "pierce", "blast", "standard"],
     pegs: L9_PEGS,
     obstacles: L9_OBSTACLES,
   },
   {
     id: 10,
     name: "观星台终章",
-    targetScore: 4600,
+    targetScore: 5100,
     balls: ["heavy", "blast", "standard", "pierce", "heavy", "standard"],
     pegs: L10_PEGS,
     obstacles: L10_OBSTACLES,

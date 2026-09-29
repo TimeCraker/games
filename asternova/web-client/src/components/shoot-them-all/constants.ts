@@ -95,3 +95,28 @@ export const PHYS = {
   pegRadius: 10,
   pegRestitution: 0.5,
 } as const
+
+/**
+ * 球种手感分化（2026-09-28 数值实测调优，遗留风险 #3）。
+ *
+ * 语义目标：heavy「更沉」= 低弹+微抓地+高密度，撞上去像夯一下；
+ * pierce「更飘快」= 零风阻+轻质+更滑，穿阵时贴直线滑过去；
+ * blast「更猛」= 高弹+低风阻，爆完还带着劲乱窜。
+ *
+ * ⚠️ 镜像红线：GameEngine.launch（实弹）与 GhostPredictor.predict（幽灵球）
+ * 必须经由同一 applyBallPhys 施加本表，逐条一致才保 <2px 轨迹精度。
+ * 另注：matter 弹性合成 = max(球, 钉)，故 restitution 差异在碰钉时有效
+ * （钉 0.5 → heavy 合成 0.50 / standard 0.55 / blast 0.62）；
+ * 而 setStatic(false) 会用 _original 快照还原 restitution/friction/density，
+ * 施加必须发生在 setStatic(false) 之后（见 launch）。
+ */
+export const BALL_PHYS = {
+  /** 基准（白皮书 §7：restitution 0.55） */
+  standard: { restitution: 0.55, friction: 0.001, frictionAir: 0.006, density: 0.005 },
+  /** 重弹「更沉」：钝弹、贴障碍、质量感 */
+  heavy: { restitution: 0.5, friction: 0.004, frictionAir: 0.006, density: 0.008 },
+  /** 穿透弹「更飘快」：零风阻（穿钉不衰减）+ 轻质 */
+  pierce: { restitution: 0.6, friction: 0.0005, frictionAir: 0, density: 0.0035 },
+  /** 爆裂弹「更猛】：高弹 + 低风阻 */
+  blast: { restitution: 0.62, friction: 0.001, frictionAir: 0.004, density: 0.0055 },
+} as const

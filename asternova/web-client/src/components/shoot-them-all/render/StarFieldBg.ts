@@ -93,6 +93,7 @@ export class StarFieldBg {
     this.buildStructures()
     this.buildNebulaBands()
     this.buildStars()
+    this.buildSideWalls()
     this.buildL4()
   }
 
@@ -148,10 +149,10 @@ export class StarFieldBg {
   }
 
   /**
-   * 巨型结构剪影（判决 1：占背景 30%+ 面积）——
+   * 巨型结构剪影（判决 1：占背景 30%+ 面积；本轮补差 2：描边亮度 +50% 一眼可辨）——
    * ① 行星弧线（左下巨型天体边缘 + 暗环）② 巨型星象仪同心环轨（上部主场）
    * ③ 观星台环形轨道（斜切全场的轨道弧）④ 环上刻度钉点。
-   * 全部一次绘制的 Graphics；描边冷灰 @10–16%，行星 rim 走 amber 极低 alpha（禁霓虹）。
+   * 全部一次绘制的 Graphics；描边冷灰 @17–39%（上轮 0.14–0.26 ×1.5），行星 rim 走 amber 低 alpha（禁霓虹）。
    */
   private buildStructures(): void {
     const g = new Graphics()
@@ -162,30 +163,30 @@ export class StarFieldBg {
     const pcy = 1620
     const pr = 560
     // 行星体：比背景略亮的冷灰面（剪影感），上缘渐亮
-    g.circle(pcx, pcy, pr).fill({ color: 0x141a22, alpha: 0.95 })
+    g.circle(pcx, pcy, pr).fill({ color: 0x1a222c, alpha: 0.95 })
     // 弧缘内描边（amber 极淡 = 反射恒星光）
-    g.arc(pcx, pcy, pr - 1, Math.PI * 1.12, Math.PI * 1.92).stroke({ width: 3, color: PALETTE.amber, alpha: 0.22 })
-    g.arc(pcx, pcy, pr - 8, Math.PI * 1.18, Math.PI * 1.86).stroke({ width: 1.5, color: PALETTE.amberBright, alpha: 0.13 })
-    // 暗环��行星环剪影）：两条扁椭圆
+    g.arc(pcx, pcy, pr - 1, Math.PI * 1.12, Math.PI * 1.92).stroke({ width: 3, color: PALETTE.amber, alpha: 0.33 })
+    g.arc(pcx, pcy, pr - 8, Math.PI * 1.18, Math.PI * 1.86).stroke({ width: 1.5, color: PALETTE.amberBright, alpha: 0.2 })
+    // 暗环（行星环剪影）：两条扁椭圆
     for (const [rx, ry, a] of [
-      [720, 92, 0.11],
-      [780, 104, 0.07],
+      [720, 92, 0.17],
+      [780, 104, 0.11],
     ] as const) {
       strokeRotatedEllipse(g, pcx - 30, pcy - 80, rx, ry, -0.18, 3, ART.fog400, a)
     }
     // 行星表面经纬微线（极淡，只在上缘可见区）
     for (let i = 0; i < 5; i++) {
       const rr = pr * (0.55 + i * 0.09)
-      g.arc(pcx, pcy, rr, Math.PI * 1.22, Math.PI * 1.82).stroke({ width: 1, color: ART.ink500, alpha: 0.22 })
+      g.arc(pcx, pcy, rr, Math.PI * 1.22, Math.PI * 1.82).stroke({ width: 1, color: ART.ink500, alpha: 0.33 })
     }
 
     // ---- ② 巨型星象仪轮廓：同心环 + 子午弧，圆心 (360, 420) ----
     const acx = 360
     const acy = 420
     for (const [r, a] of [
-      [300, 0.22],
-      [368, 0.18],
-      [448, 0.14],
+      [300, 0.33],
+      [368, 0.27],
+      [448, 0.21],
     ] as const) {
       g.circle(acx, acy, r).stroke({ width: 1.6, color: ART.fog400, alpha: a })
     }
@@ -197,25 +198,25 @@ export class StarFieldBg {
       const r1 = r0 + (major ? 14 : 7)
       g.moveTo(acx + Math.cos(a) * r0, acy + Math.sin(a) * r0)
         .lineTo(acx + Math.cos(a) * r1, acy + Math.sin(a) * r1)
-        .stroke({ width: 1, color: ART.fog400, alpha: major ? 0.26 : 0.15 })
+        .stroke({ width: 1, color: ART.fog400, alpha: major ? 0.39 : 0.23 })
     }
     // 子午弧 ×3（旋转椭圆，形成球体框架感）
     for (const rot of [-0.5, 0.15, 0.8]) {
-      strokeRotatedEllipse(g, acx, acy, 448, 190, rot, 1.2, ART.fog400, 0.15)
+      strokeRotatedEllipse(g, acx, acy, 448, 190, rot, 1.2, ART.fog400, 0.23)
     }
     // 极轴短线
-    g.moveTo(acx, acy - 470).lineTo(acx, acy + 470).stroke({ width: 1, color: ART.fog400, alpha: 0.12 })
+    g.moveTo(acx, acy - 470).lineTo(acx, acy + 470).stroke({ width: 1, color: ART.fog400, alpha: 0.18 })
 
     // ---- ③ 观星台环形轨道：大椭圆弧斜切中下部 ----
-    strokeRotatedEllipse(g, 360, 980, 640, 120, -0.12, 2.5, ART.fog400, 0.2)
-    strokeRotatedEllipse(g, 360, 980, 600, 104, -0.12, 1.2, ART.fog400, 0.13)
+    strokeRotatedEllipse(g, 360, 980, 640, 120, -0.12, 2.5, ART.fog400, 0.3)
+    strokeRotatedEllipse(g, 360, 980, 600, 104, -0.12, 1.2, ART.fog400, 0.2)
     // 轨道上的站点方块（剪影细节）
     for (let i = 0; i < 9; i++) {
       const a = -0.12 + (i / 8) * Math.PI * 1.05 + 0.12
       const x = 360 + Math.cos(a) * 620
       const y = 980 + Math.sin(a) * 112
-      g.rect(x - 8, y - 3.5, 16, 7).fill({ color: ART.ink500, alpha: 0.7 })
-      g.rect(x - 8, y - 3.5, 16, 7).stroke({ width: 1, color: ART.fog400, alpha: 0.2 })
+      g.rect(x - 8, y - 3.5, 16, 7).fill({ color: ART.ink500, alpha: 0.85 })
+      g.rect(x - 8, y - 3.5, 16, 7).stroke({ width: 1, color: ART.fog400, alpha: 0.3 })
     }
 
     // ---- ④ 观测舱剪影组（轨道旁的小型结构，随机但确定性） ----
@@ -224,10 +225,85 @@ export class StarFieldBg {
       const y = 880 + rnd() * 160
       const w = 26 + rnd() * 40
       const h = 12 + rnd() * 22
-      g.rect(x, y, w, h).fill({ color: 0x121822, alpha: 0.85 })
-      g.rect(x, y, w, 2).stroke({ width: 1, color: ART.fog400, alpha: 0.22 })
+      g.rect(x, y, w, h).fill({ color: 0x161c26, alpha: 0.9 })
+      g.rect(x, y, w, 2).stroke({ width: 1, color: ART.fog400, alpha: 0.34 })
     }
 
+    this.container.addChild(g)
+  }
+
+  /**
+   * 两侧仪器墙（本轮补差 4：侧边区域加层次细节，贴「深空观星台」母题）——
+   * 双立柱面板 + 柱间管线与接头环 + 板缝铆钉 + 内缘刻度柱 + 仪器壁龛（左右非对称）。
+   * 全部一次绘制的 Graphics（零每帧成本）；alpha 压在 0.12–0.55，
+   * 是「墙的结构」不是发光装饰，整体亮度低于钉板主体、不抢戏。
+   */
+  private buildSideWalls(): void {
+    const g = new Graphics()
+    const seamStep = 150
+    for (const side of [0, 1] as const) {
+      // lx = 距外缘距离（0..72）；X 映射到世界 x（右墙镜像）
+      const X = (lx: number) => (side === 0 ? lx : WIDTH - lx)
+      const seamOff = side === 0 ? 30 : 105 // 左右错缝，避免镜像印章感
+      const nicheYs = side === 0 ? [340, 820, 1160] : [220, 640, 1040]
+
+      // ① 外立柱面板 + 内立柱面板（双柱，冷灰面 + 亮缘）
+      for (const [lx0, lx1, fillA] of [
+        [6, 30, 0.55],
+        [38, 58, 0.4],
+      ] as const) {
+        const xa = X(lx0)
+        const xb = X(lx1)
+        g.rect(Math.min(xa, xb), 0, Math.abs(xb - xa), HEIGHT).fill({ color: ART.ink700, alpha: fillA })
+        g.moveTo(xa, 0).lineTo(xa, HEIGHT).stroke({ width: 1, color: ART.fog400, alpha: 0.22 })
+        g.moveTo(xb, 0).lineTo(xb, HEIGHT).stroke({ width: 1, color: ART.fog400, alpha: 0.18 })
+      }
+
+      // ② 柱间暗槽 + 竖直管线（双线 + 接头环）
+      const xc = X(34)
+      g.rect(Math.min(X(30), X(38)), 0, 8, HEIGHT).fill({ color: ART.ink600, alpha: 0.5 })
+      g.moveTo(xc, 0).lineTo(xc, HEIGHT).stroke({ width: 2, color: ART.ink500, alpha: 0.7 })
+      const xh = xc + (side === 0 ? -1.5 : 1.5)
+      g.moveTo(xh, 0).lineTo(xh, HEIGHT).stroke({ width: 1, color: ART.fog400, alpha: 0.12 })
+      for (let y = seamOff; y < HEIGHT; y += 220) {
+        g.rect(Math.min(X(31), X(37)) , y - 3, 6, 6).fill({ color: ART.brass, alpha: 0.35 })
+      }
+
+      // ③ 横向板缝 + 铆钉
+      for (let y = seamOff; y < HEIGHT; y += seamStep) {
+        g.moveTo(X(6), y).lineTo(X(58), y).stroke({ width: 1, color: ART.fog400, alpha: 0.2 })
+        for (const lx of [14, 22, 48]) {
+          g.circle(X(lx), y, 2.2).fill({ color: ART.fog400, alpha: 0.3 })
+          g.circle(X(lx), y, 2.2).stroke({ width: 1, color: ART.ink600, alpha: 0.5 })
+        }
+      }
+
+      // ④ 内缘刻度柱（赤道仪语言：每 26px 小齿、每 4 齿主齿）
+      for (let i = 0, y = 20; y < HEIGHT; i++, y += 26) {
+        const major = i % 4 === 0
+        const len = major ? 9 : 4
+        g.moveTo(X(62), y).lineTo(X(62 + len), y).stroke({
+          width: 1,
+          color: ART.fog400,
+          alpha: major ? 0.38 : 0.25,
+        })
+      }
+
+      // ⑤ 仪器壁龛：圆角面板 + 琥珀指示点 + 细读数线（非对称布局）
+      for (const ny of nicheYs) {
+        const xa = Math.min(X(38), X(60))
+        g.roundRect(xa, ny - 20, 22, 40, 4).fill({ color: ART.ink600, alpha: 0.55 })
+        g.roundRect(xa, ny - 20, 22, 40, 4).stroke({ width: 1, color: ART.brass, alpha: 0.4 })
+        g.circle(xa + 11, ny - 8, 1.8).fill({ color: PALETTE.amberBright, alpha: 0.5 })
+        g.moveTo(xa + 5, ny + 6).lineTo(xa + 17, ny + 6).stroke({ width: 1, color: ART.fog400, alpha: 0.3 })
+        g.moveTo(xa + 5, ny + 11).lineTo(xa + 12, ny + 11).stroke({ width: 1, color: ART.fog400, alpha: 0.22 })
+      }
+
+      // ⑥ 斜撑（每 500px 一根，结构感）
+      for (let y = seamOff + 250; y < HEIGHT; y += 500) {
+        g.moveTo(X(6), y).lineTo(X(30), y + 60).stroke({ width: 1, color: ART.fog400, alpha: 0.12 })
+      }
+    }
     this.container.addChild(g)
   }
 

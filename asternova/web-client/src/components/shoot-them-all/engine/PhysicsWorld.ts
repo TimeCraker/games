@@ -1,9 +1,26 @@
 import Matter from "matter-js"
 
-import { HEIGHT, PHYS, WIDTH } from "../constants"
+import { BALL_PHYS, HEIGHT, PHYS, WIDTH } from "../constants"
+import type { BallKind } from "./types"
 
 /** 自定义力（磁星/涡流引力，每子步施加到非静态体）。引擎层零 Pixi 依赖。 */
 export type CustomForceFn = (body: Matter.Body, deltaMs: number) => void
+
+/**
+ * 按球种套用手感参数（BALL_PHYS 单点表）。
+ *
+ * ⚠️ 镜像红线：GameEngine.launch（实弹）与 GhostPredictor.predict（幽灵球）必须
+ * 都走本函数，逐条同值才保 <2px 轨迹精度。实弹侧必须在 setStatic(false) **之后**
+ * 调用——matter 的 setStatic(false) 会用 _original 快照还原 restitution/friction/
+ * density，提前设置会被覆盖回标准值。
+ */
+export function applyBallPhys(body: Matter.Body, kind: BallKind): void {
+  const p = BALL_PHYS[kind]
+  body.restitution = p.restitution
+  body.friction = p.friction
+  body.frictionAir = p.frictionAir
+  Matter.Body.setDensity(body, p.density)
+}
 
 /**
  * matter 物理世界（Stage Spec §3.2/§8.5）。

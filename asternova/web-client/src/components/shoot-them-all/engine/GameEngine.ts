@@ -4,7 +4,7 @@ import { HEIGHT, PHYS, RULES, WIDTH } from "../constants"
 import { getLevel, LEVELS } from "./content/levels"
 import { Entity, EntityRegistry } from "./EntityRegistry"
 import { GhostPredictor, TrajectoryResult } from "./GhostPredictor"
-import { PhysicsWorld } from "./PhysicsWorld"
+import { applyBallPhys, PhysicsWorld } from "./PhysicsWorld"
 import type { BallKind, EngineEvent, LevelDef, ObstacleKind, PegKind, StaHudState, StaPhase } from "./types"
 
 export type { BallKind, EngineEvent, StaHudState, StaPhase } from "./types"
@@ -144,13 +144,15 @@ export class GameEngine {
     this.heavySkillFired = false
 
     const body = this.ball.body
-    body.frictionAir = kind === "pierce" ? 0 : PHYS.ballFrictionAir // 穿透弹「不衰减」
     // 穿透弹飞行期把钉临时变传感器：matter 传感器对只发碰撞事件、不产生求解反弹，
     // 于是「穿钉不减速不反弹」由物理层直接保证，而不是事后抵消冲量。
     this.setPegSensors(kind === "pierce")
 
     const v = PHYS.v0
     Matter.Body.setStatic(body, false)
+    // 球种手感（BALL_PHYS）必须在 setStatic(false) 之后套用：setStatic 会用
+    // _original 快照把 restitution/friction/density 还原成生成期标准值。
+    applyBallPhys(body, kind)
     // 顶点相位对齐：球是 25 边形近似圆，带着残余自转会让 SAT 选面与幽灵预测不同
     // （实测首碰弹射段镜像分叉 32px+），每发归零。
     Matter.Body.setAngle(body, 0)
@@ -276,9 +278,13 @@ export class GameEngine {
       Matter.Body.setVelocity(this.ball.body, { x: 0, y: 0 })
     }
     this.setPegSensors(false)
-    // 星级按未打出的剩余球数（在飞的球算已打出）：≥2=3★、1=2★、0=1★
+    // 星级按「用球数」（在飞的球算已打出）：3 球内过关=3★、4 球=2★、≥5 球=1★。
+    // 2026-09-28 实测调优（白皮书 §10 星级阈值）：原「剩 ≥2 球=3★」在 6 球关几乎白送
+    // （实测 L5 十次过关全 3★）；改按用球数后，5 球关与白皮书口径完全一致
+    // （剩 ≥2 = 用了 ≤3），6 球关略收紧，3★ 才要真本事。
     const left = this.queue.length
-    this.stars = left >= 2 ? 3 : left === 1 ? 2 : 1
+    const used = this.level.balls.length - left
+    this.stars = used <= 3 ? 3 : used === 4 ? 2 : 1
     this.phase = "level-clear"
     this.onEvent?.({ type: "level-clear", stars: this.stars, score: this.score, ballsLeft: left })
   }
