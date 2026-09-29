@@ -6,6 +6,105 @@
 
 ---
 
+## R6（2026-09-29）· 动效完成度审计与 game-feel 升级
+
+**主题**：把 UI 从「静态好看」补到「有 game-feel 的丝滑」——一切展开/切换有曲线、三态齐备、数字有翻牌、锁定有反馈。美术风格零改动，只补动效与微交互。
+**判据**：STYLE.md §5.4 token（`--ease-instrument` 微交互 / `--ease-cinematic` 进场；200/500/900/2600ms）+ `ui-polish/rules.md`（只 transform/opacity、禁线性缓动、焦点环=琥珀环）。
+**方法**：全 React UI 组件静态代码审计（逐元素）+ 真实浏览器走查（IAB，桌面 1280×800 / 移动 390×844，dev `localhost:3000`，webpack）。
+**证据**：`%TEMP%\ui-polish-r6\r6-before-*.png`（选关桌面/移动、对局 HUD、暂停面板入场中间帧+落定帧、merge 规则弹层、lobby 登录墙）。
+
+### 打分表（修前，按 game-feel 重要性排序）
+
+图例：✅ 有动画且合 token · ⚠️ 简陋（有反馈但缺态/缺曲线/瞬跳）· ❌ 瞬变/无反馈
+
+| # | 屏幕 · 元素 | 现状 | 判级 | 证据（文件:行） |
+| --- | --- | --- | --- | --- |
+| 1 | 规则/开场弹层 `ArcadeEntry`（merge/star-dash/nebula 三游戏首屏） | 条件渲染直挂直卸，无任何进出动画 | ❌ | `arcade/ArcadeEntry.tsx:175-226` |
+| 2 | STA 选关屏 · 卡片群 | 挂载即全部出现，无 stagger | ❌ | `shoot-them-all/ui/StaLevelSelect.tsx:49-87` |
+| 3 | STA 选关屏 ↔ 对局切换 | AnimatePresence 已包但子组件非 motion，实际硬切 | ❌ | `shoot-them-all/StaRoot.tsx:335-339` |
+| 4 | 共享结算 `ResultOverlay` · 分数/最高分 | 静态文本瞬跳，无 count-up（结算情绪核心） | ❌ | `ui/ResultOverlay.tsx:130-141` |
+| 5 | 锁定关点击 | `disabled` + cursor 变化，无 shake 无提示 | ❌ | `StaLevelSelect.tsx:134,154,168-170` |
+| 6 | nebula 商店按钮组（购买/直升/刷新） | 无 transition 属性、无 active、无 focus-visible，购买成功无反馈 | ❌ | `nebula-survivor/NebulaGame.tsx:426-452` |
+| 7 | star-dash 底部动作钮 | 无 hover 变化、无 focus-visible，仅 active:scale-95 | ❌ | `star-dash/StarDashGame.tsx:1041-1073` |
+| 8 | 加载屏 `GameLoadingScreen` | 整屏瞬变出现；百分比文字瞬跳 | ❌ | `ui/GameLoadingScreen.tsx:27-60` |
+| 9 | STA 球托 · 空槽（×0）点击 | opacity 0.35 + disabled，无 shake/提示 | ❌ | `StaBallDock.tsx:90,103,112-124` |
+| 10 | STA 球托 · 选中态 | 原地变边框色（无滑动过渡） | ⚠️ | `StaBallDock.tsx:134-136,149-155` |
+| 11 | DynamicIsland · CLEAR 横幅切换 | 条件渲染硬切，缺 art bible 点名的交叉淡入淡出 | ⚠️ | `StaDynamicIsland.tsx:71-74` |
+| 12 | 暂停面板 · 遮罩 | opacity 200ms 有，但无 backdrop-blur 渐入 | ⚠️ | `StaPausePanel.tsx:52-74`（入场 spring ✅，走查已证） |
+| 13 | 暂停面板 · 主按钮 | `transition-transform` 不覆盖 hover:brightness-105（提亮瞬跳） | ⚠️ | `StaPausePanel.tsx:103` |
+| 14 | HUD 比分 `RollingNumber` | 数位滚动 150ms ✅，但大跳分只按 ±1 格滚（跨位瞬跳） | ⚠️ | `ui/RollingNumber.tsx:26-31` |
+| 15 | 选关 · CURRENT 卡 | 静态金边 + CURRENT 字样，无呼吸 | ⚠️ | `StaLevelSelect.tsx:146,272-276` |
+| 16 | 选关 · 星星 | 静态 SVG，无 check-pop | ⚠️ | `StaLevelSelect.tsx:262-271` |
+| 17 | nebula HUD 系统键 | hover/active 有，缺 focus-visible | ⚠️ | `nebula-survivor/ui/Hud.tsx:77` |
+| 18 | nebula E 技冷却环 | conic-gradient 读数逐帧瞬跳 | ⚠️ | `nebula-survivor/ui/Hud.tsx:194-198` |
+| 19 | BGM Dial 按钮 | 环读数/面板展开 ✅，Dial 本体无 hover/active | ⚠️ | `audio/LoopingBgmControl.tsx` |
+| 20 | 结算 CRT 扫描线 | 静态叠层不闪动 | ⚠️ | `ui/ResultOverlay.tsx:78-86` |
+| 21 | 暂停/教学条 ghost 按钮 | `transition-colors` 不覆盖 `active:scale`（按压缩放瞬跳，系统性） | ⚠️ | `StaPausePanel.tsx:115,127`、`StaTutorialBar.tsx:117-127`、`ui/GameBackButton.tsx:33` |
+| 22 | STA 选关卡 hover/press/focus | translate-y + scale + 焦点环齐备 | ✅ | `StaLevelSelect.tsx:141,147` |
+| 23 | 选关 Spotlight Border | 预烘焙渐变 + transform 跟随，200ms | ✅ | `StaLevelSelect.tsx:172-191` |
+| 24 | 球托 Dock 放大 | 距离衰减 scale 1.35/1.09，180ms | ✅ | `StaBallDock.tsx:81-137` |
+| 25 | DynamicIsland 胶囊变形/连击 pop | 220ms 变形 + scale pop 齐备 | ✅ | `StaDynamicIsland.tsx:58-66,130-151` |
+| 26 | 教学条进出 | slide-up+fade 220ms，exit 有 | ✅ | `StaTutorialBar.tsx:98-104` |
+| 27 | 结算浮层进出 | springSnappy 进出 + exit | ✅ | `ResultOverlay.tsx:72-95` |
+| 28 | CLEAR/FAIL 节拍 | 380/300ms 节拍设计，尊重 reduced-motion | ✅ | `StaRoot.tsx:46-47,139-164` |
+
+**已核对的良好面**：动效基建齐全（framer-motion 12 + `src/lib/motion.ts` token + globals.css reduced-motion 全局开关 + MotionConfig reducedMotion="user"），缺的是覆盖面不是轮子。
+
+### 修复计划（本轮 commit 切分）
+
+1. `feat(web-client)` 动效微件基建：globals.css keyframes（shake/呼吸环/check-pop）+ motion.ts stagger + `CountUpValue`
+2. `feat(shoot-them-all)` 选关屏：stagger 入场 / CURRENT 呼吸描边 / 锁定卡 shake+提示 / 星星 pop / select↔game 真转场
+3. `feat(shoot-them-all)` HUD：BallDock morphing 滑块 / CLEAR 交叉淡入 / 暂停遮罩 blur 渐入 / RollingNumber 大跳平滑 / transition 组合修复
+4. `feat(web-client)` 共享：ArcadeEntry 进出动画 / ResultOverlay count-up + 统计行 stagger / 加载屏入场
+5. `fix(web-client)` 按钮三态补全：nebula 商店 + HUD / star-dash / BGM Dial
+6. `docs(asternova)` 台账 R6 修后对照 + rules.md 工艺补录
+
+### 修复清单（R6 实施）
+
+| 级 | 方向 | 位置 | 前值 → 后值 | 验证 |
+| --- | --- | --- | --- | --- |
+| P1 | 弹层 | `arcade/ArcadeEntry.tsx` + 5 个挂载点（nebula×3 / merge / star-dash） | 条件渲染直挂直卸 → 遮罩 fade 200ms + 面板进场 500ms `--ease-cinematic`（drawer 上滑 / centered 缩放），exit 反向（挂载点补 AnimatePresence） | merge 实机编译 200；中间态截图见 `%TEMP%\ui-polish-r6\` |
+| P1 | 选关屏 | `shoot-them-all/ui/StaLevelSelect.tsx` | 卡片挂载即全部出现 → stagger 入场（500ms cinematic，+30ms/张）+ header 同步入场 | **中间帧实拍**：`r6-after-sta-select-transition-mid.png`（01→02/03→04→05+ 级联清晰可见） |
+| P1 | 屏间转场 | `StaRoot.tsx` + `StaHud.tsx` | select↔game 硬切 → 选关根节点接 AnimatePresence（exit fade+y 上行）+ HUD 淡入淡出 250ms | 同上中间帧（HUD 已淡出、选关级联进入） |
+| P1 | 锁定反馈 | `StaLevelSelect.tsx` | 锁定卡 disabled 死响应 → aria-disabled + WAAPI shake ±3px 160ms + 「先通过第 N 关」提示浮层（200ms 进出，1.6s 自消） | 实拍 `r6-after-sta-locked-shake-tip.png`（浮层在位） |
+| P1 | 结算数字 | `ui/ResultOverlay.tsx` + `arcade/ArcadeResult.tsx` + 新增 `ui/CountUpValue.tsx` | 分数/最高分瞬跳 → CountUpValue 翻牌（900ms `--duration-slow` + cinematic，0.25s 起随行入场）+ 统计行 stagger（+40ms/行） | lint 0 error + build 通过；**实机触发未复现**（见环境限制），挂下轮隔轮评审 |
+| P2 | 选中态 | `shoot-them-all/ui/StaBallDock.tsx` | 选中原地变色 → morphing 滑块（琥珀环+底部指示条一体，x 弹簧 springSnappy） | 实拍 `r6-after-sta-game-dock-pill.png`（滑块在位） |
+| P2 | 空槽反馈 | `StaBallDock.tsx` | ×0 死响应 → aria-disabled + WAAPI shake（composite:"add" 不扰 hover scale） | `document.getAnimations()` 抓到 160ms running 动画 ✓ |
+| P2 | HUD 内容切换 | `ui/StaDynamicIsland.tsx` | CLEAR 横幅条件渲染硬切 → 与常规读数交叉淡入淡出 180ms（art bible §5 #10 点名项） | lint + build ✓ |
+| P2 | 大跳分 | `ui/RollingNumber.tsx` | 列按「总位数-列序」key，跨千位整列重挂瞬跳 → 按「从右位次」key，既有列平滑滚动、新增高位列落位即现 | lint + build ✓ |
+| P2 | 当前关表达 | `StaLevelSelect.tsx` + globals.css | CURRENT 静态金边 → `hud-breathe-ring` 呼吸描边（opacity 0.45↔1，2.6s ambient） | 落定态截图 `r6-after-sta-select-settled.png` |
+| P3 | 加载屏 | `ui/GameLoadingScreen.tsx` | 整屏瞬变 → 入场 fade 300ms + spinner 外圈琥珀描线环（`hud-draw-ring` 900ms 单圈，SVG stroke 例外工艺） | dev 实拍（选关加载中画面） |
+| P3 | 按钮三态 | `nebula/NebulaGame.tsx`（商店 4 钮 + 金币读数 pop + 面板入场）、`nebula/ui/Hud.tsx`（系统键 focus 环 + E 技冷却环 @property 平滑）、`star-dash/StarDashGame.tsx`（底栏 3 钮 hover+focus）、`audio/LoopingBgmControl.tsx`（Dial hover/active） | 无 transition/active/focus 缺失 → 三态齐备；商店面板 scale/slide 进场 | lint + build ✓；冷却环用 globals.css 注册的 `--nd-cd-progress`（@property），回零帧免过渡防倒转 |
+| P3 | transition 组合 | `StaDynamicIsland` 暂停钮 / `StaPausePanel` 3 钮 / `StaTutorialBar` / `ui/GameBackButton.tsx` | `transition-colors`（或 transform）不覆盖 `active:scale` 按压瞬跳 → 统一 `transition-[...,scale]` + `--ease-instrument` | lint ✓ |
+| P3 | 页签切换 | globals.css（`[data-slot="tabs-content"][data-state=active]`） | login 页签内容瞬切 → 全局 Radix Tabs 激活面板淡入上浮 250ms | build ✓（login 页可达已证） |
+
+### 验证汇总
+
+- `npm run lint`：0 errors（9 个存量 unused-vars warning，与本轮无关）· `npm run build`（Next 16 Turbopack）：全 12 页静态生成通过。
+- **包体红线**：零新依赖；framer-motion 12 已在全部受影响路由的 chunk 图内（ArcadeEntry/GameLoadingScreen/BallDock 新增的 motion import 不引入新库代码）；`public/godot/` 50MB WASM git 零改动。全站 client chunks 合计 2.9MB/50 文件（Turbopack 产出，无对照基线，增量为本轮组件级 KB 级源码）。
+- 实机走查（IAB，桌面 1280×800）：选关 stagger 中间帧、锁定卡 shake+提示、空槽 shake（getAnimations 证实 160ms WAAPI）、球托滑块、选关↔对局转场全部实拍通过；暂停面板入场 spring（修前已证，本轮保留）；视觉风格零偏离（对照 `r6-before/after-sta-select-*.png` 同构图）。
+- reduced-motion：全部新增动效走 framer `MotionConfig reducedMotion="user"`（StaRoot 已有）+ globals.css 全局 0.01ms kill switch 双保险；CSS 类（breathe/check-pop/draw-ring/fade-in-up）被 kill switch 自动覆盖。
+
+### 环境限制（登记）
+
+- **lobby 登录后走查仍不可行**：游客进入需邀请码、邮箱注册需真实验证码（沿用 R2 起的「待后端凭据」口径）；lobby 卡片动效本轮降级为 login 页签切换全局动效（见修复清单），lobby 卡片 stagger 挂剩余队列。
+- **结算 count-up 实机触发未复现**：STA 走「5 球未达标→失败结算」路径时球体滞留球托下方沟底、落定判定不触发（见下方新登记引擎边角案例）；merge 堆球自动化未越过警戒线。CountUpValue 以代码级 + 编译验证收口，挂下轮隔轮评审实拍。
+- 线上旧版 game.asterforge.top 为冻结展示态（BLUEPRINT.md:128），本轮不作为修前对照基准，修前证据一律取本地 HEAD。
+
+### 新登记问题（非本轮引入）
+
+- [P2·引擎] STA 球体可滞留球托下方沟底（y≈1240+），settle 判定不触发 → 本关永不判负/判胜，只能暂停退出。复现：第 1 关贴边发球使球落入 dock 下缘。疑 PhysicsWorld 边界/settle 检测未覆盖 dock 下缘区（`engine/PhysicsWorld.ts`）。
+
+### 剩余队列（R7+ 候选）
+
+- [P1] R6 隔轮评审：结算 count-up / CLEAR 交叉淡入 / 冷却环平滑的实机截图复核（需可复现的结算触发路径）。
+- [P2] lobby 登录后全量审计 + 卡片 stagger（待凭据/后端，原 R2 遗留）。
+- [P2] 上表 STA 引擎球体滞留边角案例（交引擎侧轮次）。
+- [P3] 结算 CRT 扫描线静态叠层的微动效候选（本轮判 ⚠️ 保留）。
+- [P3] xiaoxiaole（vanilla iframe）内部动效（iframe 壳既定不动）。
+
+---
+
 ## R2（2026-09-24）· 隔轮评审 + 深扫 + 工艺轮
 
 ### 隔轮评审（R1 改动，截图证据）

@@ -52,6 +52,18 @@
 - 字体：正文 Geist Sans；数据/坐标 `font-mono-data`（JetBrains Mono + tnum）；品牌大字 Orbitron（`.aster-title`，颜色 `var(--paper)`）。
 - 间距/圆角走 token：`--radius` 阶梯、`max-w-aster`（1180px）容器。
 
+### 6.1 微交互工艺补录（2026-09-29 R6 动效轮）
+
+- **「禁瞬变」总则**：一切展开/切换/内容替换必须有曲线过渡（`--ease-instrument` 微交互 / `--ease-cinematic` 进场，§5.4 token），条件渲染直挂直卸视为违规。
+- **transition 与按压缩放组合**：任何写了 `active:scale-*` 的元素，transition-property 必须覆盖 `scale`（写 `transition-[color,background-color,border-color,scale]` 或显式列出）；只写 `transition-colors` 会让按压缩放瞬跳（R6 修复的系统性毛病）。
+- **shake（抖动反馈）**：锁定/无余量等「点了但没结果」的元素必须给 shake + 提示浮层，不给死响应。实现用 WAAPI（`el.animate`，±3px / 160ms / `--ease-instrument`），可重复触发、不与 framer entrance 冲突；**叠在已有 inline transform 上的元素必须 `composite:"add"`**（如球托槽体的 hover scale）。
+- **呼吸描边**：常驻选中态（如 CURRENT 关卡卡）用 `.hud-breathe-ring`（opacity 0.45↔1，`--duration-ambient` 2.6s 循环，opacity-only），禁 box-shadow/filter 动画。
+- **check-pop**：达成类标记（星级/勾选）入场用 `.hud-check-pop`（scale 0.6→1.12→1 + fade，180ms），`animation-fill-mode: both` 配 inline `animationDelay` 做逐项交错。
+- **SVG 描线例外**：`transform/opacity` 总则允许的唯一例外是 SVG `stroke-dashoffset` 描线（`.hud-draw-ring`，加载屏「坐标锁定」语言）；不得用于大面积装饰循环。
+- **conic-gradient 读数平滑**：冷却环等角度读数用 `@property` 注册的自定义属性（如 `--nd-cd-progress`，syntax `<number>`）+ `transition` 平滑快照步进；**重置/回零帧必须免过渡**（transition:"none"），否则整环快速倒转。@property 支持 Chromium 85+/Safari 16.4+/Firefox 128+，降级为步进无害。
+- **count-up**：结算分数/最高分用 `CountUpValue`（900ms `--duration-slow` + `--ease-cinematic`，配容器 stagger 的 delay 起滚）；游戏内 HUD 高频读数用 `RollingNumber` 数位滚动（列按「从右位次」key，跨位数不重挂）。
+- **React Compiler lint 红线**：render 期禁读写 ref（含「prev value」模式）；跨帧比较用 state 镜像（同值 setState 自动 bail）或移入 effect。
+
 ## 7. 工具链
 
 - `public/**` 已加入 eslint 忽略（Godot 导出产物与静态游戏，非手写源码）。
