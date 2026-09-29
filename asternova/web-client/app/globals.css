@@ -595,6 +595,44 @@ body {
     transform: translateX(340%) skewX(-18deg);
   }
 }
+
+/* ===== R6 动效轮：微交互 keyframes（2026-09-29）=====
+   全部只动 transform/opacity（rules.md §7），自动被上方
+   prefers-reduced-motion 全局开关（0.01ms）覆盖。 */
+
+/* 当前关呼吸描边：琥珀环透明度往复，--duration-ambient 2.6s 循环 */
+@keyframes hud-breathe-ring {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.hud-breathe-ring {
+  animation: hud-breathe-ring var(--duration-ambient, 2600ms) ease-in-out infinite;
+}
+
+/* 星级/勾选 pop：进场一次，scale 过冲回弹（配 animation-delay 做逐星交错，
+   fill-mode both 保证延迟期间不可见） */
+@keyframes hud-check-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.hud-check-pop {
+  animation: hud-check-pop 180ms var(--ease-instrument, cubic-bezier(0.32, 0.72, 0, 1)) both;
+}
 /* ===== 键盘焦点统一样式 · 2026-09-22 =====
    游戏壳 HUD 大量按钮无焦点样式；此处兜底全站（鼠标点击不显示环） */
 :focus-visible {
