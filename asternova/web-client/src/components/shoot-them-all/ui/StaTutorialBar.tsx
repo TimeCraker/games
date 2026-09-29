@@ -119,7 +119,7 @@ export function StaTutorialBar({
           onClick={advance}
           className={cn(
             "shrink-0 border-0 bg-transparent px-2 py-1 text-[13px] text-hud-text-dim",
-            "transition-colors duration-150 hover:text-hud-text active:scale-[0.98]",
+            "transition-[color,scale] duration-150 ease-[var(--ease-instrument)] hover:text-hud-text active:scale-[0.98]",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60",
           )}
         >

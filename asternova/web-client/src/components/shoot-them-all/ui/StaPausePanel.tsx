@@ -100,7 +100,7 @@ export function StaPausePanel({
               autoFocus
               className={cn(
                 "h-[52px] w-full border border-transparent bg-hud-accent text-[15px] font-medium tracking-[0.04em] text-ink-900",
-                "transition-transform duration-150 hover:brightness-105 active:scale-[0.98]",
+                "transition-[filter,scale] duration-150 ease-[var(--ease-instrument)] hover:brightness-105 active:scale-[0.98]",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60",
               )}
             >
@@ -112,7 +112,7 @@ export function StaPausePanel({
               onClick={onRestart}
               className={cn(
                 "h-[52px] w-full border border-hud-line bg-transparent text-[15px] font-medium tracking-[0.04em] text-hud-text-dim",
-                "transition-colors duration-150 hover:border-hud-accent/50 hover:text-hud-text active:scale-[0.98]",
+                "transition-[color,border-color,scale] duration-150 ease-[var(--ease-instrument)] hover:border-hud-accent/50 hover:text-hud-text active:scale-[0.98]",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60",
               )}
             >
@@ -124,7 +124,7 @@ export function StaPausePanel({
               onClick={onExit}
               className={cn(
                 "h-[52px] w-full border border-transparent bg-transparent text-[15px] font-medium tracking-[0.04em] text-hud-text-dim",
-                "transition-colors duration-150 hover:text-hud-text active:scale-[0.98]",
+                "transition-[color,scale] duration-150 ease-[var(--ease-instrument)] hover:text-hud-text active:scale-[0.98]",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60",
               )}
             >

@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
+import { motion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
+import { springSnappy } from "@/src/lib/motion"
 
 import type { BallKind } from "../engine/types"
 import { BALL_KINDS, BALL_KIND_LABEL, BallGlyph } from "./BallGlyph"
@@ -20,7 +22,8 @@ import { BALL_KINDS, BALL_KIND_LABEL, BallGlyph } from "./BallGlyph"
  * 余量仍取自 hudSnapshot().ballQueue（按球种聚合计数），点选调 selectBall(kind)。
  *
  * 只动 transform（scale + translateY），180ms `--ease-instrument`（§5 #8）。
- * 当前选中球种持续高亮：外环 --arcade-accent 2px + 底部 2px 琥珀指示条，不悬停也保持 1.12 倍。
+ * R6：选中态改 morphing 滑块 —— 琥珀环 + 底部指示条整体（x 弹簧滑动），弃原地变色（§5.3）。
+ * 空槽（×0）点击给 WAAPI shake 反馈（composite:"add" 叠加在 hover scale 上）。
  * 球种图标复用 BallGlyph（3.1 球体微缩版的界面层实现），不另画图标。
  *
  * 触控：视觉槽 72×72 + 间距 12；命中区扩到 88 逻辑（真实 ≥44px，§7）；
@@ -34,10 +37,30 @@ import { BALL_KINDS, BALL_KIND_LABEL, BallGlyph } from "./BallGlyph"
 const SLOT = 72
 const GAP = 12
 const HIT = 88
+/** 槽位外框节奏：负外边距把 88 命中区折进 72+12 的视觉网格，SLOT 盒起点 = i*(SLOT+GAP) */
+const STEP = SLOT + GAP
+/** 滑块比 SLOT 盒外扩 4px 成环 */
+const PILL_INSET = 4
 
 function falloff(d: number): number {
   const t = Math.max(0, 1 - d / 2)
   return t * t
+}
+
+/** 空槽 shake：WAAPI composite:"add" 叠加在槽体现有 scale transform 上 */
+function shakeSlot(el: HTMLElement | null): void {
+  if (!el || typeof el.animate !== "function") return
+  el.animate(
+    [
+      { transform: "translateX(0)" },
+      { transform: "translateX(-3px)" },
+      { transform: "translateX(3px)" },
+      { transform: "translateX(-3px)" },
+      { transform: "translateX(3px)" },
+      { transform: "translateX(0)" },
+    ],
+    { duration: 160, easing: "cubic-bezier(0.32, 0.72, 0, 1)", composite: "add" },
+  )
 }
 
 export function StaBallDock({
@@ -66,6 +89,7 @@ export function StaBallDock({
 
   // 当前选中球种：优先飞在场上的，其次队首
   const activeKind: BallKind | null = current ?? queue[0] ?? null
+  const activeIdx = activeKind ? BALL_KINDS.indexOf(activeKind) : -1
   const active = pressedIdx ?? hoverIdx
 
   return (
@@ -78,6 +102,31 @@ export function StaBallDock({
       }}
     >
       <div className="relative flex items-center" style={{ gap: GAP }}>
+        {/* R6 morphing 选中滑块：琥珀环 + 底部指示条一体，x 弹簧滑到当前槽 */}
+        <motion.span
+          aria-hidden
+          className="pointer-events-none absolute z-10 border-2"
+          style={{
+            width: SLOT + PILL_INSET * 2,
+            height: SLOT + PILL_INSET * 2,
+            top: "50%",
+            left: 0,
+            marginTop: -(SLOT + PILL_INSET * 2) / 2,
+            borderColor: "var(--arcade-accent)",
+          }}
+          initial={false}
+          animate={{
+            x: activeIdx * STEP - PILL_INSET,
+            opacity: activeIdx >= 0 ? 1 : 0,
+          }}
+          transition={activeIdx >= 0 ? springSnappy : { duration: 0.15 }}
+        >
+          <span
+            className="absolute bottom-[2px] left-1/2 h-[2px] -translate-x-1/2 bg-hud-accent"
+            style={{ width: SLOT * 0.55 }}
+          />
+        </motion.span>
+
         {BALL_KINDS.map((kind, i) => {
           const d = active === null ? Infinity : Math.abs(i - active)
           const mag = active === null ? 0 : 0.35 * falloff(d)
@@ -93,7 +142,9 @@ export function StaBallDock({
             <button
               key={kind}
               type="button"
-              disabled={off}
+              // 空槽保持可点击以给 shake 反馈（R6）；终态禁用仍然真 disabled
+              disabled={disabled}
+              aria-disabled={empty || undefined}
               aria-label={`${BALL_KIND_LABEL[kind]}，余量 ${count}`}
               aria-pressed={isCurrent}
               title={BALL_KIND_LABEL[kind]}
@@ -119,8 +170,14 @@ export function StaBallDock({
                 setHoverIdx((v) => (v === i ? null : v))
                 setPressedIdx(null)
               }}
-              onClick={() => {
-                if (!off) onSelect(kind)
+              onClick={(e) => {
+                if (disabled) return
+                if (empty) {
+                  // shake 挂在 button 本体（无 base transform，免 composite），槽体 hover scale 不受扰
+                  shakeSlot(e.currentTarget)
+                  return
+                }
+                onSelect(kind)
               }}
             >
               {/* 视觉槽体 */}
@@ -131,9 +188,6 @@ export function StaBallDock({
                   height: SLOT,
                   transform: `translate(-50%, -50%) scale(${scale}) translateY(${lift}px)`,
                   transition: "transform 180ms var(--ease-instrument)",
-                  borderColor: isCurrent ? "var(--arcade-accent)" : undefined,
-                  borderWidth: isCurrent ? 2 : 1,
-                  boxShadow: isCurrent ? "inset 0 1px 0 var(--glass-highlight)" : undefined,
                 }}
               >
                 <BallGlyph kind={kind} size={34} />
@@ -144,15 +198,6 @@ export function StaBallDock({
                 >
                   ×{count}
                 </span>
-
-                {/* 选中球种：底部 2px 琥珀指示条 */}
-                {isCurrent ? (
-                  <span
-                    aria-hidden
-                    className="absolute bottom-[2px] left-1/2 h-[2px] -translate-x-1/2 bg-hud-accent"
-                    style={{ width: SLOT * 0.55 }}
-                  />
-                ) : null}
               </span>
             </button>
           )

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { motion, useReducedMotion } from "framer-motion"
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
@@ -68,10 +68,28 @@ export function StaDynamicIsland({ hud, totalBalls, clearBanner, onPause }: Prop
           {/* 顶部内高光条（玻璃语言，禁外发光） */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-glass-highlight" />
 
-          {clearBanner ? (
-            <ClearBanner stars={hud.stars} />
-          ) : (
-            <div className="flex w-full items-center justify-center gap-4 px-5">
+          {/* R6：CLEAR 横幅 ↔ 常规读数交叉淡入淡出（§5 #10 点名要求），双内容绝对定位叠放 */}
+          <AnimatePresence initial={false}>
+            {clearBanner ? (
+              <motion.div
+                key="clear"
+                className="absolute inset-0 flex flex-col items-center justify-center gap-1"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={reduceMotion ? { duration: 0 } : { duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+              >
+                <ClearBanner stars={hud.stars} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="readout"
+                className="absolute inset-0 flex w-full items-center justify-center gap-4 px-5"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={reduceMotion ? { duration: 0 } : { duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+              >
               {/* 分数 */}
               <div className="flex flex-col items-start">
                 <RollingNumber
@@ -149,8 +167,9 @@ export function StaDynamicIsland({ hud, totalBalls, clearBanner, onPause }: Prop
                   COMBO
                 </span>
               </motion.div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
 
@@ -164,7 +183,7 @@ export function StaDynamicIsland({ hud, totalBalls, clearBanner, onPause }: Prop
         className="pointer-events-auto absolute flex items-center justify-center border-0 bg-transparent p-0 text-hud-text outline-none focus-visible:ring-2 focus-visible:ring-hud-accent"
         style={{ left: 636 - 16, top: 24 - 16, width: 88, height: 88 }}
       >
-        <span className="hud-chamfer-sm flex h-[56px] w-[56px] items-center justify-center border border-glass-border bg-glass-bg text-hud-text transition-colors duration-150 hover:text-hud-accent active:scale-[0.98]">
+        <span className="hud-chamfer-sm flex h-[56px] w-[56px] items-center justify-center border border-glass-border bg-glass-bg text-hud-text transition-[color,scale] duration-150 ease-[var(--ease-instrument)] hover:text-hud-accent active:scale-[0.98]">
           <PauseGlyph size={22} />
         </span>
       </button>

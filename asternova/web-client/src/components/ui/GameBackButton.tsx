@@ -30,7 +30,7 @@ export function GameBackButton({
 }) {
   const router = useRouter()
   const base =
-    "group relative inline-flex min-h-6 items-center gap-1.5 border border-hud-line bg-ink-800/80 px-3.5 py-2.5 text-[13px] font-medium text-hud-text backdrop-blur-glass-md transition-colors duration-fast hover:border-hud-accent/50 hover:text-hud-paper active:scale-[0.98] focus-visible:outline-none focus-visible:border-hud-accent before:absolute before:-inset-x-2 before:-inset-y-3 before:content-['']"
+    "group relative inline-flex min-h-6 items-center gap-1.5 border border-hud-line bg-ink-800/80 px-3.5 py-2.5 text-[13px] font-medium text-hud-text backdrop-blur-glass-md transition-[color,border-color,scale] duration-fast ease-[var(--ease-instrument)] hover:border-hud-accent/50 hover:text-hud-paper active:scale-[0.98] focus-visible:outline-none focus-visible:border-hud-accent before:absolute before:-inset-x-2 before:-inset-y-3 before:content-['']"
   const pos =
     variant === "floating"
       ? "fixed left-[max(0.75rem,env(safe-area-inset-left))] top-[max(0.75rem,env(safe-area-inset-top))] z-[160] transform-gpu pointer-events-auto bg-ink-900/85 shadow-lg"
