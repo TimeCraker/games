@@ -223,50 +223,57 @@ export function NebulaGame() {
       </AnimatePresence>
 
       {/* ============ 弹层 ============ */}
-      {phase === "briefing" ? (
-        <ArcadeEntry
-          slug="nebula-survivor"
-          titleId="nebula-briefing-title"
-          eyebrow={<p className={`mb-1 text-center text-[10px] uppercase tracking-[0.32em] text-white/45 ${MONO}`}>Briefing</p>}
-          title="星域突围"
-          subtitle={<span className="text-[13px] text-white/55">读完点击「进入机库」开始</span>}
-          label="进入机库"
-          onConfirm={onBriefingConfirm}
-          skipRules={{ checked: dontShow, onChange: setDontShow, label: "下次不再显示（本机记住）" }}
-        >
-          <BriefingRules />
-        </ArcadeEntry>
-      ) : null}
+      {/* R6：AnimatePresence 包挂载点，获得 ArcadeEntry 进出场动画 */}
+      <AnimatePresence>
+        {phase === "briefing" ? (
+          <ArcadeEntry
+            slug="nebula-survivor"
+            titleId="nebula-briefing-title"
+            eyebrow={<p className={`mb-1 text-center text-[10px] uppercase tracking-[0.32em] text-white/45 ${MONO}`}>Briefing</p>}
+            title="星域突围"
+            subtitle={<span className="text-[13px] text-white/55">读完点击「进入机库」开始</span>}
+            label="进入机库"
+            onConfirm={onBriefingConfirm}
+            skipRules={{ checked: dontShow, onChange: setDontShow, label: "下次不再显示（本机记住）" }}
+          >
+            <BriefingRules />
+          </ArcadeEntry>
+        ) : null}
+      </AnimatePresence>
 
-      {pauseOpen ? (
-        <ArcadeEntry
-          slug="nebula-survivor"
-          titleId="nebula-pause-title"
-          eyebrow={<p className={`mb-1 text-center text-[10px] uppercase tracking-[0.32em] text-white/45 ${MONO}`}>Paused</p>}
-          title="已暂停"
-          subtitle={<span className="text-[13px] text-white/55">关闭后继续战斗（Esc / P 亦可）</span>}
-          label="继续游戏"
-          onConfirm={closePause}
-          onRequestClose={closePause}
-        >
-          <BriefingRules />
-        </ArcadeEntry>
-      ) : null}
+      <AnimatePresence>
+        {pauseOpen ? (
+          <ArcadeEntry
+            slug="nebula-survivor"
+            titleId="nebula-pause-title"
+            eyebrow={<p className={`mb-1 text-center text-[10px] uppercase tracking-[0.32em] text-white/45 ${MONO}`}>Paused</p>}
+            title="已暂停"
+            subtitle={<span className="text-[13px] text-white/55">关闭后继续战斗（Esc / P 亦可）</span>}
+            label="继续游戏"
+            onConfirm={closePause}
+            onRequestClose={closePause}
+          >
+            <BriefingRules />
+          </ArcadeEntry>
+        ) : null}
+      </AnimatePresence>
 
-      {helpOpen ? (
-        <ArcadeEntry
-          slug="nebula-survivor"
-          titleId="nebula-help-title"
-          eyebrow={<p className={`mb-1 text-center text-[10px] uppercase tracking-[0.32em] text-white/45 ${MONO}`}>Reference</p>}
-          title="行动手册"
-          subtitle={<span className="text-[13px] text-white/55">随时可查</span>}
-          label="返回游戏"
-          onConfirm={() => setHelpOpen(false)}
-          onRequestClose={() => setHelpOpen(false)}
-        >
-          <BriefingRules />
-        </ArcadeEntry>
-      ) : null}
+      <AnimatePresence>
+        {helpOpen ? (
+          <ArcadeEntry
+            slug="nebula-survivor"
+            titleId="nebula-help-title"
+            eyebrow={<p className={`mb-1 text-center text-[10px] uppercase tracking-[0.32em] text-white/45 ${MONO}`}>Reference</p>}
+            title="行动手册"
+            subtitle={<span className="text-[13px] text-white/55">随时可查</span>}
+            label="返回游戏"
+            onConfirm={() => setHelpOpen(false)}
+            onRequestClose={() => setHelpOpen(false)}
+          >
+            <BriefingRules />
+          </ArcadeEntry>
+        ) : null}
+      </AnimatePresence>
 
       {phase === "hangar" ? (
         <HangarPanel
@@ -399,11 +406,27 @@ function ShopOverlay({ ui, classId, onBuy, onUpgrade, onRefresh, onClose }: {
       style={{ background: "rgba(5,6,7,0.72)" }}
       role="dialog" aria-modal="true" aria-labelledby="nebula-shop-title"
     >
+      <motion.div
+        initial={{ opacity: 0, y: 16, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 8 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      >
       <Panel className="w-full max-w-[520px] p-4 sm:p-5">
         <p className={`text-[10px] uppercase tracking-[0.32em] text-white/45 ${MONO}`}>Supply</p>
         <h2 id="nebula-shop-title" className="mt-1 text-lg font-semibold text-white">补给站</h2>
         <p className="mt-1 text-[12px] text-white/50">
-          金币 <b className="text-hud-accent-bright">{ui.coins}</b> · 波次 {ui.wave}
+          金币{" "}
+          <motion.b
+            key={ui.coins}
+            className="inline-block text-hud-accent-bright"
+            initial={{ scale: 1.3 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+          >
+            {ui.coins}
+          </motion.b>{" "}
+          · 波次 {ui.wave}
         </p>
 
         {/* 本职业可买的三把武器 */}
@@ -422,7 +445,7 @@ function ShopOverlay({ ui, classId, onBuy, onUpgrade, onRefresh, onClose }: {
                   {owned ? (
                     <button
                       type="button"
-                      className="rounded border border-white/15 bg-black/40 px-2 py-1 text-[10.5px] text-white/85 hover:bg-white/10"
+                      className="rounded border border-white/15 bg-black/40 px-2 py-1 text-[10.5px] text-white/85 transition-[color,background-color,scale] duration-150 ease-[var(--ease-instrument)] hover:bg-white/10 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60"
                       onClick={() => onUpgrade(id as never)}
                     >
                       直升 1 星
@@ -430,7 +453,7 @@ function ShopOverlay({ ui, classId, onBuy, onUpgrade, onRefresh, onClose }: {
                   ) : null}
                   <button
                     type="button"
-                    className="rounded border border-hud-accent/45 bg-hud-accent/12 px-2 py-1 text-[10.5px] text-hud-accent-bright hover:bg-hud-accent/20"
+                    className="rounded border border-hud-accent/45 bg-hud-accent/12 px-2 py-1 text-[10.5px] text-hud-accent-bright transition-[color,background-color,scale] duration-150 ease-[var(--ease-instrument)] hover:bg-hud-accent/20 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60"
                     onClick={() => onBuy(id as never)}
                   >
                     购买
@@ -442,12 +465,12 @@ function ShopOverlay({ ui, classId, onBuy, onUpgrade, onRefresh, onClose }: {
         </div>
 
         <div className="mt-3 flex gap-2">
-          <button type="button" className="flex-1 rounded-lg border border-white/15 bg-white/[0.05] py-2 text-[12px] text-white/85 hover:bg-white/10" onClick={onRefresh}>
+          <button type="button" className="flex-1 rounded-lg border border-white/15 bg-white/[0.05] py-2 text-[12px] text-white/85 transition-[color,background-color,scale] duration-150 ease-[var(--ease-instrument)] hover:bg-white/10 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60" onClick={onRefresh}>
             刷新货架
           </button>
           <button
             type="button"
-            className="flex-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-600 py-2 text-[12.5px] font-semibold text-gray-950"
+            className="flex-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-600 py-2 text-[12.5px] font-semibold text-gray-950 transition-[filter,scale] duration-150 ease-[var(--ease-instrument)] hover:brightness-105 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60"
             onClick={onClose}
           >
             继续战斗
@@ -457,6 +480,7 @@ function ShopOverlay({ ui, classId, onBuy, onUpgrade, onRefresh, onClose }: {
           提示：商店货架与「直接花钱升星」都只作用于当前持有的武器。
         </p>
       </Panel>
+      </motion.div>
     </motion.div>
   )
 }

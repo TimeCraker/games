@@ -17,12 +17,15 @@ import { cinematicEase } from "@/src/lib/motion"
 export function CountUpValue({
   value,
   duration = 0.9,
+  delay = 0,
   className,
   label,
 }: {
   value: number
   /** 补间秒数，默认 0.9（结算/高光档） */
   duration?: number
+  /** 起滚延迟秒数（配合容器 stagger，等行入场后再滚） */
+  delay?: number
   className?: string
   /** 无障碍朗读用的纯文本（默认用最终值的千分位形式） */
   label?: string
@@ -42,6 +45,7 @@ export function CountUpValue({
     if (from === value) return
     const controls = animate(from, value, {
       duration,
+      delay,
       ease: cinematicEase,
       onUpdate: (v) => {
         const next = Math.round(v)
@@ -52,7 +56,7 @@ export function CountUpValue({
       },
     })
     return () => controls.stop()
-  }, [value, duration, reduceMotion])
+  }, [value, duration, delay, reduceMotion])
 
   const text = (Number.isFinite(shown) ? Math.max(0, shown) : 0).toLocaleString("en-US")
   const finalText = (Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0).toLocaleString("en-US")

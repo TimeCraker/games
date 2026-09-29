@@ -374,7 +374,7 @@ export function LoopingBgmControl({
     <button
       type="button"
       onClick={onPrimaryClick}
-      className="relative flex h-11 w-11 shrink-0 items-center justify-center focus-visible:outline-none"
+      className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-[background-color,scale] duration-150 ease-[var(--ease-instrument)] hover:bg-white/[0.06] active:scale-[0.95] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60"
       title="背景音乐"
       aria-label="背景音乐"
       aria-expanded={open}

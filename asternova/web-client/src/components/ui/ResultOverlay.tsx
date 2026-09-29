@@ -4,7 +4,8 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { springSnappy } from "@/src/lib/motion"
+import { CountUpValue } from "@/src/components/ui/CountUpValue"
+import { cinematicEase, springSnappy } from "@/src/lib/motion"
 import { useDialogA11y } from "@/src/hooks/useDialogA11y"
 import { cn } from "@/lib/utils"
 
@@ -129,13 +130,28 @@ export function ResultOverlay({
 
           {stats && stats.length > 0 && (
             <div className="mt-6 flex items-stretch justify-center gap-6">
-              {stats.map((s) => (
-                <div key={s.label} className="flex flex-col">
-                  <span className="font-mono-data text-2xl font-bold text-white">{s.value}</span>
+              {/* R6：统计行 stagger 上浮（+40ms/行），数字值走 CountUpValue 翻牌 */}
+              {stats.map((s, i) => (
+                <motion.div
+                  key={s.label}
+                  className="flex flex-col"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, ease: cinematicEase, delay: 0.25 + i * 0.04 }}
+                >
+                  {typeof s.value === "number" ? (
+                    <CountUpValue
+                      value={s.value}
+                      delay={0.25 + i * 0.04}
+                      className="font-mono-data text-2xl font-bold text-white"
+                    />
+                  ) : (
+                    <span className="font-mono-data text-2xl font-bold text-white">{s.value}</span>
+                  )}
                   <span className="font-mono-data mt-1 text-[11px] tracking-[0.14em] text-hud-text-dim">
                     {s.label}
                   </span>
-                </div>
+                </motion.div>
               ))}
             </div>
           )}

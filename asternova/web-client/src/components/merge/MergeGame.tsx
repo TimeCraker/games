@@ -780,6 +780,8 @@ const confirmMergeRules = React.useCallback(() => {
         ) : null}
       </div>
 
+      {/* R6：AnimatePresence 包挂载点，获得 ArcadeEntry 进出场动画 */}
+      <AnimatePresence>
       {rulesModalOpen ? (
         <ArcadeEntry
           slug="merge"
@@ -840,6 +842,7 @@ const confirmMergeRules = React.useCallback(() => {
             </ul>
         </ArcadeEntry>
       ) : null}
+      </AnimatePresence>
 
       <StagePortal>
         <AnimatePresence>

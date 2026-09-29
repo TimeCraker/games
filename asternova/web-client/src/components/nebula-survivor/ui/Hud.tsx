@@ -74,7 +74,7 @@ export function HudStats({ ui }: { ui: UiSnapshot }) {
 export function HudSysKeys({ sfxOn, onToggleSfx, onPause, onHelp }: {
   sfxOn: boolean; onToggleSfx: () => void; onPause: () => void; onHelp: () => void
 }) {
-  const cls = "pointer-events-auto flex h-8 min-w-8 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-white/13 bg-black/55 px-2.5 text-[11px] text-white/80 backdrop-blur-md transition hover:bg-white/[0.11] active:scale-[0.97] sm:px-3"
+  const cls = "pointer-events-auto flex h-8 min-w-8 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-white/13 bg-black/55 px-2.5 text-[11px] text-white/80 backdrop-blur-md transition duration-150 ease-[var(--ease-instrument)] hover:bg-white/[0.11] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60 sm:px-3"
   return (
     <div className="pointer-events-none flex items-center gap-1.5">
       <button type="button" className={cls} aria-label={sfxOn ? "关闭音效" : "开启音效"} onClick={onToggleSfx}>
@@ -181,20 +181,32 @@ export function HudLoadout({ ui }: { ui: UiSnapshot }) {
   )
 }
 
-/** ⑧ 右下 · E 技冷却环 */
+/** ⑧ 右下 · E 技冷却环。
+ *  R6：进度走注册过的 --nd-cd-progress 自定义属性（globals.css @property），
+ *  conic-gradient 角度随其 150ms linear 平滑，10Hz 快照步进不再逐格瞬跳。 */
 export function HudSkillRing({ ui, size = 64, onUse }: { ui: UiSnapshot; size?: number; onUse?: () => void }) {
   const def = ESKILLS[ui.eskill as ESkillId]
   const total = def?.cd ?? 1
   const k = ui.eskillCd <= 0 ? 1 : 1 - Math.min(1, ui.eskillCd / total)
+  // 使用回零帧（k 骤降）不过渡，避免整环快速倒转；充能期才平滑。
+  // React Compiler lint 禁 render 期读 ref，故用 state 存上一帧 k（同值 setState 会被 bail）。
+  const [prevK, setPrevK] = React.useState(k)
+  const isReset = k < prevK - 0.02
+  React.useEffect(() => {
+    setPrevK(k)
+  }, [k])
   const Tag = onUse ? "button" : "div"
   return (
     <Tag
       type={onUse ? "button" : undefined}
       onClick={onUse}
-      className={`${onUse ? "pointer-events-auto active:scale-95" : "pointer-events-none"} relative rounded-full transition`}
+      className={`${onUse ? "pointer-events-auto transition-[scale] duration-150 ease-[var(--ease-instrument)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60" : "pointer-events-none"} relative rounded-full`}
       style={{
         width: size, height: size,
-        background: `conic-gradient(rgba(216,163,60,0.95) ${k * 360}deg, rgba(255,255,255,0.09) ${k * 360}deg 360deg)`,
+        // @ts-expect-error CSS 自定义属性透传（--nd-cd-progress 已在 globals.css @property 注册）
+        "--nd-cd-progress": k,
+        background: `conic-gradient(rgba(216,163,60,0.95) calc(var(--nd-cd-progress) * 360deg), rgba(255,255,255,0.09) calc(var(--nd-cd-progress) * 360deg) 360deg)`,
+        transition: isReset ? "none" : "--nd-cd-progress 150ms linear",
       }}
       aria-label={`E 技 ${def?.name ?? ""}`}
     >

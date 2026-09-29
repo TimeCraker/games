@@ -1,11 +1,13 @@
 "use client"
 
 import * as React from "react"
+import { motion } from "framer-motion"
 
 import { BrandMark } from "@/src/components/arcade/BrandMark"
 import type { ArcadeSlug } from "@/src/components/arcade/brand"
 import { StagePortal } from "@/src/components/game-shell/StagePortal"
 import { useDialogA11y } from "@/src/hooks/useDialogA11y"
+import { cinematicEase } from "@/src/lib/motion"
 import { cn } from "@/lib/utils"
 
 /**
@@ -174,15 +176,27 @@ export function ArcadeEntry({
 
   return (
     <StagePortal>
-      <div
+      {/* R6 动效轮：遮罩 fade 200ms + 面板进场 500ms --ease-cinematic（drawer 上滑 / centered 缩放），
+          exit 反向 200ms。调用方需以 <AnimatePresence> 包挂载点才能获得出场动画。 */}
+      <motion.div
         ref={dialogRef}
         className={overlayClass}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         style={safeArea ? { ...SAFE_AREA_STYLE, ...overlayStyle } : overlayStyle}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
       >
-        <div className={panelClass}>
+        <motion.div
+          className={panelClass}
+          initial={isCentered ? { opacity: 0, scale: 0.96 } : { opacity: 0, y: 24 }}
+          animate={isCentered ? { opacity: 1, scale: 1 } : { opacity: 1, y: 0 }}
+          exit={isCentered ? { opacity: 0, scale: 0.97 } : { opacity: 0, y: 16 }}
+          transition={{ duration: 0.5, ease: cinematicEase }}
+        >
           {panelOverlay}
           {eyebrow}
           <h2 id={titleId} className={titleClassName}>
@@ -220,8 +234,8 @@ export function ArcadeEntry({
             )}
           </button>
           {footer}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </StagePortal>
   )
 }

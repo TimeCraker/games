@@ -964,6 +964,8 @@ export function StarDashGame() {
         {isMobile && !rulesModalOpen ? <GameBackButton variant="floating" /> : null}
       </StagePortal>
 
+      {/* R6：AnimatePresence 包挂载点，获得 ArcadeEntry 进出场动画 */}
+      <AnimatePresence>
       {rulesModalOpen ? (
         <ArcadeEntry
           slug="lets-running"
@@ -1018,6 +1020,7 @@ export function StarDashGame() {
             </ul>
         </ArcadeEntry>
       ) : null}
+      </AnimatePresence>
 
       <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 min-[480px]:px-4">
         <div
@@ -1038,7 +1041,7 @@ export function StarDashGame() {
                   e.preventDefault()
                   tryJump()
                 }}
-                className="flex h-[3.25rem] min-w-[5.5rem] shrink-0 items-center gap-2 rounded-2xl border border-white/10 bg-glass-bg backdrop-blur-glass-md pl-1.5 pr-2.5 text-xs font-semibold text-white/90 shadow-sm transition active:scale-95 sm:h-14 sm:min-w-[6.25rem] sm:gap-2.5 sm:pl-2 sm:pr-3 sm:text-sm"
+                className="flex h-[3.25rem] min-w-[5.5rem] shrink-0 items-center gap-2 rounded-2xl border border-white/10 bg-glass-bg backdrop-blur-glass-md pl-1.5 pr-2.5 text-xs font-semibold text-white/90 shadow-sm transition duration-150 ease-[var(--ease-instrument)] hover:border-white/20 hover:bg-white/[0.08] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60 sm:h-14 sm:min-w-[6.25rem] sm:gap-2.5 sm:pl-2 sm:pr-3 sm:text-sm"
                 style={{ touchAction: "manipulation" }}
               >
                 <DashIconJump iconClass="h-9 w-9 sm:h-10 sm:w-10" />
@@ -1051,7 +1054,7 @@ export function StarDashGame() {
                   tryActivateBoost()
                 }}
                 className={cn(
-                  "flex h-[3.25rem] min-w-[6rem] shrink-0 items-center gap-1.5 rounded-2xl border border-white/10 bg-glass-bg backdrop-blur-glass-md pl-1.5 pr-2 text-xs font-semibold leading-tight shadow-sm transition active:scale-95 sm:h-14 sm:min-w-[7rem] sm:gap-2 sm:pl-2 sm:pr-2.5 sm:text-sm",
+                  "flex h-[3.25rem] min-w-[6rem] shrink-0 items-center gap-1.5 rounded-2xl border border-white/10 bg-glass-bg backdrop-blur-glass-md pl-1.5 pr-2 text-xs font-semibold leading-tight shadow-sm transition duration-150 ease-[var(--ease-instrument)] hover:border-white/20 hover:bg-white/[0.08] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60 sm:h-14 sm:min-w-[7rem] sm:gap-2 sm:pl-2 sm:pr-2.5 sm:text-sm",
                   boostReadyUi ? "animate-pulse text-white" : "text-white/50",
                 )}
                 style={{ touchAction: "manipulation" }}
@@ -1070,7 +1073,7 @@ export function StarDashGame() {
                   e.preventDefault()
                   trySlide()
                 }}
-                className="flex h-[3.25rem] min-w-[5.5rem] shrink-0 items-center gap-2 rounded-2xl border border-white/10 bg-glass-bg backdrop-blur-glass-md pl-1.5 pr-2.5 text-xs font-semibold text-white/90 shadow-sm transition active:scale-95 sm:h-14 sm:min-w-[6.25rem] sm:gap-2.5 sm:pl-2 sm:pr-3 sm:text-sm"
+                className="flex h-[3.25rem] min-w-[5.5rem] shrink-0 items-center gap-2 rounded-2xl border border-white/10 bg-glass-bg backdrop-blur-glass-md pl-1.5 pr-2.5 text-xs font-semibold text-white/90 shadow-sm transition duration-150 ease-[var(--ease-instrument)] hover:border-white/20 hover:bg-white/[0.08] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60 sm:h-14 sm:min-w-[6.25rem] sm:gap-2.5 sm:pl-2 sm:pr-3 sm:text-sm"
                 style={{ touchAction: "manipulation" }}
               >
                 <DashIconSlide iconClass="h-9 w-9 sm:h-10 sm:w-10" />

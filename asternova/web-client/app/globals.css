@@ -600,6 +600,14 @@ body {
    全部只动 transform/opacity（rules.md §7），自动被上方
    prefers-reduced-motion 全局开关（0.01ms）覆盖。 */
 
+/* E 技冷却环的进度数值：注册为可过渡的自定义属性，conic-gradient 角度随其平滑
+   （Chromium 85+/Safari 16.4+/Firefox 128+，降级为按快照步进，无害） */
+@property --nd-cd-progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
 /* 当前关呼吸描边：琥珀环透明度往复，--duration-ambient 2.6s 循环 */
 @keyframes hud-breathe-ring {
   0%,
@@ -632,6 +640,35 @@ body {
 }
 .hud-check-pop {
   animation: hud-check-pop 180ms var(--ease-instrument, cubic-bezier(0.32, 0.72, 0, 1)) both;
+}
+
+/* 加载屏描线环：SVG stroke-dashoffset 单圈描绘（rules.md §7 transform/opacity 总则的
+   SVG 描线例外，与 arena Godot 加载条工艺同源的「坐标锁定」语言） */
+@keyframes hud-draw-ring {
+  from {
+    stroke-dashoffset: var(--draw-len, 176);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.hud-draw-ring {
+  animation: hud-draw-ring 900ms var(--ease-cinematic, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* R6：页签切换淡入（shadcn/Radix Tabs 激活面板挂载即播；login 页签等共用） */
+@keyframes hud-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+[data-slot="tabs-content"][data-state="active"] {
+  animation: hud-fade-in-up 250ms var(--ease-instrument, cubic-bezier(0.32, 0.72, 0, 1)) both;
 }
 /* ===== 键盘焦点统一样式 · 2026-09-22 =====
    游戏壳 HUD 大量按钮无焦点样式；此处兜底全站（鼠标点击不显示环） */

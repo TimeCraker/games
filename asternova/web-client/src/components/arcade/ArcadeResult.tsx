@@ -6,7 +6,7 @@ import { ResultOverlay, type ResultStat } from "@/src/components/ui/ResultOverla
 
 import { BrandMark } from "./BrandMark"
 import type { ArcadeSlug } from "./brand"
-import { formatScore, newRoundId, submitRecord } from "./records"
+import { newRoundId, submitRecord } from "./records"
 
 /**
  * 街机统一结算。
@@ -61,9 +61,10 @@ export function ArcadeResult({
   const [result] = React.useState(() => submitRecord(slug, { score, mode, roundId }))
 
   const stats: ResultStat[] = [
-    { label: "本局得分", value: formatScore(score) },
+    // R6：传原始数字，ResultOverlay 内部走 CountUpValue 翻牌（千分位格式一致）
+    { label: "本局得分", value: score },
     ...(extraStats ?? []),
-    { label: "历史最高", value: formatScore(result.record.best) },
+    { label: "历史最高", value: result.record.best },
   ]
 
   return (

@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
+import { motion } from "framer-motion"
 import { Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { cinematicEase } from "@/src/lib/motion"
 
 /**
  * 统一加载屏（Stage A 共享组件）
@@ -10,6 +12,7 @@ import { cn } from "@/lib/utils"
  * 替换 4 处裸 loading（各 PageClient 的 loading 回调 + arena 加载序列）
  *
  * progress 提供 → 真进度条（arena 工艺）；未提供 → 旋转 spinner（indeterminate）
+ * R6：整屏入场 fade 300ms + spinner 外圈琥珀描线环（hud-draw-ring，900ms 单圈）
  */
 export function GameLoadingScreen({
   label = "正在进入战场",
@@ -25,7 +28,10 @@ export function GameLoadingScreen({
   const pct = typeof progress === "number" ? Math.max(0, Math.min(100, progress)) : null
   const hasProgress = pct !== null
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, ease: cinematicEase }}
       className={cn(
         "relative flex h-full min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-space-black text-white",
         className,
@@ -45,7 +51,29 @@ export function GameLoadingScreen({
               />
             </div>
           ) : (
-            <Loader2 className="h-7 w-7 animate-spin text-hud-accent/80" />
+            <span className="relative inline-flex h-14 w-14 items-center justify-center">
+              {/* R6 描线环：坐标锁定语言，单圈 900ms 描完后交给 Loader2 旋转 */}
+              <svg
+                viewBox="0 0 64 64"
+                aria-hidden
+                className="pointer-events-none absolute inset-0 h-full w-full"
+              >
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="28"
+                  fill="none"
+                  stroke="var(--amber-500, #D8A33C)"
+                  strokeOpacity="0.65"
+                  strokeWidth="1.5"
+                  strokeDasharray="176"
+                  strokeDashoffset="176"
+                  className="hud-draw-ring"
+                />
+                <circle cx="32" cy="4" r="2" fill="var(--amber-400, #E9BE69)" className="hud-check-pop" />
+              </svg>
+              <Loader2 className="h-6 w-6 animate-spin text-hud-accent/80" />
+            </span>
           )}
         </div>
 
@@ -56,6 +84,6 @@ export function GameLoadingScreen({
           <p className="mt-5 font-mono-data text-[11px] leading-relaxed tracking-[0.08em] text-white/50">{hint}</p>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }
