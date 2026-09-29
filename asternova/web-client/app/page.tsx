@@ -58,9 +58,17 @@ export default function Home() {
           transition={{ duration: 0.95, delay: 0.4, ease: cinematicEase }}
           className="space-y-7"
         >
+          {/* 帽线图注（R7）：mono 双语 kicker，单一琥珀；窄屏收字号防中文断词 */}
+          <div className="flex items-center justify-center gap-3">
+            <span aria-hidden className="hidden h-px w-8 bg-hud-accent/45 sm:block sm:w-12" />
+            <span className="whitespace-nowrap font-mono-data text-[9px] uppercase tracking-[0.2em] text-hud-accent/90 sm:text-[11px] sm:tracking-[0.28em]">
+              Deep Space Observatory · 深空观测站
+            </span>
+            <span aria-hidden className="hidden h-px w-8 bg-hud-accent/45 sm:block sm:w-12" />
+          </div>
           <h1 className="aster-title text-4xl sm:text-6xl md:text-7xl">ASTERNOVA STUDIO</h1>
           <p className="aster-slogan text-sm sm:text-base">Reach Beyond the Stars</p>
-          <div className="mx-auto h-px w-24 bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+          <div className="mx-auto h-px w-24 bg-gradient-to-r from-transparent via-hud-accent/40 to-transparent" />
         </motion.div>
 
         <motion.div
@@ -72,16 +80,19 @@ export default function Home() {
           <motion.button
             type="button"
             onClick={() => router.push("/login")}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 420, damping: 26 }}
-            className="group relative inline-flex items-center gap-2 rounded-full bg-white px-10 py-3.5 text-sm font-semibold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition-shadow duration-300 hover:bg-white/90 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_8px_30px_-8px_rgba(255,255,255,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            className="group relative inline-flex items-center rounded-full bg-white/[0.08] p-[3px] ring-1 ring-white/15 transition-[box-shadow,border-color] duration-300 hover:ring-hud-accent/40 hover:shadow-[0_10px_36px_-12px_rgba(216,163,60,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hud-accent/60"
           >
-            <span>进入大厅</span>
-            <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
+            {/* 双层壳：外圈半透明环 + 内芯纯白胶囊，琥珀箭头作唯一彩色点缀 */}
+            <span className="inline-flex items-center gap-2 rounded-full bg-white px-9 py-3 text-sm font-semibold text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition-[filter] duration-200 ease-[var(--ease-instrument)] group-hover:brightness-[1.02]">
+              <span>进入大厅</span>
+              <ChevronRight className="h-4 w-4 text-hud-accent transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.25} />
+            </span>
           </motion.button>
           <p className="font-mono-data mt-4 text-[10px] tracking-[0.12em] text-white/50">
-            登录后进入游戏大厅
+            登录后进入游戏大厅 · ENTER THE LOBBY
           </p>
         </motion.div>
       </main>
@@ -91,7 +102,7 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.4, ease: cinematicEase }}
-        className="relative z-10 mx-auto w-full max-w-6xl px-6 py-6 sm:py-7"
+        className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-20 pt-6 sm:pb-7 sm:pt-7"
       >
         <p className="font-mono-data text-center text-[10px] tracking-[0.18em] text-white/50">
           © 2026 ASTERNOVA · DEEP SPACE OBSERVATORY

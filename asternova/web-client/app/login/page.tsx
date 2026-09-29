@@ -320,6 +320,9 @@ export default function LoginPage() {
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-80"
             aria-hidden
           />
+          {/* R7：琥珀四角括号（nebula Panel 同款母题），落定观测台语言 */}
+          <span aria-hidden className="pointer-events-none absolute -left-px -top-px h-3 w-3 border-l-2 border-t-2 border-hud-accent/65" />
+          <span aria-hidden className="pointer-events-none absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2 border-hud-accent/65" />
           <div className="star-chart-grid-fine pointer-events-none absolute inset-0 opacity-50" aria-hidden />
 
           <div className="relative px-6 pb-7 pt-7 sm:px-8 sm:pb-8 sm:pt-8">
@@ -422,7 +425,7 @@ export default function LoginPage() {
                 <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-2xl border border-white/[0.07] bg-black/40 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
                   <TabsTrigger
                     value="password_login"
-                    className="group/tab relative h-10 rounded-xl border border-transparent text-[13px] font-medium text-white/50 transition data-[state=active]:border-white/[0.12] data-[state=active]:bg-white/[0.12] data-[state=active]:text-white data-[state=active]:shadow-[0_0_20px_rgba(255,255,255,0.06)]"
+                    className="group/tab relative h-10 rounded-xl border border-transparent text-[13px] font-medium text-white/50 transition data-[state=active]:border-hud-accent/40! data-[state=active]:bg-hud-accent/15! data-[state=active]:text-hud-accent-bright! data-[state=active]:shadow-[0_0_20px_rgba(216,163,60,0.12)]!"
                   >
                     <KeyRound
                       className="mr-1.5 h-3.5 w-3.5 opacity-55 transition group-data-[state=active]/tab:opacity-100"
@@ -432,7 +435,7 @@ export default function LoginPage() {
                   </TabsTrigger>
                   <TabsTrigger
                     value="email_login"
-                    className="group/tab relative h-10 rounded-xl border border-transparent text-[13px] font-medium text-white/50 transition data-[state=active]:border-white/[0.12] data-[state=active]:bg-white/[0.12] data-[state=active]:text-white data-[state=active]:shadow-[0_0_20px_rgba(255,255,255,0.06)]"
+                    className="group/tab relative h-10 rounded-xl border border-transparent text-[13px] font-medium text-white/50 transition data-[state=active]:border-hud-accent/40! data-[state=active]:bg-hud-accent/15! data-[state=active]:text-hud-accent-bright! data-[state=active]:shadow-[0_0_20px_rgba(216,163,60,0.12)]!"
                   >
                     <Mail
                       className="mr-1.5 h-3.5 w-3.5 opacity-55 transition group-data-[state=active]/tab:opacity-100"
@@ -489,7 +492,7 @@ export default function LoginPage() {
                     <Button
                       type="submit"
                       disabled={passwordSubmitting}
-                      className="mt-1 h-12 w-full rounded-xl text-[15px] font-semibold tracking-[-0.02em] disabled:opacity-55"
+                      className="mt-1 h-12 w-full rounded-xl bg-hud-accent text-[15px] font-semibold tracking-[-0.02em] text-ink-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] transition-[filter,box-shadow] duration-200 ease-[var(--ease-instrument)] hover:bg-hud-accent hover:brightness-105 active:brightness-95 disabled:opacity-55"
                     >
                       {passwordSubmitting ? "登录中…" : "登录"}
                     </Button>
@@ -578,7 +581,7 @@ export default function LoginPage() {
                     <Button
                       type="submit"
                       disabled={emailSubmitting}
-                      className="mt-1 h-12 w-full rounded-xl text-[15px] font-semibold tracking-[-0.02em] disabled:opacity-55"
+                      className="mt-1 h-12 w-full rounded-xl bg-hud-accent text-[15px] font-semibold tracking-[-0.02em] text-ink-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] transition-[filter,box-shadow] duration-200 ease-[var(--ease-instrument)] hover:bg-hud-accent hover:brightness-105 active:brightness-95 disabled:opacity-55"
                     >
                       {emailSubmitting
                         ? "提交中…"
