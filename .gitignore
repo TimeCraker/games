@@ -27,3 +27,6 @@ __pycache__/
 anim_list_out.txt
 shot.png
 .playwright-mcp/
+
+# 美术验收基线截图（本地比对用，不入库）
+sta-baseline-*.png
