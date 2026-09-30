@@ -2,6 +2,11 @@
 
 # 🌌 AsterNova Game Server
 
+> ⚠️ **封存状态声明（2026-09-30）**
+> backend 一期已**封存**（不部署、不开发，仅作为二期「大型联机」的起点资产）。
+> 现行权威架构为**房主权威（Host-Authoritative）**；下文描述的「服务端权威（Server-Authoritative）」为旧设计，仅供历史参考，不随现状更新。
+> 现行架构定案以 `asternova/docs/architecture.md` 与仓库 `CLAUDE.md` 为准。
+
    
 
 **AsterNova** 是一个采用 Go 语言构建的工业级、模块化实时多人对战游戏服务端框架。本项目基于\*\*服务端权威（Server-Authoritative）\*\*网络架构设计，通过严格的高低频业务隔离与微服务化拆分，提供高频物理帧同步、严密的安全鉴权与极简的跨端（Web/移动端）扩展支持。
@@ -120,3 +125,14 @@ AsterNova-Server/
     go run main.go
     ```
     服务将挂载于 `localhost:8081` 监听全栈网络请求。
+
+## 🧰 开发命令（封存期标准检查）
+
+封存期不引入 Makefile / CI（Windows 无 make 保障，封存代码不值得引构建编排）；改动 Go 代码后手动执行以下四条标准检查：
+
+```bash
+gofmt -l ./...   # 格式检查，输出应为空（批量格式化用 gofmt -w .）
+go vet ./...     # 静态检查
+go build ./...   # 编译通过
+go test ./...    # 单元测试全绿
+```
