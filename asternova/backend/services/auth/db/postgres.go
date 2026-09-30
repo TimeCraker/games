@@ -12,8 +12,8 @@ import (
 	migrate "github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-	_ "github.com/jackc/pgx/v5/stdlib" // 注册 database/sql "pgx" 驱动供迁移连接使用
 	"github.com/jackc/pgx/v5/pgxpool"
+	_ "github.com/jackc/pgx/v5/stdlib" // 注册 database/sql "pgx" 驱动供迁移连接使用
 
 	"github.com/TimeCraker/asternova-backend/services/auth/db/sqlc"
 )

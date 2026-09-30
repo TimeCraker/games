@@ -103,4 +103,3 @@ func GuestLogin(c *gin.Context) {
 		},
 	})
 }
-

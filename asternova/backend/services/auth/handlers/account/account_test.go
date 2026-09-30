@@ -16,9 +16,9 @@ func init() {
 
 func TestRandomHex(t *testing.T) {
 	cases := []struct {
-		name     string
-		nBytes   int
-		wantLen  int
+		name    string
+		nBytes  int
+		wantLen int
 	}{
 		{"3 字节输出 6 个 hex 字符", 3, 6},
 		{"12 字节输出 24 个 hex 字符", 12, 24},

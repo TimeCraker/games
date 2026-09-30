@@ -94,4 +94,3 @@ func ResetPasswordWithEmail(c *gin.Context) {
 		"identifier": identifier,
 	})
 }
-

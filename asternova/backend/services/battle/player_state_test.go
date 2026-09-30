@@ -63,10 +63,10 @@ func TestPlayerHeldAttackLoopsAfterRecovery(t *testing.T) {
 	// 持续按住攻击键：一套连招结束后应能再次进入前摇（自动连发语义）
 	p := &BattlePlayer{CurrentState: Idle}
 	p.Input.IsAttacking = true
-	step(p, 0.016)                                   // PreCast
-	step(p, AttackPreCast+0.001)                     // Attack
-	step(p, AttackDuration+0.001)                    // PostCast
-	step(p, AttackPostCastMiss+0.001)                // Idle + 同帧再次触发 PreCast
+	step(p, 0.016)                    // PreCast
+	step(p, AttackPreCast+0.001)      // Attack
+	step(p, AttackDuration+0.001)     // PostCast
+	step(p, AttackPostCastMiss+0.001) // Idle + 同帧再次触发 PreCast
 	if p.CurrentState != PreCast {
 		t.Errorf("按住攻击键连招结束后状态 = %d, want 再次进入 PreCast(%d)", p.CurrentState, PreCast)
 	}
@@ -175,9 +175,9 @@ func TestPlayerHitStunDecelerates(t *testing.T) {
 func TestPlayerMoveFacing(t *testing.T) {
 	t.Run("Move 状态按输入方向更新 FacingX", func(t *testing.T) {
 		cases := []struct {
-			name    string
-			inputX  float64
-			want    float64
+			name   string
+			inputX float64
+			want   float64
 		}{
 			{"向右", 0.5, 1.0},
 			{"向左", -0.5, -1.0},

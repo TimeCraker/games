@@ -18,21 +18,21 @@ const (
 	DashDistMultiplier     = 1.5
 
 	// 战斗与状态时间参数 (秒)
-	DashDuration           = 0.3 // 冲刺持续时间
-	DashPostCast           = 0.5 // 冲刺结束后的后摇
-	AttackPreCast          = 0.1 // 攻击前摇
-	AttackDuration         = 0.05 // 攻击判定窗口
-	AttackPostCastMiss     = 0.5 // 攻击挥空后摇惩罚
-	AttackPostCastHit      = 0.3 // 攻击命中后摇奖励
-	HitStunNormal          = 0.4 // 普通受击硬直
-	HitStunClash           = 0.5 // 拼刀受击硬直
+	DashDuration       = 0.3  // 冲刺持续时间
+	DashPostCast       = 0.5  // 冲刺结束后的后摇
+	AttackPreCast      = 0.1  // 攻击前摇
+	AttackDuration     = 0.05 // 攻击判定窗口
+	AttackPostCastMiss = 0.5  // 攻击挥空后摇惩罚
+	AttackPostCastHit  = 0.3  // 攻击命中后摇奖励
+	HitStunNormal      = 0.4  // 普通受击硬直
+	HitStunClash       = 0.5  // 拼刀受击硬直
 
 	// 判定与数值参数
-	MeleeRadius            = 150.0 // 扇形攻击判定半径
-	DashHitRadius          = 60.0  // 冲刺碰撞半径
-	KnockbackSpeed         = 1600.0 // 击退初速度
-	BaseDamage       int32 = 30    // 基础伤害
-	EnergyReward     int32 = 1     // 命中回复能量
+	MeleeRadius          = 150.0  // 扇形攻击判定半径
+	DashHitRadius        = 60.0   // 冲刺碰撞半径
+	KnockbackSpeed       = 1600.0 // 击退初速度
+	BaseDamage     int32 = 30     // 基础伤害
+	EnergyReward   int32 = 1      // 命中回复能量
 )
 
 // State 表示玩家在战斗状态机中的离散状态枚举（与协议中的 current_state 对齐使用）
