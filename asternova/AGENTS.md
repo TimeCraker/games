@@ -2,6 +2,8 @@
 
 本文件为所有进入 `asternova/` 目录的 AI 编码助手（Antigravity, Claude Code, Cursor 等）提供工作准则、本地环境与决策约束。后续所有会话的 Agent 进入本仓库必须优先遵守以下规范。
 
+> **2026-09-30 流程校正（与下文历史条款冲突时以本段为准）**：用户授权按实际资产选择最合适的实现方式。角色制作可使用 Blender UI、MCP 或 Python 自动化，但装配、蒙皮及重定向都必须有逐阶段实际图像检查与 Godot 动作验证；不再以调用通道禁止可靠的工具操作。白/橙/紫新角色遵循 [当前 Stage Spec](docs/stage-specs/three-character-assembly-rigging.md)，不套用旧 Aster 路径、43 骨数量或旧服装造型。骨名匹配不等于重定向完成，允许验证后的离线动画烘焙。模型相似度不得由 Agent 自报百分比。用户已授权本轮连续执行，阶段图像用于检查和交付，无须重复等待逐步放行。美术目标不变。
+
 ---
 
 ## 0. 本地基础设施与工具调用规范（CLI 与 MCP 双模就绪 · 必读基础）
@@ -11,13 +13,13 @@
 | 模式 | 工具 / 服务 | 本地绝对路径 / 配置源 | 状态与版本 | 核心使用场景与规范 |
 | :--- | :--- | :--- | :--- | :--- |
 | **CLI 模式**<br>(底层无头批处理) | **Godot 4.7** | `C:\Users\TimeCraker\tools\godot\Godot_v4.7.2-stable_win64.exe` | **v4.7.2 stable** | 全局 `godot` 命令行可用；用于无头执行测试脚本、三视图截屏与场景跑分。 |
-| **CLI 模式**<br>(底层无头批处理) | **Blender 5.2** | `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe` | **5.2.1 LTS** | 内置 Python 3.11 + `mmd_tools v4.5.14`；仅限非审美批处理（导出 / LOD / 贴图通道搬运 / 自动化出图），见下方调用准则。 |
+| **CLI 模式**<br>(本地自动化) | **Blender** | 使用 `Get-Command blender` 解析；本次为 `C:\Users\TimeCraker\tools\blender\blender-5.2.1-windows-x64\blender.exe` | 运行 `blender --version` 核实 | 导入、装配、蒙皮、烘焙、导出与渲染均可自动化；变形与视觉效果须看图验证。插件和 Python 版本需实际查询。 |
 | **MCP 模式**<br>(前台可视化交互) | **Blender MCP**（`blender-mcp`，视口插件已装入 5.2） | Claude Code 会话可直接调用（配置随客户端各自维护：Claude Code 在 `~/.claude.json` / 项目 `.mcp.json`；Gemini CLI 在 `~/.gemini/`） | ✅ 2026-09-10 验证可用 | **一切审美相关建模操作的首选通道**：视口截图、代码执行、Hunyuan3D / Hyper3D Rodin 图生 3D 直连导入、PolyHaven / PolyPizza 素材库检索。 |
 | **MCP 模式**<br>(前台可视化交互) | **Godot MCP**（`@coding-solo/godot-mcp`） | 同上（按客户端配置） | ⬜ **尚未接入 Claude Code**（此前仅 Gemini 侧配置） | 前台唤起 Godot 编辑器、运行调试、动态增删节点与实时抓取控制台报错；接入前 Godot 侧自动化一律走 CLI。 |
 
 > **调用准则（2026-09-10 修订：视觉闭环铁律，所有建模 Agent 强制遵守）**：
 > 1. **审美类操作（造型 / 比例 / 材质 / 光照 / 几何手术）一律优先在 MCP 会话内完成**；
-> 2. **CLI + Python 无头脚本仅限非审美的确定性批处理**：格式导出、LOD 减面、贴图通道搬运、自动化出图与 CI 跑分——**严禁用无头脚本做「不看效果就无法确认好坏」的修改**（有机角色绑定与重定向的禁令见 character-modeling-pipeline §1.1 红线 5）；
+> 2. **自动化必须可检查**：脚本可以调用 Blender 成熟工具进行装配、蒙皮与烘焙；关键变更后出图检查，不得因脚本无异常而宣称视觉合格。
 > 3. **视觉闭环铁律**：任何几何 / 材质 / 光照修改之后，必须**立即截图**（MCP 视口截图或无头渲染均可），由 Agent 多模态能力**亲自看图**并与参考图比对，确认无误才准执行下一步；**严禁连续多步盲改后才看结果，严禁未看图就声称通过**；
 > 4. **参考图同框验收**：按参考图生产的资产必须交付「参考图 vs 成品」同框对比看板（同透视、同光照），由制作人拍板；**严禁自报数值化相似度**（详细流程见 modular SOP §2.6）；
 > 5. **并行纪律**：**一个资产一个 Agent**；`.blend` 无法合并编辑，严禁多 Agent 同改一个文件 / 一个资产目录；需要并行时按资产拆分任务；
@@ -58,7 +60,7 @@
    - 恪守工业界"大形归纳（Stylized Clumps）+ 贴图分绺暗线（Crease Grooves）+ 法线球面化（Sphere Normal Transfer）"的低几何开销、高视觉还原管线。
 4. **资产管理纪律（防乱放红线）**：
    - 严禁在 `art/` 或项目根目录随意堆放 `debug_*`、`crop_*`、`test_*`、`extract_*` 等临时脚本调试图片。所有中间调试产物必须在内存或临时目录（如 OS temp）处理完毕即刻销毁。
-   - 角色 3D 验收以 `art/characters/aster/turnaround-final.png` 为绝对视觉基准，关键配饰齐全后同框对比，综合相似度 ≥ 90% 方可验收。
+   - 角色按各自原画和实物资产验收；旧 Aster 才使用 `art/characters/aster/turnaround-final.png`。同框对比并记录具体差异，最终美术验收由用户判断，不自报相似度。
 5. **验证闭环与提交规范**：
    - 独立可验证单元完成后立即提交：Conventional Commits + 中英对照（如 `feat(art): ... / ...`）。
    - 渲染与美术改动必须先出可验证件（截图对比、真机跑分、弹出窗口供用户检阅），严禁凭模型自我声称通过。
