@@ -30,3 +30,6 @@ shot.png
 
 # 美术验收基线截图（本地比对用，不入库）
 sta-baseline-*.png
+
+# AI 工具本地缓存（与 ResumeAIX 仓同款处理）
+.zcode/
