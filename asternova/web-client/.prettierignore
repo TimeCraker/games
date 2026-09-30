@@ -1,0 +1,6 @@
+.next/
+out/
+node_modules/
+public/godot/
+package-lock.json
+next-env.d.ts
