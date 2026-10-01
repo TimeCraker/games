@@ -14,6 +14,14 @@
 
 原始来源：`C:/Users/TimeCraker/Pictures/游戏人物建模参考`。工作源：`art/characters/white/rework/`；证据：该目录的 `review/`；新静态预览独立存放，保留旧动作原型。临时脚本、试验渲染放 OS temp。
 
+### Windows Computer Use 恢复记录（2026-10-01）
+
+- [x] 修复 Node REPL 启动时“failed to write kernel assets / 系统找不到指定的路径”：运行中的服务引用了两个已丢失的临时目录，恢复目录后重新初始化成功。未修改 Codex 配置，未重装插件。
+- [x] 通过 `@oai/sky` 列出窗口、激活当前 `white_rework_working.blend`，取得真实 Blender 桌面截图。
+- [x] 点击 Blender 视口并发送 `KP_3`，截图确认角色从正面切到侧面，完成真实输入验证。
+
+后续可使用 Windows Computer Use 调整 Blender，并在每次输入后检查新截图。此记录仅证明工具恢复可用，不代表模型外观达标；本次验证未修改模型几何。
+
 ## 进度（2/6）
 
 - [x] 校正项目及源目录文档，保存源文档备份。
