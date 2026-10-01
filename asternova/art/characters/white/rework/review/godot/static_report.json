@@ -1,0 +1,88 @@
+{
+	"art_approved": false,
+	"engine": "4.7.2-stable (official)",
+	"images": [
+		{
+			"clay": false,
+			"head": false,
+			"mode": 1,
+			"name": "new_front",
+			"save_error": 0,
+			"toon": true
+		},
+		{
+			"clay": false,
+			"head": false,
+			"mode": 1,
+			"name": "new_left",
+			"save_error": 0,
+			"toon": true
+		},
+		{
+			"clay": false,
+			"head": false,
+			"mode": 1,
+			"name": "new_back",
+			"save_error": 0,
+			"toon": true
+		},
+		{
+			"clay": false,
+			"head": false,
+			"mode": 1,
+			"name": "new_right",
+			"save_error": 0,
+			"toon": true
+		},
+		{
+			"clay": false,
+			"head": true,
+			"mode": 1,
+			"name": "new_head",
+			"save_error": 0,
+			"toon": true
+		},
+		{
+			"clay": true,
+			"head": false,
+			"mode": 1,
+			"name": "new_clay",
+			"save_error": 0,
+			"toon": true
+		},
+		{
+			"clay": false,
+			"head": false,
+			"mode": 1,
+			"name": "new_front_pbr",
+			"save_error": 0,
+			"toon": false
+		},
+		{
+			"clay": false,
+			"head": true,
+			"mode": 1,
+			"name": "new_head_pbr",
+			"save_error": 0,
+			"toon": false
+		},
+		{
+			"clay": false,
+			"head": false,
+			"mode": 2,
+			"name": "old_rest",
+			"save_error": 0,
+			"toon": false
+		},
+		{
+			"clay": false,
+			"head": false,
+			"mode": 3,
+			"name": "old_idle",
+			"save_error": 0,
+			"toon": false
+		}
+	],
+	"renderer": "forward_plus",
+	"sample_meshes": 26
+}

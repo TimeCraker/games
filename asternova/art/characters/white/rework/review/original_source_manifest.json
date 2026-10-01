@@ -1,0 +1,17 @@
+[
+  {
+    "role": "body",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\白色\\3D模型\\01_素体_quad.glb",
+    "sha256": "221abdbbeaf73d32e4bea1c6080463167569eee4ff267b410b8dbb7584710013"
+  },
+  {
+    "role": "outfit",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\白色\\3D模型\\02_服装_quad.glb",
+    "sha256": "698af8b8c4e4ca778c20798eba6445263e94442e0f5986ba8cd86260ec2f03cc"
+  },
+  {
+    "role": "hair",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\白色\\3D模型\\03_头发_quad.glb",
+    "sha256": "e55e5592bfcc9a4d0f3ae325ac3a02633690444362a1542064231e099339350e"
+  }
+]

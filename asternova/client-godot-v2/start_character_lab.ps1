@@ -1,4 +1,4 @@
-param([string]$GodotPath)
+param([string]$GodotPath, [string]$Scene = 'res://scenes/character_lab/character_lab.tscn')
 $ErrorActionPreference = 'Stop'
 if (-not $GodotPath) {
     $godotCommand = Get-Command godot -ErrorAction SilentlyContinue
@@ -18,5 +18,5 @@ if (-not $GodotPath -or -not (Test-Path -LiteralPath $GodotPath)) {
 $quotedProject = '"' + $PSScriptRoot + '"'
 $importProcess = Start-Process -FilePath $GodotPath -ArgumentList @('--headless', '--path', $quotedProject, '--editor', '--import') -WindowStyle Hidden -Wait -PassThru
 if ($importProcess.ExitCode -ne 0) { throw 'Godot asset import failed.' }
-$gameProcess = Start-Process -FilePath $GodotPath -ArgumentList @('--path', $quotedProject, '--resolution', '1440x900', 'res://scenes/character_lab/character_lab.tscn') -WindowStyle Normal -Wait -PassThru
+$gameProcess = Start-Process -FilePath $GodotPath -ArgumentList @('--path', $quotedProject, '--resolution', '1440x900', $Scene) -WindowStyle Normal -Wait -PassThru
 exit $gameProcess.ExitCode
