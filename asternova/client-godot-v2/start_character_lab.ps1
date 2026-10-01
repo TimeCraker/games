@@ -13,7 +13,10 @@ if (-not $GodotPath) {
 if (-not $GodotPath -or -not (Test-Path -LiteralPath $GodotPath)) {
     throw 'Godot executable not found. Pass -GodotPath with the installed executable.'
 }
-& $GodotPath --headless --path $PSScriptRoot --editor --import
-if ($LASTEXITCODE -ne 0) { throw 'Godot asset import failed.' }
-& $GodotPath --path $PSScriptRoot 'res://scenes/character_lab/character_lab.tscn'
-exit $LASTEXITCODE
+# Windows PowerShell can launch a GUI executable asynchronously; LASTEXITCODE
+# is then unset. Wait on the actual process, including for headless imports.
+$quotedProject = '"' + $PSScriptRoot + '"'
+$importProcess = Start-Process -FilePath $GodotPath -ArgumentList @('--headless', '--path', $quotedProject, '--editor', '--import') -WindowStyle Hidden -Wait -PassThru
+if ($importProcess.ExitCode -ne 0) { throw 'Godot asset import failed.' }
+$gameProcess = Start-Process -FilePath $GodotPath -ArgumentList @('--path', $quotedProject, '--resolution', '1440x900', 'res://scenes/character_lab/character_lab.tscn') -WindowStyle Normal -Wait -PassThru
+exit $gameProcess.ExitCode
