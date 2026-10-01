@@ -1,5 +1,7 @@
 # AsterNova 核心技术与设计文档体系（Docs Hub）
 
+> **2026-10-01 状态校正**：三角色动作工程原型可运行，但静态装配和艺术品质未通过。原“6/6”是历史工程交付记录，不能作为美术完成结论。当前先返工白色静态样板并等待用户确认；执行 `docs/stage-specs/character-art-rework.md`（相对 asternova 根目录）。
+
 > **最高决策权重顺序**：  
 > **用户当前指令** > [BLUEPRINT.md](BLUEPRINT.md)（愿景与里程碑）> [architecture.md](architecture.md)（技术定案与红线）> [STYLE.md](STYLE.md)（美术风格圣经）> 阶段施工单 / 细分 SOP > 根目录 `CLAUDE.md`。
 
