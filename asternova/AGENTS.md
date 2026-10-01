@@ -12,7 +12,7 @@
 
 | 模式 | 工具 / 服务 | 本地绝对路径 / 配置源 | 状态与版本 | 核心使用场景与规范 |
 | :--- | :--- | :--- | :--- | :--- |
-| **CLI 模式**<br>(底层无头批处理) | **Godot 4.7** | `C:\Users\TimeCraker\tools\godot\Godot_v4.7.2-stable_win64.exe` | **v4.7.2 stable** | 全局 `godot` 命令行可用；用于无头执行测试脚本、三视图截屏与场景跑分。 |
+| **CLI 模式**<br>(底层无头批处理) | **Godot 4.7** | `C:\Users\TimeCraker\tools\godot\Godot_v4.7.2-stable_win64_console.exe`；交互窗口用同目录的非 console 版本 | **v4.7.2 stable** | 本次未解析到全局 `godot` 命令，按安装目录或显式参数调用；Windows PowerShell 调用图形版本须等待实际进程退出，再检查退出码。用于无头检查、实际场景运行与截屏。 |
 | **CLI 模式**<br>(本地自动化) | **Blender** | 使用 `Get-Command blender` 解析；本次为 `C:\Users\TimeCraker\tools\blender\blender-5.2.1-windows-x64\blender.exe` | 运行 `blender --version` 核实 | 导入、装配、蒙皮、烘焙、导出与渲染均可自动化；变形与视觉效果须看图验证。插件和 Python 版本需实际查询。 |
 | **MCP 模式**<br>(前台可视化交互) | **Blender MCP**（`blender-mcp`，视口插件已装入 5.2） | Claude Code 会话可直接调用（配置随客户端各自维护：Claude Code 在 `~/.claude.json` / 项目 `.mcp.json`；Gemini CLI 在 `~/.gemini/`） | ✅ 2026-09-10 验证可用 | **一切审美相关建模操作的首选通道**：视口截图、代码执行、Hunyuan3D / Hyper3D Rodin 图生 3D 直连导入、PolyHaven / PolyPizza 素材库检索。 |
 | **MCP 模式**<br>(前台可视化交互) | **Godot MCP**（`@coding-solo/godot-mcp`） | 同上（按客户端配置） | ⬜ **尚未接入 Claude Code**（此前仅 Gemini 侧配置） | 前台唤起 Godot 编辑器、运行调试、动态增删节点与实时抓取控制台报错；接入前 Godot 侧自动化一律走 CLI。 |
