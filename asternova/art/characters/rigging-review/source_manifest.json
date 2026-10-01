@@ -1,0 +1,119 @@
+[
+  {
+    "character": "white",
+    "role": "body",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\白色\\3D模型\\01_素体_quad.glb",
+    "sha256": "221abdbbeaf73d32e4bea1c6080463167569eee4ff267b410b8dbb7584710013",
+    "bytes": 9458412,
+    "meshes": 1,
+    "skins": 0,
+    "animations": 0,
+    "primitive_modes": [
+      4
+    ]
+  },
+  {
+    "character": "white",
+    "role": "outfit",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\白色\\3D模型\\02_服装_quad.glb",
+    "sha256": "698af8b8c4e4ca778c20798eba6445263e94442e0f5986ba8cd86260ec2f03cc",
+    "bytes": 9902128,
+    "meshes": 1,
+    "skins": 0,
+    "animations": 0,
+    "primitive_modes": [
+      4
+    ]
+  },
+  {
+    "character": "white",
+    "role": "hair",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\白色\\3D模型\\03_头发_quad.glb",
+    "sha256": "e55e5592bfcc9a4d0f3ae325ac3a02633690444362a1542064231e099339350e",
+    "bytes": 9893108,
+    "meshes": 1,
+    "skins": 0,
+    "animations": 0,
+    "primitive_modes": [
+      4
+    ]
+  },
+  {
+    "character": "orange",
+    "role": "body",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\橙色\\3D模型\\01_素体_quad.glb",
+    "sha256": "284a80074d4df1246885b94895089315300099e9ef9c3d7b8332b644399fddd3",
+    "bytes": 14324100,
+    "meshes": 1,
+    "skins": 0,
+    "animations": 0,
+    "primitive_modes": [
+      4
+    ]
+  },
+  {
+    "character": "orange",
+    "role": "outfit",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\橙色\\3D模型\\03_头发_quad.glb",
+    "sha256": "82651e2266cce7d50d31215dbbd491e1375bec04a67721cd55e2fdc754ba8b7c",
+    "bytes": 10951560,
+    "meshes": 1,
+    "skins": 0,
+    "animations": 0,
+    "primitive_modes": [
+      4
+    ]
+  },
+  {
+    "character": "orange",
+    "role": "hair",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\橙色\\3D模型\\02_服装_quad.glb",
+    "sha256": "6e7fed5aa95b1546d7d8e21a8c5892475e430d8cd7642eaadac3a7ab3ef5419e",
+    "bytes": 4643620,
+    "meshes": 1,
+    "skins": 0,
+    "animations": 0,
+    "primitive_modes": [
+      4
+    ]
+  },
+  {
+    "character": "purple",
+    "role": "body",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\3D模型\\01_素体_quad.glb",
+    "sha256": "c5cafed9ecdc50593e3cf9acaf21af68ba80c31244d64206d09499748b931d7c",
+    "bytes": 12492468,
+    "meshes": 1,
+    "skins": 0,
+    "animations": 0,
+    "primitive_modes": [
+      4
+    ]
+  },
+  {
+    "character": "purple",
+    "role": "outfit",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\3D模型\\02_服装_quad.glb",
+    "sha256": "3a506343e13e694a2a230a8d9f9b384753a1c30542f7f3fa24113db67fd6b71e",
+    "bytes": 14593000,
+    "meshes": 1,
+    "skins": 0,
+    "animations": 0,
+    "primitive_modes": [
+      4
+    ]
+  },
+  {
+    "character": "purple",
+    "role": "hair",
+    "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\3D模型\\03_头发_quad.glb",
+    "sha256": "e41252e4a2390df47e54159c945639fdc024116366a7960f0570a3dc6bad23e1",
+    "bytes": 9224884,
+    "meshes": 1,
+    "skins": 0,
+    "animations": 0,
+    "primitive_modes": [
+      4
+    ]
+  }
+]

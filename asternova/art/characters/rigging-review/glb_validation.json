@@ -1,0 +1,215 @@
+[
+  {
+    "file": "white.glb",
+    "sha256": "2cd3244abd8e29807c1659128bfc777bf6b7bc7473e69a3ec824ffb5e85861bf",
+    "meshes": [
+      {
+        "name": "Body",
+        "vertices": 9339,
+        "max_bind_error_m": 5.658111124538121e-07,
+        "max_weight_sum_error": 1.1920928955078125e-07
+      },
+      {
+        "name": "Hair",
+        "vertices": 56443,
+        "max_bind_error_m": 7.135730293608061e-07,
+        "max_weight_sum_error": 0.0
+      },
+      {
+        "name": "Outfit",
+        "vertices": 14009,
+        "max_bind_error_m": 5.092381102286967e-07,
+        "max_weight_sum_error": 1.7881393432617188e-07
+      }
+    ],
+    "animations": [
+      {
+        "name": "Attack",
+        "duration_s": 0.8666666746139526,
+        "changing_tracks": 19
+      },
+      {
+        "name": "Fall",
+        "duration_s": 2.5333333015441895,
+        "changing_tracks": 19
+      },
+      {
+        "name": "Idle",
+        "duration_s": 2.5333333015441895,
+        "changing_tracks": 20
+      },
+      {
+        "name": "Jump",
+        "duration_s": 1.3666666746139526,
+        "changing_tracks": 22
+      },
+      {
+        "name": "Land",
+        "duration_s": 1.2999999523162842,
+        "changing_tracks": 24
+      },
+      {
+        "name": "Run",
+        "duration_s": 0.9666666388511658,
+        "changing_tracks": 22
+      },
+      {
+        "name": "Sprint",
+        "duration_s": 0.699999988079071,
+        "changing_tracks": 22
+      },
+      {
+        "name": "Talk",
+        "duration_s": 2.9666666984558105,
+        "changing_tracks": 20
+      },
+      {
+        "name": "Walk",
+        "duration_s": 1.3666666746139526,
+        "changing_tracks": 24
+      }
+    ]
+  },
+  {
+    "file": "orange.glb",
+    "sha256": "636c8e90f4c25dff18e08ac3ae7da40b87ba488a74570cafa366aeff2e81c4a5",
+    "meshes": [
+      {
+        "name": "Body",
+        "vertices": 53395,
+        "max_bind_error_m": 6.018277020811021e-07,
+        "max_weight_sum_error": 1.7881393432617188e-07
+      },
+      {
+        "name": "Hair",
+        "vertices": 7601,
+        "max_bind_error_m": 1.522099920348256e-07,
+        "max_weight_sum_error": 0.0
+      },
+      {
+        "name": "Outfit",
+        "vertices": 13976,
+        "max_bind_error_m": 5.263453577793439e-07,
+        "max_weight_sum_error": 1.1920928955078125e-07
+      }
+    ],
+    "animations": [
+      {
+        "name": "Attack",
+        "duration_s": 0.8666666746139526,
+        "changing_tracks": 19
+      },
+      {
+        "name": "Fall",
+        "duration_s": 2.5333333015441895,
+        "changing_tracks": 19
+      },
+      {
+        "name": "Idle",
+        "duration_s": 2.5333333015441895,
+        "changing_tracks": 20
+      },
+      {
+        "name": "Jump",
+        "duration_s": 1.3666666746139526,
+        "changing_tracks": 22
+      },
+      {
+        "name": "Land",
+        "duration_s": 1.2999999523162842,
+        "changing_tracks": 24
+      },
+      {
+        "name": "Run",
+        "duration_s": 0.9666666388511658,
+        "changing_tracks": 22
+      },
+      {
+        "name": "Sprint",
+        "duration_s": 0.699999988079071,
+        "changing_tracks": 22
+      },
+      {
+        "name": "Talk",
+        "duration_s": 2.9666666984558105,
+        "changing_tracks": 20
+      },
+      {
+        "name": "Walk",
+        "duration_s": 1.3666666746139526,
+        "changing_tracks": 24
+      }
+    ]
+  },
+  {
+    "file": "purple.glb",
+    "sha256": "787f53a92eca88deb3caa289dcd8cca058be35fece2824761e95546b15c996b4",
+    "meshes": [
+      {
+        "name": "Body",
+        "vertices": 43410,
+        "max_bind_error_m": 6.236032118659884e-07,
+        "max_weight_sum_error": 1.7881393432617188e-07
+      },
+      {
+        "name": "Hair",
+        "vertices": 41400,
+        "max_bind_error_m": 8.77025241392969e-07,
+        "max_weight_sum_error": 0.0
+      },
+      {
+        "name": "Outfit",
+        "vertices": 62364,
+        "max_bind_error_m": 5.383128937181188e-07,
+        "max_weight_sum_error": 1.7881393432617188e-07
+      }
+    ],
+    "animations": [
+      {
+        "name": "Attack",
+        "duration_s": 0.8666666746139526,
+        "changing_tracks": 19
+      },
+      {
+        "name": "Fall",
+        "duration_s": 2.5333333015441895,
+        "changing_tracks": 19
+      },
+      {
+        "name": "Idle",
+        "duration_s": 2.5333333015441895,
+        "changing_tracks": 20
+      },
+      {
+        "name": "Jump",
+        "duration_s": 1.3666666746139526,
+        "changing_tracks": 22
+      },
+      {
+        "name": "Land",
+        "duration_s": 1.2999999523162842,
+        "changing_tracks": 24
+      },
+      {
+        "name": "Run",
+        "duration_s": 0.9666666388511658,
+        "changing_tracks": 22
+      },
+      {
+        "name": "Sprint",
+        "duration_s": 0.699999988079071,
+        "changing_tracks": 22
+      },
+      {
+        "name": "Talk",
+        "duration_s": 2.9666666984558105,
+        "changing_tracks": 20
+      },
+      {
+        "name": "Walk",
+        "duration_s": 1.3666666746139526,
+        "changing_tracks": 24
+      }
+    ]
+  }
+]

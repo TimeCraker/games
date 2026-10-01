@@ -1,0 +1,17 @@
+{
+  "white": {
+    "Walk": 1.028,
+    "Run": 5.5,
+    "Sprint": 7.413
+  },
+  "orange": {
+    "Walk": 1.028,
+    "Run": 5.5,
+    "Sprint": 7.413
+  },
+  "purple": {
+    "Walk": 1.028,
+    "Run": 5.5,
+    "Sprint": 7.413
+  }
+}

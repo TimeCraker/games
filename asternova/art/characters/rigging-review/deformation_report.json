@@ -1,0 +1,3989 @@
+[
+  {
+    "character": "white_master",
+    "note": "Diagnostic, not an artistic acceptance test. Seven samples per clip; no collision or cloth simulation.",
+    "samples": [
+      {
+        "clip": "Attack",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1133
+      },
+      {
+        "clip": "Attack",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.2573
+      },
+      {
+        "clip": "Attack",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Attack",
+        "frame": 5.17,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1184
+      },
+      {
+        "clip": "Attack",
+        "frame": 5.17,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.257
+      },
+      {
+        "clip": "Attack",
+        "frame": 5.17,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Attack",
+        "frame": 9.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1501
+      },
+      {
+        "clip": "Attack",
+        "frame": 9.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 23,
+        "largest_edge_m": 0.2546
+      },
+      {
+        "clip": "Attack",
+        "frame": 9.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Attack",
+        "frame": 13.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1421
+      },
+      {
+        "clip": "Attack",
+        "frame": 13.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 15,
+        "largest_edge_m": 0.2554
+      },
+      {
+        "clip": "Attack",
+        "frame": 13.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Attack",
+        "frame": 17.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1124
+      },
+      {
+        "clip": "Attack",
+        "frame": 17.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2568
+      },
+      {
+        "clip": "Attack",
+        "frame": 17.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Attack",
+        "frame": 21.83,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1089
+      },
+      {
+        "clip": "Attack",
+        "frame": 21.83,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.2571
+      },
+      {
+        "clip": "Attack",
+        "frame": 21.83,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Attack",
+        "frame": 26.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1131
+      },
+      {
+        "clip": "Attack",
+        "frame": 26.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.2573
+      },
+      {
+        "clip": "Attack",
+        "frame": 26.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Fall",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1059
+      },
+      {
+        "clip": "Fall",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 7,
+        "largest_edge_m": 0.2738
+      },
+      {
+        "clip": "Fall",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Fall",
+        "frame": 13.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1035
+      },
+      {
+        "clip": "Fall",
+        "frame": 13.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 6,
+        "largest_edge_m": 0.2712
+      },
+      {
+        "clip": "Fall",
+        "frame": 13.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Fall",
+        "frame": 26.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0997
+      },
+      {
+        "clip": "Fall",
+        "frame": 26.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 6,
+        "largest_edge_m": 0.2685
+      },
+      {
+        "clip": "Fall",
+        "frame": 26.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Fall",
+        "frame": 38.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0989
+      },
+      {
+        "clip": "Fall",
+        "frame": 38.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 6,
+        "largest_edge_m": 0.269
+      },
+      {
+        "clip": "Fall",
+        "frame": 38.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Fall",
+        "frame": 51.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0999
+      },
+      {
+        "clip": "Fall",
+        "frame": 51.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 6,
+        "largest_edge_m": 0.272
+      },
+      {
+        "clip": "Fall",
+        "frame": 51.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Fall",
+        "frame": 63.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.104
+      },
+      {
+        "clip": "Fall",
+        "frame": 63.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 7,
+        "largest_edge_m": 0.2742
+      },
+      {
+        "clip": "Fall",
+        "frame": 63.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Fall",
+        "frame": 76.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1059
+      },
+      {
+        "clip": "Fall",
+        "frame": 76.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 7,
+        "largest_edge_m": 0.2738
+      },
+      {
+        "clip": "Fall",
+        "frame": 76.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Idle",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0922
+      },
+      {
+        "clip": "Idle",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2573
+      },
+      {
+        "clip": "Idle",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Idle",
+        "frame": 13.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0921
+      },
+      {
+        "clip": "Idle",
+        "frame": 13.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2576
+      },
+      {
+        "clip": "Idle",
+        "frame": 13.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Idle",
+        "frame": 26.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0921
+      },
+      {
+        "clip": "Idle",
+        "frame": 26.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2577
+      },
+      {
+        "clip": "Idle",
+        "frame": 26.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Idle",
+        "frame": 38.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0922
+      },
+      {
+        "clip": "Idle",
+        "frame": 38.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2575
+      },
+      {
+        "clip": "Idle",
+        "frame": 38.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Idle",
+        "frame": 51.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0921
+      },
+      {
+        "clip": "Idle",
+        "frame": 51.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2577
+      },
+      {
+        "clip": "Idle",
+        "frame": 51.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Idle",
+        "frame": 63.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0921
+      },
+      {
+        "clip": "Idle",
+        "frame": 63.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2576
+      },
+      {
+        "clip": "Idle",
+        "frame": 63.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Idle",
+        "frame": 76.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0922
+      },
+      {
+        "clip": "Idle",
+        "frame": 76.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2573
+      },
+      {
+        "clip": "Idle",
+        "frame": 76.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Jump",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0991
+      },
+      {
+        "clip": "Jump",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 6,
+        "largest_edge_m": 0.2644
+      },
+      {
+        "clip": "Jump",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Jump",
+        "frame": 7.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0969
+      },
+      {
+        "clip": "Jump",
+        "frame": 7.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 3,
+        "largest_edge_m": 0.2711
+      },
+      {
+        "clip": "Jump",
+        "frame": 7.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Jump",
+        "frame": 14.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1235
+      },
+      {
+        "clip": "Jump",
+        "frame": 14.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 13,
+        "largest_edge_m": 0.2773
+      },
+      {
+        "clip": "Jump",
+        "frame": 14.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Jump",
+        "frame": 21.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1217
+      },
+      {
+        "clip": "Jump",
+        "frame": 21.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 14,
+        "largest_edge_m": 0.2752
+      },
+      {
+        "clip": "Jump",
+        "frame": 21.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Jump",
+        "frame": 27.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1147
+      },
+      {
+        "clip": "Jump",
+        "frame": 27.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 12,
+        "largest_edge_m": 0.2742
+      },
+      {
+        "clip": "Jump",
+        "frame": 27.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Jump",
+        "frame": 34.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1071
+      },
+      {
+        "clip": "Jump",
+        "frame": 34.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 10,
+        "largest_edge_m": 0.2739
+      },
+      {
+        "clip": "Jump",
+        "frame": 34.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Jump",
+        "frame": 41.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1059
+      },
+      {
+        "clip": "Jump",
+        "frame": 41.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 7,
+        "largest_edge_m": 0.2738
+      },
+      {
+        "clip": "Jump",
+        "frame": 41.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Land",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.096
+      },
+      {
+        "clip": "Land",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.2643
+      },
+      {
+        "clip": "Land",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Land",
+        "frame": 7.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.103
+      },
+      {
+        "clip": "Land",
+        "frame": 7.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 8,
+        "largest_edge_m": 0.2692
+      },
+      {
+        "clip": "Land",
+        "frame": 7.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Land",
+        "frame": 13.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1135
+      },
+      {
+        "clip": "Land",
+        "frame": 13.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.263
+      },
+      {
+        "clip": "Land",
+        "frame": 13.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Land",
+        "frame": 20.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1004
+      },
+      {
+        "clip": "Land",
+        "frame": 20.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2598
+      },
+      {
+        "clip": "Land",
+        "frame": 20.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Land",
+        "frame": 26.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0923
+      },
+      {
+        "clip": "Land",
+        "frame": 26.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2575
+      },
+      {
+        "clip": "Land",
+        "frame": 26.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Land",
+        "frame": 32.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0922
+      },
+      {
+        "clip": "Land",
+        "frame": 32.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2574
+      },
+      {
+        "clip": "Land",
+        "frame": 32.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Land",
+        "frame": 39.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0922
+      },
+      {
+        "clip": "Land",
+        "frame": 39.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2574
+      },
+      {
+        "clip": "Land",
+        "frame": 39.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Run",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1004
+      },
+      {
+        "clip": "Run",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 4,
+        "largest_edge_m": 0.2513
+      },
+      {
+        "clip": "Run",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Run",
+        "frame": 5.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1021
+      },
+      {
+        "clip": "Run",
+        "frame": 5.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 7,
+        "largest_edge_m": 0.253
+      },
+      {
+        "clip": "Run",
+        "frame": 5.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Run",
+        "frame": 10.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1006
+      },
+      {
+        "clip": "Run",
+        "frame": 10.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 11,
+        "largest_edge_m": 0.2595
+      },
+      {
+        "clip": "Run",
+        "frame": 10.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Run",
+        "frame": 15.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.104
+      },
+      {
+        "clip": "Run",
+        "frame": 15.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.2575
+      },
+      {
+        "clip": "Run",
+        "frame": 15.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Run",
+        "frame": 19.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0972
+      },
+      {
+        "clip": "Run",
+        "frame": 19.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2555
+      },
+      {
+        "clip": "Run",
+        "frame": 19.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Run",
+        "frame": 24.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0933
+      },
+      {
+        "clip": "Run",
+        "frame": 24.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 3,
+        "largest_edge_m": 0.2569
+      },
+      {
+        "clip": "Run",
+        "frame": 24.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Run",
+        "frame": 29.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1001
+      },
+      {
+        "clip": "Run",
+        "frame": 29.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 3,
+        "largest_edge_m": 0.2515
+      },
+      {
+        "clip": "Run",
+        "frame": 29.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Sprint",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0965
+      },
+      {
+        "clip": "Sprint",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 2,
+        "largest_edge_m": 0.2494
+      },
+      {
+        "clip": "Sprint",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Sprint",
+        "frame": 4.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1002
+      },
+      {
+        "clip": "Sprint",
+        "frame": 4.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.2513
+      },
+      {
+        "clip": "Sprint",
+        "frame": 4.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Sprint",
+        "frame": 7.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1024
+      },
+      {
+        "clip": "Sprint",
+        "frame": 7.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.2579
+      },
+      {
+        "clip": "Sprint",
+        "frame": 7.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Sprint",
+        "frame": 11.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0967
+      },
+      {
+        "clip": "Sprint",
+        "frame": 11.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 8,
+        "largest_edge_m": 0.2547
+      },
+      {
+        "clip": "Sprint",
+        "frame": 11.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Sprint",
+        "frame": 14.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0972
+      },
+      {
+        "clip": "Sprint",
+        "frame": 14.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.2542
+      },
+      {
+        "clip": "Sprint",
+        "frame": 14.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Sprint",
+        "frame": 17.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0927
+      },
+      {
+        "clip": "Sprint",
+        "frame": 17.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2557
+      },
+      {
+        "clip": "Sprint",
+        "frame": 17.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Sprint",
+        "frame": 21.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0965
+      },
+      {
+        "clip": "Sprint",
+        "frame": 21.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 2,
+        "largest_edge_m": 0.2494
+      },
+      {
+        "clip": "Sprint",
+        "frame": 21.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Talk",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0947
+      },
+      {
+        "clip": "Talk",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2574
+      },
+      {
+        "clip": "Talk",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Talk",
+        "frame": 15.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0974
+      },
+      {
+        "clip": "Talk",
+        "frame": 15.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2576
+      },
+      {
+        "clip": "Talk",
+        "frame": 15.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Talk",
+        "frame": 30.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0956
+      },
+      {
+        "clip": "Talk",
+        "frame": 30.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2575
+      },
+      {
+        "clip": "Talk",
+        "frame": 30.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Talk",
+        "frame": 45.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0993
+      },
+      {
+        "clip": "Talk",
+        "frame": 45.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2574
+      },
+      {
+        "clip": "Talk",
+        "frame": 45.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Talk",
+        "frame": 59.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0991
+      },
+      {
+        "clip": "Talk",
+        "frame": 59.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2577
+      },
+      {
+        "clip": "Talk",
+        "frame": 59.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Talk",
+        "frame": 74.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1003
+      },
+      {
+        "clip": "Talk",
+        "frame": 74.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2576
+      },
+      {
+        "clip": "Talk",
+        "frame": 74.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Talk",
+        "frame": 89.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0947
+      },
+      {
+        "clip": "Talk",
+        "frame": 89.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2574
+      },
+      {
+        "clip": "Talk",
+        "frame": 89.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Walk",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0926
+      },
+      {
+        "clip": "Walk",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2536
+      },
+      {
+        "clip": "Walk",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Walk",
+        "frame": 7.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.092
+      },
+      {
+        "clip": "Walk",
+        "frame": 7.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.251
+      },
+      {
+        "clip": "Walk",
+        "frame": 7.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Walk",
+        "frame": 14.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0964
+      },
+      {
+        "clip": "Walk",
+        "frame": 14.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.2498
+      },
+      {
+        "clip": "Walk",
+        "frame": 14.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Walk",
+        "frame": 21.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0919
+      },
+      {
+        "clip": "Walk",
+        "frame": 21.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2492
+      },
+      {
+        "clip": "Walk",
+        "frame": 21.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Walk",
+        "frame": 27.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0923
+      },
+      {
+        "clip": "Walk",
+        "frame": 27.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2505
+      },
+      {
+        "clip": "Walk",
+        "frame": 27.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Walk",
+        "frame": 34.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0935
+      },
+      {
+        "clip": "Walk",
+        "frame": 34.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2543
+      },
+      {
+        "clip": "Walk",
+        "frame": 34.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      },
+      {
+        "clip": "Walk",
+        "frame": 41.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0926
+      },
+      {
+        "clip": "Walk",
+        "frame": 41.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2536
+      },
+      {
+        "clip": "Walk",
+        "frame": 41.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.133
+      }
+    ]
+  },
+  {
+    "character": "orange_master",
+    "note": "Diagnostic, not an artistic acceptance test. Seven samples per clip; no collision or cloth simulation.",
+    "samples": [
+      {
+        "clip": "Attack",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Attack",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 13,
+        "largest_edge_m": 0.2695
+      },
+      {
+        "clip": "Attack",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Attack",
+        "frame": 5.17,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Attack",
+        "frame": 5.17,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 14,
+        "largest_edge_m": 0.2692
+      },
+      {
+        "clip": "Attack",
+        "frame": 5.17,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Attack",
+        "frame": 9.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.1818
+      },
+      {
+        "clip": "Attack",
+        "frame": 9.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 27,
+        "largest_edge_m": 0.2653
+      },
+      {
+        "clip": "Attack",
+        "frame": 9.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Attack",
+        "frame": 13.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.1837
+      },
+      {
+        "clip": "Attack",
+        "frame": 13.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 22,
+        "largest_edge_m": 0.2672
+      },
+      {
+        "clip": "Attack",
+        "frame": 13.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Attack",
+        "frame": 17.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1857
+      },
+      {
+        "clip": "Attack",
+        "frame": 17.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 13,
+        "largest_edge_m": 0.2695
+      },
+      {
+        "clip": "Attack",
+        "frame": 17.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Attack",
+        "frame": 21.83,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Attack",
+        "frame": 21.83,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 13,
+        "largest_edge_m": 0.2695
+      },
+      {
+        "clip": "Attack",
+        "frame": 21.83,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Attack",
+        "frame": 26.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Attack",
+        "frame": 26.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 13,
+        "largest_edge_m": 0.2695
+      },
+      {
+        "clip": "Attack",
+        "frame": 26.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Fall",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Fall",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 23,
+        "largest_edge_m": 0.2776
+      },
+      {
+        "clip": "Fall",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Fall",
+        "frame": 13.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Fall",
+        "frame": 13.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 21,
+        "largest_edge_m": 0.2775
+      },
+      {
+        "clip": "Fall",
+        "frame": 13.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Fall",
+        "frame": 26.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Fall",
+        "frame": 26.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 20,
+        "largest_edge_m": 0.2783
+      },
+      {
+        "clip": "Fall",
+        "frame": 26.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Fall",
+        "frame": 38.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Fall",
+        "frame": 38.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 22,
+        "largest_edge_m": 0.2796
+      },
+      {
+        "clip": "Fall",
+        "frame": 38.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Fall",
+        "frame": 51.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Fall",
+        "frame": 51.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 22,
+        "largest_edge_m": 0.2801
+      },
+      {
+        "clip": "Fall",
+        "frame": 51.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Fall",
+        "frame": 63.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Fall",
+        "frame": 63.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 22,
+        "largest_edge_m": 0.2788
+      },
+      {
+        "clip": "Fall",
+        "frame": 63.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Fall",
+        "frame": 76.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Fall",
+        "frame": 76.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 23,
+        "largest_edge_m": 0.2776
+      },
+      {
+        "clip": "Fall",
+        "frame": 76.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Idle",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Idle",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2648
+      },
+      {
+        "clip": "Idle",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Idle",
+        "frame": 13.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Idle",
+        "frame": 13.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2658
+      },
+      {
+        "clip": "Idle",
+        "frame": 13.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Idle",
+        "frame": 26.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Idle",
+        "frame": 26.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2659
+      },
+      {
+        "clip": "Idle",
+        "frame": 26.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Idle",
+        "frame": 38.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Idle",
+        "frame": 38.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.265
+      },
+      {
+        "clip": "Idle",
+        "frame": 38.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Idle",
+        "frame": 51.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Idle",
+        "frame": 51.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2659
+      },
+      {
+        "clip": "Idle",
+        "frame": 51.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Idle",
+        "frame": 63.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Idle",
+        "frame": 63.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2659
+      },
+      {
+        "clip": "Idle",
+        "frame": 63.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Idle",
+        "frame": 76.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Idle",
+        "frame": 76.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2648
+      },
+      {
+        "clip": "Idle",
+        "frame": 76.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Jump",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Jump",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.2757
+      },
+      {
+        "clip": "Jump",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Jump",
+        "frame": 7.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Jump",
+        "frame": 7.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.2822
+      },
+      {
+        "clip": "Jump",
+        "frame": 7.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Jump",
+        "frame": 14.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1857
+      },
+      {
+        "clip": "Jump",
+        "frame": 14.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 28,
+        "largest_edge_m": 0.2889
+      },
+      {
+        "clip": "Jump",
+        "frame": 14.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Jump",
+        "frame": 21.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1857
+      },
+      {
+        "clip": "Jump",
+        "frame": 21.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 31,
+        "largest_edge_m": 0.2862
+      },
+      {
+        "clip": "Jump",
+        "frame": 21.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Jump",
+        "frame": 27.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Jump",
+        "frame": 27.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 30,
+        "largest_edge_m": 0.2821
+      },
+      {
+        "clip": "Jump",
+        "frame": 27.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Jump",
+        "frame": 34.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Jump",
+        "frame": 34.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 25,
+        "largest_edge_m": 0.2787
+      },
+      {
+        "clip": "Jump",
+        "frame": 34.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Jump",
+        "frame": 41.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Jump",
+        "frame": 41.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 23,
+        "largest_edge_m": 0.2776
+      },
+      {
+        "clip": "Jump",
+        "frame": 41.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Land",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Land",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 15,
+        "largest_edge_m": 0.272
+      },
+      {
+        "clip": "Land",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Land",
+        "frame": 7.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Land",
+        "frame": 7.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 13,
+        "largest_edge_m": 0.2664
+      },
+      {
+        "clip": "Land",
+        "frame": 7.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Land",
+        "frame": 13.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Land",
+        "frame": 13.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.2682
+      },
+      {
+        "clip": "Land",
+        "frame": 13.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Land",
+        "frame": 20.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Land",
+        "frame": 20.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 7,
+        "largest_edge_m": 0.2678
+      },
+      {
+        "clip": "Land",
+        "frame": 20.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Land",
+        "frame": 26.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Land",
+        "frame": 26.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.2648
+      },
+      {
+        "clip": "Land",
+        "frame": 26.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Land",
+        "frame": 32.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Land",
+        "frame": 32.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.265
+      },
+      {
+        "clip": "Land",
+        "frame": 32.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Land",
+        "frame": 39.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Land",
+        "frame": 39.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2649
+      },
+      {
+        "clip": "Land",
+        "frame": 39.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Run",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1788
+      },
+      {
+        "clip": "Run",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 11,
+        "largest_edge_m": 0.2528
+      },
+      {
+        "clip": "Run",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Run",
+        "frame": 5.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Run",
+        "frame": 5.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.2566
+      },
+      {
+        "clip": "Run",
+        "frame": 5.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Run",
+        "frame": 10.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1805
+      },
+      {
+        "clip": "Run",
+        "frame": 10.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.2662
+      },
+      {
+        "clip": "Run",
+        "frame": 10.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Run",
+        "frame": 15.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1796
+      },
+      {
+        "clip": "Run",
+        "frame": 15.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 11,
+        "largest_edge_m": 0.2603
+      },
+      {
+        "clip": "Run",
+        "frame": 15.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Run",
+        "frame": 19.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1851
+      },
+      {
+        "clip": "Run",
+        "frame": 19.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 7,
+        "largest_edge_m": 0.2519
+      },
+      {
+        "clip": "Run",
+        "frame": 19.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Run",
+        "frame": 24.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.18
+      },
+      {
+        "clip": "Run",
+        "frame": 24.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 12,
+        "largest_edge_m": 0.2587
+      },
+      {
+        "clip": "Run",
+        "frame": 24.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Run",
+        "frame": 29.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1788
+      },
+      {
+        "clip": "Run",
+        "frame": 29.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 11,
+        "largest_edge_m": 0.2531
+      },
+      {
+        "clip": "Run",
+        "frame": 29.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Sprint",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1818
+      },
+      {
+        "clip": "Sprint",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 11,
+        "largest_edge_m": 0.2474
+      },
+      {
+        "clip": "Sprint",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Sprint",
+        "frame": 4.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Sprint",
+        "frame": 4.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.2522
+      },
+      {
+        "clip": "Sprint",
+        "frame": 4.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Sprint",
+        "frame": 7.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1833
+      },
+      {
+        "clip": "Sprint",
+        "frame": 7.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 6,
+        "largest_edge_m": 0.2646
+      },
+      {
+        "clip": "Sprint",
+        "frame": 7.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Sprint",
+        "frame": 11.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1822
+      },
+      {
+        "clip": "Sprint",
+        "frame": 11.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 10,
+        "largest_edge_m": 0.2556
+      },
+      {
+        "clip": "Sprint",
+        "frame": 11.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Sprint",
+        "frame": 14.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1856
+      },
+      {
+        "clip": "Sprint",
+        "frame": 14.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 4,
+        "largest_edge_m": 0.2472
+      },
+      {
+        "clip": "Sprint",
+        "frame": 14.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Sprint",
+        "frame": 17.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1826
+      },
+      {
+        "clip": "Sprint",
+        "frame": 17.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.2553
+      },
+      {
+        "clip": "Sprint",
+        "frame": 17.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Sprint",
+        "frame": 21.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1818
+      },
+      {
+        "clip": "Sprint",
+        "frame": 21.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 11,
+        "largest_edge_m": 0.2474
+      },
+      {
+        "clip": "Sprint",
+        "frame": 21.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Talk",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Talk",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.2651
+      },
+      {
+        "clip": "Talk",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Talk",
+        "frame": 15.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Talk",
+        "frame": 15.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 10,
+        "largest_edge_m": 0.2658
+      },
+      {
+        "clip": "Talk",
+        "frame": 15.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Talk",
+        "frame": 30.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Talk",
+        "frame": 30.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 8,
+        "largest_edge_m": 0.2656
+      },
+      {
+        "clip": "Talk",
+        "frame": 30.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Talk",
+        "frame": 45.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Talk",
+        "frame": 45.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.2651
+      },
+      {
+        "clip": "Talk",
+        "frame": 45.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Talk",
+        "frame": 59.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Talk",
+        "frame": 59.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.2659
+      },
+      {
+        "clip": "Talk",
+        "frame": 59.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Talk",
+        "frame": 74.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Talk",
+        "frame": 74.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 10,
+        "largest_edge_m": 0.2657
+      },
+      {
+        "clip": "Talk",
+        "frame": 74.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Talk",
+        "frame": 89.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Talk",
+        "frame": 89.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.2651
+      },
+      {
+        "clip": "Talk",
+        "frame": 89.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Walk",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Walk",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.2534
+      },
+      {
+        "clip": "Walk",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Walk",
+        "frame": 7.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Walk",
+        "frame": 7.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.2499
+      },
+      {
+        "clip": "Walk",
+        "frame": 7.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Walk",
+        "frame": 14.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Walk",
+        "frame": 14.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2506
+      },
+      {
+        "clip": "Walk",
+        "frame": 14.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Walk",
+        "frame": 21.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Walk",
+        "frame": 21.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 4,
+        "largest_edge_m": 0.2487
+      },
+      {
+        "clip": "Walk",
+        "frame": 21.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Walk",
+        "frame": 27.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Walk",
+        "frame": 27.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.2498
+      },
+      {
+        "clip": "Walk",
+        "frame": 27.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Walk",
+        "frame": 34.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1859
+      },
+      {
+        "clip": "Walk",
+        "frame": 34.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.2529
+      },
+      {
+        "clip": "Walk",
+        "frame": 34.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      },
+      {
+        "clip": "Walk",
+        "frame": 41.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1858
+      },
+      {
+        "clip": "Walk",
+        "frame": 41.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.2534
+      },
+      {
+        "clip": "Walk",
+        "frame": 41.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0791
+      }
+    ]
+  },
+  {
+    "character": "purple_master",
+    "note": "Diagnostic, not an artistic acceptance test. Seven samples per clip; no collision or cloth simulation.",
+    "samples": [
+      {
+        "clip": "Attack",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.0961
+      },
+      {
+        "clip": "Attack",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 10,
+        "largest_edge_m": 0.175
+      },
+      {
+        "clip": "Attack",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Attack",
+        "frame": 5.17,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 2,
+        "largest_edge_m": 0.1019
+      },
+      {
+        "clip": "Attack",
+        "frame": 5.17,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 12,
+        "largest_edge_m": 0.179
+      },
+      {
+        "clip": "Attack",
+        "frame": 5.17,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Attack",
+        "frame": 9.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 15,
+        "largest_edge_m": 0.1336
+      },
+      {
+        "clip": "Attack",
+        "frame": 9.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 24,
+        "largest_edge_m": 0.2321
+      },
+      {
+        "clip": "Attack",
+        "frame": 9.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Attack",
+        "frame": 13.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 10,
+        "largest_edge_m": 0.1276
+      },
+      {
+        "clip": "Attack",
+        "frame": 13.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 19,
+        "largest_edge_m": 0.2154
+      },
+      {
+        "clip": "Attack",
+        "frame": 13.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Attack",
+        "frame": 17.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 2,
+        "largest_edge_m": 0.0987
+      },
+      {
+        "clip": "Attack",
+        "frame": 17.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 8,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Attack",
+        "frame": 17.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Attack",
+        "frame": 21.83,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.0919
+      },
+      {
+        "clip": "Attack",
+        "frame": 21.83,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 8,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Attack",
+        "frame": 21.83,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Attack",
+        "frame": 26.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.0958
+      },
+      {
+        "clip": "Attack",
+        "frame": 26.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 10,
+        "largest_edge_m": 0.1743
+      },
+      {
+        "clip": "Attack",
+        "frame": 26.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Fall",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Fall",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 13,
+        "largest_edge_m": 0.2177
+      },
+      {
+        "clip": "Fall",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Fall",
+        "frame": 13.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Fall",
+        "frame": 13.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 14,
+        "largest_edge_m": 0.2175
+      },
+      {
+        "clip": "Fall",
+        "frame": 13.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Fall",
+        "frame": 26.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Fall",
+        "frame": 26.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 14,
+        "largest_edge_m": 0.2189
+      },
+      {
+        "clip": "Fall",
+        "frame": 26.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Fall",
+        "frame": 38.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Fall",
+        "frame": 38.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 14,
+        "largest_edge_m": 0.2216
+      },
+      {
+        "clip": "Fall",
+        "frame": 38.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Fall",
+        "frame": 51.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Fall",
+        "frame": 51.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 14,
+        "largest_edge_m": 0.2221
+      },
+      {
+        "clip": "Fall",
+        "frame": 51.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Fall",
+        "frame": 63.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Fall",
+        "frame": 63.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 14,
+        "largest_edge_m": 0.2202
+      },
+      {
+        "clip": "Fall",
+        "frame": 63.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Fall",
+        "frame": 76.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Fall",
+        "frame": 76.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 13,
+        "largest_edge_m": 0.2177
+      },
+      {
+        "clip": "Fall",
+        "frame": 76.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Idle",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Idle",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Idle",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Idle",
+        "frame": 13.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Idle",
+        "frame": 13.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Idle",
+        "frame": 13.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Idle",
+        "frame": 26.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Idle",
+        "frame": 26.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Idle",
+        "frame": 26.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Idle",
+        "frame": 38.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Idle",
+        "frame": 38.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Idle",
+        "frame": 38.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Idle",
+        "frame": 51.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Idle",
+        "frame": 51.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Idle",
+        "frame": 51.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Idle",
+        "frame": 63.5,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Idle",
+        "frame": 63.5,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Idle",
+        "frame": 63.5,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Idle",
+        "frame": 76.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Idle",
+        "frame": 76.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Idle",
+        "frame": 76.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Jump",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0775
+      },
+      {
+        "clip": "Jump",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Jump",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Jump",
+        "frame": 7.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Jump",
+        "frame": 7.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 4,
+        "largest_edge_m": 0.2166
+      },
+      {
+        "clip": "Jump",
+        "frame": 7.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Jump",
+        "frame": 14.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0789
+      },
+      {
+        "clip": "Jump",
+        "frame": 14.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 23,
+        "largest_edge_m": 0.2437
+      },
+      {
+        "clip": "Jump",
+        "frame": 14.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Jump",
+        "frame": 21.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0807
+      },
+      {
+        "clip": "Jump",
+        "frame": 21.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 23,
+        "largest_edge_m": 0.2411
+      },
+      {
+        "clip": "Jump",
+        "frame": 21.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Jump",
+        "frame": 27.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0779
+      },
+      {
+        "clip": "Jump",
+        "frame": 27.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 22,
+        "largest_edge_m": 0.2335
+      },
+      {
+        "clip": "Jump",
+        "frame": 27.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Jump",
+        "frame": 34.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Jump",
+        "frame": 34.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 15,
+        "largest_edge_m": 0.2245
+      },
+      {
+        "clip": "Jump",
+        "frame": 34.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Jump",
+        "frame": 41.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Jump",
+        "frame": 41.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 13,
+        "largest_edge_m": 0.2177
+      },
+      {
+        "clip": "Jump",
+        "frame": 41.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Land",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Land",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 7,
+        "largest_edge_m": 0.2082
+      },
+      {
+        "clip": "Land",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Land",
+        "frame": 7.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0881
+      },
+      {
+        "clip": "Land",
+        "frame": 7.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 8,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Land",
+        "frame": 7.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Land",
+        "frame": 13.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 2,
+        "largest_edge_m": 0.0991
+      },
+      {
+        "clip": "Land",
+        "frame": 13.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Land",
+        "frame": 13.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Land",
+        "frame": 20.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.087
+      },
+      {
+        "clip": "Land",
+        "frame": 20.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 4,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Land",
+        "frame": 20.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Land",
+        "frame": 26.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Land",
+        "frame": 26.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 1,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Land",
+        "frame": 26.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Land",
+        "frame": 32.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Land",
+        "frame": 32.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Land",
+        "frame": 32.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Land",
+        "frame": 39.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Land",
+        "frame": 39.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Land",
+        "frame": 39.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Run",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Run",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 14,
+        "largest_edge_m": 0.235
+      },
+      {
+        "clip": "Run",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Run",
+        "frame": 5.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Run",
+        "frame": 5.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 3,
+        "largest_edge_m": 0.1689
+      },
+      {
+        "clip": "Run",
+        "frame": 5.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Run",
+        "frame": 10.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Run",
+        "frame": 10.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 15,
+        "largest_edge_m": 0.2384
+      },
+      {
+        "clip": "Run",
+        "frame": 10.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Run",
+        "frame": 15.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0841
+      },
+      {
+        "clip": "Run",
+        "frame": 15.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 17,
+        "largest_edge_m": 0.2374
+      },
+      {
+        "clip": "Run",
+        "frame": 15.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Run",
+        "frame": 19.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Run",
+        "frame": 19.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 3,
+        "largest_edge_m": 0.1744
+      },
+      {
+        "clip": "Run",
+        "frame": 19.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Run",
+        "frame": 24.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Run",
+        "frame": 24.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 7,
+        "largest_edge_m": 0.2304
+      },
+      {
+        "clip": "Run",
+        "frame": 24.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Run",
+        "frame": 29.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Run",
+        "frame": 29.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 14,
+        "largest_edge_m": 0.2344
+      },
+      {
+        "clip": "Run",
+        "frame": 29.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Sprint",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Sprint",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.2208
+      },
+      {
+        "clip": "Sprint",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Sprint",
+        "frame": 4.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Sprint",
+        "frame": 4.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 4,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Sprint",
+        "frame": 4.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Sprint",
+        "frame": 7.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Sprint",
+        "frame": 7.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 3,
+        "largest_edge_m": 0.1997
+      },
+      {
+        "clip": "Sprint",
+        "frame": 7.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Sprint",
+        "frame": 11.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Sprint",
+        "frame": 11.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 8,
+        "largest_edge_m": 0.2218
+      },
+      {
+        "clip": "Sprint",
+        "frame": 11.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Sprint",
+        "frame": 14.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Sprint",
+        "frame": 14.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 4,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Sprint",
+        "frame": 14.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Sprint",
+        "frame": 17.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Sprint",
+        "frame": 17.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 4,
+        "largest_edge_m": 0.1872
+      },
+      {
+        "clip": "Sprint",
+        "frame": 17.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Sprint",
+        "frame": 21.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Sprint",
+        "frame": 21.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 9,
+        "largest_edge_m": 0.2199
+      },
+      {
+        "clip": "Sprint",
+        "frame": 21.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Talk",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Talk",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Talk",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Talk",
+        "frame": 15.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Talk",
+        "frame": 15.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 6,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Talk",
+        "frame": 15.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Talk",
+        "frame": 30.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Talk",
+        "frame": 30.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Talk",
+        "frame": 30.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Talk",
+        "frame": 45.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Talk",
+        "frame": 45.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Talk",
+        "frame": 45.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Talk",
+        "frame": 59.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Talk",
+        "frame": 59.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Talk",
+        "frame": 59.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Talk",
+        "frame": 74.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Talk",
+        "frame": 74.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Talk",
+        "frame": 74.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Talk",
+        "frame": 89.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Talk",
+        "frame": 89.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 5,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Talk",
+        "frame": 89.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Walk",
+        "frame": 1.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Walk",
+        "frame": 1.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 2,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Walk",
+        "frame": 1.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Walk",
+        "frame": 7.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Walk",
+        "frame": 7.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Walk",
+        "frame": 7.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Walk",
+        "frame": 14.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Walk",
+        "frame": 14.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Walk",
+        "frame": 14.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Walk",
+        "frame": 21.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Walk",
+        "frame": 21.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 2,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Walk",
+        "frame": 21.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Walk",
+        "frame": 27.67,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Walk",
+        "frame": 27.67,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Walk",
+        "frame": 27.67,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Walk",
+        "frame": 34.33,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Walk",
+        "frame": 34.33,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Walk",
+        "frame": 34.33,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      },
+      {
+        "clip": "Walk",
+        "frame": 41.0,
+        "mesh": "Body",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0768
+      },
+      {
+        "clip": "Walk",
+        "frame": 41.0,
+        "mesh": "Outfit",
+        "edges_over_5x_and_3cm": 2,
+        "largest_edge_m": 0.1634
+      },
+      {
+        "clip": "Walk",
+        "frame": 41.0,
+        "mesh": "Hair",
+        "edges_over_5x_and_3cm": 0,
+        "largest_edge_m": 0.0363
+      }
+    ]
+  }
+]

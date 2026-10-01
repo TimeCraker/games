@@ -1,0 +1,38 @@
+{
+  "character": "white",
+  "bones": 27,
+  "meshes": {
+    "Body": {
+      "vertices": 4277,
+      "triangles": 7171,
+      "unweighted": 0,
+      "max_weight_sum_error": 1.4567558537237346e-07,
+      "max_influences": 4
+    },
+    "Outfit": {
+      "vertices": 5481,
+      "triangles": 9883,
+      "unweighted": 0,
+      "max_weight_sum_error": 7.753183126624208e-07,
+      "max_influences": 4
+    },
+    "Hair": {
+      "vertices": 56116,
+      "triangles": 50111,
+      "unweighted": 0,
+      "max_weight_sum_error": 5.364418029785156e-07,
+      "max_influences": 2
+    }
+  },
+  "clips": [
+    "Idle",
+    "Walk",
+    "Run",
+    "Sprint",
+    "Jump",
+    "Fall",
+    "Land",
+    "Attack",
+    "Talk"
+  ]
+}

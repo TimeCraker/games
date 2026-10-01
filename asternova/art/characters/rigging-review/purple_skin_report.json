@@ -1,0 +1,38 @@
+{
+  "character": "purple",
+  "bones": 27,
+  "meshes": {
+    "Body": {
+      "vertices": 19948,
+      "triangles": 36977,
+      "unweighted": 0,
+      "max_weight_sum_error": 1.6531248547835276e-07,
+      "max_influences": 4
+    },
+    "Outfit": {
+      "vertices": 25754,
+      "triangles": 47484,
+      "unweighted": 0,
+      "max_weight_sum_error": 9.872019290924072e-07,
+      "max_influences": 4
+    },
+    "Hair": {
+      "vertices": 41274,
+      "triangles": 37311,
+      "unweighted": 0,
+      "max_weight_sum_error": 2.9802322387695312e-08,
+      "max_influences": 2
+    }
+  },
+  "clips": [
+    "Idle",
+    "Walk",
+    "Run",
+    "Sprint",
+    "Jump",
+    "Fall",
+    "Land",
+    "Attack",
+    "Talk"
+  ]
+}

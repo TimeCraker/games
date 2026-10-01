@@ -1,0 +1,38 @@
+{
+  "character": "orange",
+  "bones": 27,
+  "meshes": {
+    "Body": {
+      "vertices": 23934,
+      "triangles": 44422,
+      "unweighted": 0,
+      "max_weight_sum_error": 1.6131525626406074e-07,
+      "max_influences": 4
+    },
+    "Outfit": {
+      "vertices": 5348,
+      "triangles": 9947,
+      "unweighted": 0,
+      "max_weight_sum_error": 8.751903806114569e-07,
+      "max_influences": 4
+    },
+    "Hair": {
+      "vertices": 7593,
+      "triangles": 7022,
+      "unweighted": 0,
+      "max_weight_sum_error": 2.9802322387695312e-08,
+      "max_influences": 2
+    }
+  },
+  "clips": [
+    "Idle",
+    "Walk",
+    "Run",
+    "Sprint",
+    "Jump",
+    "Fall",
+    "Land",
+    "Attack",
+    "Talk"
+  ]
+}
