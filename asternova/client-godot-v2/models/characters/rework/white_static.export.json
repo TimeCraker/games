@@ -1,6 +1,6 @@
 {
   "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\white\\rework\\white_rework_working.blend",
-  "source_sha256": "fcec9ef9776b2d72c233bc0bd23e6b4503e14a811f6ea811b27f9fef863c52a4",
+  "source_sha256": "3bc6f5a15d8e3fbaec1d38767a37f26e3a68e624810820b3af0b41ee964390e9",
   "objects": [
     "Body_Work",
     "Outfit_Work",
@@ -9,9 +9,6 @@
     "ElbowCuff_Work_R",
     "Sleeve_Work_L",
     "Sleeve_Work_R",
-    "HairClip_Work",
-    "Drape_Work",
-    "Drape_Lining_Work",
     "Head_Work",
     "Glove_Work_L",
     "WristCuff_Work_L",
@@ -27,8 +24,19 @@
     "JacketBoundEdge_Work_L",
     "BlueCollar_Work_R",
     "JacketBoundEdge_Work_R",
-    "Shorts_Work"
+    "Shorts_Work",
+    "HairClip_Work_Main",
+    "HairClip_Rivet_Main",
+    "HairClip_Work_Companion",
+    "HairClip_Rivet_Companion",
+    "Drape_Work",
+    "Drape_HipFold_Work",
+    "WaistBelt_Work",
+    "SleeveStrap_Work_L",
+    "SleeveStrap_Work_R",
+    "BeltHardware_Work",
+    "JacketHardware_Work"
   ],
-  "output_sha256": "825b0d7c91766b6edc2c5a5e9ba430706b617a552d84a7dcff97778c81abf9bb",
+  "output_sha256": "6a657b1bcfa885b9b3a8057ae51f8be4072b1044fa8999fd1d0bea9ac5b5a923",
   "art_approved": false
 }

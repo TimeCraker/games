@@ -1,0 +1,20 @@
+{
+  "head_uv_corners": 1362,
+  "raw_uv_matches": 1362,
+  "max_base_position_delta_m": 0.0,
+  "face_material": "Face_CleanForehead.002",
+  "mirrored_eye_trial_in_use": false,
+  "sleeve_strap_surface_gap_m": {
+    "L": {
+      "min": 0.00047484453534707427,
+      "max": 0.00480184331536293,
+      "wrap_mode": "ON_SURFACE"
+    },
+    "R": {
+      "min": 6.263936666073278e-05,
+      "max": 0.0028058174066245556,
+      "wrap_mode": "ON_SURFACE"
+    }
+  },
+  "art_approved": false
+}
