@@ -1,0 +1,12 @@
+{
+  "vertex_count": 56116,
+  "unselected_vertex_count": 31199,
+  "max_unselected_displacement_m": 0.0,
+  "selected_max_displacement_m": 0.04667989027322842,
+  "front_bang_samples": 1724,
+  "front_bang_median_unsigned_distance_before_m": 0.06300903111696243,
+  "front_bang_median_unsigned_distance_after_m": 0.03287927433848381,
+  "face_material": "Face_CleanForehead.002",
+  "note": "Unsigned nearest-surface distances are diagnostic only; multi-view images remain the visual evidence.",
+  "art_approved": false
+}

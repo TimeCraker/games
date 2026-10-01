@@ -5,7 +5,7 @@
 ## 本检查点
 
 - 保留原素模五官：头部 1362 个 UV 角点与原身体全部对应，基础坐标差为 0。撤下眉眼镜像试验；原始左右眼设计保留。`Face_CleanForehead.002` 仅清理额头短发残留，保护深色眉眼和紫色虹膜。
-- 完整长发分别用发冠、后发变形笼贴合头型。星形黑蓝银发夹替换旧枪刺状试验。
+- 完整长发使用独立头型贴合变形笼，分别控制中央刘海、鬓角及后脑体积；保留长发末端和原五官。原前伸版本保留在隐藏归档，发夹按修后表面移位。星形黑蓝银发夹替换旧枪刺状试验。
 - 保留连续原手臂、原手套、独立腕带；Blender Cloth 制作静态袖褶，不代表运行时布料模拟。
 - 衣摆改为尖角轮廓，蓝黑白三角块面和金色细线烘焙为可导出的贴图；腰部折片改为不对称尖角，圆裙片保留在隐藏归档。
 - 蓝色翻领改为沿衣身垂下。腰带、扣件和衣片扣带单独可编辑；袖扣带使用 Shrinkwrap PROJECT / ON_SURFACE 贴合袖面，侧视确认撤下悬空条。
@@ -29,6 +29,7 @@
 
 ## 证据与剩余差距
 
+- `review/hair_fit_comparison.png`：海报头部、修前修后正面与侧面同框；`hair_fit_front/side/threequarter/back.png` 是本次局部贴合检查。`hair_fit_measurements.json` 验证未选中的 31199 个顶点没有移动；距离统计只用于诊断。
 - `review/checkpoint_front.png`、`checkpoint_head.png`、`checkpoint_left.png`：本检查点 Blender 渲染。
 - `review/godot/`：实际引擎正侧背、头部、中性材质、Toon/PBR 和旧版截图。
 - `review/poster_old_current.png`：海报、旧动作原型、上一返工、本检查点同框。引擎版本相机和灯光一致；海报姿态、透视和布光不同。
