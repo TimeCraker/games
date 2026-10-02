@@ -74,13 +74,13 @@ func _build_ui() -> void:
 	var column := VBoxContainer.new()
 	panel.add_child(column)
 	var title := Label.new()
-	title.text = "白色角色 · 返工试验未达标"
+	title.text = "白色静态样板 · 待用户确认"
 	title.add_theme_font_size_override("font_size", 24)
 	column.add_child(title)
 	status = Label.new()
 	column.add_child(status)
 	var help := Label.new()
-	help.text = "1 返工试验  /  2 旧版休止  /  3 旧版 Idle\nV 正侧背  ·  H 头部  ·  M 素模  ·  P 转台\nN 切换 Toon/PBR  ·  右键环绕  ·  滚轮缩放"
+	help.text = "1 当前样板  /  2 旧版休止  /  3 旧版 Idle\nV 正侧背  ·  H 头部  ·  M 素模  ·  P 转台\nN 切换 Toon/PBR  ·  右键环绕  ·  滚轮缩放"
 	column.add_child(help)
 
 func _set_mode(value: int) -> void:
@@ -94,7 +94,7 @@ func _set_mode(value: int) -> void:
 	if mode == 3 and baseline_player and baseline_player.has_animation("Idle"):
 		baseline_player.play("Idle")
 		baseline_player.seek(0.0, true)
-	status.text = ["", "返工试验：未通过美术验收", "旧版：休止姿态", "旧版：Idle 动作"][mode]
+	status.text = ["", "当前：静态外观待确认，尚未绑定", "旧版：休止姿态", "旧版：Idle 动作"][mode]
 
 func _update_camera() -> void:
 	var target := Vector3(0, 1.53 if head_view else 0.88, 0)

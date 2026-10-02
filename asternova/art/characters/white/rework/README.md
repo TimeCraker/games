@@ -1,35 +1,37 @@
-# 白色角色：原资产细节装配候选，未通过最终美术验收
+# 白色角色静态样板
 
-更新：2026-10-01 晚。唯一制作源仍为 `white_rework_working.blend`，纹理已打包。宏观进度 3/6；白色尚未确认，未制作紫橙、未绑定。
+更新：2026-10-02。唯一制作源为 `white_rework_working.blend`。当前 5/6：静态候选已完成内部多角度检查，用户外观确认仍待完成。紫色、橙色和绑定尚未开始。
 
-## 当前对象
+## 当前制作对象
 
-- `Head_Work`：保留原五官、几何和 UV。新增独立 `Head_ScalpClosure` 补头顶与后脑内层。
-- `Hair_ScalpFit_Work`：保留原长发造型及 UV，继承修改器求值结果已冻结为网格，当前只有一个贴合笼。`Edit_Crown/Bangs/SideLocks/BackLocks` 用于后续分区编辑。
-- `Outfit_SourceDetail_Work`：从原服装派生，恢复褶皱、腰带、衣摆图形与手套，独立校准领口和袖子。袖子选择限定连通衣物部件；腰腿饰件不随袖子变形。
-- `SleeveCuff_Fitted_-1/1`：贴合前臂的袖口；身体的袖内遮罩可关闭恢复。
-- `EXPORT_White` 当前导出 13 个可见网格。旧硬片服装和旧头发保留隐藏；不要重新启用旧试验。
+- `Head_Work`：原眉眼、基础几何及 UV 保留；使用原贴图与柔和面部材质。`Head_ScalpClosure` 补头顶/后脑内层。
+- `Hair_Sections_Work`：保留原主要发束与长发设计。`ScalpLandmarks_Cage` 控制头型适配；`FringeThickness_Control` 只减薄前额外层；`SideLengths_BehindShoulder_Cage` 将肩旁长发移至袖子后。重复耳周和小碎件用可恢复 MASK 隐藏。耳周原烘焙杂色使用独立银白材质。
+- `Outfit_Trimmed_Work`：从原服装派生，保留腰带、图形衣摆、手套及独立扣件。旧袖子与前臂衣片通过原生 Bisect 裁切。白色前襟重新分配布料材质，补衣料厚度；长衣摆使用单独长度笼调整。
+- `Sleeve_Anatomical_Work_-1/1`：重建四边形袖筒，用原生 Cloth 与身体碰撞得到褶皱，再冻结为可编辑四边形网格。生产导出不依赖临时模拟缓存。模拟前来源保存在隐藏归档。
+- `SleeveUpperBinding_*`、`ShoulderWebbing_*`、`SleeveCuff_Fitted_*`：连接袖子、肩部与前臂；前臂连续表面恢复。
+- `SleeveRibbon_Outer/Inset_*`：接在袖带后侧的蓝黑垂带，避免穿过手臂。
 
-## 已验证与剩余问题
+`EXPORT_White` 当前包含 23 个可见网格。原资产、旧装配和被撤下的造型试验在隐藏来源/归档集合中保留。
 
-原始三件 GLB 哈希未变；头部几何和 UV 与原归档相同；源文件、导出记录和渲染记录哈希一致。Godot 4.7.2 Forward+ 实际载入并完成 10 张截图，进程退出码 0。新版 0 蒙皮、0 动作。
+## 验证与边界
 
-服装轮廓与原设计的层次明显恢复。头部贴合改进有限；源肩饰破碎感、耳周细节、脸部烘焙阴影及局部接缝仍需打磨。未测性能，未完成最终 NPR，未获得用户美术确认。
+三件原始 GLB 哈希未变，头部基础几何和 UV 哈希与原归档一致。制作源、导出与渲染报告哈希一致。新版没有蒙皮与动作；白色外观确认后再继续紫橙和绑定。
+
+当前是供用户验收的静态样板。海报的姿势、透视、光照及二维发束表现与正交休止模型不同；不报告相似度，不把导出成功当成用户确认。未测帧时，也未制作最终面部表情或动态布料。
 
 ## 最新证据
 
-- `review/source_detail_comparison.png`：海报、接手时、当前全身对照。模型前后同相机、同灯光。
-- `review/source_detail_head_comparison.png`：头部前后正侧面对照。
-- `review/source_detail_assembly/`：当前正/左右侧/背、三分之四、头部和中性材质，以及来源验证报告。
-- `review/godot/`：当前实际引擎截图和报告。
-- 旧 `checkpoint_*`、`hair_fit_*`、`poster_old_current.png` 是历史检查点。
+- `review/assembly_fit_comparison_20261002.png`：海报、上轮保存版、当前全身同框。
+- `review/assembly_head_comparison_20261002.png`：原眉眼保留与头部正侧面前后对照。
+- `review/assembly_fit_20261002/`：全身/头部/中性材质固定视图，来源及结构报告。
+- `review/godot_20261002/`：当前实际引擎多视图和报告。
 
-## 继续编辑与查看
+`source_detail_*`、旧 `godot/`、`checkpoint_*` 和 `hair_fit_*` 为历史检查点。
 
-直接编辑 working blend。`white_static_master.blend` 为被否定的历史试验。不要运行旧装配参数脚本覆盖当前源。
+## 编辑与查看
+
+直接编辑 working blend；导出器只读取 `EXPORT_White`，不从旧装配参数重建。不要运行旧脚本覆盖它。
 
 从 games 根目录双击 `启动白色静态样板.bat`：1 当前、2 旧休止、3 旧 Idle；V 正侧背、H 头部、M 中性材质、P 转台、N Toon/PBR；右键环绕、滚轮缩放。
 
-导出器 `scripts/pipeline/characters/export_static_review.py` 读取工作源；新增 `render_static_review.py` 读取工作源并以固定相机出图。两者都不保存或重建源文件。
-
-当前执行入口与后续问题详见 `docs/stage-specs/character-art-rework-handoff.md`。
+导出与固定视图入口：`scripts/pipeline/characters/export_static_review.py`、`render_static_review.py`。恢复入口和完整命令见 `docs/stage-specs/character-art-rework-handoff.md`。

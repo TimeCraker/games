@@ -1,6 +1,6 @@
 {
   "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\white\\rework\\white_rework_working.blend",
-  "source_sha256": "47cc0c752cad116a43a0a93401f0f384bcadd32ce93f8516216c2b3551ad1e72",
+  "source_sha256": "7d2deb5c95ff2344082c35bde580601ecb015667847c6e75fba7a386a7d586b3",
   "objects": [
     "Body_Work",
     "Head_Work",
@@ -10,12 +10,22 @@
     "HairClip_Rivet_Main",
     "HairClip_Work_Companion",
     "HairClip_Rivet_Companion",
-    "Hair_ScalpFit_Work",
-    "Outfit_SourceDetail_Work",
     "Head_ScalpClosure",
     "SleeveCuff_Fitted_-1",
-    "SleeveCuff_Fitted_1"
+    "SleeveCuff_Fitted_1",
+    "Hair_Sections_Work",
+    "Sleeve_Anatomical_Work_-1",
+    "Sleeve_Anatomical_Work_1",
+    "Outfit_Trimmed_Work",
+    "SleeveUpperBinding_-1",
+    "ShoulderWebbing_-1",
+    "SleeveRibbon_Outer_-1",
+    "SleeveRibbon_Inset_-1",
+    "SleeveUpperBinding_1",
+    "ShoulderWebbing_1",
+    "SleeveRibbon_Outer_1",
+    "SleeveRibbon_Inset_1"
   ],
-  "output_sha256": "7f04f63614235648074bdbf5e8a03bcb160d00f7d21a82b5210f915f4002084d",
+  "output_sha256": "21a82592fbabc4903d576ec864fe05bd2c2f9c50eebcff4cba84e419021ed6d2",
   "art_approved": false
 }

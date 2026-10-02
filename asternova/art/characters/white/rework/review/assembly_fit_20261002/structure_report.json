@@ -1,0 +1,49 @@
+{
+  "source_sha256": "7d2deb5c95ff2344082c35bde580601ecb015667847c6e75fba7a386a7d586b3",
+  "source_export_render_hash_match": true,
+  "glb_hash_matches": true,
+  "face_geometry_uv_unchanged": true,
+  "original_assets": [
+    {
+      "role": "body",
+      "unchanged": true
+    },
+    {
+      "role": "outfit",
+      "unchanged": true
+    },
+    {
+      "role": "hair",
+      "unchanged": true
+    }
+  ],
+  "exported_objects": [
+    "Body_Work",
+    "Head_Work",
+    "LegSkin_Work",
+    "Shorts_Work",
+    "HairClip_Work_Main",
+    "HairClip_Rivet_Main",
+    "HairClip_Work_Companion",
+    "HairClip_Rivet_Companion",
+    "Head_ScalpClosure",
+    "SleeveCuff_Fitted_-1",
+    "SleeveCuff_Fitted_1",
+    "Hair_Sections_Work",
+    "Sleeve_Anatomical_Work_-1",
+    "Sleeve_Anatomical_Work_1",
+    "Outfit_Trimmed_Work",
+    "SleeveUpperBinding_-1",
+    "ShoulderWebbing_-1",
+    "SleeveRibbon_Outer_-1",
+    "SleeveRibbon_Inset_-1",
+    "SleeveUpperBinding_1",
+    "ShoulderWebbing_1",
+    "SleeveRibbon_Outer_1",
+    "SleeveRibbon_Inset_1"
+  ],
+  "mesh_count": 23,
+  "skin_count": 0,
+  "animation_count": 0,
+  "art_approved": false
+}
