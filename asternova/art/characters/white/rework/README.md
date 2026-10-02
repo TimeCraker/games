@@ -1,10 +1,10 @@
 # 白色角色静态样板
 
-更新：2026-10-02。唯一制作源为 `white_rework_working.blend`。当前 5/6：静态候选已完成内部多角度检查，用户外观确认仍待完成。紫色、橙色和绑定尚未开始。
+更新：2026-10-03。唯一制作源为 `white_rework_working.blend`。当前 5/6：静态候选已完成内部多角度检查，用户外观确认仍待完成。紫色、橙色和绑定尚未开始。
 
 ## 当前制作对象
 
-- `Head_Work`：原眉眼、基础几何及 UV 保留；使用原贴图与柔和面部材质。`Head_ScalpClosure` 补头顶/后脑内层。
+- `Head_Work`：原眉眼、基础几何及 UV 保留；使用原贴图与柔和面部材质。`EarRim_ContactGuide` 仅调整右耳上缘与侧发的接触，基础网格未应用变形。`Head_ScalpClosure` 补头顶/后脑内层。
 - `Hair_Sections_Work`：保留原主要发束与长发设计。`ScalpLandmarks_Cage` 控制头型适配；`FringeThickness_Control` 只减薄前额外层；`SideLengths_BehindShoulder_Cage` 将肩旁长发移至袖子后。重复耳周和小碎件用可恢复 MASK 隐藏。耳周原烘焙杂色使用独立银白材质。
 - `Outfit_Trimmed_Work`：从原服装派生，保留腰带、图形衣摆、手套及独立扣件。旧袖子与前臂衣片通过原生 Bisect 裁切。白色前襟重新分配布料材质，补衣料厚度；长衣摆使用单独长度笼调整。
 - `Sleeve_Anatomical_Work_-1/1`：重建四边形袖筒，用原生 Cloth 与身体碰撞得到褶皱，再冻结为可编辑四边形网格。生产导出不依赖临时模拟缓存。模拟前来源保存在隐藏归档。
