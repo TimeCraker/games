@@ -36,8 +36,8 @@ jobs:
 
       # lint 非阻塞：历史债务不挡构建（对齐本仓 CI 惯例）
       - name: Lint (non-blocking)
-        run: pnpm lint
+        run: npm run lint
         continue-on-error: true
 
       - name: Build
-        run: pnpm build
+        run: npm run build
