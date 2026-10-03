@@ -1,0 +1,28 @@
+{
+  "phase": "head_hair_hood_candidate",
+  "art_approved": false,
+  "source_blend": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+  "source_sha256": "e60f15325d79f62d2595d8db42b632f6412a475506d9669fd0f922a240a3c2c1",
+  "face_original_vertex_count_protected": 4686,
+  "face_max_coordinate_error_m": 1.2013700229374393e-07,
+  "body_uv_unchanged": true,
+  "body_uv_sha256": "ced0e65ed94f1c466f5d64b3da86219a8fe11ef87b669019678a25dcd53df33a",
+  "short_hair_mask_reversible": true,
+  "hair_original_polygons": 37311,
+  "hair_work_polygons": 37311,
+  "hair_work_uv_unchanged": true,
+  "hood_original_geometry_retained": true,
+  "remaining": [
+    "Original bodice overlaps base clothing",
+    "Sleeves and cuffs require fitting",
+    "Garment seams, tails and pendants require repair"
+  ],
+  "views": [
+    "head",
+    "head_side",
+    "front",
+    "left",
+    "back",
+    "threequarter"
+  ]
+}
