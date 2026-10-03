@@ -8,3 +8,7 @@ export_presets.cfg
 *.log
 debug_output.txt
 error_log.txt
+
+# Tripo 导出的中间纹理（UUID 后缀调试产物，最终纹理已嵌入 glb，不入库）
+models/characters/rework/*_tripo_rgb_*.jpg
+models/characters/rework/*_tripo_rgb_*.jpg.import
