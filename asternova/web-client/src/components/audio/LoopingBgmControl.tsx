@@ -42,6 +42,13 @@ type Props = {
    * 用于「压住开始按钮直到音乐加载出来」。用 ref 保证只触发一次，重复调用幂等。
    */
   onReady?: () => void
+  /**
+   * 性能优化 2026-10：置 true 时 preload="none" 且跳过挂载期 play() 尝试，
+   * 音频推迟到首次用户手势才加载（浏览器本就禁止无手势自动播放，提前拉取
+   * 属于纯浪费带宽；落地页 1.4MB WAV 曾拖慢 Slow 4G 下的 LCP）。
+   * 适用于无「压住开始按钮」诉求的页面（如落地页）；游戏页保持默认 false 不变。
+   */
+  deferLoadUntilGesture?: boolean
 }
 
 const FILE_CANDIDATES = [
@@ -76,6 +83,7 @@ export function LoopingBgmControl({
   hidden = false,
   variant = "floating",
   onReady,
+  deferLoadUntilGesture = false,
 }: Props) {
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const barRefs = React.useRef<Array<HTMLSpanElement | null>>([])
@@ -309,13 +317,15 @@ export function LoopingBgmControl({
         /* autoplay blocked until user interacts */
       })
     }
-    tryPlay()
+    // deferLoadUntilGesture：跳过挂载期尝试（play() 会连带触发资源加载），
+    // 只依赖下方 once 的 pointerdown —— 首次手势时 play() 自动加载并播放
+    if (!deferLoadUntilGesture) tryPlay()
     window.addEventListener("pointerdown", tryPlay, { once: true })
     return () => {
       window.removeEventListener("pointerdown", tryPlay)
       el.pause()
     }
-  }, [resolvedSrc])
+  }, [resolvedSrc, deferLoadUntilGesture])
 
   React.useEffect(() => {
     const el = audioRef.current
@@ -492,7 +502,16 @@ export function LoopingBgmControl({
   )
 
   // <audio> 无条件挂载：preload="auto" 在教程 / 简报期间就预热音源，见上方注释。
-  const audioEl = <audio ref={audioRef} src={resolvedSrc} loop preload="auto" onError={onAudioError} />
+  // deferLoadUntilGesture 时改 preload="none"，首次手势 play() 才拉取（落地页专用）。
+  const audioEl = (
+    <audio
+      ref={audioRef}
+      src={resolvedSrc}
+      loop
+      preload={deferLoadUntilGesture ? "none" : "auto"}
+      onError={onAudioError}
+    />
+  )
 
   if (variant === "inline") {
     return (

@@ -303,11 +303,26 @@ void main() {
 
     const clock = new THREE.Clock()
     const viewDir = new THREE.Vector3(0, 0, 1)
+
+    // 性能优化 2026-10：环境背景按 30fps 采样。本材质是纯 u_time 驱动的时间型着色器
+    // （旋转/波纹速度按秒推进，与帧率无关），30fps 与 60fps 视觉不可分辨；
+    // 主线程渲染成本减半（软件光栅/headless 下每帧 50ms+ 的长任务减半）。
+    // 帧率门只跳过「渲染」，不跳过时间推进 —— 勿删。
+    const MIN_FRAME_MS = 1000 / 30
+    let lastFrameAt = 0
+
     const tick = () => {
       if (pausedRef.current) {
         rafRef.current = null
         return
       }
+      const now = performance.now()
+      if (now - lastFrameAt < MIN_FRAME_MS - 0.5) {
+        rafRef.current = window.requestAnimationFrame(tick)
+        return
+      }
+      lastFrameAt = now
+
       const dt = clock.getDelta()
       const t = clock.elapsedTime
 
