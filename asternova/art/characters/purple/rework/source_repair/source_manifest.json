@@ -1,0 +1,33 @@
+{
+  "created": "2026-10-03",
+  "source_assets": {
+    "body": {
+      "filepath": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\3D模型\\01_素体_quad.glb",
+      "sha256": "c5cafed9ecdc50593e3cf9acaf21af68ba80c31244d64206d09499748b931d7c",
+      "vertices": 53433,
+      "polygons": 46962
+    },
+    "outfit": {
+      "filepath": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\3D模型\\02_服装_quad.glb",
+      "sha256": "3a506343e13e694a2a230a8d9f9b384753a1c30542f7f3fa24113db67fd6b71e",
+      "vertices": 62242,
+      "polygons": 47502
+    },
+    "hair": {
+      "filepath": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\3D模型\\03_头发_quad.glb",
+      "sha256": "e41252e4a2390df47e54159c945639fdc024116366a7960f0570a3dc6bad23e1",
+      "vertices": 41274,
+      "polygons": 37311
+    }
+  },
+  "initial_alignment": {
+    "body_scale": 1.65,
+    "outfit_scale": 1.65,
+    "hair_scale": 0.9,
+    "hair_height_offset": 0.75,
+    "front_rotation_degrees": -90,
+    "rotation_and_scale_applied_on_work_only": true
+  },
+  "art_approved": false,
+  "initial_blend_sha256": "3747fbb7f6c4d021bafd490aa0c3c9c021e1f9ace21f1745eb5d1dd90336c830"
+}
