@@ -1,0 +1,43 @@
+{
+  "phase": "hood_back_neck_refinement",
+  "baseline_source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+  "baseline_git_commit": "99450c6",
+  "hood_position": "draped behind the neck using original hood lattice, lower attachment row pinned",
+  "native_outer_collar_translation_m": [
+    0,
+    0,
+    -0.033
+  ],
+  "native_head_and_hair_rigid_translation_m": [
+    0,
+    0,
+    0.015
+  ],
+  "original_face_vertices_protected": 4686,
+  "face_max_alignment_compensated_error_m": 3.577830554110697e-07,
+  "face_rigid_translation_compensation_m": [
+    0,
+    0,
+    0.015
+  ],
+  "body_evaluated_vertices": 53433,
+  "body_source_vertices": 53433,
+  "original_inner_short_hair_and_scalp_restored": true,
+  "short_hair_mask_enabled": false,
+  "outfit_original_faces_retained": 47502,
+  "outfit_unique_original_faces": 47502,
+  "outfit_uv_unchanged": true,
+  "body_uv_unchanged": true,
+  "hair_uv_unchanged": true,
+  "outer_collar_top_before_m": 1.4461669921875,
+  "outer_collar_top_after_m": 1.4131669998168945,
+  "chin_before_m": 1.4131346940994263,
+  "chin_after_m": 1.4281346940994264,
+  "armature_count": 0,
+  "action_count": 0,
+  "art_approved": false,
+  "runtime_verified": false,
+  "source_blend": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+  "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+  "additional_authored_review_camera": "Purple_View_head_back"
+}

@@ -1,0 +1,28 @@
+{
+  "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+  "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+  "source_unchanged": true,
+  "operation": "render",
+  "art_approved": false,
+  "result": null,
+  "views": [
+    "front",
+    "left",
+    "right",
+    "back",
+    "threequarter",
+    "head",
+    "head_side",
+    "clay",
+    "clay_left",
+    "clay_right",
+    "clay_back",
+    "poster",
+    "face_front",
+    "face_profile",
+    "head_back"
+  ],
+  "review_profile": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\review_profile.json",
+  "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+  "face_view_isolation": "Hide outfit and independent hair; restore source embedded short hair for face inspection"
+}

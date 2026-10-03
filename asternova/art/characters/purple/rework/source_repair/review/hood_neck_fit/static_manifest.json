@@ -1,0 +1,590 @@
+{
+  "schema_version": 1,
+  "source_blend": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+  "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+  "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+  "art_approved": false,
+  "rigging_started": false,
+  "runtime_verified": false,
+  "renders": [
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\front.png",
+      "image_sha256": "ad5e956e95964ec1fd574a9cf4364e853b20b3bd93aed1166c80901f0fff2e55",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\left.png",
+      "image_sha256": "95b66028705402e67a850692f88200479a32ec1a2ef49b2e0b91ea2a1ff66687",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\right.png",
+      "image_sha256": "feadea1162c01c1fbb30fb6448e5e42ea79787f7c7eda0e2d39d6103ac66dade",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\back.png",
+      "image_sha256": "1bac71d05a80d602ffb7ea06bfba566bae6db4d404a0c4b10f3ebcf265c40baf",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\threequarter.png",
+      "image_sha256": "0e6c885578f591c84ebb64a4e3698964e1494427c943c52c4b5da251378e52a5",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\head.png",
+      "image_sha256": "1b372c6618e611b2721178bd0babaefb08351620b0acd3731bbcb3786517682d",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\head_side.png",
+      "image_sha256": "2606e41a9eae97f239549dd2052edf3d189dc210f05fce2701cf09757c084714",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\clay.png",
+      "image_sha256": "de1a8af86a1197c268c37e97c88972b70a73192643e6bca3d7c647b2da7b2e7f",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\clay_left.png",
+      "image_sha256": "2018d792e9057e98a2a5edcb658ccdf3345b6b10acde3357027f9229bb393d01",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\clay_right.png",
+      "image_sha256": "927c44aad0ef566f265777314955d10ae457658108f282ca08b0c2098f6041c9",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\clay_back.png",
+      "image_sha256": "9dc2211c8cbe0d95f9f988d73230ecde6918e61f9c5bb533ad8eb63fc6d464a7",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\poster.png",
+      "image_sha256": "9af5f925e8b847de40147c078c36695e29dc6c66aae740aa6106ecf9d8647df3",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\face_front.png",
+      "image_sha256": "ff68f43ba198197ee3e3f2a47480b961e7d0f82d8a5079b936a661a475a26cd0",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": true
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\face_profile.png",
+      "image_sha256": "a51231de6f0270ef9456f3ea8375bb94415ac2cebf71619fb02d40288aebbf9e",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": true
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\head_back.png",
+      "image_sha256": "85e702de6c75df5854d138cb4d62484fb6defd7a53edd009330caee583e0054f",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+      "face_inspection_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\comparison\\original_assembly\\front.png",
+      "image_sha256": "6c8ee98c0d5f7403c778ab1afa6c9940200a2953c28a75f6849928cf48f57052",
+      "source": "C:\\Users\\TimeCraker\\AppData\\Local\\Temp\\asternova-purple-source-repair-20261003\\initial_original_assembly.blend",
+      "source_sha256": "3747fbb7f6c4d021bafd490aa0c3c9c021e1f9ace21f1745eb5d1dd90336c830",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8"
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\comparison\\old_failed\\front.png",
+      "image_sha256": "402a3dd34f6c4fca5fb78f0ae83866beebca485207e38e71b2cb6bce1cd06f21",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\purple_rework_working.blend",
+      "source_sha256": "3d6ab86ae89d78091b23a3c4895773ff9aec35862a5beceee005eb1c8b42fea4",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8"
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\glb_reimport\\front.png",
+      "image_sha256": "5a14364356694701c98c527856d5c03b4e3d5be30885c904744d8bbc7dbdff17",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\exports\\hood_back\\purple_source_static_hood_back.glb",
+      "source_sha256": "0dbc45d94f8440d08e4aeebc2f1698ded7f95d65e9bc04bcc1332ed388a12d7f",
+      "source_blend_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8"
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\glb_reimport\\head.png",
+      "image_sha256": "41e03201b1db83660f83151b6fcd316d691e382e5ab40eb7407713feec5cb49a",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\exports\\hood_back\\purple_source_static_hood_back.glb",
+      "source_sha256": "0dbc45d94f8440d08e4aeebc2f1698ded7f95d65e9bc04bcc1332ed388a12d7f",
+      "source_blend_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8"
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\glb_reimport\\back.png",
+      "image_sha256": "c88da54870023594d0c33cda0a0bec6a38fe2b81a8c3001cbfc3fb130f5c2f88",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\exports\\hood_back\\purple_source_static_hood_back.glb",
+      "source_sha256": "0dbc45d94f8440d08e4aeebc2f1698ded7f95d65e9bc04bcc1332ed388a12d7f",
+      "source_blend_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8"
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\initial\\assembly_back.png",
+      "image_sha256": "dd4bae051648529e4b747633c44ef60bfcfa99ab0f59d8db5ad274d2eca59190",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "3747fbb7f6c4d021bafd490aa0c3c9c021e1f9ace21f1745eb5d1dd90336c830",
+      "source_snapshot_git_commit": "2f49d80a1b81a0adf7cd146728ac80074477bba3",
+      "phase": "initial",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\initial\\assembly_front.png",
+      "image_sha256": "50fd3c8e12839c0a0d1e87ca722d62a873985587bb8abb90675d9fa86edb0f68",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "3747fbb7f6c4d021bafd490aa0c3c9c021e1f9ace21f1745eb5d1dd90336c830",
+      "source_snapshot_git_commit": "2f49d80a1b81a0adf7cd146728ac80074477bba3",
+      "phase": "initial",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\initial\\assembly_left.png",
+      "image_sha256": "97c9dfe0d58c6c0b94afd4e083617f91e231e8372f4e0efacb77cdad04f37487",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "3747fbb7f6c4d021bafd490aa0c3c9c021e1f9ace21f1745eb5d1dd90336c830",
+      "source_snapshot_git_commit": "2f49d80a1b81a0adf7cd146728ac80074477bba3",
+      "phase": "initial",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\initial\\raw_body.png",
+      "image_sha256": "d7d83e990b1dd2de0e453f52e8da77be249e4f20371b7870ee1bd77bebddb062",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "3747fbb7f6c4d021bafd490aa0c3c9c021e1f9ace21f1745eb5d1dd90336c830",
+      "source_snapshot_git_commit": "2f49d80a1b81a0adf7cd146728ac80074477bba3",
+      "phase": "initial",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": true
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\initial\\raw_hair.png",
+      "image_sha256": "7ae81a657f8685775db998058354b9346fe3aa3191622be9da451fc08d303b25",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "3747fbb7f6c4d021bafd490aa0c3c9c021e1f9ace21f1745eb5d1dd90336c830",
+      "source_snapshot_git_commit": "2f49d80a1b81a0adf7cd146728ac80074477bba3",
+      "phase": "initial",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": true
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\initial\\raw_outfit.png",
+      "image_sha256": "7ff861d0c6b19ec61f7f7ea37f32bc89a92214608e1023c8d12dc7b360411fab",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "3747fbb7f6c4d021bafd490aa0c3c9c021e1f9ace21f1745eb5d1dd90336c830",
+      "source_snapshot_git_commit": "2f49d80a1b81a0adf7cd146728ac80074477bba3",
+      "phase": "initial",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": true
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\head_fit\\back.png",
+      "image_sha256": "166de1f74a4174b256284ef6f4b6c76b73ccb0f596eb7a9898a7d5535dfea007",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "e60f15325d79f62d2595d8db42b632f6412a475506d9669fd0f922a240a3c2c1",
+      "source_snapshot_git_commit": "9fae88446d382900a7d6be750cd3b373a5b9d9b3",
+      "phase": "head_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\head_fit\\front.png",
+      "image_sha256": "dbc2bb9217ee1d61dbfede11b48641364a84487246c33445f5733b3e9cd83cf2",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "e60f15325d79f62d2595d8db42b632f6412a475506d9669fd0f922a240a3c2c1",
+      "source_snapshot_git_commit": "9fae88446d382900a7d6be750cd3b373a5b9d9b3",
+      "phase": "head_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\head_fit\\head.png",
+      "image_sha256": "edca18dc4b3dfc7e90ab58515adb202dd61feee479e8b5e5df5401475520e3e2",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "e60f15325d79f62d2595d8db42b632f6412a475506d9669fd0f922a240a3c2c1",
+      "source_snapshot_git_commit": "9fae88446d382900a7d6be750cd3b373a5b9d9b3",
+      "phase": "head_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\head_fit\\head_side.png",
+      "image_sha256": "7f82f68b933a76c1da90a2bc5d15115331f11d13927d5d892cdc304791c365e5",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "e60f15325d79f62d2595d8db42b632f6412a475506d9669fd0f922a240a3c2c1",
+      "source_snapshot_git_commit": "9fae88446d382900a7d6be750cd3b373a5b9d9b3",
+      "phase": "head_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\head_fit\\left.png",
+      "image_sha256": "9a7ba32e08e31a7788bf9951563fae12a8f63a028ea0cbf10b416d84ad1125a6",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "e60f15325d79f62d2595d8db42b632f6412a475506d9669fd0f922a240a3c2c1",
+      "source_snapshot_git_commit": "9fae88446d382900a7d6be750cd3b373a5b9d9b3",
+      "phase": "head_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\head_fit\\threequarter.png",
+      "image_sha256": "719df8c91692f90af43502e8db1f08762c6e22e2ad7ccce570934de34e761386",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "e60f15325d79f62d2595d8db42b632f6412a475506d9669fd0f922a240a3c2c1",
+      "source_snapshot_git_commit": "9fae88446d382900a7d6be750cd3b373a5b9d9b3",
+      "phase": "head_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\back.png",
+      "image_sha256": "9d123cac002d7939d1f21cdc38a713c4a06709adbcfe0e530569dafabeb39f19",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\clay.png",
+      "image_sha256": "7196836c3a5e6ab8d9def679258d2d8f0cba70bbfe9f9afdbbffeb731435fc3b",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\clay_back.png",
+      "image_sha256": "ebc848ca1c1ad4be54853012d8a03b4062c6f9dab4739c5f9b219684a4f53d51",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\clay_left.png",
+      "image_sha256": "caa7580fc9320f71cb54af29e314f79eb9471c5cbcc0a765f6afe74a5660bbd4",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\clay_right.png",
+      "image_sha256": "5079897f04ec776e9143b9b8857fb48418f120781b67eaee6f409d2f42377f21",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\face_front.png",
+      "image_sha256": "bc95194560085a98da125c6f26e4619d4b56d7dc5166a35ef8679eca18179a44",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\face_profile.png",
+      "image_sha256": "b0ac0d3eece52f337bee580686f32c36a6d975445f953cd972242e696f40a0c3",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\front.png",
+      "image_sha256": "746b492b52620cb9ba492d2111a31be17793ce25d88f3d8bb211fc77e6c32696",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\head.png",
+      "image_sha256": "81b18fe30ca2145cd8a45f081eab68bdf835a7e57f897c3f5831a2a2d81ef89f",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\head_side.png",
+      "image_sha256": "34dfdb9a131331adc767e6f2ebd8bd3d86ea34fe0cb861f3f136d53eadcc5ace",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\left.png",
+      "image_sha256": "14dd46c2f477ea3c79f49ed292f7fffec56ae378ae1b70d19a8b5462a6c0a4ef",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\poster.png",
+      "image_sha256": "2b3ed1fa9fca0ec639df4cb4befab3e693860319c9cd99663cbd43613f6faa37",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\right.png",
+      "image_sha256": "239989178465dd87338f4b89e4ef19a3b9124434f69474b842f1ba0045168f7e",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\threequarter.png",
+      "image_sha256": "73eea2e7301bb81ae8c0c006440fe2e67aad1457a960227f4b019b0ef34e89d7",
+      "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf",
+      "phase": "garment_fit",
+      "review_stage": "authored historical scene",
+      "original_part_isolation": false
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\海报参考图\\01_海报参考图.png",
+      "image_sha256": "b51d3512193cb608e959533b802bce8d05c71a5124fe73e6f505a1aea8b35cfb",
+      "source": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\海报参考图\\01_海报参考图.png",
+      "source_sha256": "b51d3512193cb608e959533b802bce8d05c71a5124fe73e6f505a1aea8b35cfb",
+      "kind": "reference"
+    }
+  ],
+  "boards": [
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\purple_static_comparison.png",
+      "image_sha256": "95fd7745888f450a1a6089f7d749dc8562b29d4d78e8457952fe6d323fb3b219",
+      "source_blend_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "inputs": [
+        {
+          "image": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\海报参考图\\01_海报参考图.png",
+          "image_sha256": "b51d3512193cb608e959533b802bce8d05c71a5124fe73e6f505a1aea8b35cfb",
+          "source_sha256": "b51d3512193cb608e959533b802bce8d05c71a5124fe73e6f505a1aea8b35cfb"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\comparison\\original_assembly\\front.png",
+          "image_sha256": "6c8ee98c0d5f7403c778ab1afa6c9940200a2953c28a75f6849928cf48f57052",
+          "source_sha256": "3747fbb7f6c4d021bafd490aa0c3c9c021e1f9ace21f1745eb5d1dd90336c830"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\comparison\\old_failed\\front.png",
+          "image_sha256": "402a3dd34f6c4fca5fb78f0ae83866beebca485207e38e71b2cb6bce1cd06f21",
+          "source_sha256": "3d6ab86ae89d78091b23a3c4895773ff9aec35862a5beceee005eb1c8b42fea4"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\front.png",
+          "image_sha256": "ad5e956e95964ec1fd574a9cf4364e853b20b3bd93aed1166c80901f0fff2e55",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        }
+      ],
+      "layout_only": true
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\purple_static_views.png",
+      "image_sha256": "8d7b98adc8036966a1b628cc57781dab76648b12f85ef6386096a26f70ba2806",
+      "source_blend_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "inputs": [
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\front.png",
+          "image_sha256": "ad5e956e95964ec1fd574a9cf4364e853b20b3bd93aed1166c80901f0fff2e55",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\left.png",
+          "image_sha256": "95b66028705402e67a850692f88200479a32ec1a2ef49b2e0b91ea2a1ff66687",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\right.png",
+          "image_sha256": "feadea1162c01c1fbb30fb6448e5e42ea79787f7c7eda0e2d39d6103ac66dade",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\back.png",
+          "image_sha256": "1bac71d05a80d602ffb7ea06bfba566bae6db4d404a0c4b10f3ebcf265c40baf",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        }
+      ],
+      "layout_only": true
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\purple_static_neutral.png",
+      "image_sha256": "7e558f01387e793e641b50282a7237a1b66204a71298b56a373c1063a550f923",
+      "source_blend_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "inputs": [
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\clay.png",
+          "image_sha256": "de1a8af86a1197c268c37e97c88972b70a73192643e6bca3d7c647b2da7b2e7f",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\clay_left.png",
+          "image_sha256": "2018d792e9057e98a2a5edcb658ccdf3345b6b10acde3357027f9229bb393d01",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\clay_right.png",
+          "image_sha256": "927c44aad0ef566f265777314955d10ae457658108f282ca08b0c2098f6041c9",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\clay_back.png",
+          "image_sha256": "9dc2211c8cbe0d95f9f988d73230ecde6918e61f9c5bb533ad8eb63fc6d464a7",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        }
+      ],
+      "layout_only": true
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\purple_static_details.png",
+      "image_sha256": "42a05dd257c6fc123481097fa5c6ea3f7c79776aa75c6b9149f975a4349f8d6a",
+      "source_blend_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "inputs": [
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\head.png",
+          "image_sha256": "1b372c6618e611b2721178bd0babaefb08351620b0acd3731bbcb3786517682d",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\face_profile.png",
+          "image_sha256": "a51231de6f0270ef9456f3ea8375bb94415ac2cebf71619fb02d40288aebbf9e",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\poster.png",
+          "image_sha256": "9af5f925e8b847de40147c078c36695e29dc6c66aae740aa6106ecf9d8647df3",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        }
+      ],
+      "layout_only": true
+    },
+    {
+      "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\hood_neck_before_after.png",
+      "image_sha256": "5b1722028200e96ab4e579c707f2fe8ecc993cdf2408b4590f0f5c88500919f0",
+      "source_blend_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b",
+      "inputs": [
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\garment_fit\\head.png",
+          "image_sha256": "81b18fe30ca2145cd8a45f081eab68bdf835a7e57f897c3f5831a2a2d81ef89f",
+          "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\head.png",
+          "image_sha256": "1b372c6618e611b2721178bd0babaefb08351620b0acd3731bbcb3786517682d",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\head_side.png",
+          "image_sha256": "2606e41a9eae97f239549dd2052edf3d189dc210f05fce2701cf09757c084714",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        },
+        {
+          "image": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\hood_neck_fit\\head_back.png",
+          "image_sha256": "85e702de6c75df5854d138cb4d62484fb6defd7a53edd009330caee583e0054f",
+          "source_sha256": "037de42605efdb0bccfba259ee3a2701beaef3161df63765d66017acc977ab2b"
+        }
+      ],
+      "layout_only": true
+    }
+  ],
+  "historical_source_snapshots": [
+    {
+      "phase": "initial",
+      "source_sha256": "3747fbb7f6c4d021bafd490aa0c3c9c021e1f9ace21f1745eb5d1dd90336c830",
+      "source_snapshot_git_commit": "2f49d80a1b81a0adf7cd146728ac80074477bba3"
+    },
+    {
+      "phase": "head_fit",
+      "source_sha256": "e60f15325d79f62d2595d8db42b632f6412a475506d9669fd0f922a240a3c2c1",
+      "source_snapshot_git_commit": "9fae88446d382900a7d6be750cd3b373a5b9d9b3"
+    },
+    {
+      "phase": "garment_fit",
+      "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+      "source_snapshot_git_commit": "99450c6b0ba5d9ef77b849189563e6c5206094bf"
+    }
+  ]
+}
