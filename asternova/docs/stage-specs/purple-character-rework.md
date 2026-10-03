@@ -29,11 +29,13 @@
 
 ## 本次工具记录
 
-当前客户端没有可调用的 Blender MCP 工具；本机插件连接和进程状态按实际检查记录。即使 socket 可用，也不得切换或覆盖白色 Agent 的活动工程。使用独立 Blender 进程和 Python 调用原生选择、编辑、变形笼等工具，关键修改立即渲染并亲自检查。
+初次诊断时客户端没有可调用的 Blender MCP 工具，因此使用独立 Blender 进程调用原生选择、编辑和变形笼，关键修改立即渲染并亲自检查。连接状态以下述实时验证为准；即使 socket 可用，也不得切换或覆盖白色 Agent 的活动工程。
 
 2026-10-03 实测：Blender 5.2.1 可调用；9876 socket 拒绝连接；没有活动 Blender 进程；当前 UI 工具明确禁用原生桌面控制。使用独立无头进程完成原始三件与旧休止/Idle 实际渲染。
 
 2026-10-03 后续纠正：用户询问为何持续使用 Python。重新核查发现 Codex 的实际 MCP 配置只有 `context7` 和 `node_repl`，当前聊天没有原生 Blender MCP 工具。已备份配置并添加紫色专用 `blender_purple`（`mcp-for-blender` 2.1.3，端口 9877，关闭遥测），保留所有原有配置；启动独立活动 Blender，载入紫色静态制作源。通过真实 MCP stdio 客户端完成 `get_scene_info`、`execute_blender_code`、`get_viewport_screenshot`：临时隐藏兜帽、取得截图、恢复兜帽并取得截图，均亲自看图。证据在 `art/characters/purple/rework/review/mcp/`。这是独立 MCP 客户端验证；当前聊天的原生工具列表仍未加载 Blender，不能描述为本聊天已经原生接入。新配置加载需要重载 Codex。
+
+2026-10-03 原生接入复验：用户重启 Codex 后，本聊天已加载 `blender_purple`。首次原生调用发现 Blender 未运行；启动独立紫色进程后，`get_addon_status`、`get_scene_info`、`execute_blender_code` 和 `get_viewport_screenshot` 均成功。实际活动文件为 `purple_rework_working.blend`，Blender 5.2.1 LTS、端口 9877、49 个场景对象、用户美术确认仍为 false；视口截图已亲自检查。插件协议 9 低于服务端预期的 13，当前核心调用通过其支持的兼容能力完成。原生客户端证据保存于 `review/mcp/native_client/`；不再依赖独立 stdio 客户端作为本聊天的操作入口。
 
 当前活动工程为 `purple_rework_working.blend`。最新兜帽已改为开口布料结构，主长发以独立变形笼适配，袖口垂饰已分件并补连接链。旧原型 GLB、旧比较图片以及初版绑定工程不是这些最新调整的验收件。下一步先通过活动 MCP 场景复核静态轮廓和接缝，再同步绑定副本和运行导出；不覆盖旧 `purple.glb`。
 

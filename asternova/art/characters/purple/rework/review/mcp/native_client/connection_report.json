@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-03",
+  "client": "Codex native MCP tools",
+  "server": "blender_purple",
+  "user_prompt": "重启codex了 你再试试",
+  "port": 9877,
+  "initial_connection": "Failed while Blender was closed; independent purple Blender process started",
+  "addon_status": {
+    "result": "{\n  \"up_to_date\": false,\n  \"protocol_version\": 9,\n  \"expected_protocol_version\": 13,\n  \"addon_version\": [\n    1,\n    7\n  ],\n  \"capabilities\": [\n    \"bpy_api_lookup\",\n    \"describe_node_type\",\n    \"drain_human_activity\",\n    \"execute_code\",\n    \"get_addon_info\",\n    \"get_object_info\",\n    \"get_scene_info\",\n    \"get_telemetry_consent\",\n    \"get_viewport_screenshot\",\n    \"get_world_state_snapshot\",\n    \"set_telemetry_consent\"\n  ],\n  \"blender_version\": \"5.2.1 LTS\",\n  \"premium_generators\": [],\n  \"source\": \"native\",\n  \"warning\": \"Blender addon protocol 9 is behind expected 13. Run `uvx mcp-for-blender install-addon` to update it, then restart Blender or disable/enable 'Interface: MCP for Blender', then Start MCP Server. Trajectory still works via fallbacks.\",\n  \"telemetry_consent\": false,\n  \"update_command\": \"uvx mcp-for-blender install-addon\",\n  \"after_install\": \"If the addon file was updated: in Blender, Preferences \\u2192 Add-ons \\u2192 disable/enable 'Interface: Blender MCP', or restart Blender, then Start MCP Server.\"\n}"
+  },
+  "scene": {
+    "result": "{\n  \"name\": \"Scene\",\n  \"object_count\": 49,\n  \"objects\": [\n    {\n      \"name\": \"Camera.003\",\n      \"type\": \"CAMERA\",\n      \"location\": [\n        0.0,\n        -4.0,\n        0.88\n      ]\n    },\n    {\n      \"name\": \"Area.009\",\n      \"type\": \"LIGHT\",\n      \"location\": [\n        2.0,\n        -3.0,\n        4.0\n      ]\n    },\n    {\n      \"name\": \"Area.010\",\n      \"type\": \"LIGHT\",\n      \"location\": [\n        -3.0,\n        -2.0,\n        2.0\n      ]\n    },\n    {\n      \"name\": \"Area.011\",\n      \"type\": \"LIGHT\",\n      \"location\": [\n        1.0,\n        3.0,\n        4.0\n      ]\n    },\n    {\n      \"name\": \"Source_Body\",\n      \"type\": \"MESH\",\n      \"location\": [\n        0.0,\n        0.0,\n        0.0\n      ]\n    },\n    {\n      \"name\": \"Source_Outfit\",\n      \"type\": \"MESH\",\n      \"location\": [\n        0.0,\n        0.0,\n        0.0\n      ]\n    },\n    {\n      \"name\": \"Source_Hair\",\n      \"type\": \"MESH\",\n      \"location\": [\n        0.0,\n        0.0,\n        0.0\n      ]\n    },\n    {\n      \"name\": \"Body_Work\",\n      \"type\": \"MESH\",\n      \"location\": [\n        0.0,\n        0.0,\n        0.0\n      ]\n    },\n    {\n      \"name\": \"Hair_Work\",\n      \"type\": \"MESH\",\n      \"location\": [\n        0.0,\n        0.0,\n        0.0\n      ]\n    },\n    {\n      \"name\": \"Outfit_Work\",\n      \"type\": \"MESH\",\n      \"location\": [\n        0.0,\n        0.0,\n        0.0\n      ]\n    }\n  ],\n  \"materials_count\": 8\n}"
+  },
+  "identity": {
+    "result": "Code executed successfully: {\"filepath\": \"C:\\\\Users\\\\TimeCraker\\\\Desktop\\\\my_workspace\\\\games\\\\asternova\\\\art\\\\characters\\\\purple\\\\rework\\\\purple_rework_working.blend\", \"blender_version\": \"5.2.1 LTS\", \"mcp_port\": 9877, \"art_approved\": false, \"collections\": [{\"name\": \"ARCHIVE_Purple_Replaced_Parts\", \"objects\": 5}, {\"name\": \"EDIT_Purple_Fit_Cages\", \"objects\": 14}, {\"name\": \"SOURCE_Purple_Immutable\", \"objects\": 3}, {\"name\": \"WORK_Purple\", \"objects\": 23}]}\n"
+  },
+  "viewport": {
+    "file": "active_front.png",
+    "native_image_returned": true,
+    "visually_reviewed": true
+  },
+  "geometry_modified": false,
+  "art_approved": false,
+  "note": "Core native tools succeeded. Addon protocol 9 is older than the server's expected 13; current calls used supported fallback capabilities.",
+  "saved_viewport": {
+    "success": true,
+    "width": 1400,
+    "height": 832,
+    "filepath": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\review\\mcp\\native_client\\active_front.png",
+    "method": "offscreen"
+  }
+}
