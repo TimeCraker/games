@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'asternova/web-client/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'asternova/web-client/**'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  web-client:
+    name: web-client lint + build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: asternova/web-client
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      # rewrites 需要的目标后端（构建期占位，与线上 api 同源）
+      NEXT_PUBLIC_API_URL: 'https://api.asterforge.top'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: asternova/web-client/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # lint 非阻塞：历史债务不挡构建（对齐本仓 CI 惯例）
+      - name: Lint (non-blocking)
+        run: pnpm lint
+        continue-on-error: true
+
+      - name: Build
+        run: pnpm build
