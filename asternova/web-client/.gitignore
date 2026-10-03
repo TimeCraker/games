@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+# 锁文件单源 npm（曾双锁漂移：pnpm-lock 滞留旧版，2026-10-03 定源删除）
+/pnpm-lock.yaml
+
 # testing
 /coverage
 

@@ -1,0 +1,856 @@
+[
+  {
+    "name": "get_addon_status",
+    "inputSchema": {
+      "properties": {
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "get_addon_statusArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "disable_telemetry",
+    "inputSchema": {
+      "properties": {
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "disable_telemetryArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_scene_info",
+    "inputSchema": {
+      "properties": {
+        "user_prompt": {
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "user_prompt"
+      ],
+      "title": "get_scene_infoArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_object_info",
+    "inputSchema": {
+      "properties": {
+        "object_name": {
+          "title": "Object Name",
+          "type": "string"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "object_name"
+      ],
+      "title": "get_object_infoArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_viewport_screenshot",
+    "inputSchema": {
+      "properties": {
+        "max_size": {
+          "default": 1000,
+          "title": "Max Size",
+          "type": "integer"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "get_viewport_screenshotArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "execute_blender_code",
+    "inputSchema": {
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "execute_blender_codeArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "describe_node_type",
+    "inputSchema": {
+      "properties": {
+        "bl_idname": {
+          "title": "Bl Idname",
+          "type": "string"
+        },
+        "property_overrides": {
+          "additionalProperties": true,
+          "default": null,
+          "title": "Property Overrides",
+          "type": "object"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bl_idname"
+      ],
+      "title": "describe_node_typeArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "bpy_api_lookup",
+    "inputSchema": {
+      "properties": {
+        "query": {
+          "title": "Query",
+          "type": "string"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "bpy_api_lookupArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_polyhaven_categories",
+    "inputSchema": {
+      "properties": {
+        "asset_type": {
+          "default": "hdris",
+          "title": "Asset Type",
+          "type": "string"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "get_polyhaven_categoriesArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "search_polyhaven_assets",
+    "inputSchema": {
+      "properties": {
+        "query": {
+          "default": null,
+          "title": "Query",
+          "type": "string"
+        },
+        "asset_type": {
+          "default": "all",
+          "title": "Asset Type",
+          "type": "string"
+        },
+        "category": {
+          "default": null,
+          "title": "Category",
+          "type": "string"
+        },
+        "attributes": {
+          "additionalProperties": true,
+          "default": null,
+          "title": "Attributes",
+          "type": "object"
+        },
+        "min_size_m": {
+          "default": null,
+          "title": "Min Size M",
+          "type": "number"
+        },
+        "limit": {
+          "default": 20,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "search_polyhaven_assetsArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_polyhaven_asset_preview",
+    "inputSchema": {
+      "properties": {
+        "asset_id": {
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset_id"
+      ],
+      "title": "get_polyhaven_asset_previewArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "download_polyhaven_asset",
+    "inputSchema": {
+      "properties": {
+        "asset_id": {
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "asset_type": {
+          "title": "Asset Type",
+          "type": "string"
+        },
+        "resolution": {
+          "default": "1k",
+          "title": "Resolution",
+          "type": "string"
+        },
+        "file_format": {
+          "default": null,
+          "title": "File Format",
+          "type": "string"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset_id",
+        "asset_type"
+      ],
+      "title": "download_polyhaven_assetArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "set_texture",
+    "inputSchema": {
+      "properties": {
+        "object_name": {
+          "title": "Object Name",
+          "type": "string"
+        },
+        "texture_id": {
+          "title": "Texture Id",
+          "type": "string"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "object_name",
+        "texture_id"
+      ],
+      "title": "set_textureArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_polyhaven_status",
+    "inputSchema": {
+      "properties": {
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "get_polyhaven_statusArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_hyper3d_status",
+    "inputSchema": {
+      "properties": {
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "get_hyper3d_statusArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_sketchfab_status",
+    "inputSchema": {
+      "properties": {
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "get_sketchfab_statusArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "search_sketchfab_models",
+    "inputSchema": {
+      "properties": {
+        "query": {
+          "title": "Query",
+          "type": "string"
+        },
+        "categories": {
+          "default": null,
+          "title": "Categories",
+          "type": "string"
+        },
+        "count": {
+          "default": 20,
+          "title": "Count",
+          "type": "integer"
+        },
+        "downloadable": {
+          "default": true,
+          "title": "Downloadable",
+          "type": "boolean"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "search_sketchfab_modelsArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_sketchfab_model_preview",
+    "inputSchema": {
+      "properties": {
+        "uid": {
+          "title": "Uid",
+          "type": "string"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "uid"
+      ],
+      "title": "get_sketchfab_model_previewArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "download_sketchfab_model",
+    "inputSchema": {
+      "properties": {
+        "uid": {
+          "title": "Uid",
+          "type": "string"
+        },
+        "target_size": {
+          "title": "Target Size",
+          "type": "number"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "uid",
+        "target_size"
+      ],
+      "title": "download_sketchfab_modelArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_polypizza_status",
+    "inputSchema": {
+      "properties": {
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "get_polypizza_statusArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "search_polypizza_models",
+    "inputSchema": {
+      "properties": {
+        "query": {
+          "default": "",
+          "title": "Query",
+          "type": "string"
+        },
+        "category": {
+          "default": null,
+          "title": "Category",
+          "type": "string"
+        },
+        "licence": {
+          "default": null,
+          "title": "Licence",
+          "type": "string"
+        },
+        "animated": {
+          "default": false,
+          "title": "Animated",
+          "type": "boolean"
+        },
+        "limit": {
+          "default": 20,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "search_polypizza_modelsArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "download_polypizza_model",
+    "inputSchema": {
+      "properties": {
+        "model_id": {
+          "title": "Model Id",
+          "type": "string"
+        },
+        "normalize_size": {
+          "default": false,
+          "title": "Normalize Size",
+          "type": "boolean"
+        },
+        "target_size": {
+          "default": 1.0,
+          "title": "Target Size",
+          "type": "number"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model_id"
+      ],
+      "title": "download_polypizza_modelArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "generate_hyper3d_model_via_text",
+    "inputSchema": {
+      "properties": {
+        "text_prompt": {
+          "title": "Text Prompt",
+          "type": "string"
+        },
+        "bbox_condition": {
+          "default": null,
+          "items": {
+            "type": "number"
+          },
+          "title": "Bbox Condition",
+          "type": "array"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text_prompt"
+      ],
+      "title": "generate_hyper3d_model_via_textArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "generate_hyper3d_model_via_images",
+    "inputSchema": {
+      "properties": {
+        "input_image_paths": {
+          "default": null,
+          "items": {
+            "type": "string"
+          },
+          "title": "Input Image Paths",
+          "type": "array"
+        },
+        "input_image_urls": {
+          "default": null,
+          "items": {
+            "type": "string"
+          },
+          "title": "Input Image Urls",
+          "type": "array"
+        },
+        "bbox_condition": {
+          "default": null,
+          "items": {
+            "type": "number"
+          },
+          "title": "Bbox Condition",
+          "type": "array"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "generate_hyper3d_model_via_imagesArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "poll_rodin_job_status",
+    "inputSchema": {
+      "properties": {
+        "subscription_key": {
+          "default": null,
+          "title": "Subscription Key",
+          "type": "string"
+        },
+        "request_id": {
+          "default": null,
+          "title": "Request Id",
+          "type": "string"
+        }
+      },
+      "title": "poll_rodin_job_statusArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "import_generated_asset",
+    "inputSchema": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "task_uuid": {
+          "default": null,
+          "title": "Task Uuid",
+          "type": "string"
+        },
+        "request_id": {
+          "default": null,
+          "title": "Request Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "import_generated_assetArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_hunyuan3d_status",
+    "inputSchema": {
+      "properties": {
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "get_hunyuan3d_statusArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "generate_hunyuan3d_model",
+    "inputSchema": {
+      "properties": {
+        "text_prompt": {
+          "default": null,
+          "title": "Text Prompt",
+          "type": "string"
+        },
+        "input_image_url": {
+          "default": null,
+          "title": "Input Image Url",
+          "type": "string"
+        },
+        "quality": {
+          "default": null,
+          "title": "Quality",
+          "type": "string"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "generate_hunyuan3d_modelArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "poll_hunyuan_job_status",
+    "inputSchema": {
+      "properties": {
+        "job_id": {
+          "default": null,
+          "title": "Job Id",
+          "type": "string"
+        }
+      },
+      "title": "poll_hunyuan_job_statusArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "import_generated_asset_hunyuan",
+    "inputSchema": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "zip_file_url": {
+          "title": "Zip File Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "zip_file_url"
+      ],
+      "title": "import_generated_asset_hunyuanArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "get_tripo_status",
+    "inputSchema": {
+      "properties": {
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "get_tripo_statusArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "generate_tripo_model",
+    "inputSchema": {
+      "properties": {
+        "text_prompt": {
+          "default": null,
+          "title": "Text Prompt",
+          "type": "string"
+        },
+        "input_image_url": {
+          "default": null,
+          "title": "Input Image Url",
+          "type": "string"
+        },
+        "quality": {
+          "default": null,
+          "title": "Quality",
+          "type": "string"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "title": "generate_tripo_modelArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "poll_tripo_job_status",
+    "inputSchema": {
+      "properties": {
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "poll_tripo_job_statusArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "import_generated_asset_tripo",
+    "inputSchema": {
+      "properties": {
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "name"
+      ],
+      "title": "import_generated_asset_tripoArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "export_scene",
+    "inputSchema": {
+      "properties": {
+        "filepath": {
+          "title": "Filepath",
+          "type": "string"
+        },
+        "format": {
+          "default": "glb",
+          "title": "Format",
+          "type": "string"
+        },
+        "object_names": {
+          "default": null,
+          "items": {
+            "type": "string"
+          },
+          "title": "Object Names",
+          "type": "array"
+        },
+        "selection_only": {
+          "default": false,
+          "title": "Selection Only",
+          "type": "boolean"
+        },
+        "apply_modifiers": {
+          "default": true,
+          "title": "Apply Modifiers",
+          "type": "boolean"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "filepath"
+      ],
+      "title": "export_sceneArguments",
+      "type": "object"
+    }
+  },
+  {
+    "name": "record_trajectory_feedback",
+    "inputSchema": {
+      "properties": {
+        "feedback": {
+          "title": "Feedback",
+          "type": "string"
+        },
+        "correction_text": {
+          "default": null,
+          "title": "Correction Text",
+          "type": "string"
+        },
+        "step_index": {
+          "default": null,
+          "title": "Step Index",
+          "type": "integer"
+        },
+        "user_prompt": {
+          "default": "",
+          "title": "User Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "feedback"
+      ],
+      "title": "record_trajectory_feedbackArguments",
+      "type": "object"
+    }
+  }
+]
