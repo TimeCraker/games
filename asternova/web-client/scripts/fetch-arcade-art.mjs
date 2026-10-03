@@ -57,7 +57,7 @@ async function meta(id) {
 }
 
 /** 生成 LQIP：24px 宽 + 模糊，转 base64 data URI（供 next/image placeholder="blur"） */
-async function makeLqip(buf, w, h) {
+async function makeLqip(buf) {
   const tiny = await sharp(buf)
     .resize({ width: 24, fit: "cover", position: "attention" })
     .blur(1.4)
@@ -69,7 +69,6 @@ async function makeLqip(buf, w, h) {
 await fs.mkdir(OUT_DIR, { recursive: true })
 const credits = []
 const lqipEntries = []
-const blur = (w) => Math.max(0, 6 - w)
 
 for (const p of PICKS) {
   try {
@@ -113,7 +112,7 @@ for (const p of PICKS) {
       .webp({ quality: 84, effort: 5 })
       .toFile(path.join(OUT_DIR, p.slug + ".webp"))
 
-    const lqip = await makeLqip(buf, p.w, p.h)
+    const lqip = await makeLqip(buf)
     if (!p.isBackground) lqipEntries.push({ slug: p.slug, w: p.w, h: p.h, lqip })
 
     const m = await meta(p.id)

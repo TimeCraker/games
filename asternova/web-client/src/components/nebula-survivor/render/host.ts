@@ -112,7 +112,6 @@ export class NebulaHost {
 
   snapshot(): UiSnapshot {
     const s = this.sim
-    const def = { blink: 6.5, shield: 15, afterburn: 10, recharge: 18, quantum: 0.6 } as Record<string, number>
     return {
       hp: Math.max(0, Math.round(s.player.hp)), maxHp: Math.round(s.player.maxHp),
       level: s.level, xp: Math.floor(s.xp), xpToNext: s.xpToNext,

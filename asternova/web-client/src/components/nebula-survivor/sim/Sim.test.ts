@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import { FIXED_DT, Sim } from "./Sim"
-import { MERGE_REQUIRED, MAX_STARS } from "../content/weapons"
+import { MAX_STARS } from "../content/weapons"
 import { CLASS_IDS } from "../content/classes"
 
 /**

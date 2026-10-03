@@ -26,11 +26,6 @@ export const C = {
   redRim: 0xe0a99b,
 } as const
 
-function fillStroke(g: Graphics, fill: number, alpha: number, strokeW = 0, stroke = C.ink, strokeAlpha = 1) {
-  g.fill({ color: fill, alpha })
-  if (strokeW > 0) g.stroke({ width: strokeW, color: stroke, alpha: strokeAlpha })
-}
-
 /**
  * 玩家单位：**舰装少女**（俯视）。
  *

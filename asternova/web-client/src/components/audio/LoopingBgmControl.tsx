@@ -318,8 +318,8 @@ export function LoopingBgmControl({
   }, [resolvedSrc])
 
   React.useEffect(() => {
+    const el = audioRef.current
     return () => {
-      const el = audioRef.current
       if (!el) return
       el.pause()
       el.removeAttribute("src")

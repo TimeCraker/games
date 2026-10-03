@@ -170,7 +170,7 @@ export default function ArenaPage() {
 
     window.addEventListener("unity:battle_result", handleBattleResult)
     return () => window.removeEventListener("unity:battle_result", handleBattleResult)
-  }, [router])
+  }, [router, userId])
 
   React.useEffect(() => {
     if (isSceneReady) {

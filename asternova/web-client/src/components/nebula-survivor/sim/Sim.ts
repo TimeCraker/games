@@ -19,7 +19,6 @@ const MAX_BULLETS = 320
 const MAX_ESHOTS = 260
 const MAX_DROPS = 220
 const MAX_FIELDS = 24
-const MAX_PARTICLES = 320
 
 /** 波次时长（秒）；每波结束给一次商店机会 */
 export const WAVE_SECONDS = 42
