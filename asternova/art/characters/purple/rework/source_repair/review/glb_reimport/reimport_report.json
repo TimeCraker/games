@@ -1,0 +1,36 @@
+{
+  "source_glb": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\exports\\purple_source_static.glb",
+  "glb_sha256": "2a6e83e74d2dc3d8d1395dbd685dcce4041dc556616be6860684a1af84128b22",
+  "glb_unchanged_after_import": true,
+  "mesh_count": 8,
+  "materials": 4,
+  "images": 3,
+  "skins": 0,
+  "animations": 0,
+  "all_primitives_have_uv_and_normals": true,
+  "rendered_views": [
+    "front",
+    "head",
+    "back"
+  ],
+  "art_approved": false,
+  "runtime_verified": false,
+  "godot_started": false,
+  "source_blend": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+  "source_blend_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+  "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8",
+  "pixel_comparison_to_saved_source": {
+    "front": {
+      "mean_absolute_channel_error_0_to_255": 0.000543097616173327,
+      "fraction_pixels_all_channels_within_4": 0.9999989898989899
+    },
+    "head": {
+      "mean_absolute_channel_error_0_to_255": 0.0010383838089182973,
+      "fraction_pixels_all_channels_within_4": 0.9999969696969697
+    },
+    "back": {
+      "mean_absolute_channel_error_0_to_255": 0.0009670033468864858,
+      "fraction_pixels_all_channels_within_4": 0.9999747474747475
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "outfit_original_polygons": 47502,
+  "outfit_work_original_polygons": 47502,
+  "outfit_unique_original_faces": 47502,
+  "outfit_uv_per_original_face_unchanged": true,
+  "body_uv_unchanged": true,
+  "hair_uv_unchanged": true,
+  "protected_face_vertex_count": 4686,
+  "protected_face_vertices_present": 4686,
+  "protected_face_evaluated_max_error_m": 1.2013700256829907e-07,
+  "new_geometry_scope": [
+    "One oval gold connector at the original thigh pendant 16.9 mm gap"
+  ],
+  "art_approved": false,
+  "rigging_started": false,
+  "runtime_verified": false,
+  "glove_pose": {
+    "left": "Native arm cage: Y +0.30 rad about shoulder, then Z +0.20 rad about shoulder",
+    "right": "Native arm cage: Y -0.30 rad about shoulder; bottom two lattice rows Z -0.12 rad then X +0.027 m. Upper forearm rows pinned to original sleeve pose",
+    "face_and_boots_modified": false
+  },
+  "source_path": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+  "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b"
+}

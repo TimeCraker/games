@@ -1,0 +1,13 @@
+{
+  "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\purple_rework_working.blend",
+  "source_sha256": "3d6ab86ae89d78091b23a3c4895773ff9aec35862a5beceee005eb1c8b42fea4",
+  "source_unchanged": true,
+  "operation": "render",
+  "art_approved": false,
+  "result": null,
+  "views": [
+    "front"
+  ],
+  "review_profile": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\review\\review_profile.json",
+  "review_profile_sha256": "970193548c1e71ee29d193f9aad5a604211c7d60a8a26c8e0fc2ee938a33e4b8"
+}

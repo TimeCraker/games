@@ -1,0 +1,16 @@
+{
+  "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\purple_source_repair.blend",
+  "source_sha256": "6c629320eebe120e7968d573589de1cf7f2299e4314741b39e0f627f5de8996b",
+  "source_unchanged": true,
+  "operation": "export",
+  "art_approved": false,
+  "result": {
+    "path": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\source_repair\\exports\\purple_source_static.glb",
+    "meshes": 8,
+    "sha256": "2a6e83e74d2dc3d8d1395dbd685dcce4041dc556616be6860684a1af84128b22"
+  },
+  "views": null,
+  "review_profile": null,
+  "review_profile_sha256": null,
+  "face_view_isolation": null
+}
