@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-03",
+  "channel": "Codex native blender_purple MCP",
+  "source_blend": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\purple_rework_working.blend",
+  "source_blend_sha256": "3d6ab86ae89d78091b23a3c4895773ff9aec35862a5beceee005eb1c8b42fea4",
+  "original_glb_checks": {
+    "body": {
+      "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\3D模型\\01_素体_quad.glb",
+      "sha256": "c5cafed9ecdc50593e3cf9acaf21af68ba80c31244d64206d09499748b931d7c",
+      "unchanged": true
+    },
+    "outfit": {
+      "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\3D模型\\02_服装_quad.glb",
+      "sha256": "3a506343e13e694a2a230a8d9f9b384753a1c30542f7f3fa24113db67fd6b71e",
+      "unchanged": true
+    },
+    "hair": {
+      "path": "C:\\Users\\TimeCraker\\Pictures\\游戏人物建模参考\\紫色\\3D模型\\03_头发_quad.glb",
+      "sha256": "e41252e4a2390df47e54159c945639fdc024116366a7960f0570a3dc6bad23e1",
+      "unchanged": true
+    }
+  },
+  "static_art_approved": false,
+  "rig_synced_to_this_revision": false,
+  "runtime_synced_to_this_revision": false,
+  "views": [
+    "front",
+    "left",
+    "right",
+    "back",
+    "head_front"
+  ],
+  "visually_reviewed": true,
+  "body_face_mesh_modified": false,
+  "new_structures": [
+    "Corset_Rebuilt",
+    "ShortSkirt_Rebuilt",
+    "Skirt_WhitePanel_L",
+    "Skirt_WhitePanel_R",
+    "Corset_Upper_Belt",
+    "Corset_Lower_Belt",
+    "Skirt_Hip_Belt",
+    "CoatTail_White_L",
+    "CoatTail_White_R",
+    "CoatTail_Dark_L",
+    "CoatTail_Dark_R",
+    "CoatTail_Purple_L",
+    "CoatTail_Purple_R",
+    "Hood_Back_Volume_Fit_Cage"
+  ],
+  "known_issues": [
+    "Clothing patterns, seam transitions and decorative details remain to refine.",
+    "Face character and hood folds require art review against the poster.",
+    "New clothing requires skinning and deformation validation; prior runtime evidence is stale."
+  ]
+}
