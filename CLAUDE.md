@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [x] **backend 迁移 PostgreSQL**（弃 GORM/MySQL → sqlc + golang-migrate，本地开发数据直接弃，module 改名 `github.com/TimeCraker/asternova-backend`）
 - [x] STYLE.md 随 M1 大部分定稿（面数策略 2026-09-10 修订：AI 生成资产**生成阶段不设上限**、取 Tripo 最高档、LOD 后置）
 - [x] **文档收敛手术（2026-09-10）**：废黜 HANDOVER.md 与旧角色计划书（git 历史可恢复）；全仓统一面数 / 材质 / M1 验收口径；**建模视觉闭环铁律**入 AGENTS.md 与 architecture §9（审美操作走 Blender MCP + 每步截图多模态自查；无头脚本仅限非审美批处理；一个资产一个 Agent）
-- 当前主线：**M1**（场景基线已出但制作人尚未终审「过」，按参考图驱动闭环逐资产攻坚）与 **M2**（真身 rig + 连击/卡肉/极闪/动捕动画树已落地；Transport 与联机未启动）
+- 当前主线（2026-10）：**三角色美术返工**（白色静态样板返工中待用户确认，紫色原资产修复推进中，详见 `asternova/docs/stage-specs/character-art-rework.md` 与 `asternova/AGENTS.md` 顶部 2026-10-01 校正）；并行推进 **M1**（场景基线已出但制作人尚未终审「过」，按参考图驱动闭环逐资产攻坚）与 **M2**（真身 rig + 连击/卡肉/极闪/动捕动画树已落地；Transport 与联机未启动）
 
 ## 整体架构（big picture）
 

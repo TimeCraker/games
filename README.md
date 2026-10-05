@@ -48,10 +48,10 @@ AsterNova 已按新栈重启（2026-08-31 重大定案：**单机优先 + 房主
 
 | | Godot 4（v2，主客户端） | Web Shell | 一代 Godot（冻结） |
 |---|---|---|---|
-| 状态 | **M2 启动开发** | 现役（将演化为官网 + 托管壳） | 冻结为参考实现 |
+| 状态 | **M2 开发中（主力）** | 现役（将演化为官网 + 托管壳） | 冻结为参考实现 |
 | 目标平台 | Windows exe · Android APK · Web WASM | 浏览器 | Web WASM |
 | 技术栈 | GDScript · 二次元角色渲染 · 三档画质 | Next.js 16 · React 19 · Zustand | GDScript · 自研零依赖 Protobuf |
-| 目录 | `asternova/client-godot-v2`（规划） | [`asternova/web-client`](asternova/web-client) | [`asternova/client-godot`](asternova/client-godot) |
+| 目录 | `asternova/client-godot-v2`（已落地开发） | [`asternova/web-client`](asternova/web-client) | [`asternova/client-godot`](asternova/client-godot) |
 
 > Unity WebGL 客户端已归档（2026-08-30），历史可经 `git log` 追溯。
 
@@ -108,7 +108,7 @@ games/asternova/
 ├── web-client/      # Next.js 16 Game Shell + Arcade（现役，将演化为官网 + 托管壳）
 ├── backend/         # Go · Gin · WS · PostgreSQL(sqlc + golang-migrate) · Redis
 ├── client-godot/    # 一代 Godot 客户端（已冻结，见 FROZEN.md）
-├── client-godot-v2/ # 新客户端（M2 启动）
+├── client-godot-v2/ # 新客户端（M2 主力开发中）
 └── assets/          # 共享静态资源
 ```
 

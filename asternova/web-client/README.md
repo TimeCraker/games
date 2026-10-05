@@ -1,7 +1,5 @@
 ﻿-----
 
-[![CI](https://github.com/TimeCraker/asternova-web-client/actions/workflows/ci.yml/badge.svg)](https://github.com/TimeCraker/asternova-web-client/actions/workflows/ci.yml)
-
 # 🌌 AsterNova Web Client (Game Shell)
 
    
@@ -94,7 +92,7 @@ AsterNova-Web/
 2.  **安装依赖与配置:**
     ```bash
     npm install
-    cp .env.development .env.local
+    cp .env.production .env.local   # 仓库内现有环境模板为 .env.production，按需自建 .env.local
     ```
     *(注：纯 IP 局域网联机调试时，需在 Chrome 开启 `chrome://flags/#unsafely-treat-insecure-origin-as-secure` 以解禁 SharedArrayBuffer 内存共享限制)*
 3.  **启动容器:**

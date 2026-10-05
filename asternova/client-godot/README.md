@@ -2,7 +2,8 @@
 
 # 🌌 AsterNova Game Client (Godot Engine)
 
-   
+> ⚠️ **冻结状态声明（2026-08-30，文档补标 2026-10-05）**
+> 本目录是 AsterNova **第一代 Godot 客户端（WASM 形态）**，已**冻结为参考实现，不再开发**。下文描述的「服务端权威」架构为旧设计，仅供历史参考。新客户端开发在 [`asternova/client-godot-v2/`](../client-godot-v2/)（M2 主力）；架构定案见 [`docs/architecture.md`](../docs/architecture.md)。仍具参考价值的资产清单见 [FROZEN.md](FROZEN.md)。
 
 > **"Feel the impact, not the latency."** — 极致的 Web 端高频动作渲染引擎。
 
