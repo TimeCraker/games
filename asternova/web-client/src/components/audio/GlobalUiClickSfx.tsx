@@ -26,6 +26,9 @@ export function GlobalUiClickSfx() {
     return () => document.removeEventListener("pointerdown", playClick, true)
   }, [])
 
-  return <audio ref={audioRef} src={CLICK_SFX_SRC} preload="auto" />
+  // 性能优化 2026-10：preload="none"——此 WAV（144KB）挂在根布局、每页都载，
+  // 预载字节会挤占 Slow 4G 下的关键带宽；首次点击时 play() 自动触发加载，
+  // 仅极首次点击有可感知延迟，之后走浏览器缓存瞬时播放。
+  return <audio ref={audioRef} src={CLICK_SFX_SRC} preload="none" />
 }
 
