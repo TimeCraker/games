@@ -13,9 +13,9 @@ asternova/render-lab/
 │   ├── aster/                 # Aster 角色模型（基模工程与贴图）
 │   │   ├── aster_head_base_v2.blend   # 👑 当前最新工业级块面基模工程
 │   │   └── textures/          # 贴图（干净瓷肌 aster_body_texture.png 等）
-│   └── weapons/               # 武器与道具 3D 资产库
+│   └── weapons/               # （武器资产实际存放于 asternova/art/models/weapons/，见下行说明）
 │       └── aster_katana/      # Aster 专属佩刀「星霜月华」全套资产
-│           ├── aster_katana.blend         # 🗡️ Blender 5.2 建模源工程（双分件+描边）
+│           ├── aster_katana.blend         # 🗡️ Blender 5.2 建模源工程（双分件+描边）（实际路径 asternova/art/models/weapons/aster_katana/）
 │           ├── aster_katana.glb           # 📦 游戏标准 glTF 资产（899 面，116KB）
 │           ├── aster_katana_3d_viewer.html # 🌐 自包含 3D Web 检视器（双击秒开）
 │           ├── katana_preview.png         # 🖼️ 五视角高清合成验收看板
@@ -33,9 +33,7 @@ asternova/render-lab/
     ├── turnaround_capture.gd  # Godot 自动化三视图捕获脚本
     ├── screenshot_capture.gd  # Godot 三档画质自动跑分与截图脚本
     ├── weapon_viewer.gd       # 🗡️ 武器 360° Orbit 相机与 Tween 拔刀驱动脚本
-    ├── build_aster_katana_mesh.py # 佩刀自动化建模与 GLB 导出
-    ├── build_katana_texture.py    # 佩刀 2K NPR 贴图程序化绘制
-    └── generate_katana_web_viewer.py # 佩刀 3D Web 检视器生成器
+    └── （佩刀批处理脚本实际位于 asternova/scripts/pipeline/weapons/：build_aster_katana_mesh.py · build_katana_texture.py · generate_katana_web_viewer.py）
 ```
 
 ---
@@ -53,8 +51,9 @@ godot --path "asternova/render-lab" "res://scenes/turnaround_stage.tscn"
 # 运行黄昏商店街切片场景
 godot --path "asternova/render-lab" "res://scenes/street_sunset.tscn"
 
-# 使用本地 Blender 5.2.1 LTS 后台无头运行 Python 拓扑/贴图批处理脚本
-& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b "asternova/art/models/weapons/aster_katana/aster_katana.blend" -P "asternova/scripts/pipeline/weapons/build_aster_katana_mesh.py"
+# 使用本地 Blender 5.2.1 后台无头运行 Python 拓扑/贴图批处理脚本
+# （Blender 实际安装路径以 asternova/AGENTS.md §0 为准：C:\Users\TimeCraker\tools\blender\blender-5.2.1-windows-x64\blender.exe）
+& "C:\Users\TimeCraker\tools\blender\blender-5.2.1-windows-x64\blender.exe" -b "asternova/art/models/weapons/aster_katana/aster_katana.blend" -P "asternova/scripts/pipeline/weapons/build_aster_katana_mesh.py"
 ```
 
 ### 2. MCP 模式（前台可视化交互式协同）

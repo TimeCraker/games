@@ -42,6 +42,8 @@ flowchart TD
 | **细分 SOP** | [pipeline/modular_art_and_asset_production_sop.md](pipeline/modular_art_and_asset_production_sop.md) | 场景与道具资产指南：特定单体 Tripo + 几何手术，通用设施 Poly Haven MCP 直取 | **已生效** | `render-lab/models/`<br>`scripts/pipeline/environment/` |
 | **细分 SOP** | [pipeline/weapon-modeling-pipeline.md](pipeline/weapon-modeling-pipeline.md) | 3D 武器道具指南：星霜月华佩刀基准、零偏置双分件拔刀架构、轻量 899 三角面 | **已生效** | `art/characters/aster/`<br>`scripts/pipeline/weapons/` |
 | **细分 SOP** | [pipeline/trim_sheet_and_modular_spec.md](pipeline/trim_sheet_and_modular_spec.md) | 日系近未来 Trim Sheet 规范（仅适用于 Tier 1 地面 PBR；构件部分已废弃） | **收缩维护** | `render-lab/textures/` |
+| **细分 SOP** | [pipeline/character-art-generation-sop.md](pipeline/character-art-generation-sop.md) | 角色建模参考图生成与分层拆解 SOP（海报→素体→服装→头发→3D 模型五大目录规范） | **已生效** | 角色资产输入目录 |
+| **细分 SOP** | [pipeline/character-specification-requirements.md](pipeline/character-specification-requirements.md) | 二次元高精角色需求与精细度技术规范（头身比 / A-Pose / 生成与装配验收依据；含 2026-10-01 返工规则） | **已生效** | `art/characters/` |
 | **历史归档** | [archive/initial_prompt.md](archive/initial_prompt.md) | 早期角色建模任务的原始 Prompt 历史记录 | **已归档** | 历史备查 |
 
 ---
