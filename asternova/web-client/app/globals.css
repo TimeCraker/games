@@ -351,6 +351,38 @@ body {
   color: rgba(255, 255, 255, 0.5);
 }
 
+/* ===== 首页 CSS 先行入场动画（性能 2026-10） =====
+   LCP 元素（主标题）此前由 framer-motion 在 hydration 完成后才从 opacity:0 淡入，
+   Slow 4G 模拟下 LCP 被推迟到主包 JS 就绪（实测 5.4s，而 FCP 仅 1.1s）。
+   改为纯 CSS 动画：样式表到达后首帧即开始播放，完全不依赖 JS。
+   时长/延迟/缓动/位移/模糊与原 framer 版本逐项对齐，视觉等价；
+   prefers-reduced-motion 由上方全局 0.01ms 开关统一接管。 */
+@keyframes home-rise-blur {
+  from { opacity: 0; transform: translateY(18px); filter: blur(10px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes home-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes home-drop {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes home-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes home-zoom-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+.anim-home-rise-blur { animation: home-rise-blur 0.95s var(--ease-cinematic) 0.4s both; }
+.anim-home-rise-cta { animation: home-rise 0.7s var(--ease-cinematic) 1s both; }
+.anim-home-drop-header { animation: home-drop 0.6s var(--ease-cinematic) both; }
+.anim-home-fade-footer { animation: home-fade 1s var(--ease-cinematic) 1.4s both; }
+.anim-home-zoom-bg { animation: home-zoom-in 1.2s var(--ease-cinematic) 0.12s both; }
+
 /* ===== 动效 token ===== */
 :root {
   --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
