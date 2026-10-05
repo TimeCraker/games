@@ -2,6 +2,8 @@
 
 > 依据：`web-client/app/globals.css`（Stage A 深空黑体系）· `src/components/arcade/brand.ts`（街机品牌单一真源）。
 > 本文件是「审美有依据」的挂靠点。任何工艺改动必须引用此处规则或先补录规则，禁止拍脑袋。
+>
+> **台账序列沿革（2026-10-05 归一）**：UI 打磨历史上有两条并行台账——本目录（R 序列）与仓库根 `docs/ui-polish/`（S 序列，R5–S13，2026-09-25 用户叫停后归档）。本文件为唯一现行规则源，已并入 S 序列独有的媒体纪律、死样式纪律、时长 token 演进与工具链条目；S 序列完整台账见 [AUDIT.md](AUDIT.md) 的「S 序列归档」节。
 
 ## 1. 主题
 
@@ -48,7 +50,9 @@
 
 ## 6. 动效与排版
 
-- 时长 token：`--duration-fast: 200ms`（hover/微交互 150–300ms 区间）；缓动 `--ease-cinematic`。
+- 时长 token：`--duration-fast: 200ms`（hover/微交互 150–300ms 区间）；缓动 `--ease-instrument` / `--ease-cinematic`；氛围呼吸类循环动效统一 `--duration-ambient: 2600ms`（S7 起，lobby 光晕已挂接）；一次性装饰扫光/电影感过渡挂 `--duration-slow: 900ms`（S10 起，lobby 光痕由 0.88s 归一至该令牌）；低于秒级的重复闪烁禁用。
+- 媒体纪律（S13 起）：`<audio>/<video>` 组件必须在卸载 cleanup 显式 `pause()`——浏览器不会自动暂停被移出 DOM 的媒体元素（前台曾现「离开首页后黑洞 BGM 串场」）；portal 重建元素时同样要先停旧元素。
+- 死样式纪律（S11 起）：keyframes/工具类无任何组件引用即删（删繁就简）；删除前 grep 全仓取证。
 - 字体：正文 Geist Sans；数据/坐标 `font-mono-data`（JetBrains Mono + tnum）；品牌大字 Orbitron（`.aster-title`，颜色 `var(--paper)`）。
 - 间距/圆角走 token：`--radius` 阶梯、`max-w-aster`（1180px）容器。
 
@@ -68,6 +72,8 @@
 
 - `public/**` 已加入 eslint 忽略（Godot 导出产物与静态游戏，非手写源码）。
 - `typescript.ignoreBuildErrors: true` → build 通过 ≠ 类型正确，改动后跑 `npx tsc --noEmit` 或依赖 IDE。
+- S5 起：`next.config.ts` 已启用 `experimental.workerThreads`（沙箱禁管道 stdio 时 dev/build 的 fork 均 EPERM，线程模式通过）；第二序列打磨期站点用 `npm run build && node node_modules/next/dist/bin/next start -H 127.0.0.1 -p 4105 .`。
+- 审计脚本：零依赖 CDP 扫描器（第二序列用根级 `docs/ui-polish/tools/audit.mjs`，台账归档后位于仓库根 `docs/ui-polish/tools/`，未入库 git），产物落 `.ui-polish/artifacts/`（不进仓库）；改扫描器判定后同步 `.ui-polish/tools` 可执行副本。
 - 既有 tsc 报错基线（**别去动，也别拿它当新问题**）：`CinematicBlackHole.tsx` ×4（缺 @types/three）、
   `nebula-survivor/render/NebulaBackground.ts(61,17)`、`hooks/useMobileGameViewport.ts(40,105)`。
 - lint 基线：0 errors / 6 warnings（arena exhaustive-deps、fetch-arcade-art.mjs ×3、LoopingBgmControl、NebulaScene）。
