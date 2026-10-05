@@ -4,7 +4,6 @@ import dynamic from "next/dynamic"
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronRight } from "lucide-react"
-import { onIdle } from "@/src/lib/idle"
 import { LoopingBgmControl } from "@/src/components/audio/LoopingBgmControl"
 
 const CinematicBlackHole = dynamic(
@@ -22,24 +21,25 @@ export default function Home() {
   // 全屏 canvas 的首次绘制排在所有 JS 之后），TBT 同步下降。
   const [blackHoleReady, setBlackHoleReady] = useState(false)
   useEffect(() => {
-    // 性能优化 2026-10（第二轮）：单纯 idle 触发在快速网络下 hydration 一结束就命中
-    // （requestIdleCallback 几乎立刻返回），484KB three.js chunk + ~0.8s 的 WebGL
-    // 初始化长任务仍然砸在加载关键窗口里（ Slow 4G 模拟下挤占 LCP 带宽）。
-    // 新触发器：
+    // 性能优化 2026-10（第二轮）：兜底计时必须用真 setTimeout。此前两版
+    // （onIdle(2500) / onIdle(8000)）都踩了同一个坑：requestIdleCallback 的 timeout
+    // 语义是「最迟不超过」，空闲时几乎立刻命中——本机实测 hydration 后 ~300ms 就
+    // 拉取了 484KB three.js chunk，~0.8s 的 WebGL 初始化长任务照旧砸在加载关键窗口。
+    // 现行为：
     //  - 首次 pointerdown/pointermove/keydown 提前揭示——桌面访客头几秒必有指针移动，
-    //    观感接近原版即时挂载；触屏用户的首次点按同理。
-    //  - 8s 空闲兜底（onIdle timeout）——无交互（含无头测量）或静置的移动端在页面
-    //    完全安静后才开始下载/初始化场景，背景以纯黑 + 星图网格过渡，无感知断层。
+    //    观感≈即时挂载；触屏点按同理。
+    //  - 8s 硬下限 setTimeout——无交互/静置设备在页面完全安静后才加载场景，
+    //    期间背景为纯黑占位 + 星图网格，无感知断层。
     let cancelled = false
     const reveal = () => {
       if (!cancelled) setBlackHoleReady(true)
     }
-    const cancelIdle = onIdle(reveal, 8000)
+    const timer = window.setTimeout(reveal, 8000)
     const targets: Array<keyof WindowEventMap> = ["pointerdown", "pointermove", "keydown"]
     targets.forEach((t) => window.addEventListener(t, reveal, { once: true }))
     return () => {
       cancelled = true
-      cancelIdle()
+      window.clearTimeout(timer)
       targets.forEach((t) => window.removeEventListener(t, reveal))
     }
   }, [])
