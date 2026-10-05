@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { AnimatePresence, motion } from "framer-motion"
 import { StagePortal } from "@/src/components/game-shell/StagePortal"
 
 /* ============================================================================
@@ -436,15 +435,12 @@ export function LoopingBgmControl({
 
   const floating = variant !== "inline"
 
-  /** 音量面板：绝对定位的下拉/侧浮，展开不影响宿主布局宽度 */
+  /** 音量面板：绝对定位的下拉/侧浮，展开不影响宿主布局宽度。
+   *  性能 2026-10：入场动画改 CSS（.anim-bgm-panel），本组件不再依赖 framer-motion。 */
   const volumePanel = (
-    <motion.div
-      initial={reduceMotion ? false : { opacity: 0, scale: 0.96, x: floating ? 6 : 0, y: floating ? 0 : -6 }}
-      animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-      exit={reduceMotion ? undefined : { opacity: 0, scale: 0.96 }}
-      transition={{ duration: 0.18, ease: [0.32, 0.72, 0, 1] }}
+    <div
       className={[
-        "absolute z-20 flex items-center gap-2 border border-hud-line bg-ink-800/95 p-1.5 backdrop-blur-md",
+        "anim-bgm-panel absolute z-20 flex items-center gap-2 border border-hud-line bg-ink-800/95 p-1.5 backdrop-blur-md",
         "shadow-[0_10px_32px_rgba(0,0,0,0.55)]",
         floating ? "bottom-0 right-full mr-2 origin-bottom-right" : "right-0 top-full mt-2 origin-top-right",
       ].join(" ")}
@@ -489,7 +485,7 @@ export function LoopingBgmControl({
             })}
           </div>
         </div>
-      </motion.div>
+      </div>
   )
 
   const shell = (
@@ -497,7 +493,7 @@ export function LoopingBgmControl({
       <div className="flex items-center border border-hud-line bg-ink-800/85 p-1 shadow-[0_8px_28px_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-200 hover:border-hud-accent/40">
         {dial}
       </div>
-      <AnimatePresence>{open ? volumePanel : null}</AnimatePresence>
+      {open ? volumePanel : null}
     </div>
   )
 

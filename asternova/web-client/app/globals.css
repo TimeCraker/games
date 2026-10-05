@@ -383,6 +383,16 @@ body {
 .anim-home-fade-footer { animation: home-fade 1s var(--ease-cinematic) 1.4s both; }
 .anim-home-zoom-bg { animation: home-zoom-in 1.2s var(--ease-cinematic) 0.12s both; }
 
+/* BGM 音量面板挂载动画（性能 2026-10）：原为 framer-motion 0.18s 缩放淡入，
+   CSS 等价替换后 LoopingBgmControl 不再引 framer（首页关键路径少一个共享 chunk）。
+   仅保留入场动画，退场直接卸载（0.18s 内消失，不可感知）。方向性位移（floating 右移 /
+   inline 上移）在 0.18s 尺度下与纯缩放不可分辨，统一为缩放淡入。 */
+@keyframes bgm-panel-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.anim-bgm-panel { animation: bgm-panel-in 0.18s cubic-bezier(0.32, 0.72, 0, 1) both; }
+
 /* ===== 动效 token ===== */
 :root {
   --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
