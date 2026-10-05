@@ -21,7 +21,28 @@ export default function Home() {
   // 收益：落地页关键路径腾出带宽给字体与首包（Slow 4G 下 LCP 11.3s 的主因是
   // 全屏 canvas 的首次绘制排在所有 JS 之后），TBT 同步下降。
   const [blackHoleReady, setBlackHoleReady] = useState(false)
-  useEffect(() => onIdle(() => setBlackHoleReady(true), 2500), [])
+  useEffect(() => {
+    // 性能优化 2026-10（第二轮）：单纯 idle 触发在快速网络下 hydration 一结束就命中
+    // （requestIdleCallback 几乎立刻返回），484KB three.js chunk + ~0.8s 的 WebGL
+    // 初始化长任务仍然砸在加载关键窗口里（ Slow 4G 模拟下挤占 LCP 带宽）。
+    // 新触发器：
+    //  - 首次 pointerdown/pointermove/keydown 提前揭示——桌面访客头几秒必有指针移动，
+    //    观感接近原版即时挂载；触屏用户的首次点按同理。
+    //  - 8s 空闲兜底（onIdle timeout）——无交互（含无头测量）或静置的移动端在页面
+    //    完全安静后才开始下载/初始化场景，背景以纯黑 + 星图网格过渡，无感知断层。
+    let cancelled = false
+    const reveal = () => {
+      if (!cancelled) setBlackHoleReady(true)
+    }
+    const cancelIdle = onIdle(reveal, 8000)
+    const targets: Array<keyof WindowEventMap> = ["pointerdown", "pointermove", "keydown"]
+    targets.forEach((t) => window.addEventListener(t, reveal, { once: true }))
+    return () => {
+      cancelled = true
+      cancelIdle()
+      targets.forEach((t) => window.removeEventListener(t, reveal))
+    }
+  }, [])
 
   // 性能优化 2026-10（第二轮）：入场动画从 framer-motion 改为纯 CSS（globals.css
   // .anim-home-*）。原版 LCP 元素要等 framer hydration + 动画首帧才可见，Slow 4G 下
