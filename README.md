@@ -92,23 +92,28 @@ AsterNova 已按新栈重启（2026-08-31 重大定案：**单机优先 + 房主
 
 ```bash
 # Web 外壳（官网 / Arcade，现役）
-cd asternova/web-client && npm install && cp .env.development .env.local && npm run dev
+cd asternova/web-client && npm install && cp .env.production .env.local && npm run dev   # .env 模板本机持有、git 忽略不入库；新 clone 按需自建 .env.local
 
 # Go 后端（❄️ 一期封存：二期大型联机起点资产，本节仅二期重启时参考）
 # cd asternova/backend && docker compose up -d && go run main.go   # :8081，PG+Redis，自动 migrate up
 ```
 
 > 一期为单机优先架构：游戏本体（client-godot-v2，M2 启动）单机直接可玩，无需起后端。
+>
+> Windows 一键体验（仓库根 bat，需本机 Godot 4.7.2）：`启动AsterNova游戏体验.bat`（核心战斗沙盒 combat_playground）· `启动三角色动作测试.bat` / `启动白色静态样板.bat`（character_lab 角色审阅）。
 
 ## Monorepo
 
 ```
 games/asternova/
-├── docs/            # 蓝图三件套（BLUEPRINT / architecture / STYLE）← 开发决策锚点
+├── docs/            # 蓝图三件套（BLUEPRINT / architecture / STYLE）+ Stage Specs ← 开发决策锚点
 ├── web-client/      # Next.js 16 Game Shell + Arcade（现役，将演化为官网 + 托管壳）
-├── backend/         # Go · Gin · WS · PostgreSQL(sqlc + golang-migrate) · Redis
+├── backend/         # Go · Gin · WS · PostgreSQL(sqlc + golang-migrate) · Redis（❄️ 一期封存）
 ├── client-godot/    # 一代 Godot 客户端（已冻结，见 FROZEN.md）
-├── client-godot-v2/ # 新客户端（M2 主力开发中）
+├── client-godot-v2/ # 新客户端（M2 主力开发中，含 character_lab 角色审阅舞台）
+├── render-lab/      # M1 渲染垂直切片沙盒（建模源工程 / Toon Shader / 渲染舞台）
+├── art/             # 美术资产与定稿库（角色包 / 原画 / 同框验收件 / 返工工程）
+├── scripts/         # Blender/Godot 管线自动化（characters / environment / weapons）
 └── assets/          # 共享静态资源
 ```
 

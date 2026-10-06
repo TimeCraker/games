@@ -100,22 +100,26 @@ flowchart TD
 
 ```plaintext
 AsterNova-Server/
-├── proto/              # Protobuf 3 协议定义 (.proto) 与 pb.go 编译产物
 ├── services/           # 核心服务集群
-│   ├── auth/           # 账户生命周期、验证码限流、JWT 签发
+│   ├── auth/           # 账户生命周期、验证码限流、JWT 签发（含 db/sqlc 生成层）
 │   ├── gateway/        # 并发锁 (Mutex) Hub 状态管理、WebSocket 长连接收发
 │   ├── match/          # 独立 1Hz 异步撮合引擎
-│   └── battle/         # 60Hz 物理状态机、服务端权威运算逻辑
-├── test/               # 压测工具与网关路由模拟
+│   ├── battle/         # 60Hz 物理状态机、服务端权威运算逻辑
+│   └── proto/          # Protobuf 3 协议定义 (.proto) 与 pb.go 编译产物
+├── queries/            # sqlc SQL 声明（生成 services/auth/db/sqlc/）
+├── migrations/         # golang-migrate 迁移文件（up/down 成对，启动自动 up）
+├── sqlc.yaml           # sqlc 生成配置
+├── test/               # 手动压测客户端（test_client.go）
+├── docs/               # 生成脚本的全量快照（别手改）
 ├── main.go             # 进程入口、DB 挂载与后台守护协程初始化
-└── docker-compose.yml  # 本地容器化基建 (PostgreSQL, Redis)
+└── docker-compose.yml  # 本地容器化基建 (PostgreSQL, Redis, Qdrant)
 ```
 
 ## 🛠️ 快速启动
 
-1.  **拉起基建:** 确保已安装 Docker，启动 PostgreSQL 16 与 Redis 实例。
+1.  **拉起基建:** 确保已安装 Docker，启动 PostgreSQL 16、Redis 与 Qdrant 实例。
     ```bash
-    docker-compose up -d
+    docker compose up -d
     ```
 2.  **配置环境:** 复制 `.env.example` 为 `.env`,填入 `JWT_SECRET`、`SMTP_SECRET` 等密钥（一律环境变量，永不入库）;数据库连接串 `DATABASE_DSN` 缺省连本地 `game_dev` 库。
 3.  **启动网关与服务:** (进程启动时自动执行内嵌的 golang-migrate 迁移,幂等)

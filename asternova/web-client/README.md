@@ -64,7 +64,7 @@ flowchart TD
   * **唯一状态源 (Single Source of Truth):**
       * 引入 `Zustand` 作为外壳 UI 与内置游戏状态同步的唯一真相源，彻底杜绝了 DOM 状态与 Canvas 渲染状态脱节的“幽灵 Bug”。
   * **极致性能与网络压榨:**
-      * **Load Time 优化:** 利用 Next.js 响应头与服务端配置，强制开启 Brotli/Gzip 对 `.wasm` 与 `.pck` 包体进行极致压缩（体积缩减约 **30%-50%**），大幅降低首屏解析时间。
+      * **Load Time 优化:** 利用 Next.js 响应头与服务端配置，对 `.wasm` / `.pck` / `.js` 的 `.gz` 预压缩变体下发一年期 immutable 缓存头（体积缩减约 **30%-50%**），大幅降低首屏解析时间。
       * **60Hz 实时同步:** 跨过 Web 层的 HTTP 限制，由内嵌引擎模块直连 Go 后端，承载 `60FPS` 的 Protobuf 二进制状态帧收发。
   * **移动端物理级自适应 (Scale-to-Fit):**
       * 自研 `ScaleFitGameStage` 视口控制器。实时嗅探设备横纵比，基于 `1366x768` 强制计算 CSS Transform Matrix。彻底解决移动端浏览器软键盘遮挡、滑动回弹等原生冲突。
@@ -83,16 +83,18 @@ AsterNova-Web/
 │   │   └── audio/              # 全局音频上下文生命周期接管
 │   ├── hooks/                  # 视口矩阵流计算 Hook
 │   └── store/                  # Zustand 游戏状态总线
-└── next.config.ts              # WASM 资源的 Brotli 压缩与跨域隔离配置
+├── components/ · lib/          # shadcn/ui 组件体系
+├── scripts/                    # dev.mjs 等启动脚本
+└── next.config.ts              # WASM 资源的 Gzip 缓存头与跨域隔离配置
 ```
 
 ## 🚦 快速启动
 
-1.  **环境准备:** 确保本机已安装 Node.js 18+。
+1.  **环境准备:** 确保本机已安装 Node.js 20.9+（CI 用 24）。
 2.  **安装依赖与配置:**
     ```bash
     npm install
-    cp .env.production .env.local   # 仓库内现有环境模板为 .env.production，按需自建 .env.local
+    cp .env.production .env.local   # .env.production 为本机模板（git 忽略 .env* 不入库）；新 clone 需按需自建 .env.local
     ```
     *(注：纯 IP 局域网联机调试时，需在 Chrome 开启 `chrome://flags/#unsafely-treat-insecure-origin-as-secure` 以解禁 SharedArrayBuffer 内存共享限制)*
 3.  **启动容器:**

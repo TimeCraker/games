@@ -5,6 +5,8 @@ description: "AsterNova 游戏项目运维 - 部署、状态、日志、故障�
 
 # game-asternova
 
+> ⚠️ **历史参考（2026-10-06 补标）**：本文描述的是**线上旧版**（阿里云 · MySQL 时代）的运维知识，仅维护线上旧版时参考。当前仓库主线为 AsterNova 新栈（backend 一期封存、PG 已迁移、六仓已 subtree 并入本 monorepo），文内仓库结构（`TimeCraker/asternova-web-client` / `TimeCraker/game-backend-demo` 独立仓）、`mysql.go`、Redis 6380 硬编码等均为旧版栈路径，与现仓代码不一致；新栈部署以工作区 asterforge-deploy 体系为准。
+
 AsterNova 游戏项目全栈运维：前后端部署、服务器维护、故障排查。Git 是 source of truth。阿里云内存仅 1.6GB，**铁律：禁止在服务器上编译**。
 
 ## 执行协议

@@ -1,6 +1,6 @@
 # Stage Spec：M1 渲染垂直切片（美术验证件）
 
-> 状态：**待用户放行**（2026-08-30 起草）。上游锚点：[BLUEPRINT.md M1](../BLUEPRINT.md) · [architecture.md §1](../architecture.md) · [STYLE.md](../STYLE.md)（风格约束源）。
+> 状态：**待制作人终审**（2026-08-30 起草；2026-09-07 曾准予「阶段性基线放行」，2026-09-10 制作人复审判其作废——验收回到「制作人亲口说过」原标准，见 §评审结论）。上游锚点：[BLUEPRINT.md M1](../BLUEPRINT.md) · [architecture.md §1](../architecture.md) · [STYLE.md](../STYLE.md)（风格约束源）。
 > 本阶段**纯美术与渲染**，不含任何玩法逻辑与网络代码。
 
 ## 目标（一句话）

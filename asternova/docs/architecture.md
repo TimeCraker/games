@@ -6,7 +6,7 @@
 
 | 层 | 选型 | 关键说明 |
 |---|---|---|
-| 游戏引擎 | **Godot 4.7.x stable**（实际部署 `v4.7.2-stable.official`，钉死当前 stable 线） | C++ 引擎内核 + 脚本胶水；全局命令行通过 `godot.cmd` 调用 |
+| 游戏引擎 | **Godot 4.7.x stable**（实际部署 `v4.7.2-stable.official`，钉死当前 stable 线） | C++ 引擎内核 + 脚本胶水；无全局 `godot` 命令，按绝对路径调用（见 AGENTS.md §0） |
 | 客户端语言 | **GDScript 2.0（全静态强类型）** | 纯 PC 端游标准，零编译等待、秒级热重载手感调教；全变量/函数强制声明静态类型；预留未来 GDExtension C++/Rust 接口 |
 | 渲染风格 | **二次元双管线 + 混合光照体系（PBR 场景 + NPR 角色 + 实时直接光 vs 预烘焙探针间接光）** | 首要对标《明日方舟：终末地》，辅以《鸣潮》《星穹铁道》；冷峻双半球天光 + 45° 侧逆立体光 + AgX 色调映射 + 全分辨率 SSAO + SSR + Inverted Hull 描边 + SDF 面部解耦；直接光/动态阴影 100% 实时保障 120 FPS 手感，间接反弹光/环境反射走预烘焙探针保证通透与帧率（详见 STYLE.md §3） |
 | 渲染器 | **Forward+ (Vulkan Clustered)（2026-09-06 统一定案）** | PC 首发端游基线，120+ FPS 高刷；支持 Clustered 聚簇光照（彻底根除 gl_compatibility 2.88x 光照异常）、AgX 模式 4、全分辨率 SSAO、屏幕空间反射 SSR、盒投影 ReflectionProbe 与原生体积雾；低配通过画质档位平滑降级，绝不牺牲 PC 画面底座 |

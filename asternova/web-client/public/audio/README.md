@@ -16,6 +16,7 @@ Structure:
   - `merge/`
   - `nebula-survivor/`
   - `arena/`
+  - (`xiaoxiaole/` 路由已上线，音频目录按需增补)
 
 When referenced in code, use absolute public paths like:
 - `/audio/home/bgm-main.mp3`

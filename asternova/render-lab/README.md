@@ -1,6 +1,6 @@
 # Render Lab（渲染与建模试验场）
 
-> **定位**：AsterNova M1 阶段专属设立的独立 3D 建模与 Godot 4.7 渲染切片沙盒（Sandbox）。与游戏网络代码、复杂 UI 彻底隔离，专注二次元 NPR 卡渲品质打磨。
+> **定位**：AsterNova M1 阶段专属设立的独立 3D 建模与 Godot 渲染切片沙盒（Sandbox，工程特征 4.5 / 渲染 Forward+，与 client-godot-v2 的 4.7 工程并存）。与游戏网络代码、复杂 UI 彻底隔离，专注二次元 NPR 卡渲品质打磨。
 
 ---
 
@@ -8,18 +8,16 @@
 
 ```text
 asternova/render-lab/
-├── project.godot              # Godot 4.7.2 独立工程根配置
-├── models/                    # 3D 建模源工程与参考模型
-│   ├── aster/                 # Aster 角色模型（基模工程与贴图）
-│   │   ├── aster_head_base_v2.blend   # 👑 当前最新工业级块面基模工程
-│   │   └── textures/          # 贴图（干净瓷肌 aster_body_texture.png 等）
-│   └── weapons/               # （武器资产实际存放于 asternova/art/models/weapons/，见下行说明）
-│       └── aster_katana/      # Aster 专属佩刀「星霜月华」全套资产
-│           ├── aster_katana.blend         # 🗡️ Blender 5.2 建模源工程（双分件+描边）（实际路径 asternova/art/models/weapons/aster_katana/）
-│           ├── aster_katana.glb           # 📦 游戏标准 glTF 资产（899 面，116KB）
-│           ├── aster_katana_3d_viewer.html # 🌐 自包含 3D Web 检视器（双击秒开）
-│           ├── katana_preview.png         # 🖼️ 五视角高清合成验收看板
-│           └── textures/                  # 2K NPR 贴图图集（tex_katana_basecolor.png）
+├── project.godot              # 独立工程根配置（features "4.5"，rendering_method forward_plus）
+├── environments/              # 环境预设（endfield_studio_environment.tres 标准布光用 · sunset_environment.tres）
+├── materials/                 # PBR 材质库（.tres）
+├── polyhaven/                 # Poly Haven 素材缓存
+├── textures/                  # 平铺 PBR / Trim Sheet 贴图
+├── models/                    # 3D 模型与参考
+│   ├── aster/                 # Aster 装配模型（aster_assembled.glb + 贴图 + Tripo 源参考图）
+│   ├── environment/           # 环境单体（含 ground/ 铺装 PBR，见其 README）
+│   ├── lumina_plaza/          # 光辉广场街区资产
+│   └── props/                 # 街景道具
 ├── shaders/                   # 二次元卡渲着色器（Toon Shader）
 │   ├── toon_character.gdshader        # 角色主着色器（Toon Ramp + 色偏映射）
 │   ├── toon_hair.gdshader             # 头发着色器（各向异性天使光环）
@@ -28,12 +26,15 @@ asternova/render-lab/
 ├── scenes/                    # 场景与舞台
 │   ├── turnaround_stage.tscn  # 三视图同框验证专用舞台（前/后/侧/特写四机位）
 │   ├── weapon_viewer.tscn     # 🗡️ 武器 360° 实时交互检视舞台（支持拔刀/特写）
-│   └── street_sunset.tscn     # 黄昏樱花商店街切片场景
-└── scripts/                   # 自动化批处理与截图脚本
+│   ├── street_environment.tscn # 黄昏樱花商店街切片场景
+│   ├── main_stage.tscn · character_aster.tscn # 主舞台与 Aster 角色场景
+│   ├── lighting/              # 标准布光（endfield_lighting_studio.tscn）
+│   └── levels/                # 街区 review/sandbox 场景（m1_endfield_street · modern_residential_sandbox 等 6 个）
+└── scripts/                   # 自动化脚本（.gd 截图/检视 + Python 街区建设批处理）
     ├── turnaround_capture.gd  # Godot 自动化三视图捕获脚本
     ├── screenshot_capture.gd  # Godot 三档画质自动跑分与截图脚本
     ├── weapon_viewer.gd       # 🗡️ 武器 360° Orbit 相机与 Tween 拔刀驱动脚本
-    └── （佩刀批处理脚本实际位于 asternova/scripts/pipeline/weapons/：build_aster_katana_mesh.py · build_katana_texture.py · generate_katana_web_viewer.py）
+    └── build_*.py · remodel_*.py 等 # 街区/角色/贴图 Blender 批处理（武器管线在 asternova/scripts/pipeline/weapons/）
 ```
 
 ---
@@ -49,7 +50,7 @@ godot --path "asternova/render-lab" "res://scenes/weapon_viewer.tscn"
 godot --path "asternova/render-lab" "res://scenes/turnaround_stage.tscn"
 
 # 运行黄昏商店街切片场景
-godot --path "asternova/render-lab" "res://scenes/street_sunset.tscn"
+godot --path "asternova/render-lab" "res://scenes/street_environment.tscn"
 
 # 使用本地 Blender 5.2.1 后台无头运行 Python 拓扑/贴图批处理脚本
 # （Blender 实际安装路径以 asternova/AGENTS.md §0 为准：C:\Users\TimeCraker\tools\blender\blender-5.2.1-windows-x64\blender.exe）

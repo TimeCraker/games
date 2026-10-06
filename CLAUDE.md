@@ -36,7 +36,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 cd asternova/web-client
 npm install
-cp .env.development .env.local   # 仓库当前只有 .env.production；按需自建 .env.local
+cp .env.production .env.local   # 模板在本机、被 git 忽略（.gitignore .env*，新 clone 没有）；新环境按需自建 .env.local
 npm run dev      # 走 scripts/dev.mjs，默认 next dev --webpack
 npm run build && npm run start && npm run lint
 ```
@@ -60,7 +60,7 @@ go run main.go          # 监听 :8081，启动时自动 migrate up（内嵌 gol
 
 **存储层**：SQL 只在 `queries/*.sql` 声明 → `sqlc generate` 生成 `services/auth/db/sqlc/`（产物入库，业务禁止手写内联 SQL）；迁移文件 `migrations/`（golang-migrate 格式，up/down 成对，启动时 embed 后自动 up）；玩家存档类数据用 JSONB 列 + payload 内 schema_version（见 `player_positions` 表与 `posPayload`）。
 
-**测试现状**：`services/` 下已有 9 包单测（auth 全域 + battle + gateway + match + proto，`go test ./...` 全绿）；端到端验证仍需起服务打真实流量（`/health`、`/api/guest-login`（需 env `GUEST_INVITE_CODE`，未配置返回 503 禁用）、双端进房快照流，`test/test_client.go` 为手动压测客户端）。M2 起引入确定性回放测试（输入流回放比对快照 hash）。`docs/`、`*_all_code_merged.txt` 是生成脚本的全量快照，别手改。
+**测试现状**：`services/` 下已有 8 包单测（auth 域 4 包 + battle + gateway/handlers + match + proto，`go test ./...` 全绿）；端到端验证仍需起服务打真实流量（`/health`、`/api/guest-login`（需 env `GUEST_INVITE_CODE`，未配置返回 503 禁用）、双端进房快照流，`test/test_client.go` 为手动压测客户端）。M2 起引入确定性回放测试（输入流回放比对快照 hash）。`docs/`、`*_all_code_merged.txt` 是生成脚本的全量快照，别手改。
 
 ### `asternova/client-godot/` — 一代 Godot 客户端（❄️ 已冻结）
 
@@ -72,14 +72,14 @@ go run main.go          # 监听 :8081，启动时自动 migrate up（内嵌 gol
 
 ### `asternova/art/` — 美术与角色资产库（自包含角色包 / 模型 / 场景贴图）
 
-`characters/aster/`（Aster 完整自包含包：设定档 `aster.md` + 官方定稿三视图 `turnaround-final.png`）· `environments/`（场景原画与贴图）· `ui/`（游戏界面资产）。
+`characters/`（`aster/` 完整自包含包：设定档 `aster.md` + 定稿三视图 `turnaround-final.png`；`white/` `purple/` 返工工程进行中，`orange/` 仅主模型待启动；`rigging-review/` 装配验收）· `models/`（源模型）· `references/`（`map_style/` 31 张场景参考图，STYLE.md 唯一肉眼验收标尺）· `comparisons/` `render_previews/` `textures/`（同框对比 / 渲染预览 / 贴图）· `ui/`（游戏界面资产）。
 
 ### `asternova/assets/` — 共享静态资源（logo / 架构图 / 压测图表 / README 引用）
 
 ## 遗留与陷阱（subtree 带来的旧文件，勿误读）
 
 - **旧 AI 规则文件已全部清除**（2026-08-30）：三份 `.cursorrules` 与 `.roo/rules/*`（backend_rules.md 为旧 Cursor 规则的原样复制）均已删除，勿再引入。有效规则 = 全局 rules + 本文件 + docs/ 蓝图。
-- **CI 是死文件**：`backend/.github/workflows/ci.yml` 与 `web-client/.github/workflows/ci.yml` 不被 GitHub 执行（Actions 只认仓库根 `.github/workflows/`，本仓库没有）→ **当前无生效 CI**。建真 CI 时放仓库根，两份旧文件可作模板（backend：vet/test/build；web-client：lint non-blocking + build）。
+- **CI 已生效（2026-10-03 起）**：仓库根 `.github/workflows/ci.yml` 在 push/PR 触及 `asternova/web-client/**` 或自身时跑 web-client lint（非阻塞）+ build（npm ci，Node 24）。backend 无 CI（一期封存，不部署不开发）；原子目录级死 CI 配置已于 2026-09-30 删除（`c5667ae`）。
 - **旧版线上运维知识**在 `backend/.agents/skills/game-asternova/SKILL.md`：线上旧版跑在阿里云（game.asterforge.top → :3001 / api.asterforge.top → :8081，CynosDB MySQL + Redis :6380），服务器内存仅 1.6GB、**禁止在服务器编译**（本地交叉编译后上传）——仅维护线上旧版时参考；新栈部署以工作区 asterforge-deploy 体系为准。
 ## 工作约定
 

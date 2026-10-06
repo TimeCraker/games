@@ -13,7 +13,7 @@
 | `road_marking_edge_decal.png` (+ `_roughness`) | 512×2048 RGBA | **0.2m 宽 × 0.8m 长** 纵向无缝 | 白漆 #E8ECF0，2px 亚像素倒角；rough 0.55 |
 | `manhole_cover_decal.png` (+ `_normal/_roughness/_metallic`) | 1024² RGBA | 0.97m 正圆井盖 | 铸铁 #34373D，16 螺栓孔 / 齿纹雨水凹槽 / 星形水道局徽章；rough 0.42 / metallic 0.45 |
 
-## Godot 4.7 用法（Forward+ / ACES）
+## Godot 用法（Forward+ / ACES，render-lab 工程特征 4.5）
 
 着色器 `toon_ground_pbr.gdshader`：`use_world_uv = true` + `world_uv_period` =
 上表世界尺寸。**无 EMISSION 伪天光**（纠偏令）：天光反射由 roughness +

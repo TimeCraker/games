@@ -4,6 +4,7 @@
 
 > ⚠️ **冻结状态声明（2026-08-30，文档补标 2026-10-05）**
 > 本目录是 AsterNova **第一代 Godot 客户端（WASM 形态）**，已**冻结为参考实现，不再开发**。下文描述的「服务端权威」架构为旧设计，仅供历史参考。新客户端开发在 [`asternova/client-godot-v2/`](../client-godot-v2/)（M2 主力）；架构定案见 [`docs/architecture.md`](../docs/architecture.md)。仍具参考价值的资产清单见 [FROZEN.md](FROZEN.md)。
+> 注：文内导出路径 `../asternova-web-client/...` 为 subtree 合并前的旧仓名；现行等价路径为 `asternova/web-client/public/godot/`（`export_presets.cfg` 中的旧路径同样如此，重用导出预设时需改指新路径）。
 
 > **"Feel the impact, not the latency."** — 极致的 Web 端高频动作渲染引擎。
 

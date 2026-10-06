@@ -36,8 +36,15 @@ flowchart TD
 | **技术底座** | [architecture.md](architecture.md) | 核心技术选型、房主权威闭环、UI分界、网络选路、红线基线、MCP 双模协同 | **v1.0 定案** | `client-godot-v2/`<br>`backend/` (二期) |
 | **美学基准** | [STYLE.md](STYLE.md) | 配色 Hex 标定、Aster 角色形体、武器规范、冷峻天光母版、Forward+ 渲染四件套 | **M1 定型** (生成不设上限) | `render-lab/`<br>`art/` |
 | **内容储备** | [CONTENT_BACKLOG.md](CONTENT_BACKLOG.md) | 趣味互动彩蛋、后续角色设计、拓展流派、长线玩法构思池（不干扰主线极简） | **持续演进** | 备忘录 |
-| **阶段施工** | [stage-specs/m1-render-vertical-slice.md](stage-specs/m1-render-vertical-slice.md) | M1 渲染垂直切片施工单：日漫清新街区场景 + Aster 渲染验收标准 | **推进中** | `render-lab/` |
-| **阶段施工** | [stage-specs/m2-transport-and-v2-skeleton.md](stage-specs/m2-transport-and-v2-skeleton.md) | M2 战斗骨架施工单：高响应身法、四段流光刀术、软吸附、双视角、Transport 抽象 | **推进中** (69 项门禁全绿) | `client-godot-v2/` |
+| **阶段施工** | [stage-specs/m1-render-vertical-slice.md](stage-specs/m1-render-vertical-slice.md) | M1 渲染垂直切片施工单：日漫清新街区场景 + Aster 渲染验收标准 | **推进中**（09-10 基线放行作废，待制作人终审） | `render-lab/` |
+| **阶段施工** | [stage-specs/m2-transport-and-v2-skeleton.md](stage-specs/m2-transport-and-v2-skeleton.md) | M2 战斗骨架施工单：高响应身法、四段流光刀术、软吸附、双视角、Transport 抽象 | **推进中** (2026-09-10 快照 69 项门禁全绿，后持续扩容) | `client-godot-v2/` |
+| **阶段施工** | [stage-specs/three-character-assembly-rigging.md](stage-specs/three-character-assembly-rigging.md) | 白/橙/紫三角色装配与动作验证施工单（工程 6/6 交付、美术未过转返工） | **被返工取代** | `art/characters/`<br>`client-godot-v2/scenes/character_lab/` |
+| **阶段施工** | [stage-specs/character-art-rework.md](stage-specs/character-art-rework.md) | 三角色静态美术返工施工单（白色静态样板确认门；配套交接 [character-art-rework-handoff.md](stage-specs/character-art-rework-handoff.md)） | **当前主线·推进中** | `art/characters/white/` |
+| **阶段施工** | [stage-specs/purple-character-rework.md](stage-specs/purple-character-rework.md) | 紫色角色独立返工（单独授权并行；旧轮失败方案见 [purple-character-rework-handoff.md](stage-specs/purple-character-rework-handoff.md)） | **推进中**（5/8，待用户确认） | `art/characters/purple/rework/source_repair/` |
+| **阶段草案** | [stage-specs/web-client-perf2-content.md](stage-specs/web-client-perf2-content.md) | web-client 性能二期 + 官网内容化（Perf 55+→70+） | **DRAFT 待评审** | `web-client/` |
+| **游戏锚点** | [shoot-them-all-whitepaper.md](shoot-them-all-whitepaper.md) · [shoot-them-all-art-bible.md](shoot-them-all-art-bible.md) | 《弹珠风暴》玩法白皮书与美术圣经（完全重制定稿） | **已定稿** | `web-client/app/shoot-them-all/` |
+| **游戏锚点** | [nebula-survivor-whitepaper.md](nebula-survivor-whitepaper.md) · [nebula-survivor-ui-spec.md](nebula-survivor-ui-spec.md) | 《星域突围》玩法白皮书（v2 施工化）与 UI 设计规格 | **已定稿** | `web-client/app/nebula-survivor/` |
+| **UI 工艺** | [ui-polish/rules.md](ui-polish/rules.md) · [ui-polish/AUDIT.md](ui-polish/AUDIT.md) | web-client UI 打磨现行规则源与审计台账（R 序列现行，S5–S13 归档） | **现行** | `web-client/`<br>`docs/ui-polish/` |
 | **细分 SOP** | [pipeline/character-modeling-pipeline.md](pipeline/character-modeling-pipeline.md) | 3D 二次元角色工业化指南：8.5 头身鸣潮级体态、SDF 极净面部阴影、逐阶段装配、蒙皮与动作验证 | **已生效** | `art/characters/`<br>`scripts/pipeline/` |
 | **细分 SOP** | [pipeline/modular_art_and_asset_production_sop.md](pipeline/modular_art_and_asset_production_sop.md) | 场景与道具资产指南：特定单体 Tripo + 几何手术，通用设施 Poly Haven MCP 直取 | **已生效** | `render-lab/models/`<br>`scripts/pipeline/environment/` |
 | **细分 SOP** | [pipeline/weapon-modeling-pipeline.md](pipeline/weapon-modeling-pipeline.md) | 3D 武器道具指南：星霜月华佩刀基准、零偏置双分件拔刀架构、轻量 899 三角面 | **已生效** | `art/characters/aster/`<br>`scripts/pipeline/weapons/` |
