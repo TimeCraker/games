@@ -25,4 +25,4 @@ ReflectionProbe(box_projection) 自然呈现；`ambient_fill` 为自定义 light
 纵深 2.6m、0.45m 白条（世界 z 驱动，坡道底部）。
 井盖：`Cylinder_086/.087` 无盖空心管运行时加盖贴花圆盘（GLB z 镜像后世界 (-2.2,+18)）；
 悬空红环装饰按节点名隐藏（Mirror/Ring/Torus + Cylinder_16/17/18/19/2 前缀）。
-像素红线验收：`scripts/pipeline/environment/check_ground_review_pixels.py`。
+验收看实机截图（`tests/lighting_preview.tscn`），由制作人判断。

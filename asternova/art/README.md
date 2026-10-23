@@ -20,12 +20,12 @@ asternova/art/
 │   ├── neighborhood/   # M1 街区源模型（街区、便利店、自动售货机），游戏里用的是 client-godot-v2 的副本
 │   └── lumina_plaza/   # 旧光映广场源模型（游戏内已删除，留作素材）
 ├── references/         # 参考图（map_style/ 场景风格参考、便利店/售货机/地面/免费道具参考）
-├── textures/           # 场景贴图源
+├── textures/           # .blend 源文件外链的贴图（改名或移动会让 .blend 丢贴图）
+│   ├── nextgen_pbr/    #   M1 街区 modern_japan_neighborhood.blend 用
+│   └── lumina_plaza/   #   光映广场 lumina_plaza_masterpiece.blend 用
 ├── ui/                 # 游戏界面资产
 └── render_previews/    # 引擎实拍预览
-    ├── lighting/       # 四套光照预设实拍（docs/pipeline/lighting-guide.md）
-    ├── environment/    # 环境单体
-    └── scenes/         # 场景
+    └── lighting/       # 四套光照预设实拍（docs/pipeline/lighting-guide.md）
 ```
 
 ---
