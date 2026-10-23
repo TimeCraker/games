@@ -17,7 +17,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [x] **backend 迁移 PostgreSQL**（弃 GORM/MySQL → sqlc + golang-migrate，本地开发数据直接弃，module 改名 `github.com/TimeCraker/asternova-backend`）
 - [x] STYLE.md 随 M1 大部分定稿（面数策略 2026-09-10 修订：AI 生成资产**生成阶段不设上限**、取 Tripo 最高档、LOD 后置）
 - [x] **文档收敛手术（2026-09-10）**：废黜 HANDOVER.md 与旧角色计划书（git 历史可恢复）；全仓统一面数 / 材质 / M1 验收口径；**建模视觉闭环铁律**入 AGENTS.md 与 architecture §9（审美操作走 Blender MCP + 每步截图多模态自查；无头脚本仅限非审美批处理；一个资产一个 Agent）
-- 当前状态以 `asternova/docs/README.md` §1 为准。简述：光照预设待制作人确认（`docs/pipeline/lighting-guide.md`）；角色地基待制作人选定（`docs/pipeline/character-pipeline.md` §3），选定前不做角色；**M1** 场景未终审「过」；**M2** 战斗（连击/卡肉/极闪/动画树）在人偶上可跑，Transport 与联机未启动
+- 当前状态以 `asternova/docs/README.md` §1 为准。简述：光照四套预设已确认为基线、随场景调整（`docs/pipeline/lighting-guide.md`）；角色地基待制作人选定（`docs/pipeline/character-pipeline.md` §3），选定前不做角色；**M1** 场景未终审「过」；**M2** 战斗（连击/卡肉/极闪/动画树）在人偶上可跑，Transport 与联机未启动
 
 ## 整体架构（big picture）
 

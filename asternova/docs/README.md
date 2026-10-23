@@ -28,7 +28,8 @@
 **场景与光照（M1）**
 
 - 街区场景 `scenes/levels/m1_street.tscn`：便利店、自动售货机、街道道具、樱花，从 render-lab 迁入。
-- 光照系统 `LightingRig` + 四套预设（晴天、黄昏、阴天、夜晚），实拍见 `art/render_previews/lighting/`。**待用户看图确认作为标准**。
+- 光照系统 `LightingRig` + 四套预设（晴天、黄昏、阴天、夜晚），实拍见 `art/render_previews/lighting/`。**2026-10-23 用户确认为基线**，后续随实际场景建模调整，不定死。
+- 关卡只剩 `combat_playground`（战斗沙盒，主场景）和 `m1_street`（M1 街区）；旧的光映广场与住宅区沙盒已删除，广场原始模型在 `art/models/lumina_plaza/`。
 - 场景材质已去掉自定义 `light()` 光照补偿，统一让引擎算光照。
 - 场景整体美术（信息密度、贴图、招牌）尚未通过用户终审。
 

@@ -3,7 +3,7 @@
 > 状态：**待制作人终审**（2026-08-30 起草；2026-09-07 曾准予「阶段性基线放行」，2026-09-10 制作人复审判其作废——验收回到「制作人亲口说过」原标准，见 §评审结论）。上游锚点：[BLUEPRINT.md M1](../BLUEPRINT.md) · [architecture.md §1](../architecture.md) · [STYLE.md](../STYLE.md)（风格约束源）。
 > 本阶段**纯美术与渲染**，不含任何玩法逻辑与网络代码。
 >
-> **2026-10-23 校正**：载体由 `render-lab/` 改为 `client-godot-v2/`（街区迁入 `scenes/levels/m1_street.tscn`，render-lab 删除）；光照改由 `LightingRig` + 四套预设统一（[lighting-guide.md](../pipeline/lighting-guide.md)），待制作人看图确认；角色线的 AI 分件生成路线已废弃，改按 [character-pipeline.md](../pipeline/character-pipeline.md)，地基待定。下文 A0、A.1 中关于角色的旧链路描述以本条为准。
+> **2026-10-23 校正**：载体由 `render-lab/` 改为 `client-godot-v2/`（街区迁入 `scenes/levels/m1_street.tscn`，render-lab 删除）；光照改由 `LightingRig` + 四套预设统一（[lighting-guide.md](../pipeline/lighting-guide.md)），制作人已确认为基线、随场景调整；角色线的 AI 分件生成路线已废弃，改按 [character-pipeline.md](../pipeline/character-pipeline.md)，地基待定。下文 A0、A.1 中关于角色的旧链路描述以本条为准。
 
 ## 目标（一句话）
 
@@ -63,7 +63,7 @@
 载体：`asternova/client-godot-v2/`，场景 `scenes/levels/m1_street.tscn`（原在 render-lab，2026-10-23 迁入）。
 
 1. 双管线底座：**Forward+ (Vulkan Clustered)** + **AgX** + 场景 PBR（不接管光照）+ 角色 toon ramp 色阶 + Inverted Hull 描边 + SSAO + SSR（SDF 面部阴影为目标）
-2. 光照：`LightingRig` + `lighting/presets/` 四套预设（晴/黄昏/阴/夜）+ 店门口盒投影 ReflectionProbe ✅ 已落地，待制作人确认
+2. 光照：`LightingRig` + `lighting/presets/` 四套预设（晴/黄昏/阴/夜）+ 店门口盒投影 ReflectionProbe ✅ 已落地，2026-10-23 制作人确认为基线（随场景调整）
 3. 樱花花瓣粒子系统（GPU 粒子）与街道自发光（自动贩卖机橱窗点光源）✅
 4. 三档画质（低/中/高）运行时可切：低=关后处理+降阴影，高=全特效——**每档出独立截图与帧率**（render-lab 的旧实现未迁入，需基于 LightingRig 重做）
 5. 相机：固定展示位 + 简易 orbit（验证材质在不同角度的表现）
