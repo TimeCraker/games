@@ -13,8 +13,8 @@ bin can never leak emission - only the drink-showcase interior lights up:
 
 Run: python build_vending_emission_mask.py
 Inputs : art/models/neighborhood/props/vending_machine/vending_machine_dual.glb
-         render-lab/models/environment/vending_machine_dual_4k_albedo.jpg
-Outputs: render-lab/models/environment/vending_machine_dual_emission_mask.png (1024, L)
+         client-godot-v2/models/environment/vending_machine_dual_4k_albedo.jpg
+Outputs: client-godot-v2/models/environment/vending_machine_dual_emission_mask.png (1024, L)
          %TEMP%/vm_mask_overlay.jpg (debug: mask in red over albedo)
 """
 import json
@@ -26,8 +26,8 @@ from PIL import Image
 
 REPO = r"C:\Users\TimeCraker\Desktop\my_workspace\games\asternova"
 GLB = os.path.join(REPO, r"art\models\neighborhood\props\vending_machine\vending_machine_dual.glb")
-ALBEDO = os.path.join(REPO, r"render-lab\models\environment\vending_machine_dual_4k_albedo.jpg")
-OUT_MASK = os.path.join(REPO, r"render-lab\models\environment\vending_machine_dual_emission_mask.png")
+ALBEDO = os.path.join(REPO, r"client-godot-v2\models\environment\vending_machine_dual_4k_albedo.jpg")
+OUT_MASK = os.path.join(REPO, r"client-godot-v2\models\environment\vending_machine_dual_emission_mask.png")
 OUT_OVERLAY = os.path.join(os.environ.get("TEMP", r"C:\Temp"), "vm_mask_overlay.jpg")
 
 RES = 1024

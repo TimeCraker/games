@@ -1,5 +1,8 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_disabled, ambient_light_disabled;
+render_mode blend_mix, depth_draw_opaque, cull_disabled;
+
+// 环境光、GI 与反射由引擎按当前 LightingPreset 提供；light() 只负责直射光的色阶化，
+// 暗部亮度跟随光源强度变化，不写固定底色（否则换光照预设时角色会脱离场景）。
 
 // --- 基础属性 ---
 group_uniforms BaseColor;
@@ -20,9 +23,8 @@ group_uniforms ToonShading;
 uniform vec4 shadow_tint : source_color = vec4(0.72, 0.76, 0.88, 1.0); // 日系冷蓝/淡紫暗部偏色
 uniform float ramp_threshold : hint_range(0.0, 1.0, 0.01) = 0.48; // 主明暗交界线 (Half-Lambert)
 uniform float ramp_smoothness : hint_range(0.001, 0.3, 0.005) = 0.03; // 阴影羽化硬度
-uniform float shadow_strength : hint_range(0.0, 1.0, 0.05) = 0.60; // 阴影冷调深度
-uniform float ambient_intensity : hint_range(0.0, 1.0, 0.02) = 0.58; // 受控 NPR 暗部底色
-uniform float direct_intensity : hint_range(0.0, 1.5, 0.05) = 0.42;  // 主光受光面漫反射系数
+uniform float shadow_strength : hint_range(0.0, 1.0, 0.05) = 0.60; // 暗部比亮部暗多少（1 = 暗部只剩环境光）
+uniform float direct_intensity : hint_range(0.0, 1.5, 0.05) = 1.0;  // 主光受光面漫反射系数
 
 // --- 二次元边缘光 (Rim Light) ---
 group_uniforms RimLight;
@@ -105,16 +107,11 @@ void light() {
 	// 2. 赛璐璐阶梯计算
 	float w = ramp_smoothness * 0.5;
 	float lit_mask = smoothstep(ramp_threshold - w, ramp_threshold + w, light_term);
-	float mid_mask = smoothstep(0.22 - w, 0.22 + w, light_term);
 
-	// 2.1 受控 NPR 暗部（不受 ATTENUATION 衰减归零，确保自身阴影区通透柔和，绝无脏黑死影）
-	vec3 ambient_base = shadow_tint.rgb * ambient_intensity;
-	vec3 shadow_mid = shadow_tint.rgb * (ambient_intensity + 0.12 * (1.0 - shadow_strength));
-	vec3 ambient_color = mix(ambient_base, shadow_mid, mid_mask);
-
-	// 2.2 直接光照（受阴影图与主光遮蔽影响）
+	// 2.1 直射光：亮部取全光，暗部取冷调的一小份同一光源
 	float direct_term = lit_mask * ATTENUATION;
-	vec3 direct_color = LIGHT_COLOR * direct_intensity * direct_term;
+	vec3 shade = mix(shadow_tint.rgb * (1.0 - shadow_strength), vec3(1.0), direct_term);
+	vec3 direct_color = LIGHT_COLOR * direct_intensity * shade;
 
 	// 3. 二次元边缘轮廓光 (Rim Light) - 仅在受光侧轻柔呈现
 	vec3 rim_contribution = vec3(0.0);
@@ -140,7 +137,6 @@ void light() {
 		strand_contribution = strand * hair_spec_color.rgb * LIGHT_COLOR * 0.20;
 	}
 
-	// 5. 漫反射与高光合成（暗部通透，亮部饱满，总和严格维持在 0.88~0.98，原厂 4K 贴图色彩分明）
-	DIFFUSE_LIGHT += ALBEDO * (ambient_color + direct_color);
+	DIFFUSE_LIGHT += ALBEDO * direct_color;
 	SPECULAR_LIGHT += specular_contribution + rim_contribution + strand_contribution;
 }

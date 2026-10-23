@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="LightingPreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://lighting/lighting_preset.gd" id="1_preset"]
+
+[resource]
+script = ExtResource("1_preset")
+display_name = "阴天 · 柔和漫射"
+sun_elevation = 55.0
+sun_azimuth = 150.0
+sun_color = Color(0.92, 0.95, 1, 1)
+sun_energy = 0.35
+sun_angular_size = 4.0
+sky_top_color = Color(0.56, 0.60, 0.66, 1)
+sky_horizon_color = Color(0.78, 0.80, 0.83, 1)
+ground_horizon_color = Color(0.62, 0.63, 0.65, 1)
+ground_bottom_color = Color(0.28, 0.28, 0.30, 1)
+sky_energy = 1.2
+ambient_energy = 1.1
+ambient_sky_contribution = 1.0
+exposure = 1.0
+contrast = 1.05
+saturation = 0.92
+sdfgi_enabled = true
+sdfgi_energy = 1.2
+sdfgi_bounce = 0.5
+ssao_intensity = 2.2
+ssao_radius = 1.2
+fog_color = Color(0.74, 0.76, 0.80, 1)
+fog_density = 0.008
+fog_aerial_perspective = 0.5
+fog_sun_scatter = 0.0
+glow_intensity = 0.2
+glow_threshold = 1.4
+practical_light_scale = 0.8

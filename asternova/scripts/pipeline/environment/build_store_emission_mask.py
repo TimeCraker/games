@@ -13,8 +13,8 @@ equipment can never leak emission - only the fascia lightbox band glows:
 
 Run: python build_store_emission_mask.py
 Inputs : art/models/neighborhood/buildings/convenience_store/convenience_store.glb
-         render-lab/models/environment/convenience_store/tex_convenience_store_basecolor.jpg
-Outputs: render-lab/models/environment/convenience_store/convenience_store_emission_mask.png (2048, L)
+         art/models/neighborhood/buildings/convenience_store/textures/tex_convenience_store_basecolor.jpg
+Outputs: client-godot-v2/models/environment/convenience_store/convenience_store_emission_mask.png (2048, L)
          %TEMP%/cs_mask_overlay.jpg (debug: mask in red over albedo)
 """
 import json
@@ -29,10 +29,10 @@ GLB = os.path.join(
     REPO, r"art\models\neighborhood\buildings\convenience_store\convenience_store.glb"
 )
 ALBEDO = os.path.join(
-    REPO, r"render-lab\models\environment\convenience_store\tex_convenience_store_basecolor.jpg"
+    REPO, r"art\models\neighborhood\buildings\convenience_store\textures\tex_convenience_store_basecolor.jpg"
 )
 OUT_MASK = os.path.join(
-    REPO, r"render-lab\models\environment\convenience_store\convenience_store_emission_mask.png"
+    REPO, r"client-godot-v2\models\environment\convenience_store\convenience_store_emission_mask.png"
 )
 OUT_OVERLAY = os.path.join(os.environ.get("TEMP", r"C:\Temp"), "cs_mask_overlay.jpg")
 

@@ -7,13 +7,13 @@ reads as dead-black regions from every interior camera. This script
 rasterizes the calibrated glb into UV space, gates texels to interior-facing
 geometry (normal points at the store core + inside the volume + near-vertical),
 then applies a warm gamma lift to exactly those texels of the 8K albedo.
-The raw atlas in art/ stays untouched; render-lab gets a derived game texture
+The raw atlas in art/ stays untouched; client-godot-v2 gets a derived game texture
 that convenience_store_npr_setup.gd binds instead of the embedded one.
 
 Run: python build_store_game_albedo.py
 Inputs : art/models/neighborhood/buildings/convenience_store/convenience_store.glb
          art/models/neighborhood/buildings/convenience_store/textures/tex_convenience_store_basecolor.jpg
-Outputs: render-lab/models/environment/convenience_store/convenience_store_albedo_game.jpg
+Outputs: client-godot-v2/models/environment/convenience_store/convenience_store_albedo_game.jpg
          %TEMP%/cs_interior_mask_overlay.jpg (debug overlay)
 """
 import json
@@ -31,7 +31,7 @@ RAW_ALBEDO = os.path.join(
     REPO, r"art\models\neighborhood\buildings\convenience_store\textures\tex_convenience_store_basecolor.jpg"
 )
 OUT_ALBEDO = os.path.join(
-    REPO, r"render-lab\models\environment\convenience_store\convenience_store_albedo_game.jpg"
+    REPO, r"client-godot-v2\models\environment\convenience_store\convenience_store_albedo_game.jpg"
 )
 OUT_OVERLAY = os.path.join(os.environ.get("TEMP", r"C:\Temp"), "cs_interior_mask_overlay.jpg")
 

@@ -27,9 +27,6 @@ const MANHOLE_COVER_SIZE := 1.01        # 圆盘边长: 贴花圆盘直径 0.956
 var _textures: Dictionary = {}
 var _cover_sealed := false          # 086/087 共用一枚井盖圆盘, 防同位双盘 z-fighting
 
-## M1 Forward+ AgX 母版标定开关 (与 render-lab 同步); 默认走 Filmic 评审分支
-@export var agx_light_master := false
-
 
 func _ready() -> void:
 	_load_textures()
@@ -106,22 +103,8 @@ func _setup_mesh(mi: MeshInstance3D, zone_name: String) -> void:
 	var tex: Dictionary = _textures[group]
 	# 沥青法线深度 0.8~1.0 (纠偏令: 骨料咬合感 + SSAO); 方砖/盲道保持 0.14 细腻微倒角
 	var normal_depth := 0.9 if group == "asphalt" else 0.14
-	# 沥青 gain 0.85 (纠偏令正常物理区间); 方砖/盲道白场亮 (STYLE #D5D8DC~#E0E0E8),
-	# 用 0.5 调和 217 (0.85) 像素硬线 => 强光下砖面纹理与拼缝依然可读
-	# 地面材质增益按 render-lab 标定同步 (0.84 压暗作弊删除后真实着色器生效):
-	# Filmic 评审分支 方砖 0.28 / 盲道 0.33; M1 AgX 母版分支 方砖 0.30 / 沥青 1.35 / fill 0.55
-	var gain: float
-	if agx_light_master:
-		gain = 1.35 if group == "asphalt" else 0.30
-	elif group == "tactile":
-		gain = 0.33
-	else:
-		gain = 0.85 if group == "asphalt" else 0.28
-	var fill: float
-	if agx_light_master:
-		fill = 0.55 if group == "asphalt" else 0.15
-	else:
-		fill = 1.4 if group == "asphalt" else 0.15
+	# 浅色方砖贴图偏白，略压防止晴天过曝；亮度由场景光照决定，不在材质里补光
+	var gain := 1.0 if group == "asphalt" else 0.8
 	for i in mi.mesh.get_surface_count():
 		var mat := ShaderMaterial.new()
 		mat.shader = SHADER_GROUND
@@ -133,8 +116,7 @@ func _setup_mesh(mi: MeshInstance3D, zone_name: String) -> void:
 		mat.set_shader_parameter("world_uv_period", period)
 		mat.set_shader_parameter("uv_offset", uv_off)
 		mat.set_shader_parameter("normal_depth", normal_depth)
-		mat.set_shader_parameter("diffuse_gain", gain)
-		mat.set_shader_parameter("ambient_fill", fill)
+		mat.set_shader_parameter("albedo_gain", gain)
 		if edge_stripe:
 			# 车道两侧 0.2m 白实线沿世界 x=±4 路缘, 坡道与广场共用同一世界坐标
 			# => 全程连贯无接缝断口; 白漆 #E8ECF0 rough 0.55, 贴花纵向周期 0.8m

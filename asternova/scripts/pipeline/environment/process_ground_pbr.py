@@ -8,7 +8,7 @@
 法线倒角 / AO / 反射探针在引擎里呈现。对标 art/references/map_style/
 的 anime_urban_zzz_01（商业街方砖）/ zzz_08（广场盲道井盖）/ zzz_12（纯净车道）。
 
-输出 (render-lab/models/environment/ground/ 与 client-godot-v2/art/textures/ground/):
+输出 (client-godot-v2/art/textures/ground/):
     ground_tiles_albedo/normal/roughness/ao.png        中性暖灰大方砖 PBR 套件 (2.4m, 4x4)
     ground_tactile_albedo/normal/roughness.png         暖姜黄盲道砖 PBR 套件 (0.9m, 3x3)
     ground_asphalt_albedo/normal/roughness.png         冷蓝灰纯净沥青 PBR 套件 (2.5m)
@@ -37,7 +37,6 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[3]          # .../asternova
 OUT_DIRS = [
-    ROOT / "render-lab" / "models" / "environment" / "ground",
     ROOT / "client-godot-v2" / "art" / "textures" / "ground",
 ]
 QA_DIR = ROOT / "art" / "render_previews" / "environment" / "ground_qa"
