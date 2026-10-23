@@ -14,7 +14,7 @@ import { inflateSync } from "node:zlib";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CDP_HTTP = process.env.CDP_HTTP || "http://127.0.0.1:9333";
 const SITE = (process.env.SITE_URL || "http://127.0.0.1:3000").replace(/\/$/, "");
-const OUT_DIR = process.env.OUT_DIR || path.resolve(HERE, "..", "artifacts");
+const OUT_DIR = process.env.OUT_DIR || path.resolve(HERE, "..", "..", ".ui-polish", "artifacts");
 const SHOTS_DIR = path.join(OUT_DIR, "shots");
 fs.mkdirSync(SHOTS_DIR, { recursive: true });
 

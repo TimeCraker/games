@@ -3,7 +3,7 @@
 > 状态：**待制作人终审**（2026-08-30 起草；2026-09-07 曾准予「阶段性基线放行」，2026-09-10 制作人复审判其作废——验收回到「制作人亲口说过」原标准，见 §评审结论）。上游锚点：[BLUEPRINT.md M1](../BLUEPRINT.md) · [architecture.md §1](../architecture.md) · [STYLE.md](../STYLE.md)（风格约束源）。
 > 本阶段**纯美术与渲染**，不含任何玩法逻辑与网络代码。
 >
-> **2026-10-23 校正**：载体由 `render-lab/` 改为 `client-godot-v2/`（街区迁入 `scenes/levels/m1_street.tscn`，render-lab 删除）；光照改由 `LightingRig` + 四套预设统一（[lighting-guide.md](../pipeline/lighting-guide.md)），制作人已确认为基线、随场景调整；角色线的 AI 分件生成路线已废弃，改按 [character-pipeline.md](../pipeline/character-pipeline.md)，地基待定。下文 A0、A.1 中关于角色的旧链路描述以本条为准。
+> **2026-10-23 校正**：载体由 `render-lab/` 改为 `client-godot-v2/`（街区迁入 `scenes/levels/m1_street.tscn`，render-lab 删除）；光照改由 `LightingRig` + 四套预设统一（[lighting-guide.md](../lighting-guide.md)），制作人已确认为基线、随场景调整；角色线的 AI 分件生成路线已废弃，改按 [asset-pipeline.md](../asset-pipeline.md) §2，地基待定。下文 A0、A.1 中关于角色的旧链路描述以本条为准。
 
 ## 目标（一句话）
 
@@ -56,7 +56,7 @@
    - **分件装配**：刀身组（`Blade_Mesh`）与刀鞘组（`Scabbard_Mesh`）独立拆分，局部原点统一锁定在【刀鞘口】`(0, 0, 0)`，实现出入鞘零偏置线性移动。
    - **材质图集**：单张 `2048x2048` BaseColor Atlas（象牙白微珠光鞘、深蓝柄卷、浅蓝蝴蝶结系绪、冷天蓝刃纹、香槟金四芒星护手）。
    - **交付产物**：工程源文件 `aster_katana.blend`、游戏通用资产 `aster_katana.glb`、贴图 `tex_katana_basecolor.png`、高精对比看板 `katana_preview.png`、以及自包含 3D Web 检视器 `aster_katana_3d_viewer.html`。
-   - **工业化实践 SOP 详见**：[docs/pipeline/weapon-modeling-pipeline.md](../pipeline/weapon-modeling-pipeline.md)。
+   - **工业化实践 SOP 详见**：[docs/asset-pipeline.md §3](../asset-pipeline.md)。
 
 ### B. 渲染（Godot 4.7.2 Stable）
 

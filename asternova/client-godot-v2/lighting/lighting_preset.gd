@@ -3,7 +3,7 @@ class_name LightingPreset
 extends Resource
 
 ## 一套完整的场景光照参数。保存为 .tres，挂到 LightingRig 上即生效。
-## 参数含义与调整方法见 docs/pipeline/lighting-guide.md。
+## 参数含义与调整方法见 docs/lighting-guide.md。
 
 @export var display_name: String = "未命名"
 

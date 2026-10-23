@@ -32,7 +32,7 @@
 
 - **`asternova/client-godot-v2/`（唯一的 Godot 工程）**：玩法、战斗、场景、光照、着色器都在这里。
   - `scenes/levels/`：`combat_playground.tscn`（主场景，战斗沙盒）、`m1_street.tscn`（街区 + 光照预设参考场景）；
-  - `lighting/`：`LightingRig` 与光照预设（用法见 `docs/pipeline/lighting-guide.md`）；
+  - `lighting/`：`LightingRig` 与光照预设（用法见 `docs/lighting-guide.md`）；
   - `scripts/entities/player/`：`CharacterRig`（角色视觉、插槽、动画）、`PlayerAnimDriver`、`PlayerController`；
   - `models/mannequin/`：当前玩家占位人偶与标准动作库；
   - `tests/`：`test_combat_runner.gd`（战斗门禁）、`lighting_preview.tscn`（光照对比截图）。
@@ -59,15 +59,15 @@
    - 独立可验证单元完成后立即提交：Conventional Commits + 中英对照（如 `feat(art): ... / ...`）。
    - 渲染与美术改动必须先出可验证件（截图对比、真机跑分、弹出窗口供用户检阅），严禁凭模型自我声称通过。
 6. **武器与道具建模管线（SOP 必读）**：
-   - 所有武器与穿戴道具制作必须严格遵循 [`docs/pipeline/weapon-modeling-pipeline.md`](docs/pipeline/weapon-modeling-pipeline.md)；
+   - 所有武器与穿戴道具制作必须严格遵循 [`docs/asset-pipeline.md` §3](docs/asset-pipeline.md)；
    - 核心铁律：① 严控 800~1,500 三角面（120 FPS 性能红线）；② 双分件原点必须绝对锁定在刀鞘口/锁扣 `(0, 0, 0)` 实现拔刀零偏置；③ 单张 2K Atlas 贴图；④ 提供 360° 交互检视件（自包含 Web 检视器 + Godot 视口）。
 7. **渲染与光照**：
    - 渲染器 **Forward+ (Vulkan Clustered)**，色调映射 **AgX**；不退回 `gl_compatibility`。
    - 每个 3D 场景放一个 `LightingRig`，选一个 `lighting/presets/` 预设；场景里不另放 WorldEnvironment / DirectionalLight3D。
    - 场景材质（地面、建筑、道具）用普通 PBR：着色器不写 `light()`，不用 `ambient_light_disabled`，不做亮度补偿系数。角色可用 `toon_character.gdshader` 的色阶，但暗部跟随光源，不写固定底色。
-   - 调光照前读 [`docs/pipeline/lighting-guide.md`](docs/pipeline/lighting-guide.md)；改完用 `tests/lighting_preview.tscn` 出四套预设对比图给用户看。
+   - 调光照前读 [`docs/lighting-guide.md`](docs/lighting-guide.md)；改完用 `tests/lighting_preview.tscn` 出四套预设对比图给用户看。
 8. **角色、骨骼与动画**：
-   - 按 [`docs/pipeline/character-pipeline.md`](docs/pipeline/character-pipeline.md)：角色要建在有正确拓扑、五官和骨骼的身体上；AI 分件生成后硬拼的路线已废弃。
+   - 按 [`docs/asset-pipeline.md` §2](docs/asset-pipeline.md)：角色要建在有正确拓扑、五官和骨骼的身体上；AI 分件生成后硬拼的路线已废弃。
    - 绑定用地基自带骨骼（VRM）或 AccuRIG / Mixamo；动画重定向用 Godot `BoneMap` + `SkeletonProfileHumanoid`，播放用 `AnimationTree`。
    - 禁止脚本按坐标/高度分配权重、手算四元数重定向；禁止代码 Tween 摆骨做假动画。
    - 换角色只换模型：新角色场景挂 `CharacterRig`，按新骨骼改插槽骨名与 `CLIP_ALIASES`。

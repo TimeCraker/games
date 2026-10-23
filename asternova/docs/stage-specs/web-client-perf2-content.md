@@ -2,7 +2,7 @@
 
 > **status: DRAFT（待所有者评审，非实施指令）**。本文为草案，未获所有者批准前不构成实施授权；所有开放问题（§8）需所有者拍板后才可排期。
 >
-> 起草：2026-10-05。上游锚点：[BLUEPRINT.md](../BLUEPRINT.md)（愿景与里程碑、web-client 演化定位）· [architecture.md](../architecture.md)（技术定案）· [ui-polish/rules.md](../ui-polish/rules.md)（UI 工艺规则现行源）· [CLAUDE.md](../../CLAUDE.md)（web-client 操作手册）。
+> 起草：2026-10-05。上游锚点：[BLUEPRINT.md](../BLUEPRINT.md)（愿景与里程碑、web-client 演化定位）· [architecture.md](../architecture.md)（技术定案）· [ui-rules.md](../../web-client/docs/ui-rules.md)（UI 工艺规则现行源）· [CLAUDE.md](../../CLAUDE.md)（web-client 操作手册）。
 
 ---
 

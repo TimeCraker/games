@@ -3,7 +3,7 @@
  *
  * 本文件是引擎层与渲染 / UI 层的唯一接口约定：命名与字段一字不动，
  * 后续渲染美术、HUD、结算 UI 波次都按此对接。数值语义以
- * asternova/docs/shoot-them-all-whitepaper.md 为准。
+ * asternova/web-client/docs/games.md §2 为准。
  */
 
 export type BallKind = "standard" | "blast" | "pierce" | "heavy"

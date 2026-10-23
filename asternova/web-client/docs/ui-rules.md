@@ -2,8 +2,7 @@
 
 > 依据：`web-client/app/globals.css`（Stage A 深空黑体系）· `src/components/arcade/brand.ts`（街机品牌单一真源）。
 > 本文件是「审美有依据」的挂靠点。任何工艺改动必须引用此处规则或先补录规则，禁止拍脑袋。
->
-> **台账序列沿革（2026-10-05 归一）**：UI 打磨历史上有两条并行台账——本目录（R 序列）与仓库根 `docs/ui-polish/`（S 序列，S5–S13，2026-09-25 用户叫停后归档；该目录现仅存 tools/ 脚本）。本文件为唯一现行规则源，已并入 S 序列独有的媒体纪律、死样式纪律、时长 token 演进与工具链条目；S 序列完整台账见 [AUDIT.md](AUDIT.md) 的「S 序列归档」节。
+> 文中 R1–R6、S5–S13 是历次 UI 打磨轮次编号；逐轮审计台账已于 2026-10-23 删除（git 历史 `asternova/docs/ui-polish/AUDIT.md` 可查），有效结论都在本文件。
 
 ## 1. 主题
 
@@ -58,7 +57,7 @@
 
 ### 6.1 微交互工艺补录（2026-09-29 R6 动效轮）
 
-- **「禁瞬变」总则**：一切展开/切换/内容替换必须有曲线过渡（`--ease-instrument` 微交互 / `--ease-cinematic` 进场，§5.4 token），条件渲染直挂直卸视为违规。
+- **「禁瞬变」总则**：一切展开/切换/内容替换必须有曲线过渡（`--ease-instrument` 微交互 / `--ease-cinematic` 进场，STYLE.md §5.4 token），条件渲染直挂直卸视为违规。
 - **transition 与按压缩放组合**：任何写了 `active:scale-*` 的元素，transition-property 必须覆盖 `scale`（写 `transition-[color,background-color,border-color,scale]` 或显式列出）；只写 `transition-colors` 会让按压缩放瞬跳（R6 修复的系统性毛病）。
 - **shake（抖动反馈）**：锁定/无余量等「点了但没结果」的元素必须给 shake + 提示浮层，不给死响应。实现用 WAAPI（`el.animate`，±3px / 160ms / `--ease-instrument`），可重复触发、不与 framer entrance 冲突；**叠在已有 inline transform 上的元素必须 `composite:"add"`**（如球托槽体的 hover scale）。
 - **呼吸描边**：常驻选中态（如 CURRENT 关卡卡）用 `.hud-breathe-ring`（opacity 0.45↔1，`--duration-ambient` 2.6s 循环，opacity-only），禁 box-shadow/filter 动画。
@@ -73,7 +72,7 @@
 - `public/**` 已加入 eslint 忽略（Godot 导出产物与静态游戏，非手写源码）。
 - `typescript.ignoreBuildErrors: true` → build 通过 ≠ 类型正确，改动后跑 `npx tsc --noEmit` 或依赖 IDE。
 - S5 起：`next.config.ts` 已启用 `experimental.workerThreads`（沙箱禁管道 stdio 时 dev/build 的 fork 均 EPERM，线程模式通过）；第二序列打磨期站点用 `npm run build && node node_modules/next/dist/bin/next start -H 127.0.0.1 -p 4105 .`。
-- 审计脚本：零依赖 CDP 扫描器（第二序列用根级 `docs/ui-polish/tools/audit.mjs`，台账归档后位于仓库根 `docs/ui-polish/tools/`，未入库 git），产物落 `.ui-polish/artifacts/`（不进仓库）；改扫描器判定后同步 `.ui-polish/tools` 可执行副本。
+- 审计脚本：`scripts/ui-polish/` 下的零依赖 CDP 扫描器（`audit.mjs` 对比度/命中盒/溢出、`interact.mjs` 键鼠端到端、`edge.mjs` 弱网、`ensure-chrome.ps1` 拉起 headless Chrome :9333），产物落 `web-client/.ui-polish/artifacts/`（不进仓库）。
 - 既有 tsc 报错基线（**别去动，也别拿它当新问题**）：`CinematicBlackHole.tsx` ×4（缺 @types/three）、
   `nebula-survivor/render/NebulaBackground.ts(61,17)`、`hooks/useMobileGameViewport.ts(40,105)`。
 - lint 基线：0 errors / 6 warnings（arena exhaustive-deps、fetch-arcade-art.mjs ×3、LoopingBgmControl、NebulaScene）。

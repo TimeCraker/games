@@ -22,7 +22,7 @@
 **角色**
 
 - 玩家角色是 **CC0 中性人偶占位**（Quaternius），挂 `CharacterRig`，佩刀可拔可收。四段连招暂时都用同一个 `Sword_Attack` 动作。
-- **没有正式角色**。白/橙/紫三角色只有原画和 AI 分件模型（`art/characters/source/`），Aster 只有设定图和原始雕刻。之前的装配、绑定、返工产物已全部删除，原因见 [character-pipeline.md](pipeline/character-pipeline.md) 第 2 节。
+- **没有正式角色**。白/橙/紫三角色只有原画和 AI 分件模型（`art/characters/source/`），Aster 只有设定图和原始雕刻。之前的装配、绑定、返工产物已全部删除，原因见 [asset-pipeline.md](asset-pipeline.md) §2.2。
 - 正式角色的制作地基（VRoid / 商用素体 / AI 一体生成）**待用户决定**。
 
 **场景与光照（M1）**
@@ -43,17 +43,13 @@
 | [architecture.md](architecture.md) | 技术选型、房主权威、UI 分界、网络、性能与安全红线 | 定案 |
 | [STYLE.md](STYLE.md) | 美术风格：配色、角色造型方向、渲染与光照基线 | 定案 |
 | [CONTENT_BACKLOG.md](CONTENT_BACKLOG.md) | 创意内容池（彩蛋、后续角色、流派构想） | 持续更新 |
-| [pipeline/lighting-guide.md](pipeline/lighting-guide.md) | 光照方案：怎么换预设、调参数、加灯、出对比图 | 现行 |
-| [pipeline/character-pipeline.md](pipeline/character-pipeline.md) | 角色制作：旧路线为何失败、可选地基、流程与规则 | 现行（地基待定） |
-| [pipeline/weapon-modeling-pipeline.md](pipeline/weapon-modeling-pipeline.md) | 武器与道具：双分件、鞘口原点、拔刀插槽 | 现行 |
-| [pipeline/modular_art_and_asset_production_sop.md](pipeline/modular_art_and_asset_production_sop.md) | 场景与道具资产制作 | 现行 |
-| [pipeline/trim_sheet_and_modular_spec.md](pipeline/trim_sheet_and_modular_spec.md) | 地面 PBR Trim Sheet 规范 | 收缩维护 |
+| [lighting-guide.md](lighting-guide.md) | 光照方案：怎么换预设、调参数、加灯、出对比图 | 现行 |
+| [asset-pipeline.md](asset-pipeline.md) | 资产制作：场景道具、角色（旧路线为何失败、可选地基）、武器 | 现行（角色地基待定） |
 | [stage-specs/m1-render-vertical-slice.md](stage-specs/m1-render-vertical-slice.md) | M1 渲染垂直切片施工单 | 推进中 |
 | [stage-specs/m2-transport-and-v2-skeleton.md](stage-specs/m2-transport-and-v2-skeleton.md) | M2 战斗骨架与 Transport 施工单 | 推进中 |
 | [stage-specs/web-client-perf2-content.md](stage-specs/web-client-perf2-content.md) | web-client 性能二期与官网内容化 | 草案 |
-| [shoot-them-all-whitepaper.md](shoot-them-all-whitepaper.md) · [shoot-them-all-art-bible.md](shoot-them-all-art-bible.md) | 《弹珠风暴》玩法与美术 | 定稿 |
-| [nebula-survivor-whitepaper.md](nebula-survivor-whitepaper.md) · [nebula-survivor-ui-spec.md](nebula-survivor-ui-spec.md) | 《星域突围》玩法与 UI | 定稿 |
-| [ui-polish/rules.md](ui-polish/rules.md) · [ui-polish/AUDIT.md](ui-polish/AUDIT.md) | web-client UI 打磨规则与审计台账 | 现行 |
+| [web-client/docs/games.md](../web-client/docs/games.md) | 街机两款小游戏（《星域突围》《弹珠风暴》）定案与红线 | 定稿 |
+| [web-client/docs/ui-rules.md](../web-client/docs/ui-rules.md) | web-client UI 工艺规则 | 现行 |
 | [archive/initial_prompt.md](archive/initial_prompt.md) | 早期角色建模 Prompt | 归档，内容已过时 |
 
 ---
@@ -61,7 +57,7 @@
 ## 3. 红线速查
 
 1. **渲染**：Forward+ + AgX。模拟 60Hz 固定步长，渲染帧率与之解耦。
-2. **场景材质不接管光照**：场景着色器不写 `light()`、不用 `ambient_light_disabled`，详见 [lighting-guide.md](pipeline/lighting-guide.md) 第 4 节。
+2. **场景材质不接管光照**：场景着色器不写 `light()`、不用 `ambient_light_disabled`，详见 [lighting-guide.md](lighting-guide.md) 第 4 节。
 3. **角色绑定**：用地基自带骨骼或 AccuRIG / Mixamo，重定向用 Godot BoneMap。禁止脚本按坐标分配权重、手算四元数重定向。
 4. **看图验收**：每步修改后截图检查；用户看实机画面后的判断是唯一验收，不自报分数或相似度。
 5. **文档只写现状**：没做到的写进 BLUEPRINT 的目标，不写成已具备。

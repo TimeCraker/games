@@ -2,7 +2,7 @@ class_name CharacterRig
 extends Node3D
 
 ## 玩家视觉骨架：当前挂 CC0 中性人偶（models/mannequin，Quaternius Universal Animation Library），
-## 正式角色按 docs/pipeline/character-pipeline.md 做好后替换模型即可，本脚本不绑定具体角色。
+## 正式角色按 docs/asset-pipeline.md §2 做好后替换模型即可，本脚本不绑定具体角色。
 ## 职责：AnimationTree 动画驱动 + 双插槽拔刀/纳刀 + 刀光采样点。
 ## 骨骼动作 100% 来自动画库，代码层不手搓骨骼姿态。
 

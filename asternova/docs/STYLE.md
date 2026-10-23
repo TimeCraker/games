@@ -69,7 +69,7 @@
     · 材质层次：棉/雪纺/丝带/刺绣/珠光皮革以 subtle 色差与软褶区分，防止纯白糊块
   - 视觉基准：[../art/characters/aster/turnaround-final.png](../art/characters/aster/turnaround-final.png)（官方设定稿 v2，后续建模/立绘/渲染一致性以它为准）；完整档案与生图提示词存档见 [../art/characters/aster/aster.md](../art/characters/aster/aster.md)
   - 气质：清冷克制 · 微暖反差；背景占位：黄昏商店街的转学生
-  - **3D 造型要求**（设计目标；目前没有可用的 Aster 3D 角色，制作方法见 [character-pipeline.md](pipeline/character-pipeline.md)）：
+  - **3D 造型要求**（设计目标；目前没有可用的 Aster 3D 角色，制作方法见 [asset-pipeline.md](asset-pipeline.md) §2）：
     · 头部：高颅顶、微收下颌。
     · 发型剪影：刘海中央雕刻出 Aster 标志性的**倒 V 型空气刘海中缝**，自然展露额头与鼻梁轮廓；两侧 face-framing 细长发束顺下颚垂落至锁骨；彻底剔除外翻的翅膀状尖刺。
     · 贴图去污基底：清洗旧版烘焙残留暗红围巾污迹，身体贴图统一使用冷白瓷肌基准色 `#FDF1EA`，消除眼角与脖颈杂质折痕。
@@ -89,7 +89,7 @@
 
 ## 2.5 武器与随身道具规范（✅ 2026-09-04 定稿）
 
-> 完整工程实践与复刻 SOP 详见：[docs/pipeline/weapon-modeling-pipeline.md](pipeline/weapon-modeling-pipeline.md)。
+> 完整工程实践与复刻 SOP 详见：[asset-pipeline.md](asset-pipeline.md) §3。
 
 - **首发基准案例：Aster 专属佩刀「星霜月华」（Seisou Gekka）**：
   - **总三角面数基准**：主手近战武器严控在 **800 ~ 1,500 三角面**（实测 899 面），坚决为 120 FPS 高刷和多武器同屏留出预算；
@@ -134,7 +134,7 @@
 > - **双管线分工（Dual-Pipeline）**：
   - **场景硬表面（PBR Pipeline）**：道路、混凝土、金属扶手、玻璃幕墙全部遵循真实微表面物理光照（Roughness / Metallic / Normal / Baked AO），结合盒投影反射探针与 SSR，打造《终末地》与《鸣潮》标志性的扎实工业质感与雨后湿润沥青光泽；
   - **二次元角色（NPR Pipeline）**：赛璐璐色阶（Toon Ramp）+ Inverted Hull 描边，保持日漫纯净通透；面部 SDF 阴影是目标，尚未实现。
-- **现状（2026-10-23）**：光照统一由 `LightingRig` + 预设管理（晴/黄昏/阴/夜，见 [lighting-guide.md](pipeline/lighting-guide.md)）；间接光用实时 SDFGI，街区店门口有一个盒投影 ReflectionProbe；下文的 LightmapGI 烘焙与探针网格是场景定稿后的计划，尚未做。
+- **现状（2026-10-23）**：光照统一由 `LightingRig` + 预设管理（晴/黄昏/阴/夜，见 [lighting-guide.md](lighting-guide.md)）；间接光用实时 SDFGI，街区店门口有一个盒投影 ReflectionProbe；下文的 LightmapGI 烘焙与探针网格是场景定稿后的计划，尚未做。
 - **混合光照体系（Hybrid Lighting System · 对标《终末地》工业级光照分工）**：
   - **实时直接光（Real-time Direct，保交互与手感）**：45° 侧逆主阳光（SunLight）与角色动态阴影（PSSM 4 分割深度阴影）、专属佩刀挥砍流光、自动贩卖机橱窗点光源 **100% 实时计算**，确保角色奔跑、滑铲、挥刀时脚下阴影紧密贴地、高光瞬时响应，支撑 120+ FPS 竞技级手感；
   - **预计算/烘焙间接光（Pre-baked Indirect GI & Probes，保画质与帧率）**：
@@ -170,11 +170,11 @@
   - 基准厚度：身体/衣物 `0.0026`，面部外缘 `0.0020`，专属佩刀 `0.0009`。
   - 距离自适应保持：开启（`distance_scaling = true`），保证近景细腻不粗笨，远景轮廓清晰。
   - 描边色：日系深灰青蓝 `#3D435C`。
-- **后处理与环境**：由 `LightingRig` 按预设生成 WorldEnvironment。渲染器 Forward+，色调映射 AgX；SSAO、SSR、雾、辉光、曝光、对比度、饱和度的取值都在 `client-godot-v2/lighting/presets/*.tres` 里，调法见 [lighting-guide.md](pipeline/lighting-guide.md)。原则：辉光克制，只让招牌和强反光发亮，衣服和皮肤不起雾。
+- **后处理与环境**：由 `LightingRig` 按预设生成 WorldEnvironment。渲染器 Forward+，色调映射 AgX；SSAO、SSR、雾、辉光、曝光、对比度、饱和度的取值都在 `client-godot-v2/lighting/presets/*.tres` 里，调法见 [lighting-guide.md](lighting-guide.md)。原则：辉光克制，只让招牌和强反光发亮，衣服和皮肤不起雾。
 
 ## 4. 场景规范（✅ 2026-09-06 M1 升级终末地工业级预设）
 
-- **标准布光**：每个场景一个 `LightingRig`（自动生成太阳与环境，太阳 PSSM 4 分割阴影），选 `lighting/presets/` 里的预设；招牌灯、店灯、路灯加入 `practical_light` 组随预设缩放；需要镜面反射的区域放盒投影 `ReflectionProbe`。参考场景 `client-godot-v2/scenes/levels/m1_street.tscn`，用法见 [lighting-guide.md](pipeline/lighting-guide.md)。
+- **标准布光**：每个场景一个 `LightingRig`（自动生成太阳与环境，太阳 PSSM 4 分割阴影），选 `lighting/presets/` 里的预设；招牌灯、店灯、路灯加入 `practical_light` 组随预设缩放；需要镜面反射的区域放盒投影 `ReflectionProbe`。参考场景 `client-godot-v2/scenes/levels/m1_street.tscn`，用法见 [lighting-guide.md](lighting-guide.md)。
 - **四级场景资产工业化架构（Tier 1~Tier 4）**：
   - **Tier 1: 地面与道路基础设施（Ground & Streets）**：严格走 **Trim Sheet / 平铺 PBR**（沥青路面、路沿石、人行道盲道砖），大面积无缝拼接、无接缝破绽、极低显存占用；
   - **Tier 2: 核心功能与特色建筑（Hero Buildings & Storefronts）**：**GPT 设计立面概念 ➔ Tripo3D 2.0 生成原生外观底模 ➔ 自动化几何手术（Blender Python 脚本切除破损假玻璃与扁平 2D 贴纸，嵌入铝合金正交窗框与真实 3D 室内陈列货架，解决 AI 生成固有缺陷）➔ 标定 2m/4m 网格与 Quad 拓扑**，具备 45° 倒角与挑檐走廊，彻底告别火柴盒式平直积木与粗糙塑料感；
@@ -203,7 +203,7 @@
 
 ## 5. UI 视觉语言（✅ 2026-09-27 定稿；本节 = 大厅 Web UI 与游戏内 HUD 的共享变量）
 
-> 单一真源：`web-client/app/globals.css`。游戏专属细则见 `docs/nebula-survivor-ui-spec.md`，网站工艺规则见 `docs/ui-polish/rules.md`。
+> 单一真源：`web-client/app/globals.css`。游戏专属细则见 `web-client/docs/games.md`，网站工艺规则见 `web-client/docs/ui-rules.md`。
 
 ### 5.1 共享色板（全部取自 §1，不另造色）
 
