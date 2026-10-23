@@ -23,7 +23,7 @@
    - 交付物必须包含：多视角高精对比看板（PNG）、Blender 源工程（.blend）、游戏标准资产（.glb）、贴图图集（.png）、以及可交互 360° 检视场景。
 
 > [!NOTE]
-> **贴图工艺与适用边界**：本管线中采用的 Python 参数化贴图绘制（如 `build_katana_texture.py`）专为**硬表面冷兵器与工业道具**设计（其具备笔直刀脊、金属受光渐变、四芒星阵列等高精度几何特征，依托代码绘制能确保数学级的对称与极速可复现）；而对于角色面部、五官、眼睛等高度依赖微观艺术质感的内容，必须严格遵从 [character-modeling-pipeline.md](character-modeling-pipeline.md) 的手绘/AI 原生图集规范，严禁用代码画圆画五官。二者分工明确，相辅相成。
+> **贴图工艺与适用边界**：本管线中采用的 Python 参数化贴图绘制（如 `build_katana_texture.py`）专为**硬表面冷兵器与工业道具**设计（其具备笔直刀脊、金属受光渐变、四芒星阵列等高精度几何特征，依托代码绘制能确保数学级的对称与极速可复现）；而对于角色面部、五官、眼睛等高度依赖微观艺术质感的内容，必须按 [character-pipeline.md](character-pipeline.md) 制作，严禁用代码画圆画五官。二者分工明确，相辅相成。
 
 ---
 
@@ -189,8 +189,7 @@ bpy.ops.export_scene.gltf(
    - 特点：单文件内嵌 Base64 GLB 模型与 Three.js 引擎，文件仅 160KB，**双击即可在任何浏览器（Chrome/Edge/Safari）秒开**，零跨域、零后端依赖；
    - 交互能力：鼠标左键 360° 自由环绕旋转、滚轮无级缩放、空格键拔刀/收刀动画、`W` 键一键切换**线框拓扑模式（Wireframe）**审查面数分布、`1~5` 快捷键特写对焦；
    - 价值：任何人无需安装 Godot 或 Blender 即可立刻评审。
-2. **Godot 4.7 引擎实时交互场景（`render-lab/scenes/weapon_viewer.tscn`）**：
-   - 在游戏原生渲染管线（Toon Shader、MSAA 3D、Glow 泛光、日落环境）下审查武器的受光折射。
+2. **Godot 引擎内检视**：原 `render-lab/scenes/weapon_viewer.tscn` 已随 render-lab 删除；现在直接在 `client-godot-v2` 的战斗沙盒里看角色手持效果，或用 `tests/lighting_preview.tscn` 在四套光照预设下截图。
 3. **自动化超高分辨率合成看板（`katana_preview.png`）**：
    - 包含：① 入鞘全身透视、② 拔刀并列展陈、③ 四芒星护手特写、④ 刀尖切先与刃纹特写、⑤ 刀柄与星芒吊坠特写。附带模型技术参数标牌（面数、材质、骨骼挂点）。
 

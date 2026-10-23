@@ -46,14 +46,14 @@ AsterNova 已按新栈重启（2026-08-31 重大定案：**单机优先 + 房主
 
 ## 客户端矩阵
 
-| | Godot 4（v2，主客户端） | Web Shell | 一代 Godot（冻结） |
-|---|---|---|---|
-| 状态 | **M2 开发中（主力）** | 现役（将演化为官网 + 托管壳） | 冻结为参考实现 |
-| 目标平台 | Windows exe · Android APK · Web WASM | 浏览器 | Web WASM |
-| 技术栈 | GDScript · 二次元角色渲染 · 三档画质 | Next.js 16 · React 19 · Zustand | GDScript · 自研零依赖 Protobuf |
-| 目录 | `asternova/client-godot-v2`（已落地开发） | [`asternova/web-client`](asternova/web-client) | [`asternova/client-godot`](asternova/client-godot) |
+| | Godot 4（v2，唯一客户端） | Web Shell |
+|---|---|---|
+| 状态 | **M1 场景 + M2 战斗开发中** | 现役（将演化为官网 + 托管壳） |
+| 目标平台 | Windows exe · Android APK · Web WASM | 浏览器 |
+| 技术栈 | GDScript · Forward+ · 二次元角色渲染 | Next.js 16 · React 19 · Zustand |
+| 目录 | [`asternova/client-godot-v2`](asternova/client-godot-v2) | [`asternova/web-client`](asternova/web-client) |
 
-> Unity WebGL 客户端已归档（2026-08-30），历史可经 `git log` 追溯。
+> Unity WebGL 客户端已归档（2026-08-30）；一代 Godot 客户端与 render-lab 渲染沙盒已删除（2026-10-23），历史均可经 `git log` 追溯。
 
 ## 压测（单机腾讯云实测，完整图表见 [`asternova/assets/`](asternova/assets/)）
 
@@ -100,7 +100,7 @@ cd asternova/web-client && npm install && cp .env.production .env.local && npm r
 
 > 一期为单机优先架构：游戏本体（client-godot-v2，M2 启动）单机直接可玩，无需起后端。
 >
-> Windows 一键体验（仓库根 bat，需本机 Godot 4.7.2）：`启动AsterNova游戏体验.bat`（核心战斗沙盒 combat_playground）· `启动三角色动作测试.bat` / `启动白色静态样板.bat`（character_lab 角色审阅）。
+> Windows 一键体验（仓库根 bat，需本机 Godot 4.7.2）：`启动AsterNova游戏体验.bat`（核心战斗沙盒 combat_playground，角色暂为 CC0 人偶占位）。
 
 ## Monorepo
 
@@ -109,11 +109,9 @@ games/asternova/
 ├── docs/            # 蓝图三件套（BLUEPRINT / architecture / STYLE）+ Stage Specs ← 开发决策锚点
 ├── web-client/      # Next.js 16 Game Shell + Arcade（现役，将演化为官网 + 托管壳）
 ├── backend/         # Go · Gin · WS · PostgreSQL(sqlc + golang-migrate) · Redis（❄️ 一期封存）
-├── client-godot/    # 一代 Godot 客户端（已冻结，见 FROZEN.md）
-├── client-godot-v2/ # 新客户端（M2 主力开发中，含 character_lab 角色审阅舞台）
-├── render-lab/      # M1 渲染垂直切片沙盒（建模源工程 / Toon Shader / 渲染舞台）
-├── art/             # 美术资产与定稿库（角色包 / 原画 / 同框验收件 / 返工工程）
-├── scripts/         # Blender/Godot 管线自动化（characters / environment / weapons）
+├── client-godot-v2/ # 唯一 Godot 工程（街区场景 / 光照预设 / 战斗沙盒）
+├── art/             # 原始美术资产（角色原画与原始雕塑 / 场景模型 / 参考图）
+├── scripts/         # Blender/Godot 管线自动化（environment / weapons）
 └── assets/          # 共享静态资源
 ```
 

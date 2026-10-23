@@ -2,7 +2,7 @@
 
 本文件为所有进入 `asternova/` 目录的 AI 编码助手（Antigravity, Claude Code, Cursor 等）提供工作准则、本地环境与决策约束。后续所有会话的 Agent 进入本仓库必须优先遵守以下规范。
 
-> **2026-10-01 角色返工校正（优先于下文历史条款）**：海报整体效果优先；先完成白色静态样板并等待用户确认，再做紫色、橙色和绑定。三角色当前为动作原型已验证、静态美术返工中。执行 [返工 Stage Spec](docs/stage-specs/character-art-rework.md)。允许局部重新建模与原生 Blender 编辑，不强制 Tripo、付费插件、固定头身比或旧骨数。逐阶段看图；原始 GLB 保留。返工 blend 是制作源，禁止旧参数脚本覆盖修复。
+> **先读 [docs/README.md](docs/README.md) 第 1 节「当前真实状态」**。2026-10-23 起：玩家角色是 CC0 人偶占位，正式角色地基待用户决定，之前的角色返工产物已全部删除；光照走 `LightingRig` + 预设。
 
 ---
 
@@ -19,7 +19,7 @@
 
 > **调用准则（2026-09-10 修订：视觉闭环铁律，所有建模 Agent 强制遵守）**：
 > 1. **审美类操作优先使用已验证的活动 Blender 连接；不可用时采用可用界面或 Python，并逐次看图**；
-> 2. **自动化必须可检查**：脚本可以调用 Blender 成熟工具进行装配、蒙皮与烘焙；关键变更后出图检查，不得因脚本无异常而宣称视觉合格。
+> 2. **自动化必须可检查**：脚本用于非审美批处理（导入导出、贴图处理、烘焙、截图）；角色绑定与权重不用脚本做（见 §2.8）。关键变更后出图检查，不得因脚本无异常而宣称视觉合格。
 > 3. **视觉闭环铁律**：任何几何 / 材质 / 光照修改之后，必须**立即截图**（MCP 视口截图或无头渲染均可），由 Agent 多模态能力**亲自看图**并与参考图比对，确认无误才准执行下一步；**严禁连续多步盲改后才看结果，严禁未看图就声称通过**；
 > 4. **参考图同框验收**：按参考图生产的资产必须交付「参考图 vs 成品」同框对比看板（成品前后同相机、同光照；二维原画无法严格复现时标注差异），由制作人拍板；**严禁自报数值化相似度**（详细流程见 modular SOP §2.6）；
 > 5. **并行纪律**：**一个资产一个 Agent**；`.blend` 无法合并编辑，严禁多 Agent 同改一个文件 / 一个资产目录；需要并行时按资产拆分任务；
@@ -30,20 +30,15 @@
 
 ## 1. 核心工作区拓扑（严禁走错目录）
 
-- **`asternova/render-lab/`（当前阶段核心工作区）**：
-  - **定位**：M1 渲染垂直切片与 3D 建模的**独立沙盒试验场（Sandbox）**。
-  - **分工**：
-    - `models/`：Blender 5 建模源工程（Aster 当前最新基模 `aster_head_base_v2.blend`）及参考模型；
-    - `shaders/`：自研二次元 Toon Shader（面部、发型、描边等）；
-    - `scenes/`：Godot 渲染与三视图比对舞台（`turnaround_stage.tscn`、黄昏樱花场景）；
-    - `scripts/`：Blender (bpy) 自动化处理脚本与 Godot 自动化测试截图脚本。
-  - **原则**：纯粹的美术与渲染环境，**隔离主工程网络/协议/UI 逻辑**。在此调优成熟后，资产直接搬迁至正式客户端。
-- **`asternova/art/`（美术资产与定稿库）**：
-  - 存放官方 2D 原画、三视图基准稿、同框对比验收件及三档真机渲染截图。
-- **`asternova/client-godot-v2/`（正式游戏客户端）**：
-  - 承载 M2/M3 正式玩法逻辑、网络传输、React Meta UI 嵌入与战斗状态机。
-- **`asternova/client-godot/`（旧工程，已冻结）**：
-  - 见 `FROZEN.md`，仅供历史参考，严禁在其上开发新功能。
+- **`asternova/client-godot-v2/`（唯一的 Godot 工程）**：玩法、战斗、场景、光照、着色器都在这里。
+  - `scenes/levels/`：`combat_playground.tscn`（主场景，战斗沙盒）、`m1_street.tscn`（街区 + 光照预设参考场景）；
+  - `lighting/`：`LightingRig` 与光照预设（用法见 `docs/pipeline/lighting-guide.md`）；
+  - `scripts/entities/player/`：`CharacterRig`（角色视觉、插槽、动画）、`PlayerAnimDriver`、`PlayerController`；
+  - `models/mannequin/`：当前玩家占位人偶与标准动作库；
+  - `tests/`：`test_combat_runner.gd`（战斗门禁）、`lighting_preview.tscn`（光照对比截图）。
+- **`asternova/art/`**：原画、源模型、参考图与渲染预览（见其 README）。
+- **`asternova/scripts/pipeline/`**：贴图与资产批处理脚本（环境、武器）。
+- 原 `render-lab/`（渲染沙盒）与 `client-godot/`（一代客户端）已于 2026-10-23 删除，git 历史可恢复，不要重建。
 
 ---
 
@@ -57,24 +52,22 @@
 3. **轻量高性能意识**：
    - 3D 动作游戏（绝区零/鸣潮式高速战斗）以 60~120 FPS 流畅运行为核心生命线。
    - 严禁为了追求所谓"细碎细节"而堆叠海量细面片或毛发粒子（会导致可怕的 Overdraw 与显存带宽枯竭）。
-   - 恪守工业界"大形归纳（Stylized Clumps）+ 贴图分绺暗线（Crease Grooves）+ 法线球面化（Sphere Normal Transfer）"的低几何开销、高视觉还原管线。
 4. **资产管理纪律（防乱放红线）**：
    - 严禁在 `art/` 或项目根目录随意堆放 `debug_*`、`crop_*`、`test_*`、`extract_*` 等临时脚本调试图片。所有中间调试产物必须在内存或临时目录（如 OS temp）处理完毕即刻销毁。
-   - 角色按各自原画和实物资产验收；旧 Aster 才使用 `art/characters/aster/turnaround-final.png`。同框对比并记录具体差异，最终美术验收由用户判断，不自报相似度。
+   - 角色按各自原画验收（白/橙/紫看 `art/characters/source/<角色>/poster/`，Aster 看 `art/characters/aster/turnaround-final.png`）。同框对比并记录具体差异，最终美术验收由用户判断，不自报相似度。
 5. **验证闭环与提交规范**：
    - 独立可验证单元完成后立即提交：Conventional Commits + 中英对照（如 `feat(art): ... / ...`）。
    - 渲染与美术改动必须先出可验证件（截图对比、真机跑分、弹出窗口供用户检阅），严禁凭模型自我声称通过。
 6. **武器与道具建模管线（SOP 必读）**：
    - 所有武器与穿戴道具制作必须严格遵循 [`docs/pipeline/weapon-modeling-pipeline.md`](docs/pipeline/weapon-modeling-pipeline.md)；
    - 核心铁律：① 严控 800~1,500 三角面（120 FPS 性能红线）；② 双分件原点必须绝对锁定在刀鞘口/锁扣 `(0, 0, 0)` 实现拔刀零偏置；③ 单张 2K Atlas 贴图；④ 提供 360° 交互检视件（自包含 Web 检视器 + Godot 视口）。
-7. **渲染底座与色彩科学标准（Forward+ 与 AgX，2026-09-06 统一定案）**：
-   - 全工程（`render-lab` 与 `client-godot-v2`）统一运行在 **Forward+ (Vulkan Clustered)** 渲染器与 **AgX 色调映射（模式 4）**；
-   - 严禁倒退回 `gl_compatibility`，严禁在着色器中硬写 2.88x 光照补偿 hack（如 `diffuse_scale = 0.20`）；
-   - 标准环境预设使用 `environments/endfield_studio_environment.tres`，标准布光使用 `scenes/lighting/endfield_lighting_studio.tscn`（45° 侧逆主光 + 盒投影反射探针 + 全分辨率 SSAO + SSR）；
-   - 场景遵循「场景硬表面真实 PBR + 角色二次元赛璐璐 NPR」双管线架构。
-8. **人形骨骼与动画驱动规范（2026-09-06 定案）**：
-   - Aster 原模具备标准 43 骨 Humanoid 工业骨架与四重蒙皮权重，动作驱动必须通过 Godot 4.7 原生 `BoneMap` + `SkeletonProfileHumanoid` + `AnimationTree`；
-   - 严禁继续使用代码 Tween 强转单根骨骼实现伪动画（导致手肘不弯、双腿滑步等假动作）。
-9. **资产制作方法**：
-   - 依据实际资产选择局部重建、雕刻、变形笼、重拓扑和贴图修复；生成服务仅作可选来源。
-   - 不限制必须使用某厂商或固定“AI 占 85%”比例。自动化和插件不保证造型、拓扑或美术质量。
+7. **渲染与光照**：
+   - 渲染器 **Forward+ (Vulkan Clustered)**，色调映射 **AgX**；不退回 `gl_compatibility`。
+   - 每个 3D 场景放一个 `LightingRig`，选一个 `lighting/presets/` 预设；场景里不另放 WorldEnvironment / DirectionalLight3D。
+   - 场景材质（地面、建筑、道具）用普通 PBR：着色器不写 `light()`，不用 `ambient_light_disabled`，不做亮度补偿系数。角色可用 `toon_character.gdshader` 的色阶，但暗部跟随光源，不写固定底色。
+   - 调光照前读 [`docs/pipeline/lighting-guide.md`](docs/pipeline/lighting-guide.md)；改完用 `tests/lighting_preview.tscn` 出四套预设对比图给用户看。
+8. **角色、骨骼与动画**：
+   - 按 [`docs/pipeline/character-pipeline.md`](docs/pipeline/character-pipeline.md)：角色要建在有正确拓扑、五官和骨骼的身体上；AI 分件生成后硬拼的路线已废弃。
+   - 绑定用地基自带骨骼（VRM）或 AccuRIG / Mixamo；动画重定向用 Godot `BoneMap` + `SkeletonProfileHumanoid`，播放用 `AnimationTree`。
+   - 禁止脚本按坐标/高度分配权重、手算四元数重定向；禁止代码 Tween 摆骨做假动画。
+   - 换角色只换模型：新角色场景挂 `CharacterRig`，按新骨骼改插槽骨名与 `CLIP_ALIASES`。

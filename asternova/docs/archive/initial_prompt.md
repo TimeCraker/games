@@ -1,3 +1,5 @@
+> **归档说明（2026-10-23）**：这是早期给 Agent 的原始任务提示，仅作历史记录。文中引用的 `character-modeling-pipeline.md` 与 `render-lab/models/` 已删除；"禁用 VRoid 底模"等假设已被推翻，现行角色流程见 [character-pipeline.md](../pipeline/character-pipeline.md)。
+
 <USER_REQUEST>
 /goal 
 【# 角色与任务定义

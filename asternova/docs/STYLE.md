@@ -69,14 +69,14 @@
     · 材质层次：棉/雪纺/丝带/刺绣/珠光皮革以 subtle 色差与软褶区分，防止纯白糊块
   - 视觉基准：[../art/characters/aster/turnaround-final.png](../art/characters/aster/turnaround-final.png)（官方设定稿 v2，后续建模/立绘/渲染一致性以它为准）；完整档案与生图提示词存档见 [../art/characters/aster/aster.md](../art/characters/aster/aster.md)
   - 气质：清冷克制 · 微暖反差；背景占位：黄昏商店街的转学生
-  - **3D 基模构建与配件验收定稿（2026-09-04 回填，2026-09-05 升级为 Tripo3D 原生多视角生成管线）**：
-    · 头部基模骨架：存放在 `render-lab/models/aster/aster_head_base_v2.blend`，采用工业级二次元块面拓扑（高颅顶、微收下颌）。
+  - **3D 造型要求**（设计目标；目前没有可用的 Aster 3D 角色，制作方法见 [character-pipeline.md](pipeline/character-pipeline.md)）：
+    · 头部：高颅顶、微收下颌。
     · 发型剪影：刘海中央雕刻出 Aster 标志性的**倒 V 型空气刘海中缝**，自然展露额头与鼻梁轮廓；两侧 face-framing 细长发束顺下颚垂落至锁骨；彻底剔除外翻的翅膀状尖刺。
     · 贴图去污基底：清洗旧版烘焙残留暗红围巾污迹，身体贴图统一使用冷白瓷肌基准色 `#FDF1EA`，消除眼角与脖颈杂质折痕。
     · **必配饰件清单（缺件严禁做成品验收）**：① 左鬓侧双层白花发饰 + 浅蓝缎带；② 领口维多利亚小圆领；③ 胸前小号浅蓝双层窄领结 + 珍珠金色小胸针；④ 后背宽腰封中号下垂蝴蝶结。
     · 验收红线：必须在上述配饰齐全状态下，采用同款透视与光影，与 2D 原画 `turnaround-final.png` 1:1 对照，逐项检查脸部、发型、比例、服装与多角度结构，并由用户确认；不自报未经定义的相似度百分比。
 - 头身比基准：8.0~8.5 头身（现代高刷二次元动作 RPG 成熟仙气档，大长腿与修长颈项适配高速战斗与运镜；2-3=Q版 / 5-5.5=萌系大头 / 本项目严禁幼态大头）
-- **三角面数工业预算（Polygon Budget）**——**面数策略（2026-09-10 制作人定案）：生成阶段不设上限**，AI 生成资产（角色/建筑/道具）一律取 Tripo 最高面数档；下表行业对标数值与分项预算仅作**风格参照与后期 LOD1 规整参考**，不是生成上限；真机性能有压力时再自动化 LOD 减面兜底：
+- **三角面数预算（Polygon Budget）**——**面数策略（2026-09-10 制作人定案）：生成阶段不设上限**，AI 生成的建筑/道具一律取 Tripo 最高面数档（角色不走 AI 分件生成，见 character-pipeline）；下表行业对标数值与分项预算是**目标与后期 LOD1 规整参考**，不是现状，也不是生成上限；真机性能有压力时再自动化 LOD 减面兜底：
   * **行业标杆实测**：《明日方舟：终末地》PC 端角色约为 **80,000 ~ 100,000 面**；《鸣潮》常规角色约为 **90,000 ~ 120,000 面**；《绝区零》动态高刷角色约为 **35,000 ~ 60,000 面**；《原神》早期为 15,000 ~ 25,000 面。所谓的“机能低面数”属于场景建筑，二次元动作角色本身均为高规格精模。
   * **Aster PC 旗舰档总预算（120+ FPS）**：**60,000 ~ 85,000 三角面**（高密度四边面 Quad 拓扑为主）：
     * 珍珠白多层长发：**15,000 ~ 22,000 面**（支撑倒 V 刘海、胸前与背后多层流转发束、SpringBone 弹簧骨柔体物理）；
@@ -84,7 +84,7 @@
     * 维多利亚常服与配饰：**35,000 ~ 45,000 面**（泡泡袖、小圆领、胸前双层窄领结、珍珠胸针、多层百褶裙、背后垂坠蝴蝶结、小皮鞋）；
     * 专属佩刀「星霜月华」：**800 ~ 1,500 面**（899 面定稿）。
   * **平衡 / LOD1 档（Web / 低配）**：自动 Quad 减面至 **25,000 ~ 35,000 面**。
-- 面部风格：消除几何体细碎凹凸暗影，采用平滑半兰伯特二次元面部阴影（`toon_face.gdshader`），保持眼角、鼻翼通透与自然腮红。
+- 面部风格（目标）：消除几何体细碎凹凸暗影，用 SDF 或平滑面部阴影，保持眼角、鼻翼通透与自然腮红。需要角色有正确的面部拓扑后才能实现。
 - 服装剪影原则：泡泡袖肩线 + 腰封收束 + 多层裙摆扩散 + 背后垂坠蝶结构成剪影四要素；外挂大件配饰（包/武器）禁止，服装结构内的装饰以"克制、日常可穿"为度
 
 ## 2.5 武器与随身道具规范（✅ 2026-09-04 定稿）
@@ -106,18 +106,18 @@
   - **描边规范**：Inverted Hull 背面法线外扩（厚度 `0.0009m`，材质使用日系深灰青蓝 `#3D435C`）。
   - **贴图规格**：单张 `2048x2048` BaseColor Atlas 图集（严禁多材质球导致 Draw Call 增加）。
 
-### 2.6 人形骨骼与动作驱动架构（✅ 2026-09-06 拍板定案）
+### 2.6 人形骨骼与动作驱动架构（2026-10-23 修订）
 
-- **标准 43 骨 Humanoid 工业骨架**：
-  - Aster 完整组装体（`aster_assembled.glb`）内置工业级标准人形骨骼（43 根骨骼，含 `Hips`、`Spine`、`Chest`、`Neck`、`Head`、`Upperarm/Lowerarm/Hand`、`Upperleg/Lowerleg/Foot` 及长发长裙骨骼）；
-  - 全身顶点具备完整 4 重骨骼蒙皮权重（`JOINTS_0`、`WEIGHTS_0`），手肘、膝盖、肩胛与脚踝弯曲布线完全支持自然折曲变形；
-  - **严禁继续使用代码 Tween 单独旋转关节（如 R_Upperarm 假挥刀）**：必须彻底告别单臂直挺僵硬、双腿滑步等假动作。
+- **骨架**：
+  - 现状：玩家是 CC0 人偶（Quaternius，Rigify 命名 52 骨），由 `CharacterRig` 驱动；没有正式角色骨架。
+  - 正式角色用标准 Humanoid 骨骼（VRM 自带或 AccuRIG / Mixamo 生成），含 `Hips`、`Spine`、`Chest`、`Neck`、`Head`、四肢，长发与裙摆另加骨链；手肘、膝盖、肩、脚踝须能自然弯曲。
+  - **严禁代码 Tween 单独旋转关节做假动作**（单臂直挺、双腿滑步）。
 - **Godot 4.7 动画驱动架构**：
-  - **重定向标准**：采用 Godot 4.7 原生 `BoneMap` + `SkeletonProfileHumanoid`，实现工业级标准动画重定向（Retargeting），使标准 Mixamo / mocap 人形动作无缝适配 Aster；
+  - **重定向标准**：采用 Godot 4.7 原生 `BoneMap` + `SkeletonProfileHumanoid`，让标准 Mixamo / mocap 人形动作适配角色骨架；
   - **动画状态树（`AnimationTree`）**：
     - **移动层（Locomotion BlendSpace1D）**：按水平速度（0.0m/s ~ 7.0m/s）在 `Idle`（呼吸待机）➔ `Walk`（优雅快步，2.8m/s）➔ `Run`（仙气前倾疾跑，7.0m/s）之间平滑混合插值，脚掌精准踩地不滑步；
     - **战斗层（Combat StateMachine）**：四段拔刀连击、分段蓄力、滑铲出刀、空中下劈与受击硬直；
-    - **局部卡肉与打击感（Hitstop）**：命中瞬间触发局部骨骼 `AnimationTree.set("parameters/playback/speed", 0.0)` 冻结 0.05s~0.10s，绝不停滞全局 `Engine.time_scale`，保持 UI 与环境粒子独立流畅；
+    - **局部卡肉与打击感（Hitstop）**：命中瞬间把自身 `AnimationTree` 的 `parameters/HitstopScale/scale` 设为 0，冻结 0.05s~0.10s，绝不停滞全局 `Engine.time_scale`，保持 UI 与环境粒子独立流畅；
   - **动态带状刀光（Ribbon Mesh Trail）**：
     - 刀身挂载 `Blade_Base`（护手原点）与 `Blade_Tip`（刀尖 -Y 0.74m）采样点；
     - `BladeRibbonTrail` 逐物理帧采样构建二次贝塞尔平滑 Quad 条带（8 切片深度），条带末端永远与刀尖/刀根无缝缝合，彻底消灭“空挥看不见刀光轨迹”；
@@ -133,7 +133,8 @@
 >
 > - **双管线分工（Dual-Pipeline）**：
   - **场景硬表面（PBR Pipeline）**：道路、混凝土、金属扶手、玻璃幕墙全部遵循真实微表面物理光照（Roughness / Metallic / Normal / Baked AO），结合盒投影反射探针与 SSR，打造《终末地》与《鸣潮》标志性的扎实工业质感与雨后湿润沥青光泽；
-  - **二次元角色（NPR Pipeline）**：Aster 采用受光控幅赛璐璐色阶（Toon Ramp）+ 面部 SDF 阴影 + Inverted Hull 描边，保持日漫纯净通透。
+  - **二次元角色（NPR Pipeline）**：赛璐璐色阶（Toon Ramp）+ Inverted Hull 描边，保持日漫纯净通透；面部 SDF 阴影是目标，尚未实现。
+- **现状（2026-10-23）**：光照统一由 `LightingRig` + 预设管理（晴/黄昏/阴/夜，见 [lighting-guide.md](pipeline/lighting-guide.md)）；间接光用实时 SDFGI，街区店门口有一个盒投影 ReflectionProbe；下文的 LightmapGI 烘焙与探针网格是场景定稿后的计划，尚未做。
 - **混合光照体系（Hybrid Lighting System · 对标《终末地》工业级光照分工）**：
   - **实时直接光（Real-time Direct，保交互与手感）**：45° 侧逆主阳光（SunLight）与角色动态阴影（PSSM 4 分割深度阴影）、专属佩刀挥砍流光、自动贩卖机橱窗点光源 **100% 实时计算**，确保角色奔跑、滑铲、挥刀时脚下阴影紧密贴地、高光瞬时响应，支撑 120+ FPS 竞技级手感；
   - **预计算/烘焙间接光（Pre-baked Indirect GI & Probes，保画质与帧率）**：
@@ -146,7 +147,7 @@
 >   - **AgX 核心优势**：模拟现代电影胶片全通道感光曲线（Inset Gamut Mapping），高光区域自然平滑地向白场滚降收敛（Highlight Roll-off），完美保全 Aster 珍珠白长发、象牙白衣物与淡水蓝细节的柔和层次；
 >   - **Blender 与离线视口标定**：View Transform 必须使用 `AgX`，Look 选择 `AgX - Medium High Contrast`，曝光补偿 `0.0 ~ +0.5`，确保 3D 软件中打样效果与游戏引擎 Forward+ 渲染输出 100% 视觉对齐。
 - **环境漫射与天光底座（Environment & Ambient Lighting · 拒绝纯代码低劣天光）**：
-  - **物理 2K HDRI 全景漫射**：坚决摒弃早期纯代码用简易渐变伪造的假天空（导致背光面呈现单调死灰且无环境色彩反弹）。场景环境光与反射统一由真实 **2K EXR/HDR（来自 Poly Haven / CC0 优质无版权库）** 驱动；
+  - **物理 2K HDRI 全景漫射**：坚决摒弃早期纯代码用简易渐变伪造的假天空（导致背光面呈现单调死灰且无环境色彩反弹）。场景环境光与反射统一由真实 **2K EXR/HDR（来自 Poly Haven / CC0 优质无版权库）** 驱动（现状：四套预设暂用程序化天空，配好 HDRI 后填入预设的 `Sky Panorama` 即可切换）；
   - **清冷日间天光配置**：环境强度（Background Strength）设为 `0.85 ~ 1.05`，天空色调略偏清冷天蓝（Sky Tint `#DCE6F5`），提供充足的二次环境漫射与三向各向异性反光，保证建筑物侧面与背光阴影透气不发黑；
   - **主直射光（Sun）与 HDRI 角度严密对齐**：主阳光作为阴影脚架与直接照明源（能量 `2.5 ~ 3.5`），其光照矢量必须与 HDRI 背景图中的太阳物理方位绝对咬合，确保阴影方向与天空云霞高光完全一致。
 - **都市机能广场地面 PBR 节点规范（Ground & Micro-Surface PBR · 光映广场级规整石板）**：
@@ -160,8 +161,8 @@
 - **Toon Ramp 角色光照算法（`toon_character.gdshader`）**：
   - 色阶模式：半兰伯特（Half-Lambert，`NdotL * 0.5 + 0.5`）结合受光衰减。
   - 明暗交界线阈值（`ramp_threshold`）：`0.48`；羽化硬度（`ramp_smoothness`）：`0.03`（经典日式硬切赛璐璐）。
-  - 过渡过渡阶：阈值 `0.22`，混合 `shadow_tint * 0.40`，低于阈值完全切入环境光底色。
-  - 面部光照仰角解耦（Face SDF Light Decoupling）：面部法线不参与垂直天顶阳光倾角计算（将垂直 Pitch 限制在 ±15° 内），杜绝正午阳光在鼻梁和眼眶投下脏碎阴影。
+  - 暗部：取同一光源的 `shadow_tint × (1 - shadow_strength)`，随光源强弱变化；环境光、GI、反射由引擎叠加（不使用 `ambient_light_disabled`，不写固定底色）。
+  - 面部光照仰角钳制（Face Pitch Clamp）：面部法线不参与垂直天顶阳光倾角计算（将垂直 Pitch 限制在 ±15° 内），杜绝正午阳光在鼻梁和眼眶投下脏碎阴影。
 - **发丝各向异性高光（Kajiya-Kay Anisotropic Highlight）**：
   - 模拟二次元少女发顶经典的“光环圈”：着色器沿发丝展开的 UV 切线流向计算各向异性高光，生成横跨刘海与发顶的平滑弧形高光带，随镜头角度自然流转。
 - **描边规范（`outline.gdshader`）**：
@@ -169,19 +170,11 @@
   - 基准厚度：身体/衣物 `0.0026`，面部外缘 `0.0020`，专属佩刀 `0.0009`。
   - 距离自适应保持：开启（`distance_scaling = true`），保证近景细腻不粗笨，远景轮廓清晰。
   - 描边色：日系深灰青蓝 `#3D435C`。
-- **标准后处理与环境预设（`endfield_studio_environment.tres`）**：
-  - 渲染器：**Forward+ (Vulkan Clustered)**。
-  - 色调映射（ToneMap）：**AgX（模式 4，`tonemap_mode = 4`）**，曝光度 1.0。
-  - 屏幕空间环境光遮蔽（SSAO）：开启，半径 `1.2`，强度 `1.8`，锐度 `1.5`，细节 `0.5`（全分辨率，精确呈现建筑倒角与台阶阴影咬合）。
-  - 屏幕空间反射（SSR）：开启，最大步数 `64`，淡入 `0.15`，淡出 `2.0`（呈现潮湿地面倒影与玻璃反光）。
-  - 泛光（Glow）：混合模式为 Softlight，强度 `0.25`，Bloom `0.04`，HDR 阈值提升至 `1.50`（极其克制，仅自发光招牌与强反光发亮，衣服与皮肤绝不光晕起雾）。
-  - 颜色调整（Color Adjustment）：对比度 `1.06`，饱和度微降至 `0.95`（彻底消灭浮躁高饱和，呈现《终末地》沉稳高级机能灰阶）。
+- **后处理与环境**：由 `LightingRig` 按预设生成 WorldEnvironment。渲染器 Forward+，色调映射 AgX；SSAO、SSR、雾、辉光、曝光、对比度、饱和度的取值都在 `client-godot-v2/lighting/presets/*.tres` 里，调法见 [lighting-guide.md](pipeline/lighting-guide.md)。原则：辉光克制，只让招牌和强反光发亮，衣服和皮肤不起雾。
 
 ## 4. 场景规范（✅ 2026-09-06 M1 升级终末地工业级预设）
 
-- **标准布光 Prefab（`endfield_lighting_studio.tscn`）**：
-  - 45° 侧逆主阳光（`SunLight`）：位置 `(-5.0, 6.0, 2.5)`，朝向 `(-45.0°, 35.0°, 0°)`，色温暖白 `Color(1, 0.98, 0.94)`，能量 `1.1`，开启 PSSM 4 分割深度阴影，`shadow_bias = 0.02`，`shadow_normal_bias = 1.5`，`shadow_blur = 1.2`。
-  - 局部反射探针（`StreetReflectionProbe`）：盒投影（`box_projection = true`），尺寸 `Vector3(30, 10, 30)`，中心高 `2.0m`，开启阴影反射，为整条街道与便利店橱窗提供真实的物理高光反射。
+- **标准布光**：每个场景一个 `LightingRig`（自动生成太阳与环境，太阳 PSSM 4 分割阴影），选 `lighting/presets/` 里的预设；招牌灯、店灯、路灯加入 `practical_light` 组随预设缩放；需要镜面反射的区域放盒投影 `ReflectionProbe`。参考场景 `client-godot-v2/scenes/levels/m1_street.tscn`，用法见 [lighting-guide.md](pipeline/lighting-guide.md)。
 - **四级场景资产工业化架构（Tier 1~Tier 4）**：
   - **Tier 1: 地面与道路基础设施（Ground & Streets）**：严格走 **Trim Sheet / 平铺 PBR**（沥青路面、路沿石、人行道盲道砖），大面积无缝拼接、无接缝破绽、极低显存占用；
   - **Tier 2: 核心功能与特色建筑（Hero Buildings & Storefronts）**：**GPT 设计立面概念 ➔ Tripo3D 2.0 生成原生外观底模 ➔ 自动化几何手术（Blender Python 脚本切除破损假玻璃与扁平 2D 贴纸，嵌入铝合金正交窗框与真实 3D 室内陈列货架，解决 AI 生成固有缺陷）➔ 标定 2m/4m 网格与 Quad 拓扑**，具备 45° 倒角与挑檐走廊，彻底告别火柴盒式平直积木与粗糙塑料感；
@@ -194,7 +187,7 @@
     ③ **西侧一户建街区**：住宅1(带4.5m二段跳阳台) + 住宅2(开放式车库室内) + 3.5m民居夹墙(专供3次折返蹬墙跳)；
     ④ **南端街角广场**：红蓝贩卖机、凸面反光镜与护栏，摆放受击木桩与红光反击傀儡进行 4 段普攻吸附、0.15s 弹刀与极闪实战。
   - 街道自发光：自动贩卖机冷饮橱窗点光源（能量 1.2，半径 2.5m）。
-- **三档画质切换标准表（`quality_manager.gd`）**：
+- **三档画质切换标准表**（原 render-lab 的 `quality_manager.gd` 实现，未迁入 client-godot-v2；重做时需改为调用 `LightingRig` 的环境，而不是另建 WorldEnvironment）：
 
 | 画质档位 | 帧率策略 | 抗锯齿 (MSAA 3D) | 泛光 (Glow Bloom) | 樱花粒子数 | 适用设备 |
 | :--- | :--- | :--- | :--- | :--- | :--- |

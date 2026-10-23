@@ -12,11 +12,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 当前状态（M1 渲染切片 + M2 战斗骨架并行推进中）
 
-- [x] 技术栈定案、client-unity 归档、client-godot 冻结、README/CLAUDE.md 重写
+- [x] 技术栈定案、client-unity 归档、README/CLAUDE.md 重写
+- [x] **地基清理（2026-10-23）**：删除 client-godot 与 render-lab（街区并入 client-godot-v2）；删除全部 AI 分件拼装的角色派生资产与旧角色 SOP，原画与原始雕塑留在 `art/characters/`；玩家临时换成 CC0 人偶；场景着色器不再接管光照，光照统一由 `LightingRig` 预设管理
 - [x] **backend 迁移 PostgreSQL**（弃 GORM/MySQL → sqlc + golang-migrate，本地开发数据直接弃，module 改名 `github.com/TimeCraker/asternova-backend`）
 - [x] STYLE.md 随 M1 大部分定稿（面数策略 2026-09-10 修订：AI 生成资产**生成阶段不设上限**、取 Tripo 最高档、LOD 后置）
 - [x] **文档收敛手术（2026-09-10）**：废黜 HANDOVER.md 与旧角色计划书（git 历史可恢复）；全仓统一面数 / 材质 / M1 验收口径；**建模视觉闭环铁律**入 AGENTS.md 与 architecture §9（审美操作走 Blender MCP + 每步截图多模态自查；无头脚本仅限非审美批处理；一个资产一个 Agent）
-- 当前主线（2026-10）：**三角色美术返工**（白色静态样板返工中待用户确认，紫色原资产修复推进中，详见 `asternova/docs/stage-specs/character-art-rework.md` 与 `asternova/AGENTS.md` 顶部 2026-10-01 校正）；并行推进 **M1**（场景基线已出但制作人尚未终审「过」，按参考图驱动闭环逐资产攻坚）与 **M2**（真身 rig + 连击/卡肉/极闪/动捕动画树已落地；Transport 与联机未启动）
+- 当前状态以 `asternova/docs/README.md` §1 为准。简述：光照预设待制作人确认（`docs/pipeline/lighting-guide.md`）；角色地基待制作人选定（`docs/pipeline/character-pipeline.md` §3），选定前不做角色；**M1** 场景未终审「过」；**M2** 战斗（连击/卡肉/极闪/动画树）在人偶上可跑，Transport 与联机未启动
 
 ## 整体架构（big picture）
 
@@ -62,9 +63,17 @@ go run main.go          # 监听 :8081，启动时自动 migrate up（内嵌 gol
 
 **测试现状**：`services/` 下已有 8 包单测（auth 域 4 包 + battle + gateway/handlers + match + proto，`go test ./...` 全绿）；端到端验证仍需起服务打真实流量（`/health`、`/api/guest-login`（需 env `GUEST_INVITE_CODE`，未配置返回 503 禁用）、双端进房快照流，`test/test_client.go` 为手动压测客户端）。M2 起引入确定性回放测试（输入流回放比对快照 hash）。`docs/`、`*_all_code_merged.txt` 是生成脚本的全量快照，别手改。
 
-### `asternova/client-godot/` — 一代 Godot 客户端（❄️ 已冻结）
+### `asternova/client-godot-v2/` — 唯一 Godot 工程（Godot 4.7.2，Forward+）
 
-见其 `FROZEN.md`。不再开发；`ProtoParser.gd`（自研零依赖 Protobuf）、`BattleWsClient.gd`（60Hz WS + 粘包/重连）、`GameManager.gd`（JSBridge 总线）在 client-godot-v2（M2 启动）需要时参考复用。导出预设路径硬编码为 web-client 的 `public/godot/`。
+```bash
+# 战斗沙盒（主场景 combat_playground）：仓库根 启动AsterNova游戏体验.bat
+# 战斗回归测试（109 项）：
+godot --headless --path asternova/client-godot-v2 -s tests/test_combat_runner.gd
+# 光照预设截图（不能 headless，需要真实渲染）：
+godot --path asternova/client-godot-v2 res://tests/lighting_preview.tscn -- --out=<目录> [--presets=day_clear,night_city]
+```
+
+关键位置：`scenes/levels/m1_street.tscn`（M1 街区）· `lighting/`（`LightingRig` + 预设，F1–F4 切换）· `scripts/entities/player/character_rig.gd`（角色挂接：骨骼插槽、太刀、动画别名表）· `models/mannequin/`（CC0 人偶占位）。一代客户端 `client-godot/` 已删除，其 `ProtoParser.gd` / `BattleWsClient.gd` 做联机时可从 git 历史取回参考。
 
 ### `asternova/docs/` — 蓝图与设计文档（决策锚点，改需用户拍板）
 
@@ -72,7 +81,7 @@ go run main.go          # 监听 :8081，启动时自动 migrate up（内嵌 gol
 
 ### `asternova/art/` — 美术与角色资产库（自包含角色包 / 模型 / 场景贴图）
 
-`characters/`（`aster/` 完整自包含包：设定档 `aster.md` + 定稿三视图 `turnaround-final.png`；`white/` `purple/` 返工工程进行中，`orange/` 仅主模型待启动；`rigging-review/` 装配验收）· `models/`（源模型）· `references/`（`map_style/` 31 张场景参考图，STYLE.md 唯一肉眼验收标尺）· `comparisons/` `render_previews/` `textures/`（同框对比 / 渲染预览 / 贴图）· `ui/`（游戏界面资产）。
+`characters/`（`aster/` 设定档 + 三视图 + 武器设定；`source/` 白/橙/紫三角色的原画与原始 AI 雕塑，只作参考，不能直接绑骨）· `models/`（源模型）· `references/`（`map_style/` 31 张场景参考图，STYLE.md 唯一肉眼验收标尺）· `comparisons/` `render_previews/` `textures/`（同框对比 / 渲染预览 / 贴图）· `ui/`（游戏界面资产）。
 
 ### `asternova/assets/` — 共享静态资源（logo / 架构图 / 压测图表 / README 引用）
 
@@ -86,7 +95,7 @@ go run main.go          # 监听 :8081，启动时自动 migrate up（内嵌 gol
 - **完成一个独立、可验证单元后即提交**；Conventional Commits + 中英对照，如 `feat(arena): 接入 WASM 战斗 / wire WASM combat engine`。
 - **最小改动**：只动需求所需，不顺手重构；换技术栈/加抽象先报备。
 - **技术卡点与方案校准（死磕红线）**：当发现一个技术方案或修复手段尝试很久都达不到预期效果时，严禁在错误基模/劣质路径上死磕打补丁；**必须果断停下，跳出局部死循环，深度调研工业界成熟标杆（如原神/鸣潮/米哈游等工业级管线）的最佳实践与技术选型**，校准方向、与用户对齐后再执行。
-- **红线**（完整版见 architecture.md §8 与 character-modeling-pipeline.md §1.1）：
+- **红线**（完整版见 architecture.md §8 与 docs/pipeline/character-pipeline.md §5）：
   - 性能优化以实测数据为准（tick 16.6ms / GC / RTT P95），不凭感觉换语言；破坏性操作先确认；渲染与资产先出验证件再批量生产；玩法方向导致的架构调整先改 BLUEPRINT 再动代码。
   - **严禁无头 Python 脚本手搓角色绑定与动画重定向**：严禁用 Python 数学代码在 Blender 无头模式（-b）下手算四元数重定向与网格蒙皮权重，禁止盲人摸象式自嗨测试；有机角色必须使用行业标准 Humanoid 自动骨骼（AccuRIG / Mixamo）与 Godot 原生 BoneMap。
 - 验证界面改动必须看真实页面与关键 API，HTTP 200 或模型声称 PASS ≠ 验收通过。

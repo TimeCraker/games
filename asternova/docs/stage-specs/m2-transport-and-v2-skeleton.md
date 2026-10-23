@@ -17,7 +17,7 @@
 ### A. 客户端工程骨架（新建 `asternova/client-godot-v2/`）
 
 1. [x] **Godot 4.7.x stable（部署 v4.7.2-stable.official）** 项目：
-   - 渲染器确立为 **Forward+ (Vulkan Clustered)**（与 `render-lab` 统一，PC 端游高刷基线，支持 AgX 色调映射、全分辨率 SSAO 与 SSR）；
+   - 渲染器确立为 **Forward+ (Vulkan Clustered)**（原与 `render-lab` 统一，render-lab 已于 2026-10-23 并入本工程；PC 端游高刷基线，支持 AgX 色调映射、全分辨率 SSAO 与 SSR）；
    - 目录规范：`scenes/`、`scripts/core/`、`scripts/combat/`、`scripts/entities/`、`scripts/transport/`；
    - `.gitignore`（过滤 `.godot/` 缓存与运行日志）；
 2. [x] **默认输入与按键映射（支持玩家自定义）**：

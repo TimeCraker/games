@@ -8,7 +8,7 @@
 |---|---|---|
 | 游戏引擎 | **Godot 4.7.x stable**（实际部署 `v4.7.2-stable.official`，钉死当前 stable 线） | C++ 引擎内核 + 脚本胶水；无全局 `godot` 命令，按绝对路径调用（见 AGENTS.md §0） |
 | 客户端语言 | **GDScript 2.0（全静态强类型）** | 纯 PC 端游标准，零编译等待、秒级热重载手感调教；全变量/函数强制声明静态类型；预留未来 GDExtension C++/Rust 接口 |
-| 渲染风格 | **二次元双管线 + 混合光照体系（PBR 场景 + NPR 角色 + 实时直接光 vs 预烘焙探针间接光）** | 首要对标《明日方舟：终末地》，辅以《鸣潮》《星穹铁道》；冷峻双半球天光 + 45° 侧逆立体光 + AgX 色调映射 + 全分辨率 SSAO + SSR + Inverted Hull 描边 + SDF 面部解耦；直接光/动态阴影 100% 实时保障 120 FPS 手感，间接反弹光/环境反射走预烘焙探针保证通透与帧率（详见 STYLE.md §3） |
+| 渲染风格 | **二次元双管线 + 混合光照体系（PBR 场景 + NPR 角色 + 实时直接光 vs 预烘焙探针间接光）** | 首要对标《明日方舟：终末地》，辅以《鸣潮》《星穹铁道》；AgX 色调映射 + SSAO + SSR + Inverted Hull 描边；光照由 `LightingRig` + 预设统一管理（晴/黄昏/阴/夜四套），间接光当前用实时 SDFGI，静态场景定稿后改烘焙 LightmapGI（详见 [lighting-guide.md](pipeline/lighting-guide.md)）；SDF 面部阴影是目标，尚未实现 |
 | 渲染器 | **Forward+ (Vulkan Clustered)（2026-09-06 统一定案）** | PC 首发端游基线，120+ FPS 高刷；支持 Clustered 聚簇光照（彻底根除 gl_compatibility 2.88x 光照异常）、AgX 模式 4、全分辨率 SSAO、屏幕空间反射 SSR、盒投影 ReflectionProbe 与原生体积雾；低配通过画质档位平滑降级，绝不牺牲 PC 画面底座 |
 | 画质分级 | **三档（低/中/高），运行时可切** | 低：关后处理 + 降分辨率 + 锁 60；中：120；高：全特效 + 高贴图 + 解锁至显示器上限（**渲染帧率 120 起步上不封顶**，与模拟 60Hz tick 解耦） |
 | 模拟核心 | **GDScript 战斗核心（代码物理驱动解耦）** | 身法（跑跳滑闪）纯代码驱动，换模型 0 返工；60Hz 固定步长；现代高响应 ACT 状态机（0.18s 缓冲 + 随时切断后摇 + 闪避无敌帧）+ 4 段流光刀术（4.5m 锥形加权软吸附）+ 居合蓄力弹刀 + **单体级卡肉（Per-Entity Hitstop，严禁全局 time_scale 污染联机）**；单机直调 / 房主广播双出口 |
@@ -18,7 +18,7 @@
 | 传输选路 | **Steam 中继优先 + WS 先行，原生端 ENet UDP 后置（M4）** | 连接策略六级降级（局域网 / IPv6 / UPnP / 打洞 / **Steam 数据中继（Valve 免费，Steam 版主路径）** / 自建后置），见 §4 |
 | 数据库 | **一期无数据库（本地存档文件）**；PG+Redis 封存二期 | PG 迁移已验收（见 §5），二期重启时直接用 |
 | UI 架构 | **菜单/设置=React（主案），游戏内 UI=Godot**（见 §3） | Windows 走 WebView2 嵌入；手柄空间导航库；Steamworks 由 Godot 进程持有 + 桥接；M3 spike 三验收，不过才退 Godot 菜单 |
-| 资产管线 | **2D 三视图定稿 → 3D AI 原生生成 (Tripo3D 2.0) → Blender 5.2 Quad 重拓扑与分件装配 → GLB + KTX2** | 彻底告别代码手搓白模与碎片拼接；以 `turnaround-final.png` 1:1 出原生雕刻网格；沙盒位于 `render-lab/`；M1 垂直切片打磨达标后同步进 `client-godot-v2` |
+| 资产管线 | **场景/道具**：Tripo 等 AI 生成 + Blender 修整 → GLB；**角色**：建在有正确拓扑与骨骼的身体上（VRoid / 商用素体 / AI 一体生成 + 自动绑骨，地基待定） | AI 分件生成角色再硬拼的路线已废弃，见 [character-pipeline.md](pipeline/character-pipeline.md)；唯一工程 `client-godot-v2` |
 | agent 接入 | **MCP (godot-mcp + blender-mcp) + 本地底层 CLI 双模协同** | 见 §9 与 AGENTS.md；前台视口走 MCP 实时协同，批量拓扑走 CLI 无头脚本 |
 | 部署 | **一期免服务端部署**（单机+房主联机） | 玩家自主机即服务器；二期中心服务复用 asterforge-deploy 体系 |
 | 测试 | Godot headless (GdUnit4) + 模拟核心确定性测试 | 固定步长 + 种子输入回放比对状态 hash；三阶段截图自检闭环 |
@@ -131,6 +131,8 @@
 3. 渲染与资产必须先出验证件给用户过目，验收通过才批量生产。
 4. 玩法方向变化导致的架构级调整（如快照频率），先改 BLUEPRINT.md 再动代码。
 5. **联机战斗打击感铁律：严禁在命中/卡肉顿帧逻辑中调用全局时间流速缩放（如 `Engine.time_scale = 0`）**。卡肉顿帧必须严格使用**单体级冻结（Per-Entity Hitstop）**——仅对攻击者与受击目标局部设置动画/运动学冻结 4~8 帧（约 0.06~0.12s），配合本机视口创伤平滑震屏，严禁污染全局环境时间导致联机队友画面卡死。
+6. **角色绑定**：用地基自带骨骼（VRM）或 AccuRIG / Mixamo 绑定，Godot `BoneMap` 重定向。禁止脚本按坐标分配权重、手算四元数重定向（[character-pipeline.md](pipeline/character-pipeline.md) §5）。
+7. **场景材质不接管光照**：场景着色器不写 `light()`、不用 `ambient_light_disabled`、不加亮度补偿系数；光照统一由 `LightingRig` 预设控制（[lighting-guide.md](pipeline/lighting-guide.md) §4）。
 
 ## 9. Agent 自动化接入与 MCP 连接架构（双模协同）
 
