@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://scripts/combat/combat_data.gd" id="2_cd"]
 [ext_resource type="Script" path="res://scripts/camera/camera_controller.gd" id="3_cc"]
 [ext_resource type="Script" path="res://scripts/combat/player_combat_fsm.gd" id="4_fsm"]
-[ext_resource type="PackedScene" uid="uid://char_aster_cli1" path="res://scenes/entities/character_aster.tscn" id="5_aster"]
+[ext_resource type="PackedScene" uid="uid://char_mannequin1" path="res://scenes/entities/character_mannequin.tscn" id="5_character"]
 
 [sub_resource type="Resource" id="Resource_combat"]
 script = ExtResource("2_cd")
@@ -25,7 +25,7 @@ shape = SubResource("CapsuleShape3D_player")
 
 [node name="VisualRoot" type="Node3D" parent="."]
 
-[node name="CharacterAster" parent="VisualRoot" instance=ExtResource("5_aster")]
+[node name="Character" parent="VisualRoot" instance=ExtResource("5_character")]
 
 [node name="CameraController" type="Node3D" parent="."]
 script = ExtResource("3_cc")

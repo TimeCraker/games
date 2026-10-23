@@ -1,13 +1,13 @@
 class_name PlayerController
 extends CharacterBody3D
 
-## Aster 角色物理与战斗主控制器（解耦型设计，支持无缝挂载未来 3D 模型）
+## 玩家角色物理与战斗主控制器（解耦型设计，支持无缝挂载未来 3D 模型）
 
 @export var combat_data: CombatData
 
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
 @onready var visual_root: Node3D = $VisualRoot
-@onready var aster_rig: AsterRig = $VisualRoot/CharacterAster
+@onready var character_rig: CharacterRig = $VisualRoot/Character
 @onready var camera_controller: CameraController = $CameraController
 @onready var combat_fsm: PlayerCombatFSM = $PlayerCombatFSM
 
@@ -45,10 +45,10 @@ func _ready() -> void:
 	combat_fsm.init(self, combat_data)
 
 	# AnimationTree 桥接驱动器：FSM 状态 → 动捕状态树 travel + Locomotion 混合参数
-	var anim_driver := AsterAnimDriver.new()
-	anim_driver.name = "AsterAnimDriver"
+	var anim_driver := PlayerAnimDriver.new()
+	anim_driver.name = "PlayerAnimDriver"
 	add_child(anim_driver)
-	anim_driver.init(combat_fsm, aster_rig, self)
+	anim_driver.init(combat_fsm, character_rig, self)
 
 	# 连接第一人称视角信号 (FPP 下隐藏真身防穿模)
 	camera_controller.view_mode_changed.connect(_on_view_mode_changed)
@@ -323,9 +323,9 @@ func start_guard_stance() -> void:
 func update_blade_stance(drawn: bool) -> void:
 	## 拔刀/纳刀插槽切换：由战斗状态机在状态迁移时驱动
 	if drawn:
-		aster_rig.draw_sword()
+		character_rig.draw_sword()
 	else:
-		aster_rig.sheathe_sword()
+		character_rig.sheathe_sword()
 
 func begin_attack_lunge(lunge_dir: Vector3, distance: float, windup: float) -> void:
 	## 磁性索敌吸附：前摇窗口内向目标匀速前突指定距离
@@ -335,7 +335,7 @@ func begin_attack_lunge(lunge_dir: Vector3, distance: float, windup: float) -> v
 func freeze_pose(duration: float) -> void:
 	## 单体局部卡肉：仅冻结自身 AnimationTree 播放与位移，Engine.time_scale 恒 1.0
 	hitstop_timer = maxf(hitstop_timer, duration)
-	aster_rig.freeze_pose(duration)
+	character_rig.freeze_pose(duration)
 
 func _trigger_screen_flash(duration: float) -> void:
 	## 全屏闪白（居合穿透斩）：交由 HUD 层执行
@@ -456,7 +456,7 @@ func _query_blade_hits(damage: float, hit_dir: Vector3, is_heavy: bool, freeze: 
 
 func play_parry_fx() -> void:
 	camera_controller.trigger_hit_impact(true)
-	spawn_hit_spark(aster_rig.get_katana_position(), true)
+	spawn_hit_spark(character_rig.get_katana_position(), true)
 	# 振刀火花与后仰震退反馈
 	velocity = visual_root.global_transform.basis.z * 4.0
 	var recoil_tween: Tween = create_tween()
@@ -547,4 +547,4 @@ func set_capsule_height(h: float) -> void:
 
 func _on_view_mode_changed(is_first_person: bool) -> void:
 	# 第一人称下隐藏整个真身模型以防穿模
-	aster_rig.visible = not is_first_person
+	character_rig.visible = not is_first_person

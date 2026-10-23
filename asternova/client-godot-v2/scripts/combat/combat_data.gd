@@ -47,7 +47,8 @@ extends Resource
 @export var soft_lock_pull_speed: float = 8.0 ## 软吸附微滑步推力
 @export var combo_damage: Array[float] = [25.0, 30.0, 45.0, 75.0]
 @export var combo_lunge_speed: Array[float] = [3.5, 3.0, 6.0, 8.5] ## 每段出刀前冲推力
-## 四段连招对应的动捕剪辑真实时长（Slash1/Slash2/Slash3/SlashUppercut，来自 aster_animlib）
+## 四段连招时长（Slash1/Slash2/Slash3/SlashUppercut）。现值沿用旧动捕库，
+## 人偶的四段都映射到同一个 Sword_Attack；换正式连招动画后按 CharacterRig.get_clip_length 重标定。
 @export var combo_anim_lengths: Array[float] = [1.167, 1.167, 1.792, 1.375]
 
 @export_group("近身索敌吸附 (Magnetic Lunge)")

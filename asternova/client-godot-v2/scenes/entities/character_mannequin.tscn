@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://char_mannequin1"]
+
+[ext_resource type="PackedScene" path="res://models/mannequin/mannequin.gltf" id="1_base"]
+[ext_resource type="Script" path="res://scripts/entities/player/character_rig.gd" id="2_rig"]
+
+[node name="Character" instance=ExtResource("1_base")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+script = ExtResource("2_rig")

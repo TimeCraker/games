@@ -55,12 +55,9 @@ asternova/
 │   ├── composite_katana_showcase.py      # 自动化多视角出图与合成看板脚本
 │   └── generate_katana_web_viewer.py     # 3D Web 检视器生成脚本
 │
-├── render-lab/scenes/                     # 🎮 引擎内独立检视视口
-│   ├── weapon_viewer.tscn                # Godot 4.7 独立展示台场景
-│   └── ../scripts/weapon_viewer.gd       # 交互代码（360°旋转/缩放/空格拔刀动画）
-│
-└── client-godot-v2/                       # ⚔️ 正式游戏客户端（挂载已落地：太刀 4 段普攻接入）
-    └── 角色右手插槽挂载（Hand_R_Weapon_Socket）与腰部插槽（Pelvis_L_Scabbard_Socket，见 scripts/entities/player/aster_rig.gd 与 tests/check_scabbard_transform.gd）
+└── client-godot-v2/                       # ⚔️ 正式游戏客户端
+    ├── models/weapons/katana.glb          # 游戏内使用的副本
+    └── 右手插槽 Hand_R_Weapon_Socket 与腰部插槽 Pelvis_L_Scabbard_Socket，见 scripts/entities/player/character_rig.gd
 ```
 
 ---
@@ -70,8 +67,7 @@ asternova/
 1. **方式 1：双击 Web 3D 检视器（最轻量推荐）**：
    - 文件：[`art/models/weapons/aster_katana/aster_katana_3d_viewer.html`](../../models/weapons/aster_katana/aster_katana_3d_viewer.html)
    - 效果：在 Edge / Chrome 浏览器中秒开，支持鼠标 360° 拖拽旋转、滚轮变焦、按空格键拔刀/收刀、按 `W` 切换线框拓扑、按 `1~5` 特写对焦。
-2. **方式 2：Godot 引擎原生场景**：
-   - 场景文件：[`render-lab/scenes/weapon_viewer.tscn`](../../../render-lab/scenes/weapon_viewer.tscn)
+2. **方式 2：Godot 游戏内**：运行仓库根 `启动AsterNova游戏体验.bat`，看人偶手持与腰挂效果（原 render-lab 的 weapon_viewer 已删除）。
 3. **方式 3：Blender 5.2 视口**：
    - 源工程：[`art/models/weapons/aster_katana/aster_katana.blend`](../../models/weapons/aster_katana/aster_katana.blend)
 

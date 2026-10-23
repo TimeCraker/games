@@ -8,9 +8,9 @@ var tick: int = 0
 var scene: Node = null
 var phase: String = "boot"
 var player: PlayerController = null
-var rig: AsterRig = null
+var rig: CharacterRig = null
 var fsm: PlayerCombatFSM = null
-var driver: AsterAnimDriver = null
+var driver: PlayerAnimDriver = null
 var check_total: int = 0
 
 # 连招测试状态
@@ -104,13 +104,14 @@ func phase_integrity() -> void:
 		return
 	print("✔ PlayerController 存在且就绪")
 
-	rig = player.visual_root.get_node_or_null("CharacterAster") as AsterRig
-	check(rig != null, "Aster 真身 rig 不存在")
-	check(rig.skeleton != null and (rig.skeleton.get_bone_count() == 26 or rig.skeleton.get_bone_count() == 43 or rig.skeleton.get_bone_count() == 55), "Aster 骨骼数量异常")
-	check(rig.hand_socket != null and rig.hand_socket is BoneAttachment3D, "Hand_R_Weapon_Socket 插槽缺失")
-	check(rig.scabbard_socket != null and rig.scabbard_socket is BoneAttachment3D, "Pelvis_L_Scabbard_Socket 插槽缺失")
+	rig = player.visual_root.get_node_or_null("Character") as CharacterRig
+	check(rig != null, "角色 rig 不存在")
+	check(rig.skeleton != null and rig.skeleton.find_bone(rig.hand_bone) != -1
+		and rig.skeleton.find_bone(rig.scabbard_bone) != -1, "骨架缺少握刀/挂鞘骨骼")
+	check(rig.hand_socket != null and rig.hand_socket.get_parent() is BoneAttachment3D, "Hand_R_Weapon_Socket 插槽缺失")
+	check(rig.scabbard_socket != null and rig.scabbard_socket.get_parent() is BoneAttachment3D, "Pelvis_L_Scabbard_Socket 插槽缺失")
 	check(rig.katana_blade != null, "Katana_Blade 刀身网格缺失")
-	print("✔ Aster 真身 rig 就绪: %d 骨骼 / 双插槽 / 刀身网格齐备" % rig.skeleton.get_bone_count())
+	print("✔ 角色 rig 就绪: %d 骨骼 / 双插槽 / 刀身网格齐备" % rig.skeleton.get_bone_count())
 
 	check(not rig.is_drawn, "入场默认应为纳刀态")
 	check(rig.katana_blade.get_parent() == rig.scabbard_socket, "纳刀态刀身未挂在左腰鞘插槽")
@@ -120,11 +121,9 @@ func phase_integrity() -> void:
 	check(not rig.is_drawn and rig.katana_blade.get_parent() == rig.scabbard_socket, "纳刀回鞘失败")
 	print("✔ 拔刀/纳刀双插槽切换检验通过 (Hand_R ↔ Pelvis_L_Scabbard)")
 
-	var body_mi: MeshInstance3D = rig.skeleton.get_node_or_null("Aster_Body") as MeshInstance3D
-	check(body_mi != null, "Aster_Body 网格缺失")
-	var body_mat: Material = body_mi.get_surface_override_material(0)
-	check(body_mat is ShaderMaterial and (body_mat as ShaderMaterial).shader != null, "Aster_Body 未实装着色器材质")
-	print("✔ NPR toon+outline 着色实装检验通过")
+	var blade_mat: Material = rig.katana_blade.get_surface_override_material(0)
+	check(blade_mat is ShaderMaterial and (blade_mat as ShaderMaterial).next_pass != null, "佩刀未实装 toon+outline 材质")
+	print("✔ 佩刀 NPR toon+outline 着色实装检验通过")
 
 	var capsule: CapsuleShape3D = player.collision_shape.shape as CapsuleShape3D
 	check(capsule != null, "碰撞体不是胶囊体")
@@ -222,8 +221,8 @@ func phase_mocap_driving() -> void:
 func phase_locomotion_blend() -> void:
 	if tick == 1:
 		fsm = player.combat_fsm
-		driver = player.get_node_or_null("AsterAnimDriver") as AsterAnimDriver
-		check(driver != null, "AsterAnimDriver 未挂载")
+		driver = player.get_node_or_null("PlayerAnimDriver") as PlayerAnimDriver
+		check(driver != null, "PlayerAnimDriver 未挂载")
 		fsm.change_state(PlayerCombatFSM.State.MOVE)
 		# 模拟 7 m/s 疾跑水平速度，驱动器应在下一物理帧写入混合参数
 		player.velocity = Vector3(0, 0, -7.0)
@@ -432,82 +431,33 @@ func phase_weapon_mount() -> void:
 	var palm: Vector3 = rig.get_palm_center_world()
 	var grip_dist := grip.distance_to(palm)
 	check(grip_dist < 0.03, "刀柄握心与右手掌心物理距离应 < 0.03m（实测 %.4fm）" % grip_dist)
-	check(rig.katana_blade.transform.origin.distance_to(AsterRig.DRAW_GRIP_COMPENSATION) < 0.001,
+	check(rig.katana_blade.transform.origin.distance_to(CharacterRig.DRAW_GRIP_COMPENSATION) < 0.001,
 		"拔刀挂载位置应为 §3 握心补偿 (0,-0.13,0)（实测 %s）" % rig.katana_blade.transform.origin)
 	print("  ✔ 物理抓握: 握心=%s 掌心=%s 距离=%.4fm" % [grip.snappedf(0.001), palm.snappedf(0.001), grip_dist])
 	rig.sheathe_sword()
-	# 断言2/3/4/5：插槽纯洁性 + Twist 洁净 + 长发锁头 + 零权重顶点（GLB 蒙皮数据真值）
-	var res := _audit_skin_weights()
-	check(res.socket_counts["Pelvis_L_Scabbard_Socket"] == 0,
-		"Pelvis_L_Scabbard_Socket 顶点权重计数应恒为 0（实测 %d）" % res.socket_counts["Pelvis_L_Scabbard_Socket"])
-	check(res.socket_counts["Hand_R_Weapon_Socket"] == 0,
-		"Hand_R_Weapon_Socket 顶点权重计数应恒为 0（实测 %d）" % res.socket_counts["Hand_R_Weapon_Socket"])
-	check(res.twist_weighted_verts == 0,
-		"肢体 Twist 扭骨加权顶点数应恒为 0（实测 %d）" % res.twist_weighted_verts)
-	check(res.hair_verts >= 500, "Hair_Mask 发丝标记顶点数应 ≥500（实测 %d）" % res.hair_verts)
-	check(res.hair_bad_verts == 0,
-		"发丝顶点在 Spine/Waist/Hip/腿骨上的权重应恒为 0（违例 %d 个）" % res.hair_bad_verts)
-	check(res.zero_weight_verts == 0, "全网格零权重顶点数应为 0（实测 %d）" % res.zero_weight_verts)
-	print("  ✔ 蒙皮审计: 加权顶点=%d Socket带权=%d/%d Twist带权=%d 发丝=%d(违例%d) 零权重=%d" % [
-		res.weighted_verts, res.socket_counts["Pelvis_L_Scabbard_Socket"],
-		res.socket_counts["Hand_R_Weapon_Socket"], res.twist_weighted_verts,
-		res.hair_verts, res.hair_bad_verts, res.zero_weight_verts])
+	# 断言2：蒙皮网格无零权重顶点（零权重顶点会停在原点或被拉成尖刺）
+	var zero := _count_zero_weight_verts()
+	check(zero == 0, "蒙皮网格零权重顶点数应为 0（实测 %d）" % zero)
+	print("  ✔ 蒙皮审计: 零权重顶点=%d" % zero)
 	phase = "done"
 
 
-## 蒙皮权重审计：扫描 Aster_Body 全部表面权重数组 + Hair_Mask 顶点色
-func _audit_skin_weights() -> Dictionary:
-	var out := {
-		"socket_counts": {"Pelvis_L_Scabbard_Socket": 0, "Hand_R_Weapon_Socket": 0},
-		"zero_weight_verts": 0,
-		"weighted_verts": 0,
-		"twist_weighted_verts": 0,
-		"hair_verts": 0,
-		"hair_bad_verts": 0,
-	}
-	var mi := rig.skeleton.get_node_or_null("Aster_Body") as MeshInstance3D
-	if mi == null or mi.mesh == null:
-		_failures.append("Aster_Body 蒙皮网格缺失")
-		return out
-	# 扭骨集合（NeckTwist01 除外——它是保留形变的颈主骨）
-	var twist_bones := {}
-	for b in rig.skeleton.get_bone_count():
-		var bn := rig.skeleton.get_bone_name(b)
-		if bn.contains("Twist") and bn != "NeckTwist01":
-			twist_bones[bn] = 0
-	# 发丝锁头黑名单骨（发丝顶点在这些骨上的权重必须恒 0）
-	var hair_forbidden := {"Spine01": 0, "Spine02": 0, "Waist": 0, "Hip": 0,
-		"Pelvis": 0, "L_Thigh": 0, "R_Thigh": 0, "L_Calf": 0, "R_Calf": 0}
-	var n_bones := rig.skeleton.get_bone_count()
-	for s in mi.mesh.get_surface_count():
-		var arrays := mi.mesh.surface_get_arrays(s)
-		var bones := arrays[Mesh.ARRAY_BONES] as PackedInt32Array
-		var weights := arrays[Mesh.ARRAY_WEIGHTS] as PackedFloat32Array
-		if bones.is_empty() or weights.is_empty():
+func _count_zero_weight_verts() -> int:
+	var zero := 0
+	for mi in rig.skeleton.find_children("*", "MeshInstance3D", true, false):
+		var mesh := (mi as MeshInstance3D).mesh
+		if mesh == null:
 			continue
-		# 发丝标记：Hair_UV 第二 UV 通道（发丝=(0.5,0.5)）→ glTF TEXCOORD_1
-		var uv2: Variant = arrays[Mesh.ARRAY_TEX_UV2]
-		var has_uv2: bool = uv2 is PackedVector2Array and uv2.size() >= weights.size() / 4
-		var n := weights.size() / 4
-		for i in n:
-			var wsum := weights[i * 4] + weights[i * 4 + 1] + weights[i * 4 + 2] + weights[i * 4 + 3]
-			if wsum < 0.0001:
-				out.zero_weight_verts += 1
+		for s in mesh.get_surface_count():
+			var raw: Variant = mesh.surface_get_arrays(s)[Mesh.ARRAY_WEIGHTS]
+			if not raw is PackedFloat32Array or (raw as PackedFloat32Array).is_empty():
 				continue
-			out.weighted_verts += 1
-			var is_hair: bool = has_uv2 and uv2[i].x > 0.25
-			if is_hair:
-				out.hair_verts += 1
-			for k in 4:
-				var bi := bones[i * 4 + k]
-				var w := weights[i * 4 + k]
-				if w <= 0.0001 or bi >= n_bones:
-					continue
-				var bn := rig.skeleton.get_bone_name(bi)
-				if out.socket_counts.has(bn):
-					out.socket_counts[bn] += 1
-				if twist_bones.has(bn):
-					out.twist_weighted_verts += 1
-				if is_hair and hair_forbidden.has(bn):
-					out.hair_bad_verts += 1
-	return out
+			var weights: PackedFloat32Array = raw
+			var stride := 8 if mesh.surface_get_format(s) & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS else 4
+			for i in weights.size() / stride:
+				var wsum := 0.0
+				for k in stride:
+					wsum += weights[i * stride + k]
+				if wsum < 0.0001:
+					zero += 1
+	return zero
