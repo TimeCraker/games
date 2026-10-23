@@ -17,7 +17,8 @@ asternova/art/
 │   ├── raw_ai_sculpt/  # Aster 的 Tripo 原始雕刻（静态参考，无骨骼）
 │   ├── source/         # Tripo 源文件
 │   ├── weapons/        # 佩刀 aster_katana 全套（游戏内用的是复制到 client-godot-v2/models/weapons/ 的 katana.glb）
-│   └── golden_slice/ · lumina_plaza/ · neighborhood/ · nextgen_pbr/   # 场景与建筑源模型
+│   ├── neighborhood/   # M1 街区源模型（街区、便利店、自动售货机），游戏里用的是 client-godot-v2 的副本
+│   └── lumina_plaza/   # 旧光映广场源模型（游戏内已删除，留作素材）
 ├── references/         # 参考图（map_style/ 场景风格参考、便利店/售货机/地面/免费道具参考）
 ├── textures/           # 场景贴图源
 ├── ui/                 # 游戏界面资产
