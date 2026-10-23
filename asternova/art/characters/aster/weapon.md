@@ -59,8 +59,8 @@ asternova/
 │   ├── weapon_viewer.tscn                # Godot 4.7 独立展示台场景
 │   └── ../scripts/weapon_viewer.gd       # 交互代码（360°旋转/缩放/空格拔刀动画）
 │
-└── client-godot-v2/                       # ⚔️ 正式游戏客户端（下一步挂载装配）
-    └── 角色右手插槽挂载（Hand_R_Weapon_Socket）与腰部插槽（Pelvis_L_Scabbard_Socket）
+└── client-godot-v2/                       # ⚔️ 正式游戏客户端（挂载已落地：太刀 4 段普攻接入）
+    └── 角色右手插槽挂载（Hand_R_Weapon_Socket）与腰部插槽（Pelvis_L_Scabbard_Socket，见 scripts/entities/player/aster_rig.gd 与 tests/check_scabbard_transform.gd）
 ```
 
 ---

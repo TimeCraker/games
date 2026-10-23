@@ -1,0 +1,141 @@
+{
+  "method": "Rigify + native closed proxy bone heat + Data Transfer + separate torso/sleeve/ornament weights and hair/hood/coat groups",
+  "meshes": {
+    "Body_Work_Skinned": {
+      "vertices": 25880,
+      "triangles": 46951,
+      "unweighted": 0,
+      "max_weight_sum_error": 8.344650268554688e-07,
+      "max_influences": 4
+    },
+    "Hair_Work_Skinned": {
+      "vertices": 25398,
+      "triangles": 37311,
+      "unweighted": 0,
+      "max_weight_sum_error": 6.332993507385254e-08,
+      "max_influences": 3
+    },
+    "Outfit_Work_Skinned": {
+      "vertices": 23459,
+      "triangles": 42909,
+      "unweighted": 0,
+      "max_weight_sum_error": 1.516309566795826e-07,
+      "max_influences": 4
+    },
+    "Outfit_Back_Rebuilt_Skinned": {
+      "vertices": 2770,
+      "triangles": 5758,
+      "unweighted": 0,
+      "max_weight_sum_error": 1.3783574104309082e-07,
+      "max_influences": 4
+    },
+    "Outfit_Back_Tabard_Rebuilt_Skinned": {
+      "vertices": 1410,
+      "triangles": 2816,
+      "unweighted": 0,
+      "max_weight_sum_error": 1.4528632164001465e-07,
+      "max_influences": 4
+    },
+    "Sleeve_Lining_R_Skinned": {
+      "vertices": 1064,
+      "triangles": 2104,
+      "unweighted": 0,
+      "max_weight_sum_error": 1.341104507446289e-07,
+      "max_influences": 4
+    },
+    "Sleeve_Lining_L_Skinned": {
+      "vertices": 930,
+      "triangles": 1852,
+      "unweighted": 0,
+      "max_weight_sum_error": 8.270144462585449e-07,
+      "max_influences": 4
+    },
+    "Back_Waist_Belt_Skinned": {
+      "vertices": 8,
+      "triangles": 12,
+      "unweighted": 0,
+      "max_weight_sum_error": 0.0,
+      "max_influences": 1
+    },
+    "Back_Shoulder_Strap_L_Skinned": {
+      "vertices": 8,
+      "triangles": 12,
+      "unweighted": 0,
+      "max_weight_sum_error": 2.9802322387695312e-08,
+      "max_influences": 2
+    },
+    "Back_Shoulder_Strap_R_Skinned": {
+      "vertices": 8,
+      "triangles": 12,
+      "unweighted": 0,
+      "max_weight_sum_error": 7.776543498039246e-08,
+      "max_influences": 3
+    },
+    "Hood_Rebuilt_Skinned": {
+      "vertices": 1122,
+      "triangles": 2240,
+      "unweighted": 0,
+      "max_weight_sum_error": 0.0,
+      "max_influences": 1
+    },
+    "Hood_White_RolledHem_Skinned": {
+      "vertices": 264,
+      "triangles": 512,
+      "unweighted": 0,
+      "max_weight_sum_error": 0.0,
+      "max_influences": 1
+    },
+    "Hood_Gold_Edge_Skinned": {
+      "vertices": 264,
+      "triangles": 512,
+      "unweighted": 0,
+      "max_weight_sum_error": 0.0,
+      "max_influences": 1
+    },
+    "Hood_BackFold_Rebuilt_Skinned": {
+      "vertices": 238,
+      "triangles": 472,
+      "unweighted": 0,
+      "max_weight_sum_error": 0.0,
+      "max_influences": 1
+    },
+    "Hood_Back_GoldStar_Skinned": {
+      "vertices": 72,
+      "triangles": 128,
+      "unweighted": 0,
+      "max_weight_sum_error": 0.0,
+      "max_influences": 1
+    },
+    "Hood_Front_GoldStar_Skinned": {
+      "vertices": 72,
+      "triangles": 128,
+      "unweighted": 0,
+      "max_weight_sum_error": 0.0,
+      "max_influences": 1
+    },
+    "Hood_Front_InnerStar_Skinned": {
+      "vertices": 72,
+      "triangles": 128,
+      "unweighted": 0,
+      "max_weight_sum_error": 0.0,
+      "max_influences": 1
+    },
+    "Hood_Front_Chain_Skinned": {
+      "vertices": 40,
+      "triangles": 64,
+      "unweighted": 0,
+      "max_weight_sum_error": 0.0,
+      "max_influences": 1
+    }
+  },
+  "art_approved": false,
+  "deformation_approved": false,
+  "poses": [
+    "rest",
+    "arms_raise",
+    "elbow_bend",
+    "squat",
+    "head_turn",
+    "step"
+  ]
+}

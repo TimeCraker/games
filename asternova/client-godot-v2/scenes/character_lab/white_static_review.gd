@@ -2,6 +2,7 @@ extends Node3D
 
 const SAMPLE = preload("res://models/characters/rework/white_static.glb")
 const BASELINE = preload("res://models/characters/white.glb")
+const FACE_REVIEW = preload("res://scenes/character_lab/white_face_review.gdshader")
 var sample: Node3D
 var baseline: Node3D
 var camera: Camera3D
@@ -74,7 +75,7 @@ func _build_ui() -> void:
 	var column := VBoxContainer.new()
 	panel.add_child(column)
 	var title := Label.new()
-	title.text = "白色静态样板 · 待用户确认"
+	title.text = "白色返工检查 · 脸部未验收"
 	title.add_theme_font_size_override("font_size", 24)
 	column.add_child(title)
 	status = Label.new()
@@ -94,7 +95,7 @@ func _set_mode(value: int) -> void:
 	if mode == 3 and baseline_player and baseline_player.has_animation("Idle"):
 		baseline_player.play("Idle")
 		baseline_player.seek(0.0, true)
-	status.text = ["", "当前：静态外观待确认，尚未绑定", "旧版：休止姿态", "旧版：Idle 动作"][mode]
+	status.text = ["", "当前：脸部继续返工，尚未绑定", "旧版：休止姿态", "旧版：Idle 动作"][mode]
 
 func _update_camera() -> void:
 	var target := Vector3(0, 1.53 if head_view else 0.88, 0)
@@ -157,11 +158,14 @@ func _prepare_review_materials(node: Node) -> void:
 			stylized.diffuse_mode = BaseMaterial3D.DIFFUSE_TOON
 			stylized.specular_mode = BaseMaterial3D.SPECULAR_DISABLED
 			stylized.emission_enabled = false
-			# Flat face lighting is a review option; the source's painted features remain.
-			# This is not an SDF face shader or a replacement for face texture repair.
+			var face_material: Material = stylized
 			if String(node.name).begins_with("Head_Work"):
-				stylized.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-			pairs.append({"original": original, "toon": stylized})
+				var soft_face := ShaderMaterial.new()
+				soft_face.shader = FACE_REVIEW
+				soft_face.set_shader_parameter("face_albedo", original.albedo_texture)
+				soft_face.set_shader_parameter("tint", original.albedo_color)
+				face_material = soft_face
+			pairs.append({"original": original, "toon": face_material})
 		node.set_meta("review_materials", pairs)
 	for child in node.get_children():
 		_prepare_review_materials(child)
@@ -185,7 +189,7 @@ func _verify() -> void:
 		return
 	DirAccess.make_dir_recursive_absolute(directory)
 	var images: Array[Dictionary] = []
-	for setting in [["new_front", 1, 0.0, false, false, true], ["new_left", 1, PI / 2, false, false, true], ["new_back", 1, PI, false, false, true], ["new_right", 1, -PI / 2, false, false, true], ["new_head", 1, 0.0, true, false, true], ["new_clay", 1, 0.0, false, true, true], ["new_front_pbr", 1, 0.0, false, false, false], ["new_head_pbr", 1, 0.0, true, false, false], ["old_rest", 2, 0.0, false, false, false], ["old_idle", 3, 0.0, false, false, false]]:
+	for setting in [["new_front", 1, 0.0, false, false, true], ["new_left", 1, PI / 2, false, false, true], ["new_back", 1, PI, false, false, true], ["new_right", 1, -PI / 2, false, false, true], ["new_head", 1, 0.0, true, false, true], ["new_head_quarter", 1, PI / 6, true, false, true], ["new_head_left", 1, PI / 2, true, false, true], ["new_head_right", 1, -PI / 2, true, false, true], ["new_clay", 1, 0.0, false, true, true], ["new_front_pbr", 1, 0.0, false, false, false], ["new_head_pbr", 1, 0.0, true, false, false], ["old_rest", 2, 0.0, false, false, false], ["old_idle", 3, 0.0, false, false, false]]:
 		_set_mode(setting[1])
 		yaw = setting[2]
 		head_view = setting[3]

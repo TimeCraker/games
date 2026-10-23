@@ -2,11 +2,12 @@
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 import sys
 
 import bpy
-from mathutils import Vector
+from mathutils import Quaternion, Vector
 
 
 VIEWS = {
@@ -17,6 +18,8 @@ VIEWS = {
     'threequarter': ((2, -4, .88), (0, 0, .88), 1.94),
     'head': ((0, -4, 1.53), (0, 0, 1.53), .43),
     'head_side': ((4, 0, 1.53), (0, 0, 1.53), .43),
+    'head_left': ((-4, 0, 1.53), (0, 0, 1.53), .43),
+    'head_reference': ((-.4, -4, 1.54), (0, 0, 1.52), .43),
     'head_threequarter': ((3, -4, 1.53), (0, 0, 1.53), .43),
     'clay': ((0, -4, .88), (0, 0, .88), 1.94),
     'head_clay': ((3, -4, 1.53), (0, 0, 1.53), .43),
@@ -58,6 +61,8 @@ def main():
         position, target, scale = VIEWS[name]
         scene.camera.location = position
         scene.camera.rotation_euler = (Vector(target) - scene.camera.location).to_track_quat('-Z', 'Y').to_euler()
+        if name == 'head_reference':
+            scene.camera.rotation_euler = (scene.camera.rotation_euler.to_quaternion() @ Quaternion((0, 0, 1), math.radians(18))).to_euler()
         scene.camera.data.type = 'ORTHO'
         scene.camera.data.ortho_scale = scale
         bpy.context.view_layer.material_override = neutral if 'clay' in name else None
@@ -66,14 +71,18 @@ def main():
     bpy.context.view_layer.material_override = None
     head = bpy.data.objects.get('Head_Work')
     original = bpy.data.objects.get('Head_BeforeForeheadCleanup')
+    archived = bpy.data.objects.get('Head_PrePortrait_Archive')
     report = {
         'source_sha256': source_hash,
         'source_unchanged': source_hash == hashlib.sha256(args.blend.read_bytes()).hexdigest(),
         'resolution': [800, 1000],
         'views': {name: VIEWS[name] for name in args.views},
+        'camera_roll_degrees': {'head_reference': 18} if 'head_reference' in args.views else {},
         'head_signature': mesh_signature(head) if head else None,
         'original_head_signature': mesh_signature(original) if original else None,
         'face_geometry_uv_unchanged': bool(head and original and mesh_signature(head) == mesh_signature(original)),
+        'original_face_archive_unchanged': bool(archived and original and mesh_signature(archived) == mesh_signature(original)),
+        'face_geometry_uv_reworked': bool(archived and head and mesh_signature(archived) != mesh_signature(head)),
         'art_approved': False,
     }
     (args.output / 'render_report.json').write_text(json.dumps(report, indent=2), encoding='utf-8')

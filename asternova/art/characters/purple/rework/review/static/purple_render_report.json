@@ -1,0 +1,114 @@
+{
+  "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\purple_rework_working.blend",
+  "source_sha256": "4595df831ac731fd0f3a7b3de19ef67c9e3cefc0021341e2646870a18d42a920",
+  "source_unchanged": true,
+  "operation": "render",
+  "art_approved": false,
+  "result": null,
+  "views": {
+    "front": [
+      [
+        0,
+        -4,
+        0.88
+      ],
+      [
+        0,
+        0,
+        0.88
+      ],
+      1.97
+    ],
+    "left": [
+      [
+        -4,
+        0,
+        0.88
+      ],
+      [
+        0,
+        0,
+        0.88
+      ],
+      1.97
+    ],
+    "right": [
+      [
+        4,
+        0,
+        0.88
+      ],
+      [
+        0,
+        0,
+        0.88
+      ],
+      1.97
+    ],
+    "back": [
+      [
+        0,
+        4,
+        0.88
+      ],
+      [
+        0,
+        0,
+        0.88
+      ],
+      1.97
+    ],
+    "threequarter": [
+      [
+        2.0,
+        -4,
+        0.92
+      ],
+      [
+        0,
+        0,
+        0.88
+      ],
+      1.97
+    ],
+    "head": [
+      [
+        0,
+        -4,
+        1.56
+      ],
+      [
+        0,
+        0,
+        1.56
+      ],
+      0.55
+    ],
+    "head_side": [
+      [
+        4,
+        0,
+        1.56
+      ],
+      [
+        0,
+        0,
+        1.56
+      ],
+      0.55
+    ],
+    "clay": [
+      [
+        0,
+        -4,
+        0.88
+      ],
+      [
+        0,
+        0,
+        0.88
+      ],
+      1.97
+    ]
+  }
+}

@@ -45,7 +45,7 @@
 
 ## 范围与协作边界
 
-本 Agent 负责紫色的原始资产检查、静态建模修复、控制骨架与蒙皮修复、动作和 Godot 验证。白色、橙色资产及白色共用计划不修改。保留旧 `purple_master.blend` 和 `models/characters/purple.glb` 作为基线；新工程在 `art/characters/purple/rework/`，新运行资产在独立 `models/characters/rework/`。
+本 Agent 负责紫色的原始资产检查、静态建模修复、控制骨架与蒙皮修复、动作和 Godot 验证。白色、橙色资产及白色共用计划不修改。保留旧 `purple_master.blend` 和 `models/characters/purple.glb` 作为基线；新工程在 `art/characters/purple/rework/`，新运行资产在独立 `models/characters/rework/`。注意：`purple/rework/` 根下的 `purple_rig_*.blend`、`purple_runtime_working.blend`、`rigify_setup.json` 及 `review/{poses,animations,godot_*}` 为上一轮被否定的实验产物（未跟踪），不属本轮 source_repair 工程；本轮制作源与产物全部位于 `rework/source_repair/`。
 
 原始来源：`C:/Users/TimeCraker/Pictures/游戏人物建模参考/紫色/`。主海报优先；拆分四视图用于补充侧背结构。原始三件 GLB 不覆盖。返工 `.blend` 是制作源，导出脚本仅读取它，禁止用旧装配公式重建覆盖。
 

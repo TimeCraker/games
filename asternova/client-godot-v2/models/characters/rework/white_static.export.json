@@ -1,9 +1,8 @@
 {
   "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\white\\rework\\white_rework_working.blend",
-  "source_sha256": "28336a88e366bfe6af16c601a0e7ab8a307cb2334bbe2077b7730b8407d5fe44",
+  "source_sha256": "faf1347c127c81c143d0170952ece93dae565a95a9b8a4242be1da75dc193bbe",
   "objects": [
     "Body_Work",
-    "Head_Work",
     "LegSkin_Work",
     "Shorts_Work",
     "HairClip_Work_Main",
@@ -24,8 +23,10 @@
     "SleeveUpperBinding_1",
     "ShoulderWebbing_1",
     "SleeveRibbon_Outer_1",
-    "SleeveRibbon_Inset_1"
+    "SleeveRibbon_Inset_1",
+    "Head_Work",
+    "Face_LipLine_OriginalReference"
   ],
-  "output_sha256": "b9d864f44bf1925a4da1bc6865ce7193211976b0959f4110087daa151d8c240b",
+  "output_sha256": "7571167044281ad8739f404c43b0f6b8f3145170d08c2cd1aa0872d8d1de8fab",
   "art_approved": false
 }

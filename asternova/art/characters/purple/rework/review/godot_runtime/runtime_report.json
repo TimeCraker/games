@@ -1,0 +1,52 @@
+{
+	"art_approved": false,
+	"bones": 47,
+	"clips": [
+		{
+			"duration_s": 2.53333330154419,
+			"name": "Idle"
+		},
+		{
+			"duration_s": 1.36666667461395,
+			"name": "Walk"
+		},
+		{
+			"duration_s": 0.966666638851166,
+			"name": "Run"
+		},
+		{
+			"duration_s": 0.699999988079071,
+			"name": "Sprint"
+		},
+		{
+			"duration_s": 1.36666667461395,
+			"name": "Jump"
+		},
+		{
+			"duration_s": 2.53333330154419,
+			"name": "Fall"
+		},
+		{
+			"duration_s": 1.29999995231628,
+			"name": "Land"
+		},
+		{
+			"duration_s": 0.866666674613953,
+			"name": "Attack"
+		},
+		{
+			"duration_s": 2.96666669845581,
+			"name": "Talk"
+		}
+	],
+	"deformation_approved": false,
+	"engine": "4.7.2-stable (official)",
+	"frame_ms_median": 4.54545454545455,
+	"frame_ms_p95": 5.46296296296296,
+	"jump_height_m": 0.78082674741745,
+	"landed": true,
+	"renderer": "forward_plus",
+	"resolution": "(1920.0, 1080.0)",
+	"run_distance_m": 4.40000104904175,
+	"walk_distance_m": 0.824000298976898
+}

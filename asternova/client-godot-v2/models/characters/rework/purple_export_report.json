@@ -1,0 +1,13 @@
+{
+  "source": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\art\\characters\\purple\\rework\\purple_rework_working.blend",
+  "source_sha256": "4595df831ac731fd0f3a7b3de19ef67c9e3cefc0021341e2646870a18d42a920",
+  "source_unchanged": true,
+  "operation": "export",
+  "art_approved": false,
+  "result": {
+    "path": "C:\\Users\\TimeCraker\\Desktop\\my_workspace\\games\\asternova\\client-godot-v2\\models\\characters\\rework\\purple_static.glb",
+    "meshes": 15,
+    "sha256": "fcef912c2a8d2dcb5a7dd42faf56610de01d54bf2a92d931e19592477240390c"
+  },
+  "views": null
+}
