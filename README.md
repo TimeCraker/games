@@ -8,6 +8,12 @@
 
 *"Feel the impact, not the latency."*
 
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![Engine: Godot 4.7](https://img.shields.io/badge/Engine-Godot%204.7.2%20Forward%2B-478CBF.svg?style=flat-square&logo=godotengine&logoColor=white)](https://godotengine.org)
+[![Netcode: 60Hz Frame Sync](https://img.shields.io/badge/Netcode-60Hz%20Host%20Authoritative-2D5A88.svg?style=flat-square)](#架构)
+[![Target: Steam + WebGL](https://img.shields.io/badge/Target-Steam%20(Windows)%20%7C%20WebGL-CC785C.svg?style=flat-square)](#里程碑)
+
 [在线试玩（旧版）](https://asterforge.top/game) · [AsterForge](https://asterforge.top)
 
 </div>
